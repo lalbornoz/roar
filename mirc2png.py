@@ -129,19 +129,25 @@ class MiRCART:
                 self.inCurCol += 1; self.inCurUnderline = 0 if self.inCurUnderline else 1;
             elif char == " ":
                 if self.inCurBold:
-                    self.outImgDraw.rectangle(((self.outCurX, self.outCurY), (self.outCurX + 7, self.outCurY + 14)), fill=self.ColourMapBold[self.outCurColourBg])
+                    colourBg = self.ColourMapBold[self.outCurColourBg]
                 else:
-                    self.outImgDraw.rectangle(((self.outCurX, self.outCurY), (self.outCurX + 7, self.outCurY + 14)), fill=self.ColourMapNormal[self.outCurColourBg])
+                    colourBg = self.ColourMapNormal[self.outCurColourBg]
+                self.outImgDraw.rectangle(((self.outCurX, self.outCurY), (self.outCurX + 7, self.outCurY + 14)), fill=colourBg)
+                if self.inCurUnderline:
+                    self.outImgDraw.line((self.outCurX, self.outCurY + 11, self.outCurX + 7, self.outCurY + 11), fill=colourFg)
                 self.outCurX += 7; self.inCurCol += 1;
             else:
                 if self.inCurBold:
-                    self.outImgDraw.rectangle(((self.outCurX, self.outCurY), (self.outCurX + 7, self.outCurY + 14)), fill=self.ColourMapBold[self.outCurColourBg])
-                    # XXX implement italic, reverse, underline
-                    self.outImgDraw.text((self.outCurX, self.outCurY), char, self.ColourMapBold[self.outCurColourFg], self.outImgFont)
+                    colourBg = self.ColourMapBold[self.outCurColourBg]
+                    colourFg = self.ColourMapBold[self.outCurColourFg]
                 else:
-                    self.outImgDraw.rectangle(((self.outCurX, self.outCurY), (self.outCurX + 7, self.outCurY + 14)), fill=self.ColourMapNormal[self.outCurColourBg])
-                    # XXX implement italic, reverse, underline
-                    self.outImgDraw.text((self.outCurX, self.outCurY), char, self.ColourMapNormal[self.outCurColourFg], self.outImgFont)
+                    colourBg = self.ColourMapNormal[self.outCurColourBg]
+                    colourFg = self.ColourMapNormal[self.outCurColourFg]
+                self.outImgDraw.rectangle(((self.outCurX, self.outCurY), (self.outCurX + 7, self.outCurY + 14)), fill=colourBg)
+                # XXX implement italic, reverse
+                self.outImgDraw.text((self.outCurX, self.outCurY), char, colourFg, self.outImgFont)
+                if self.inCurUnderline:
+                    self.outImgDraw.line((self.outCurX, self.outCurY + 11, self.outCurX + 7, self.outCurY + 11), fill=colourFg)
                 self.outCurX += 7; self.inCurCol += 1;
     # }}}
     # {{{ Parse single character as mIRC colour control code sequence and mutate state
@@ -182,7 +188,7 @@ class MiRCART:
                     self.parseAsChar(self.inLines[inCurRow][self.inCurCol])
                 elif self.state == self.State.STATE_COLOUR_SPEC:
                     self.parseAsColourSpec(self.inLines[inCurRow][self.inCurCol])
-            self.outCurX = 0; self.outCurY += 14;
+            self.outCurX = 0; self.outCurY += 13;
         self.inFile.close();
         self.outImg.save(imgFilePath);
 
