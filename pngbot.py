@@ -86,7 +86,7 @@ class IrcBot:
 
 class IrcMiRCARTBot(IrcBot):
     """IRC<->MiRCART bot"""
-    clientLastMessage = clientChannel = None
+    clientChannelLastMessage = clientChannelOps = clientChannel = None
 
     # {{{ connect(): Connect to server and (re)initialise
     def connect(self):
@@ -94,7 +94,7 @@ class IrcMiRCARTBot(IrcBot):
         super().connect()
         print("Connected to {}:{}.".format(self.serverHname, self.serverPort))
         print("Registering on {}:{} as {}, {}, {}...".format(self.serverHname, self.serverPort, self.clientNick, self.clientIdent, self.clientGecos))
-        self.clientLastMessage = 0
+        self.clientLastMessage = 0; self.clientChannelOps = [];
     # }}}
     # {{{ dispatch(): Read, parse, and dispatch single line from server
     def dispatch(self):
@@ -107,10 +107,41 @@ class IrcMiRCARTBot(IrcBot):
                 print("Registered on {}:{} as {}, {}, {}.".format(self.serverHname, self.serverPort, self.clientNick, self.clientIdent, self.clientGecos))
                 print("Joining {} on {}:{}...".format(self.clientChannel, self.serverHname, self.serverPort))
                 self.sendline("JOIN", self.clientChannel)
+            elif serverMessage[1] == "353"                                  \
+            and  serverMessage[4].lower() == self.clientChannel.lower():
+                for channelNickSpec in serverMessage[5].split(" "):
+                    if  channelNickSpec[0] == "@"                           \
+                    and len(channelNickSpec[1:]):
+                        self.clientChannelOps.append(channelNickSpec[1:])
+                        print("Authorising {} on {}".format(channelNickSpec[1:], serverMessage[2]))
+            elif serverMessage[1] == "MODE"                                 \
+            and  serverMessage[2].lower() == self.clientChannel.lower():
+                channelModeType = "+"; channelModeArg = 4;
+                channelAuthAdd = ""; channelAuthDel = "";
+                for channelModeChar in serverMessage[3]:
+                    if channelModeChar[0] == "-":
+                        channelModeType = "-"
+                    elif channelModeChar[0] == "+":
+                        channelModeType = "+"
+                    elif channelModeChar[0].isalpha():
+                        if channelModeChar[0] == "o":
+                            if channelModeType == "+":
+                                channelAuthAdd = serverMessage[channelModeArg]; channelAuthDel = "";
+                            elif channelModeType == "-":
+                                channelAuthAdd = ""; channelAuthDel = serverMessage[channelModeArg];
+                        channelModeArg += 1
+                if  len(channelAuthAdd)                                     \
+                and channelAuthAdd not in self.clientChannelOps:
+                    print("Authorising {} on {}".format(channelAuthAdd, serverMessage[2]))
+                    self.clientChannelOps.append(channelAuthAdd)
+                elif len(channelAuthDel)                                    \
+                and  channelAuthDel in self.clientChannelOps:
+                    print("Deauthorising {} on {}".format(channelAuthDel, serverMessage[2]))
+                    self.clientChannelOps.remove(channelAuthDel)
             elif serverMessage[1] == "PING":
                 self.sendline("PONG", serverMessage[2])
-            elif serverMessage[1] == "PRIVMSG"                           \
-            and  serverMessage[2].lower() == self.clientChannel.lower()    \
+            elif serverMessage[1] == "PRIVMSG"                              \
+            and  serverMessage[2].lower() == self.clientChannel.lower()     \
             and  serverMessage[3].startswith("!pngbot "):
                 if (int(time.time()) - self.clientLastMessage) < 45:
                     continue
@@ -170,12 +201,12 @@ def main(*argv):
 if __name__ == "__main__":
     if ((len(sys.argv) - 1) < 1)\
     or ((len(sys.argv) - 1) > 4):
-        print("usage: {} "                                          \
-            "<IRC server hostname> "                                \
-            "[<IRC server port; defaults to 6667>] "                \
-            "[<IRC bot nick name; defaults to pngbot>] "            \
-            "[<IRC bot user name; defaults to pngbot>] "            \
-            "[<IRC bot real name; defaults to pngbot>] "            \
+        print("usage: {} "                                                  \
+            "<IRC server hostname> "                                        \
+            "[<IRC server port; defaults to 6667>] "                        \
+            "[<IRC bot nick name; defaults to pngbot>] "                    \
+            "[<IRC bot user name; defaults to pngbot>] "                    \
+            "[<IRC bot real name; defaults to pngbot>] "                    \
             "[<IRC bot channel name; defaults to #MiRCART>] ".format(sys.argv[0]), file=sys.stderr)
     else:
         main(*sys.argv)
