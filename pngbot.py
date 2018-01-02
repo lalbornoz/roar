@@ -115,8 +115,11 @@ def main(argv0, ircServerHname, ircServerPort="6667", ircClientNick="pngbot", ir
             _MiRCART = mirc2png.MiRCART(asciiTmpFilePath, imgTmpFilePath, "DejaVuSansMono.ttf", 11)
             imgurResponseHttp = requests.post("https://api.imgur.com/3/upload.json", data={"key":"c9a6efb3d7932fd", "image":base64.b64encode(open(imgTmpFilePath, "rb").read()), "type":"base64", "name":"tmp.png", "title":"tmp.png"}, headers={"Authorization": "Client-ID c9a6efb3d7932fd"})
             imgurResponse = json.loads(imgurResponseHttp.text)
-            imgurResponseUrl = imgurResponse.get("data").get("link")
-            _IrcBot.sendline("PRIVMSG", ircServerMessage[2], "Uploaded as {}".format(imgurResponseUrl))
+            if imgurResponse.status_code == 200:
+                    imgurResponseUrl = imgurResponse.get("data").get("link")
+                    _IrcBot.sendline("PRIVMSG", ircServerMessage[2], "8/!\\ Uploaded as: {}".format(imgurResponseUrl))
+            else:
+                    _IrcBot.sendline("PRIVMSG", ircServerMessage[2], "4/!\\ Uploaded failed with HTTP status code {}!".format(imgurResponse.status_code))
             os.remove(asciiTmpFilePath); os.remove(imgTmpFilePath);
 
 if __name__ == "__main__":
