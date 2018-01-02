@@ -116,6 +116,13 @@ class IrcMiRCARTBot(IrcBot):
                     self.clientChannelOps.append(channelNickSpec[1:].lower())
                     print("Authorising {} on {}".format(channelNickSpec[1:].lower(), message[4].lower()))
     # }}}
+    # {{{ dispatchKick(): Dispatch single KICK message from server
+    def dispatchKick(self, message):
+        if  message[2].lower() == self.clientChannel.lower()                    \
+        and message[3].lower() == self.clientNick.lower():
+            print("Kicked from {} by {}, rejoining".format(message[2].lower(), message[0]))
+            self.sendline("JOIN", message[2])
+    # }}}
     # {{{ dispatchMode(): Dispatch single MODE message from server
     def dispatchMode(self, message):
         if message[2].lower() == self.clientChannel.lower():
@@ -191,6 +198,8 @@ class IrcMiRCARTBot(IrcBot):
                 self.dispatch001(serverMessage)
             elif serverMessage[1] == "353":
                 self.dispatch353(serverMessage)
+            elif serverMessage[1] == "KICK":
+                self.dispatchKick(serverMessage)
             elif serverMessage[1] == "MODE":
                 self.dispatchMode(serverMessage)
             elif serverMessage[1] == "PING":
