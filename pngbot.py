@@ -26,7 +26,7 @@ from itertools import chain
 import base64
 import json
 import mirc2png
-import os, socket, sys
+import os, socket, sys, time
 import requests
 import urllib.request
 
@@ -92,6 +92,7 @@ def main(argv0, ircServerHname, ircServerPort="6667", ircClientNick="pngbot", ir
     print("Connected to {}:{}.".format(ircServerHname, ircServerPort))
     print("Registering on {}:{} as {}, {}, {}...".format(ircServerHname, ircServerPort, ircClientNick, ircClientIdent, ircClientGecos))
     while True:
+        ircClientLastMessage = int(time.time())
         ircServerMessage = _IrcBot.readline()
         if ircServerMessage == None:
             print("Disconnected from {}:{}.".format(ircServerHname, ircServerPort))
@@ -105,6 +106,10 @@ def main(argv0, ircServerHname, ircServerPort="6667", ircClientNick="pngbot", ir
         elif ircServerMessage[1] == "PRIVMSG"                           \
         and  ircServerMessage[2].lower() == ircClientChannel.lower()    \
         and  ircServerMessage[3].startswith("!pngbot "):
+            if (int(time.time()) - ircClientLastMessage) < 45:
+                continue
+            else:
+                ircClientLastMessage = int(time.time())
             asciiUrl = ircServerMessage[3].split(" ")[1]
             asciiTmpFilePath = "tmp.txt"; imgTmpFilePath = "tmp.png";
             if os.path.isfile(asciiTmpFilePath):
