@@ -118,7 +118,8 @@ class IrcMiRCARTBot(IrcBot):
     def dispatch353(self, message):
         if message[4].lower() == self.clientChannel.lower():
             for channelNickSpec in message[5].split(" "):
-                if  channelNickSpec[0] == "@"                               \
+                if  len(channelNickSpec)                                    \
+                and channelNickSpec[0] == "@"                               \
                 and len(channelNickSpec[1:]):
                     self.clientChannelOps.append(channelNickSpec[1:].lower())
                     print("Authorising {} on {}".format(channelNickSpec[1:].lower(), message[4].lower()))
