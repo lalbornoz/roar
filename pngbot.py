@@ -46,7 +46,8 @@ class IrcBot:
     # }}}
     # {{{ close(): Close connection to server
     def close(self):
-        self.clientSocket.close()
+        if self.clientSocket != None:
+            self.clientSocket.close()
         self.clientSocket = self.clientSocketFile = None;
     # }}}
     # {{{ readline(): Read and parse single line from server into canonicalised list
@@ -83,49 +84,69 @@ class IrcBot:
         self.clientNick = clientNick; self.clientIdent = clientIdent; self.clientGecos = clientGecos;
     # }}}
 
+class IrcMiRCARTBot(IrcBot):
+    """IRC<->MiRCART bot"""
+    clientLastMessage = clientChannel = None
+
+    # {{{ connect(): Connect to server and (re)initialise
+    def connect(self):
+        print("Connecting to {}:{}...".format(self.serverHname, self.serverPort))
+        super().connect()
+        print("Connected to {}:{}.".format(self.serverHname, self.serverPort))
+        print("Registering on {}:{} as {}, {}, {}...".format(self.serverHname, self.serverPort, self.clientNick, self.clientIdent, self.clientGecos))
+        self.clientLastMessage = 0
+    # }}}
+    # {{{ dispatch(): Read, parse, and dispatch single line from server
+    def dispatch(self):
+        while True:
+            serverMessage = self.readline()
+            if serverMessage == None:
+                print("Disconnected from {}:{}.".format(self.serverHname, self.serverPort))
+                self.close(); break;
+            elif serverMessage[1] == "001":
+                print("Registered on {}:{} as {}, {}, {}.".format(self.serverHname, self.serverPort, self.clientNick, self.clientIdent, self.clientGecos))
+                print("Joining {} on {}:{}...".format(self.clientChannel, self.serverHname, self.serverPort))
+                self.sendline("JOIN", self.clientChannel)
+            elif serverMessage[1] == "PING":
+                self.sendline("PONG", serverMessage[2])
+            elif serverMessage[1] == "PRIVMSG"                           \
+            and  serverMessage[2].lower() == self.clientChannel.lower()    \
+            and  serverMessage[3].startswith("!pngbot "):
+                if (int(time.time()) - self.clientLastMessage) < 45:
+                    continue
+                else:
+                    self.clientLastMessage = int(time.time())
+                asciiUrl = serverMessage[3].split(" ")[1]
+                asciiTmpFilePath = "tmp.txt"; imgTmpFilePath = "tmp.png";
+                if os.path.isfile(asciiTmpFilePath):
+                    os.remove(asciiTmpFilePath)
+                if os.path.isfile(imgTmpFilePath):
+                    os.remove(imgTmpFilePath)
+                urllib.request.urlretrieve(asciiUrl, asciiTmpFilePath)
+                _MiRCART = mirc2png.MiRCART(asciiTmpFilePath, imgTmpFilePath, "DejaVuSansMono.ttf", 11)
+                imgurResponseHttp = requests.post("https://api.imgur.com/3/upload.json", data={"key":"c9a6efb3d7932fd", "image":base64.b64encode(open(imgTmpFilePath, "rb").read()), "type":"base64", "name":"tmp.png", "title":"tmp.png"}, headers={"Authorization": "Client-ID c9a6efb3d7932fd"})
+                imgurResponse = json.loads(imgurResponseHttp.text)
+                if imgurResponseHttp.status_code == 200:
+                        imgurResponseUrl = imgurResponse.get("data").get("link")
+                        self.sendline("PRIVMSG", serverMessage[2], "8/!\\ Uploaded as: {}".format(imgurResponseUrl))
+                else:
+                        self.sendline("PRIVMSG", serverMessage[2], "4/!\\ Uploaded failed with HTTP status code {}!".format(imgurResponseHttp.status_code))
+                os.remove(asciiTmpFilePath); os.remove(imgTmpFilePath);
+    # }}}
+    # {{{ Initialisation method
+    def __init__(self, serverHname, serverPort="6667", clientNick="pngbot", clientIdent="pngbot", clientGecos="pngbot", clientChannel="#MiRCART"):
+        super().__init__(serverHname, serverPort, clientNick, clientIdent, clientGecos)
+        self.clientChannel = clientChannel
+    # }}}
+
 #
 # Entry point
-def main(argv0, ircServerHname, ircServerPort="6667", ircClientNick="pngbot", ircClientIdent="pngbot", ircClientGecos="pngbot", ircClientChannel="#MiRCART"):
-    _IrcBot = IrcBot(ircServerHname, ircServerPort, ircClientNick, ircClientIdent, ircClientGecos)
-    print("Connecting to {}:{}...".format(ircServerHname, ircServerPort))
-    _IrcBot.connect()
-    print("Connected to {}:{}.".format(ircServerHname, ircServerPort))
-    print("Registering on {}:{} as {}, {}, {}...".format(ircServerHname, ircServerPort, ircClientNick, ircClientIdent, ircClientGecos))
+def main(*argv):
+    _IrcMiRCARTBot = IrcMiRCARTBot(*argv[1:])
     while True:
-        ircClientLastMessage = int(time.time())
-        ircServerMessage = _IrcBot.readline()
-        if ircServerMessage == None:
-            print("Disconnected from {}:{}.".format(ircServerHname, ircServerPort))
-            _IrcBot.close(); break;
-        elif ircServerMessage[1] == "001":
-            print("Registered on {}:{} as {}, {}, {}.".format(ircServerHname, ircServerPort, ircClientNick, ircClientIdent, ircClientGecos))
-            print("Joining {} on {}:{}...".format(ircClientChannel, ircServerHname, ircServerPort))
-            _IrcBot.sendline("JOIN", ircClientChannel)
-        elif ircServerMessage[1] == "PING":
-            _IrcBot.sendline("PONG", ircServerMessage[2])
-        elif ircServerMessage[1] == "PRIVMSG"                           \
-        and  ircServerMessage[2].lower() == ircClientChannel.lower()    \
-        and  ircServerMessage[3].startswith("!pngbot "):
-            if (int(time.time()) - ircClientLastMessage) < 45:
-                continue
-            else:
-                ircClientLastMessage = int(time.time())
-            asciiUrl = ircServerMessage[3].split(" ")[1]
-            asciiTmpFilePath = "tmp.txt"; imgTmpFilePath = "tmp.png";
-            if os.path.isfile(asciiTmpFilePath):
-                os.remove(asciiTmpFilePath)
-            if os.path.isfile(imgTmpFilePath):
-                os.remove(imgTmpFilePath)
-            urllib.request.urlretrieve(asciiUrl, asciiTmpFilePath)
-            _MiRCART = mirc2png.MiRCART(asciiTmpFilePath, imgTmpFilePath, "DejaVuSansMono.ttf", 11)
-            imgurResponseHttp = requests.post("https://api.imgur.com/3/upload.json", data={"key":"c9a6efb3d7932fd", "image":base64.b64encode(open(imgTmpFilePath, "rb").read()), "type":"base64", "name":"tmp.png", "title":"tmp.png"}, headers={"Authorization": "Client-ID c9a6efb3d7932fd"})
-            imgurResponse = json.loads(imgurResponseHttp.text)
-            if imgurResponse.status_code == 200:
-                    imgurResponseUrl = imgurResponse.get("data").get("link")
-                    _IrcBot.sendline("PRIVMSG", ircServerMessage[2], "8/!\\ Uploaded as: {}".format(imgurResponseUrl))
-            else:
-                    _IrcBot.sendline("PRIVMSG", ircServerMessage[2], "4/!\\ Uploaded failed with HTTP status code {}!".format(imgurResponse.status_code))
-            os.remove(asciiTmpFilePath); os.remove(imgTmpFilePath);
+        _IrcMiRCARTBot.connect()
+        _IrcMiRCARTBot.dispatch()
+        _IrcMiRCARTBot.close()
 
 if __name__ == "__main__":
     if ((len(sys.argv) - 1) < 1)\
