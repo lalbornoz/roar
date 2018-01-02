@@ -110,11 +110,11 @@ class IrcMiRCARTBot(IrcBot):
     # {{{ dispatch353(): Dispatch single 353 (RPL_NAMREPLY)
     def dispatch353(self, message):
         if message[4].lower() == self.clientChannel.lower():
-                for channelNickSpec in message[5].split(" "):
-                    if  channelNickSpec[0] == "@"                           \
-                    and len(channelNickSpec[1:]):
-                        self.clientChannelOps.append(channelNickSpec[1:].lower())
-                        print("Authorising {} on {}".format(channelNickSpec[1:].lower(), message[4].lower()))
+            for channelNickSpec in message[5].split(" "):
+                if  channelNickSpec[0] == "@"                               \
+                and len(channelNickSpec[1:]):
+                    self.clientChannelOps.append(channelNickSpec[1:].lower())
+                    print("Authorising {} on {}".format(channelNickSpec[1:].lower(), message[4].lower()))
     # }}}
     # {{{ dispatchMode(): Dispatch single MODE message from server
     def dispatchMode(self, message):
