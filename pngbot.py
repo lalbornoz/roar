@@ -50,9 +50,14 @@ class IrcBot:
             self.clientSocket.close()
         self.clientSocket = self.clientSocketFile = None;
     # }}}
-    # {{{ readline(): Read and parse single line from server into canonicalised list
-    def readline(self):
-        msg = self.clientSocketFile.readline()
+    # {{{ readline(): Read and parse single line from server into canonicalised list w/ optional timeout
+    def readline(self, timeout=0):
+        if timeout:
+            self.clientSocket.settimeout(timeout)
+        try:
+            msg = self.clientSocketFile.readline()
+        except TimeoutException:
+            return "TIMEOUT"
         if len(msg):
             msg = msg.rstrip("\r\n")
         else:
@@ -87,6 +92,7 @@ class IrcBot:
 class IrcMiRCARTBot(IrcBot):
     """IRC<->MiRCART bot"""
     clientChannelLastMessage = clientChannelOps = clientChannel = None
+    clientChannelRejoinTimerNext = clientChannelRejoin = None
 
     # {{{ connect(): Connect to server and (re)initialise
     def connect(self):
@@ -95,6 +101,7 @@ class IrcMiRCARTBot(IrcBot):
         print("Connected to {}:{}.".format(self.serverHname, self.serverPort))
         print("Registering on {}:{} as {}, {}, {}...".format(self.serverHname, self.serverPort, self.clientNick, self.clientIdent, self.clientGecos))
         self.clientLastMessage = 0; self.clientChannelOps = [];
+        clientChannelRejoinTimerNext = 0; self.clientChannelRejoin = False;
     # }}}
     # {{{ dispatchNone(): Dispatch None message from server
     def dispatchNone(self):
@@ -104,7 +111,7 @@ class IrcMiRCARTBot(IrcBot):
     # {{{ dispatch001(): Dispatch single 001 (RPL_WELCOME)
     def dispatch001(self, message):
         print("Registered on {}:{} as {}, {}, {}.".format(self.serverHname, self.serverPort, self.clientNick, self.clientIdent, self.clientGecos))
-        print("Joining {} on {}:{}...".format(self.clientChannel, self.serverHname, self.serverPort))
+        print("Attempting to join {} on {}:{}...".format(self.clientChannel, self.serverHname, self.serverPort))
         self.sendline("JOIN", self.clientChannel)
     # }}}
     # {{{ dispatch353(): Dispatch single 353 (RPL_NAMREPLY)
@@ -116,12 +123,17 @@ class IrcMiRCARTBot(IrcBot):
                     self.clientChannelOps.append(channelNickSpec[1:].lower())
                     print("Authorising {} on {}".format(channelNickSpec[1:].lower(), message[4].lower()))
     # }}}
+    # {{{ dispatchJoin(): Dispatch single JOIN message from server
+    def dispatchJoin(self, message):
+        print("Joined {} on {}:{}.".format(message[2].lower(), self.serverHname, self.serverPort))
+        self.clientChannelRejoinTimerNext = 0; self.clientChannelRejoin = False;
+    # }}}
     # {{{ dispatchKick(): Dispatch single KICK message from server
     def dispatchKick(self, message):
         if  message[2].lower() == self.clientChannel.lower()                    \
         and message[3].lower() == self.clientNick.lower():
-            print("Kicked from {} by {}, rejoining".format(message[2].lower(), message[0]))
-            self.sendline("JOIN", message[2])
+            print("Kicked from {} by {}, rejoining in 15 seconds".format(message[2].lower(), message[0]))
+            self.clientChannelRejoinTimerNext = time.time() + 15; self.clientChannelRejoin = True;
     # }}}
     # {{{ dispatchMode(): Dispatch single MODE message from server
     def dispatchMode(self, message):
@@ -188,16 +200,32 @@ class IrcMiRCARTBot(IrcBot):
             if os.path.isfile(imgTmpFilePath):
                 os.remove(imgTmpFilePath)
     # }}}
+    # {{{ dispatchTimer(): Dispatch single client timer expiration
+    def dispatchTimer(self):
+        if self.clientChannelRejoin:
+            print("Attempting to join {} on {}:{}...".format(self.clientChannel, self.serverHname, self.serverPort))
+            self.sendline("JOIN", self.clientChannel)
+            self.clientChannelRejoinTimerNext = time.time() + 15; self.clientChannelRejoin = True;
+    # }}}
     # {{{ dispatch(): Read, parse, and dispatch single line from server
     def dispatch(self):
         while True:
-            serverMessage = self.readline()
+            clientTimerNextDelta = 0
+            if self.clientChannelRejoinTimerNext:
+                timeNow = time.time()
+                if self.clientChannelRejoinTimerNext > timeNow:
+                    clientTimerNextDelta = self.clientChannelRejoinTimerNext - timeNow
+            serverMessage = self.readline(clientTimerNextDelta)
             if serverMessage == None:
                 self.dispatchNone(); break;
+            elif serverMessage == "TIMEOUT":
+                self.dispatchTimer()
             elif serverMessage[1] == "001":
                 self.dispatch001(serverMessage)
             elif serverMessage[1] == "353":
                 self.dispatch353(serverMessage)
+            elif serverMessage[1] == "JOIN":
+                self.dispatchJoin(serverMessage)
             elif serverMessage[1] == "KICK":
                 self.dispatchKick(serverMessage)
             elif serverMessage[1] == "MODE":
