@@ -114,7 +114,7 @@ class IrcMiRCARTBot(IrcBot):
                     if  channelNickSpec[0] == "@"                           \
                     and len(channelNickSpec[1:]):
                         self.clientChannelOps.append(channelNickSpec[1:].lower())
-                        print("Authorising {} on {}".format(channelNickSpec[1:].lower(), message[2].lower()))
+                        print("Authorising {} on {}".format(channelNickSpec[1:].lower(), message[4].lower()))
     # }}}
     # {{{ dispatchMode(): Dispatch single MODE message from server
     def dispatchMode(self, message):
