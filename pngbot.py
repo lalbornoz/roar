@@ -102,8 +102,8 @@ def main(argv0, ircServerHname, ircServerPort="6667", ircClientNick="pngbot", ir
             _IrcBot.sendline("JOIN", ircClientChannel)
         elif ircServerMessage[1] == "PING":
             _IrcBot.sendline("PONG", ircServerMessage[2])
-        elif ircServerMessage[1] == "PRIVMSG"           \
-        and  ircServerMessage[2] == ircClientChannel    \
+        elif ircServerMessage[1] == "PRIVMSG"                           \
+        and  ircServerMessage[2].lower() == ircClientChannel.lower()    \
         and  ircServerMessage[3].startswith("!pngbot "):
             asciiUrl = ircServerMessage[3].split(" ")[1]
             asciiTmpFilePath = "tmp.txt"; imgTmpFilePath = "tmp.png";
