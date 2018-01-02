@@ -194,15 +194,15 @@ class MiRCART:
 
 #
 # Entry point
-def main(argv0, inFilePath, imgFilePath, fontFilePath, fontSize=11):
+def main(argv0, inFilePath, imgFilePath, fontFilePath="DejaVuSansMono.ttf", fontSize=11):
     _MiRCART = MiRCART(inFilePath, imgFilePath, fontFilePath, fontSize)
 if __name__ == "__main__":
-    if ((len(sys.argv) - 1) < 3)\
+    if ((len(sys.argv) - 1) < 2)\
     or ((len(sys.argv) - 1) > 4):
-        print("usage: {} "                      \
-            "<MiRCART input file pathname> "    \
-            "<PNG image output file pathname> " \
-            "<Font file pathnane> "             \
+        print("usage: {} "                                              \
+            "<MiRCART input file pathname> "                            \
+            "<PNG image output file pathname> "                         \
+            "[<Font file pathname; defaults to DejaVuSansMono.ttf>] "   \
             "[<Font size; defaults to 11>]".format(sys.argv[0]), file=sys.stderr)
     else:
         main(*sys.argv)
