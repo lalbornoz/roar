@@ -165,7 +165,7 @@ class MiRCART:
                 self.inCurColourSpec = ""; self.state = self.State.STATE_CHAR;
     # }}}
     # {{{ Initialisation method
-    def __init__(self, inFilePath, imgFilePath, fontFilePath, fontSize):
+    def __init__(self, inFilePath, imgFilePath, fontFilePath="DejaVuSansMono.ttf", fontSize=11):
         self.inFilePath = inFilePath; self.inFile = open(inFilePath, "r");
         self.inLines = self.inFile.readlines()
         self.inColsMax = self.getMaxCols(self.inLines)
@@ -192,8 +192,8 @@ class MiRCART:
 
 #
 # Entry point
-def main(argv0, inFilePath, imgFilePath, fontFilePath="DejaVuSansMono.ttf", fontSize=11):
-    _MiRCART = MiRCART(inFilePath, imgFilePath, fontFilePath, fontSize)
+def main(*argv):
+    _MiRCART = MiRCART(*argv[1:])
 if __name__ == "__main__":
     if ((len(sys.argv) - 1) < 2)\
     or ((len(sys.argv) - 1) > 4):
