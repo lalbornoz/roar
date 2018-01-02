@@ -56,7 +56,7 @@ class IrcBot:
             self.clientSocket.settimeout(timeout)
         try:
             msg = self.clientSocketFile.readline()
-        except TimeoutException:
+        except socket.timeout:
             return "TIMEOUT"
         if len(msg):
             msg = msg.rstrip("\r\n")
