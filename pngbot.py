@@ -124,14 +124,33 @@ class IrcMiRCARTBot(IrcBot):
                     os.remove(imgTmpFilePath)
                 urllib.request.urlretrieve(asciiUrl, asciiTmpFilePath)
                 _MiRCART = mirc2png.MiRCART(asciiTmpFilePath, imgTmpFilePath, "DejaVuSansMono.ttf", 11)
-                imgurResponseHttp = requests.post("https://api.imgur.com/3/upload.json", data={"key":"c9a6efb3d7932fd", "image":base64.b64encode(open(imgTmpFilePath, "rb").read()), "type":"base64", "name":"tmp.png", "title":"tmp.png"}, headers={"Authorization": "Client-ID c9a6efb3d7932fd"})
-                imgurResponse = json.loads(imgurResponseHttp.text)
-                if imgurResponseHttp.status_code == 200:
-                        imgurResponseUrl = imgurResponse.get("data").get("link")
-                        self.sendline("PRIVMSG", serverMessage[2], "8/!\\ Uploaded as: {}".format(imgurResponseUrl))
+                imgurResponse = self.uploadToImgur(imgTmpFilePath, "MiRCART image", "MiRCART image", "c9a6efb3d7932fd")
+                if imgurResponse[0] == 200:
+                        self.sendline("PRIVMSG", serverMessage[2], "8/!\\ Uploaded as: {}".format(imgurResponse[1]))
                 else:
-                        self.sendline("PRIVMSG", serverMessage[2], "4/!\\ Uploaded failed with HTTP status code {}!".format(imgurResponseHttp.status_code))
-                os.remove(asciiTmpFilePath); os.remove(imgTmpFilePath);
+                        self.sendline("PRIVMSG", serverMessage[2], "4/!\\ Uploaded failed with HTTP status code {}!".format(imgurResponse[0]))
+                if os.path.isfile(asciiTmpFilePath):
+                    os.remove(asciiTmpFilePath)
+                if os.path.isfile(imgTmpFilePath):
+                    os.remove(imgTmpFilePath)
+    # }}}
+    # {{{ uploadToImgur(): Upload single file to Imgur
+    def uploadToImgur(self, imgFilePath, imgName, imgTitle, apiKey):
+        requestImageData = open(imgFilePath, "rb").read()
+        requestData = {                                     \
+            "image": base64.b64encode(requestImageData),    \
+            "key":   apiKey,                                \
+            "name":  imgName,                               \
+            "title": imgTitle,                              \
+            "type":  "base64"}
+        requestHeaders = {                                  \
+            "Authorization": "Client-ID " + apiKey}
+        responseHttp = requests.post("https://api.imgur.com/3/upload.json", data=requestData, headers=requestHeaders)
+        responseDict = json.loads(responseHttp.text)
+        if responseHttp.status_code == 200:
+                return [200, responseDict.get("data").get("link")]
+        else:
+                return [responseHttp.status_code]
     # }}}
     # {{{ Initialisation method
     def __init__(self, serverHname, serverPort="6667", clientNick="pngbot", clientIdent="pngbot", clientGecos="pngbot", clientChannel="#MiRCART"):
