@@ -112,8 +112,8 @@ class IrcMiRCARTBot(IrcBot):
                 for channelNickSpec in serverMessage[5].split(" "):
                     if  channelNickSpec[0] == "@"                           \
                     and len(channelNickSpec[1:]):
-                        self.clientChannelOps.append(channelNickSpec[1:])
-                        print("Authorising {} on {}".format(channelNickSpec[1:], serverMessage[2]))
+                        self.clientChannelOps.append(channelNickSpec[1:].lower())
+                        print("Authorising {} on {}".format(channelNickSpec[1:].lower(), serverMessage[2].lower()))
             elif serverMessage[1] == "MODE"                                 \
             and  serverMessage[2].lower() == self.clientChannel.lower():
                 channelModeType = "+"; channelModeArg = 4;
@@ -132,11 +132,13 @@ class IrcMiRCARTBot(IrcBot):
                         channelModeArg += 1
                 if  len(channelAuthAdd)                                     \
                 and channelAuthAdd not in self.clientChannelOps:
-                    print("Authorising {} on {}".format(channelAuthAdd, serverMessage[2]))
+                    channelAuthAdd = channelAuthAdd.lower()
+                    print("Authorising {} on {}".format(channelAuthAdd, serverMessage[2].lower()))
                     self.clientChannelOps.append(channelAuthAdd)
                 elif len(channelAuthDel)                                    \
                 and  channelAuthDel in self.clientChannelOps:
-                    print("Deauthorising {} on {}".format(channelAuthDel, serverMessage[2]))
+                    channelAuthDel = channelAuthDel.lower()
+                    print("Deauthorising {} on {}".format(channelAuthDel, serverMessage[2].lower()))
                     self.clientChannelOps.remove(channelAuthDel)
             elif serverMessage[1] == "PING":
                 self.sendline("PONG", serverMessage[2])
@@ -144,8 +146,13 @@ class IrcMiRCARTBot(IrcBot):
             and  serverMessage[2].lower() == self.clientChannel.lower()     \
             and  serverMessage[3].startswith("!pngbot "):
                 if (int(time.time()) - self.clientLastMessage) < 45:
+                    print("Ignoring request on {} from {} due to rate limit: {}".format(serverMessage[2].lower(), serverMessage[0], serverMessage[3]))
+                    continue
+                elif serverMessage[0].split("!")[0].lower() not in self.clientChannelOps:
+                    print("Ignoring request on {} from {} due to lack of authorisation: {}".format(serverMessage[2].lower(), serverMessage[0], serverMessage[3]))
                     continue
                 else:
+                    print("Processing request on {} from {}: {}".format(serverMessage[2].lower(), serverMessage[0], serverMessage[3]))
                     self.clientLastMessage = int(time.time())
                 asciiUrl = serverMessage[3].split(" ")[1]
                 asciiTmpFilePath = "tmp.txt"; imgTmpFilePath = "tmp.png";
@@ -157,8 +164,10 @@ class IrcMiRCARTBot(IrcBot):
                 _MiRCART = mirc2png.MiRCART(asciiTmpFilePath, imgTmpFilePath, "DejaVuSansMono.ttf", 11)
                 imgurResponse = self.uploadToImgur(imgTmpFilePath, "MiRCART image", "MiRCART image", "c9a6efb3d7932fd")
                 if imgurResponse[0] == 200:
+                        print("Uploaded as: {}".format(imgurResponse[1]))
                         self.sendline("PRIVMSG", serverMessage[2], "8/!\\ Uploaded as: {}".format(imgurResponse[1]))
                 else:
+                        print("Upload failed with HTTP status code {}".format(imgurResponse[0]))
                         self.sendline("PRIVMSG", serverMessage[2], "4/!\\ Uploaded failed with HTTP status code {}!".format(imgurResponse[0]))
                 if os.path.isfile(asciiTmpFilePath):
                     os.remove(asciiTmpFilePath)
