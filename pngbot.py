@@ -65,7 +65,7 @@ class IrcBot:
         if msg[0][0] == ':':
             msg = [msg[0][1:]] + msg[1:]
         else:
-            msg = [""] + msg[1:]
+            msg = [""] + msg[0:]
         return msg
     # }}}
     # {{{ sendline(): Parse and send single line to server from list
