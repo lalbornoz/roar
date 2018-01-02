@@ -28,8 +28,20 @@ import string, sys
 
 class MiRCART:
     """Abstraction over ASCIIs containing mIRC control codes"""
+    inFilePath = inFile = None;
+    inLines = inColsMax = inRows = None;
 
-    # {{{ mIRC colour number to RGBA map given ^B (bold)
+    outFontFilePath = outFontSize = None;
+    outImg = outImgDraw = outImgFont = None;
+    outCurColourBg = outCurColourFg = None;
+    outCurX = outCurY = None;
+
+    inCurBold = inCurItalic = inCurReverse = inCurUnderline = None;
+    inCurColourSpec = None;
+    state = None;
+    inCurCol = None;
+
+    # {{{ ColourMapBold: mIRC colour number to RGBA map given ^B (bold)
     ColourMapBold = [
         (255, 255, 255, 255),   # White
         (85,  85,  85,  255),   # Grey
@@ -49,7 +61,7 @@ class MiRCART:
         (255, 255, 255, 255),   # White
     ]
     # }}}
-    # {{{ mIRC colour number to RGBA map given none of ^[BFV_] (bold, italic, reverse, underline)
+    # {{{ ColourMapNormal: mIRC colour number to RGBA map given none of ^[BFV_] (bold, italic, reverse, underline)
     ColourMapNormal = [
         (255, 255, 255, 255),   # White
         (0,   0,   0,   255),   # Black
@@ -69,26 +81,13 @@ class MiRCART:
         (187, 187, 187, 255),   # Light Grey
     ]
     # }}}
-    # {{{ Parsing loop state
+    # {{{ State: Parsing loop state
     class State(Enum):
         STATE_CHAR = 1
         STATE_COLOUR_SPEC = 2
     # }}}
 
-    inFilePath = inFile = None;
-    inLines = inColsMax = inRows = None;
-
-    outFontFilePath = outFontSize = None;
-    outImg = outImgDraw = outImgFont = None;
-    outCurColourBg = outCurColourFg = None;
-    outCurX = outCurY = None;
-
-    inCurBold = inCurItalic = inCurReverse = inCurUnderline = None;
-    inCurColourSpec = None;
-    state = None;
-    inCurCol = None;
-
-    # {{{ Calculate widest row in lines, ignoring non-printable & mIRC control code sequences
+    # {{{ getMaxCols(): Calculate widest row in lines, ignoring non-printable & mIRC control code sequences
     def getMaxCols(self, lines):
         maxCols = 0;
         for curRow in range(0, len(lines)):
@@ -111,7 +110,7 @@ class MiRCART:
             maxCols = max(maxCols, curRowCols)
         return maxCols
     # }}}
-    # {{{ Parse single character as regular character and mutate state
+    # {{{ parseAsChar(): Parse single character as regular character and mutate state
     def parseAsChar(self, char):
             if char == "":
                 self.inCurCol += 1; self.inCurBold = 0 if self.inCurBold else 1;
@@ -150,7 +149,7 @@ class MiRCART:
                     self.outImgDraw.line((self.outCurX, self.outCurY + 11, self.outCurX + 7, self.outCurY + 11), fill=colourFg)
                 self.outCurX += 7; self.inCurCol += 1;
     # }}}
-    # {{{ Parse single character as mIRC colour control code sequence and mutate state
+    # {{{ parseAsColourSpec(): Parse single character as mIRC colour control code sequence and mutate state
     def parseAsColourSpec(self, char):
             if char in set(",0123456789"):
                 self.inCurColourSpec += char; self.inCurCol += 1;
@@ -165,9 +164,7 @@ class MiRCART:
                     self.outCurColourBg = 1; self.outCurColourFg = 15;
                 self.inCurColourSpec = ""; self.state = self.State.STATE_CHAR;
     # }}}
-
-    #
-    # Initialisation method
+    # {{{ Initialisation method
     def __init__(self, inFilePath, imgFilePath, fontFilePath, fontSize):
         self.inFilePath = inFilePath; self.inFile = open(inFilePath, "r");
         self.inLines = self.inFile.readlines()
@@ -191,6 +188,7 @@ class MiRCART:
             self.outCurX = 0; self.outCurY += 13;
         self.inFile.close();
         self.outImg.save(imgFilePath);
+    # }}}
 
 #
 # Entry point
