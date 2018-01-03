@@ -114,6 +114,7 @@ class IrcClient:
                 msgBytesSent = self.clientSocket.send(msg)
                 msg = msg[msgBytesSent:]; msgLen -= msgBytesSent;
             del self.clientQueue[0]
+    # }}}
 
     #
     # Initialisation method
