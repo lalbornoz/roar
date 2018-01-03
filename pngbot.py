@@ -24,22 +24,29 @@
 
 from itertools import chain
 import base64
+import errno, os, select, socket, sys, time
 import json
 import mirc2png
-import os, socket, sys, time
-import requests
-import urllib.request
+import requests, urllib.request
 
 class IrcBot:
-    """Blocking abstraction over the IRC protocol"""
+    """Non-blocking abstraction over the IRC protocol"""
     serverHname = serverPort = None;
     clientNick = clientIdent = clientGecos = None;
     clientSocket = clientSocketFile = None;
 
-    # {{{ connect(): Connect to server and register
-    def connect(self):
+    # {{{ connect(): Connect to server and register w/ optional timeout
+    def connect(self, timeout=None):
         self.clientSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.clientSocket.connect((self.serverHname, int(self.serverPort)))
+        self.clientSocket.setblocking(0)
+        try:
+            self.clientSocket.connect((self.serverHname, int(self.serverPort)))
+        except BlockingIOError:
+            pass
+        if timeout:
+            select.select([], [self.clientSocket.fileno()], [], timeout)
+        else:
+            select.select([], [self.clientSocket.fileno()], [])
         self.clientSocketFile = self.clientSocket.makefile()
         self.sendline("NICK", self.clientNick)
         self.sendline("USER", self.clientIdent, "0", "0", self.clientGecos)
@@ -51,13 +58,12 @@ class IrcBot:
         self.clientSocket = self.clientSocketFile = None;
     # }}}
     # {{{ readline(): Read and parse single line from server into canonicalised list w/ optional timeout
-    def readline(self, timeout=0):
+    def readline(self, timeout=None):
         if timeout:
-            self.clientSocket.settimeout(timeout)
-        try:
-            msg = self.clientSocketFile.readline()
-        except socket.timeout:
-            return "TIMEOUT"
+            select.select([self.clientSocket.fileno()], [], [], timeout)
+        else:
+            select.select([self.clientSocket.fileno()], [], [])
+        msg = self.clientSocketFile.readline()
         if len(msg):
             msg = msg.rstrip("\r\n")
         else:
@@ -73,15 +79,24 @@ class IrcBot:
             msg = [""] + msg[0:]
         return msg
     # }}}
-    # {{{ sendline(): Parse and send single line to server from list
-    def sendline(self, *args):
+    # {{{ sendline(): Parse and send single line to server from list w/ optional timeout
+    def sendline(self, *args, timeout=None):
         msg = ""; argNumMax = len(args);
         for argNum in range(0, argNumMax):
             if argNum == (argNumMax - 1):
                 msg += ":" + args[argNum]
             else:
                 msg += args[argNum] + " "
-        return self.clientSocket.send((msg + "\r\n").encode())
+        msg = (msg + "\r\n").encode(); msgLen = len(msg); msgBytesSent = 0;
+        while msgBytesSent < msgLen:
+            if timeout:
+                timeLast = time.time()
+                select.select([], [self.clientSocket.fileno()], [], timeout)
+                timeNow = time.time(); timeout -= timeNow - timeLast;
+            else:
+                select.select([], [self.clientSocket.fileno()], [])
+            msgBytesSent = self.clientSocket.send(msg)
+            msg = msg[msgBytesSent:]; msgLen -= msgBytesSent;
     # }}}
     # {{{ Initialisation method
     def __init__(self, serverHname, serverPort, clientNick, clientIdent, clientGecos):
@@ -94,10 +109,10 @@ class IrcMiRCARTBot(IrcBot):
     clientChannelLastMessage = clientChannelOps = clientChannel = None
     clientChannelRejoinTimerNext = clientChannelRejoin = None
 
-    # {{{ connect(): Connect to server and (re)initialise
-    def connect(self):
+    # {{{ connect(): Connect to server and (re)initialise w/ optional timeout
+    def connect(self, timeout=None):
         print("Connecting to {}:{}...".format(self.serverHname, self.serverPort))
-        super().connect()
+        super().connect(timeout)
         print("Connected to {}:{}.".format(self.serverHname, self.serverPort))
         print("Registering on {}:{} as {}, {}, {}...".format(self.serverHname, self.serverPort, self.clientNick, self.clientIdent, self.clientGecos))
         self.clientLastMessage = 0; self.clientChannelOps = [];
@@ -216,11 +231,13 @@ class IrcMiRCARTBot(IrcBot):
                 timeNow = time.time()
                 if self.clientChannelRejoinTimerNext > timeNow:
                     clientTimerNextDelta = self.clientChannelRejoinTimerNext - timeNow
+            if clientTimerNextDelta:
+                timeNow = time.time()
+                if self.clientChannelRejoinTimerNext <= timeNow:
+                    self.dispatchTimer()
             serverMessage = self.readline(clientTimerNextDelta)
             if serverMessage == None:
                 self.dispatchNone(); break;
-            elif serverMessage == "TIMEOUT":
-                self.dispatchTimer()
             elif serverMessage[1] == "001":
                 self.dispatch001(serverMessage)
             elif serverMessage[1] == "353":
@@ -265,7 +282,7 @@ class IrcMiRCARTBot(IrcBot):
 def main(*argv):
     _IrcMiRCARTBot = IrcMiRCARTBot(*argv[1:])
     while True:
-        _IrcMiRCARTBot.connect()
+        _IrcMiRCARTBot.connect(15)
         _IrcMiRCARTBot.dispatch()
         _IrcMiRCARTBot.close()
 
