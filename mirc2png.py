@@ -36,7 +36,7 @@ class MiRCART:
     outCurColourBg = outCurColourFg = None;
     outCurX = outCurY = None;
 
-    inCurBold = inCurItalic = inCurReverse = inCurUnderline = None;
+    inCurBold = inCurItalic = inCurUnderline = None;
     inCurColourSpec = None;
     state = None;
     inCurCol = None;
@@ -120,10 +120,11 @@ class MiRCART:
                 self.inCurCol += 1; self.inCurItalic = 0 if self.inCurItalic else 1;
             elif char == "":
                 self.inCurCol += 1;
-                self.inCurBold = 0; self.inCurItalic = 0; self.inCurReverse = 0; self.inCurUnderline = 0;
+                self.inCurBold = 0; self.inCurItalic = 0; self.inCurUnderline = 0;
                 self.inCurColourSpec = "";
             elif char == "":
-                self.inCurCol += 1; self.inCurReverse = 0 if self.inCurReverse else 1;
+                self.inCurCol += 1
+                self.outCurColourBg, self.outCurColourFg = self.outCurColourFg, self.outCurColourBg;
             elif char == "":
                 self.inCurCol += 1; self.inCurUnderline = 0 if self.inCurUnderline else 1;
             elif char == " ":
@@ -143,7 +144,7 @@ class MiRCART:
                     colourBg = self.ColourMapNormal[self.outCurColourBg]
                     colourFg = self.ColourMapNormal[self.outCurColourFg]
                 self.outImgDraw.rectangle(((self.outCurX, self.outCurY), (self.outCurX + 7, self.outCurY + 14)), fill=colourBg)
-                # XXX implement italic, reverse
+                # XXX implement italic
                 self.outImgDraw.text((self.outCurX, self.outCurY), char, colourFg, self.outImgFont)
                 if self.inCurUnderline:
                     self.outImgDraw.line((self.outCurX, self.outCurY + 11, self.outCurX + 7, self.outCurY + 11), fill=colourFg)
@@ -177,7 +178,7 @@ class MiRCART:
         self.outCurColourBg = 1; self.outCurColourFg = 15;
         self.outCurX = 0; self.outCurY = 0;
         for inCurRow in range(0, len(self.inLines)):
-            self.inCurBold = 0; self.inCurItalic = 0; self.inCurReverse = 0; self.inCurUnderline = 0;
+            self.inCurBold = 0; self.inCurItalic = 0; self.inCurUnderline = 0;
             self.inCurColourSpec = ""; self.state = self.State.STATE_CHAR;
             self.inCurCol = 0;
             while self.inCurCol < len(self.inLines[inCurRow]):
