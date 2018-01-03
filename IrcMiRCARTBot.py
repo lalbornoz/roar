@@ -33,6 +33,10 @@ class IrcMiRCARTBot(IrcClient.IrcClient):
     clientChannelLastMessage = clientChannelOps = clientChannel = None
     clientChannelRejoin = None
 
+    # {{{ ContentTooLargeException: Raised by _urlretrieveReportHook() given download size > 1 MB
+    class ContentTooLargeException(Exception):
+        pass
+    # }}}
     # {{{ _dispatch001(): Dispatch single 001 (RPL_WELCOME)
     def _dispatch001(self, message):
         self._log("Registered on {}:{} as {}, {}, {}.".format(self.serverHname, self.serverPort, self.clientNick, self.clientIdent, self.clientGecos))
@@ -110,7 +114,6 @@ class IrcMiRCARTBot(IrcClient.IrcClient):
                 return
             else:
                 self._log("Processing request on {} from {}: {}".format(message[2].lower(), message[0], message[3]))
-                self.clientLastMessage = int(time.time())
             asciiUrl = message[3].split(" ")[1]
             asciiTmpFilePath = "tmp.txt"; imgTmpFilePath = "tmp.png";
             if os.path.isfile(asciiTmpFilePath):
@@ -118,16 +121,29 @@ class IrcMiRCARTBot(IrcClient.IrcClient):
             if os.path.isfile(imgTmpFilePath):
                 os.remove(imgTmpFilePath)
             try:
-                urllib.request.urlretrieve(asciiUrl, asciiTmpFilePath)
+                urllib.request.urlretrieve(asciiUrl, asciiTmpFilePath, IrcMiRCARTBot._urlretrieveReportHook)
+            except IrcMiRCARTBot.ContentTooLargeException:
+                self._log("Download size exceeds quota of 1 MB!")
+                self.queue("PRIVMSG", message[2], "4/!\\ Download size exceeds quota of 1 MB!")
+                return
             except urllib.error.HTTPError as err:
                 self._log("Download failed with HTTP status code {}".format(err.code))
                 self.queue("PRIVMSG", message[2], "4/!\\ Download failed with HTTP status code {}!".format(err.code))
+                return
+            except urllib.error.URLError as err:
+                self._log("Invalid URL specified!")
+                self.queue("PRIVMSG", message[2], "4/!\\ Invalid URL specified!")
+                return
+            except ValueError as err:
+                self._log("Unknown URL type specified!")
+                self.queue("PRIVMSG", message[2], "4/!\\ Unknown URL type specified!")
                 return
             _MiRCART = MiRCART.MiRCART(asciiTmpFilePath, imgTmpFilePath, "DejaVuSansMono.ttf", 11)
             imgurResponse = self._uploadToImgur(imgTmpFilePath, "MiRCART image", "MiRCART image", "c9a6efb3d7932fd")
             if imgurResponse[0] == 200:
                     self._log("Uploaded as: {}".format(imgurResponse[1]))
                     self.queue("PRIVMSG", message[2], "8/!\\ Uploaded as: {}".format(imgurResponse[1]))
+                    self.clientLastMessage = int(time.time())
             else:
                     self._log("Upload failed with HTTP status code {}".format(imgurResponse[0]))
                     self.queue("PRIVMSG", message[2], "4/!\\ Upload failed with HTTP status code {}!".format(imgurResponse[0]))
@@ -164,6 +180,11 @@ class IrcMiRCARTBot(IrcClient.IrcClient):
                 return [200, responseDict.get("data").get("link")]
         else:
                 return [responseHttp.status_code]
+    # }}}
+    # {{{ _urlretrieveReportHook(): Limit downloads to 1 MB
+    def _urlretrieveReportHook(count, blockSize, totalSize):
+        if (totalSize > pow(2,10)):
+            raise IrcMiRCARTBot.ContentTooLargeException
     # }}}
     # {{{ connect(): Connect to server and (re)initialise w/ optional timeout
     def connect(self, timeout=None):
