@@ -118,7 +118,7 @@ class IrcMiRCARTBot(IrcClient.IrcClient):
             if os.path.isfile(imgTmpFilePath):
                 os.remove(imgTmpFilePath)
             urllib.request.urlretrieve(asciiUrl, asciiTmpFilePath)
-            _MiRCART = mirc2png.MiRCART(asciiTmpFilePath, imgTmpFilePath, "DejaVuSansMono.ttf", 11)
+            _MiRCART = MiRCART.MiRCART(asciiTmpFilePath, imgTmpFilePath, "DejaVuSansMono.ttf", 11)
             imgurResponse = self._uploadToImgur(imgTmpFilePath, "MiRCART image", "MiRCART image", "c9a6efb3d7932fd")
             if imgurResponse[0] == 200:
                     self._log("Uploaded as: {}".format(imgurResponse[1]))
