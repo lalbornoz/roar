@@ -35,10 +35,10 @@ class IrcMiRCARTBot(IrcClient.IrcClient):
 
     # {{{ connect(): Connect to server and (re)initialise w/ optional timeout
     def connect(self, timeout=None):
-        print("Connecting to {}:{}...".format(self.serverHname, self.serverPort))
+        self._log("Connecting to {}:{}...".format(self.serverHname, self.serverPort))
         if super().connect(timeout):
-                print("Connected to {}:{}.".format(self.serverHname, self.serverPort))
-                print("Registering on {}:{} as {}, {}, {}...".format(self.serverHname, self.serverPort, self.clientNick, self.clientIdent, self.clientGecos))
+                self._log("Connected to {}:{}.".format(self.serverHname, self.serverPort))
+                self._log("Registering on {}:{} as {}, {}, {}...".format(self.serverHname, self.serverPort, self.clientNick, self.clientIdent, self.clientGecos))
                 self.clientLastMessage = 0; self.clientChannelOps = [];
                 self.clientChannelRejoin = False
                 return True
@@ -47,13 +47,13 @@ class IrcMiRCARTBot(IrcClient.IrcClient):
     # }}}
     # {{{ dispatchNone(): Dispatch None message from server
     def dispatchNone(self):
-        print("Disconnected from {}:{}.".format(self.serverHname, self.serverPort))
+        self._log("Disconnected from {}:{}.".format(self.serverHname, self.serverPort))
         self.close()
     # }}}
     # {{{ dispatch001(): Dispatch single 001 (RPL_WELCOME)
     def dispatch001(self, message):
-        print("Registered on {}:{} as {}, {}, {}.".format(self.serverHname, self.serverPort, self.clientNick, self.clientIdent, self.clientGecos))
-        print("Attempting to join {} on {}:{}...".format(self.clientChannel, self.serverHname, self.serverPort))
+        self._log("Registered on {}:{} as {}, {}, {}.".format(self.serverHname, self.serverPort, self.clientNick, self.clientIdent, self.clientGecos))
+        self._log("Attempting to join {} on {}:{}...".format(self.clientChannel, self.serverHname, self.serverPort))
         self.sendline("JOIN", self.clientChannel)
     # }}}
     # {{{ dispatch353(): Dispatch single 353 (RPL_NAMREPLY)
@@ -64,18 +64,18 @@ class IrcMiRCARTBot(IrcClient.IrcClient):
                 and channelNickSpec[0] == "@"                               \
                 and len(channelNickSpec[1:]):
                     self.clientChannelOps.append(channelNickSpec[1:].lower())
-                    print("Authorising {} on {}".format(channelNickSpec[1:].lower(), message[4].lower()))
+                    self._log("Authorising {} on {}".format(channelNickSpec[1:].lower(), message[4].lower()))
     # }}}
     # {{{ dispatchJoin(): Dispatch single JOIN message from server
     def dispatchJoin(self, message):
-        print("Joined {} on {}:{}.".format(message[2].lower(), self.serverHname, self.serverPort))
+        self._log("Joined {} on {}:{}.".format(message[2].lower(), self.serverHname, self.serverPort))
         self.clientNextTimeout = None; self.clientChannelRejoin = False;
     # }}}
     # {{{ dispatchKick(): Dispatch single KICK message from server
     def dispatchKick(self, message):
         if  message[2].lower() == self.clientChannel.lower()                    \
         and message[3].lower() == self.clientNick.lower():
-            print("Kicked from {} by {}, rejoining in 15 seconds".format(message[2].lower(), message[0]))
+            self._log("Kicked from {} by {}, rejoining in 15 seconds".format(message[2].lower(), message[0]))
             self.clientNextTimeout = time.time() + 15; self.clientChannelRejoin = True;
     # }}}
     # {{{ dispatchMode(): Dispatch single MODE message from server
@@ -98,12 +98,12 @@ class IrcMiRCARTBot(IrcClient.IrcClient):
             if  len(channelAuthAdd)                                             \
             and channelAuthAdd not in self.clientChannelOps:
                 channelAuthAdd = channelAuthAdd.lower()
-                print("Authorising {} on {}".format(channelAuthAdd, message[2].lower()))
+                self._log("Authorising {} on {}".format(channelAuthAdd, message[2].lower()))
                 self.clientChannelOps.append(channelAuthAdd)
             elif len(channelAuthDel)                                            \
             and  channelAuthDel in self.clientChannelOps:
                 channelAuthDel = channelAuthDel.lower()
-                print("Deauthorising {} on {}".format(channelAuthDel, message[2].lower()))
+                self._log("Deauthorising {} on {}".format(channelAuthDel, message[2].lower()))
                 self.clientChannelOps.remove(channelAuthDel)
     # }}}
     # {{{ dispatchPing(): Dispatch single PING message from server
@@ -115,13 +115,13 @@ class IrcMiRCARTBot(IrcClient.IrcClient):
         if  message[2].lower() == self.clientChannel.lower()           \
         and message[3].startswith("!pngbot "):
             if (int(time.time()) - self.clientLastMessage) < 45:
-                print("Ignoring request on {} from {} due to rate limit: {}".format(message[2].lower(), message[0], message[3]))
+                self._log("Ignoring request on {} from {} due to rate limit: {}".format(message[2].lower(), message[0], message[3]))
                 return
             elif message[0].split("!")[0].lower() not in self.clientChannelOps:
-                print("Ignoring request on {} from {} due to lack of authorisation: {}".format(message[2].lower(), message[0], message[3]))
+                self._log("Ignoring request on {} from {} due to lack of authorisation: {}".format(message[2].lower(), message[0], message[3]))
                 return
             else:
-                print("Processing request on {} from {}: {}".format(message[2].lower(), message[0], message[3]))
+                self._log("Processing request on {} from {}: {}".format(message[2].lower(), message[0], message[3]))
                 self.clientLastMessage = int(time.time())
             asciiUrl = message[3].split(" ")[1]
             asciiTmpFilePath = "tmp.txt"; imgTmpFilePath = "tmp.png";
@@ -133,10 +133,10 @@ class IrcMiRCARTBot(IrcClient.IrcClient):
             _MiRCART = mirc2png.MiRCART(asciiTmpFilePath, imgTmpFilePath, "DejaVuSansMono.ttf", 11)
             imgurResponse = self.uploadToImgur(imgTmpFilePath, "MiRCART image", "MiRCART image", "c9a6efb3d7932fd")
             if imgurResponse[0] == 200:
-                    print("Uploaded as: {}".format(imgurResponse[1]))
+                    self._log("Uploaded as: {}".format(imgurResponse[1]))
                     self.sendline("PRIVMSG", message[2], "8/!\\ Uploaded as: {}".format(imgurResponse[1]))
             else:
-                    print("Upload failed with HTTP status code {}".format(imgurResponse[0]))
+                    self._log("Upload failed with HTTP status code {}".format(imgurResponse[0]))
                     self.sendline("PRIVMSG", message[2], "4/!\\ Uploaded failed with HTTP status code {}!".format(imgurResponse[0]))
             if os.path.isfile(asciiTmpFilePath):
                 os.remove(asciiTmpFilePath)
@@ -146,7 +146,7 @@ class IrcMiRCARTBot(IrcClient.IrcClient):
     # {{{ dispatchTimer(): Dispatch single client timer expiration
     def dispatchTimer(self):
         if self.clientChannelRejoin:
-            print("Attempting to join {} on {}:{}...".format(self.clientChannel, self.serverHname, self.serverPort))
+            self._log("Attempting to join {} on {}:{}...".format(self.clientChannel, self.serverHname, self.serverPort))
             self.sendline("JOIN", self.clientChannel)
             self.clientNextTimeout = time.time() + 15; self.clientChannelRejoin = True;
     # }}}
@@ -176,6 +176,10 @@ class IrcMiRCARTBot(IrcClient.IrcClient):
                 self.dispatchPing(serverMessage)
             elif serverMessage[1] == "PRIVMSG":
                 self.dispatchPrivmsg(serverMessage)
+    # }}}
+    # {{{ self._log(): Log single message to stdout w/ timestamp
+    def _log(self, msg):
+        print(time.strftime("%Y/%m/%d %H:%M:%S") + " " + msg)
     # }}}
     # {{{ uploadToImgur(): Upload single file to Imgur
     def uploadToImgur(self, imgFilePath, imgName, imgTitle, apiKey):
