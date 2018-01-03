@@ -95,13 +95,12 @@ class IrcClient:
                 msg += ":" + args[argNum]
             else:
                 msg += args[argNum] + " "
-        self.clientQueue.append(msg)
+        self.clientQueue.append((msg + "\r\n").encode())
     # }}}
     # {{{ unqueue(): Send all queued lines to server, honouring timers
     def unqueue(self):
         while self.clientQueue:
-            msg = self.clientQueue[0]
-            msg = (msg + "\r\n").encode(); msgLen = len(msg); msgBytesSent = 0;
+            msg = self.clientQueue[0]; msgLen = len(msg); msgBytesSent = 0;
             while msgBytesSent < msgLen:
                 if self.clientNextTimeout:
                     timeNow = time.time()
