@@ -132,10 +132,10 @@ class MiRCART:
                     colourBg = self._ColourMapBold[self.outCurColourBg]
                 else:
                     colourBg = self._ColourMapNormal[self.outCurColourBg]
-                self.outImgDraw.rectangle(((self.outCurX, self.outCurY), (self.outCurX + 7, self.outCurY + 14)), fill=colourBg)
+                self.outImgDraw.rectangle(((self.outCurX, self.outCurY), (self.outCurX + self.outImgFontSize[0], self.outCurY + self.outImgFontSize[1])), fill=colourBg)
                 if self.inCurUnderline:
-                    self.outImgDraw.line((self.outCurX, self.outCurY + 11, self.outCurX + 7, self.outCurY + 11), fill=colourFg)
-                self.outCurX += 7; self.inCurCol += 1;
+                    self.outImgDraw.line((self.outCurX, self.outCurY + (self.outImgFontSize[1] - 2), self.outCurX + self.outImgFontSize[0], self.outCurY + (self.outImgFontSize[1] - 2)), fill=colourFg)
+                self.outCurX += self.outImgFontSize[0]; self.inCurCol += 1;
             else:
                 if self.inCurBold:
                     colourBg = self._ColourMapBold[self.outCurColourBg]
@@ -143,12 +143,12 @@ class MiRCART:
                 else:
                     colourBg = self._ColourMapNormal[self.outCurColourBg]
                     colourFg = self._ColourMapNormal[self.outCurColourFg]
-                self.outImgDraw.rectangle(((self.outCurX, self.outCurY), (self.outCurX + 7, self.outCurY + 14)), fill=colourBg)
+                self.outImgDraw.rectangle(((self.outCurX, self.outCurY), (self.outCurX + self.outImgFontSize[0], self.outCurY + self.outImgFontSize[1])), fill=colourBg)
                 # XXX implement italic
                 self.outImgDraw.text((self.outCurX, self.outCurY), char, colourFg, self.outImgFont)
                 if self.inCurUnderline:
-                    self.outImgDraw.line((self.outCurX, self.outCurY + 11, self.outCurX + 7, self.outCurY + 11), fill=colourFg)
-                self.outCurX += 7; self.inCurCol += 1;
+                    self.outImgDraw.line((self.outCurX, self.outCurY + (self.outImgFontSize[1] - 2), self.outCurX + self.outImgFontSize[0], self.outCurY + (self.outImgFontSize[1] - 2)), fill=colourFg)
+                self.outCurX += self.outImgFontSize[0]; self.inCurCol += 1;
     # }}}
     # {{{ _parseAsColourSpec(): Parse single character as mIRC colour control code sequence and mutate state
     def _parseAsColourSpec(self, char):
@@ -174,9 +174,10 @@ class MiRCART:
         self.inColsMax = self._getMaxCols(self.inLines)
         self.inRows = len(self.inLines)
         self.outFontFilePath = fontFilePath; self.outFontSize = int(fontSize);
-        self.outImg = Image.new("RGBA", (self.inColsMax * 7, self.inRows * 14), self._ColourMapNormal[1])
-        self.outImgDraw = ImageDraw.Draw(self.outImg)
         self.outImgFont = ImageFont.truetype(self.outFontFilePath, self.outFontSize)
+        self.outImgFontSize = list(self.outImgFont.getsize(" ")); self.outImgFontSize[1] += 3;
+        self.outImg = Image.new("RGBA", (self.inColsMax * self.outImgFontSize[0], self.inRows * self.outImgFontSize[1]), self._ColourMapNormal[1])
+        self.outImgDraw = ImageDraw.Draw(self.outImg)
         self.outCurColourBg = 1; self.outCurColourFg = 15;
         self.outCurX = 0; self.outCurY = 0;
         for inCurRow in range(0, len(self.inLines)):
@@ -188,7 +189,7 @@ class MiRCART:
                     self._parseAsChar(self.inLines[inCurRow][self.inCurCol])
                 elif self._State == self._State.STATE_COLOUR_SPEC:
                     self._parseAsColourSpec(self.inLines[inCurRow][self.inCurCol])
-            self.outCurX = 0; self.outCurY += 13;
+            self.outCurX = 0; self.outCurY += self.outImgFontSize[1];
         self.inFile.close();
         self.outImg.save(imgFilePath);
 
