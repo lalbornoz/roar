@@ -30,7 +30,7 @@ class IrcClient:
     serverHname = serverPort = None;
     clientNick = clientIdent = clientGecos = None;
     clientSocket = clientSocketFile = None;
-    clientNextTimeout = None
+    clientNextTimeout = None; clientQueue = None;
 
     # {{{ close(): Close connection to server
     def close(self):
@@ -53,8 +53,9 @@ class IrcClient:
         else:
             select.select([], [self.clientSocket.fileno()], [])
         self.clientSocketFile = self.clientSocket.makefile()
-        self.sendline("NICK", self.clientNick)
-        self.sendline("USER", self.clientIdent, "0", "0", self.clientGecos)
+        self.clientQueue = []
+        self.queue("NICK", self.clientNick)
+        self.queue("USER", self.clientIdent, "0", "0", self.clientGecos)
         return True
     # }}}
     # {{{ readline(): Read and parse single line from server into canonicalised list, honouring timers
@@ -86,20 +87,33 @@ class IrcClient:
             msg = [""] + msg[0:]
         return msg
     # }}}
-    # {{{ sendline(): Parse and send single line to server from list, ignoring timers
-    def sendline(self, *args):
+    # {{{ queue(): Parse and queue single line to server from list
+    def queue(self, *args):
         msg = ""; argNumMax = len(args);
         for argNum in range(0, argNumMax):
             if argNum == (argNumMax - 1):
                 msg += ":" + args[argNum]
             else:
                 msg += args[argNum] + " "
-        msg = (msg + "\r\n").encode(); msgLen = len(msg); msgBytesSent = 0;
-        while msgBytesSent < msgLen:
-            readySet = select.select([], [self.clientSocket.fileno()], [])
-            msgBytesSent = self.clientSocket.send(msg)
-            msg = msg[msgBytesSent:]; msgLen -= msgBytesSent;
+        self.clientQueue.append(msg)
     # }}}
+    # {{{ unqueue(): Send all queued lines to server, honouring timers
+    def unqueue(self):
+        while self.clientQueue:
+            msg = self.clientQueue[0]
+            msg = (msg + "\r\n").encode(); msgLen = len(msg); msgBytesSent = 0;
+            while msgBytesSent < msgLen:
+                if self.clientNextTimeout:
+                    timeNow = time.time()
+                    if self.clientNextTimeout <= timeNow:
+                        self.clientQueue[0] = msg; return;
+                    else:
+                        readySet = select.select([], [self.clientSocket.fileno()], [], self.clientNextTimeout - timeNow)
+                else:
+                    readySet = select.select([], [self.clientSocket.fileno()], [])
+                msgBytesSent = self.clientSocket.send(msg)
+                msg = msg[msgBytesSent:]; msgLen -= msgBytesSent;
+            del self.clientQueue[0]
 
     #
     # Initialisation method
