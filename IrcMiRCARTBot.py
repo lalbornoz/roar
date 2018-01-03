@@ -117,7 +117,12 @@ class IrcMiRCARTBot(IrcClient.IrcClient):
                 os.remove(asciiTmpFilePath)
             if os.path.isfile(imgTmpFilePath):
                 os.remove(imgTmpFilePath)
-            urllib.request.urlretrieve(asciiUrl, asciiTmpFilePath)
+            try:
+                urllib.request.urlretrieve(asciiUrl, asciiTmpFilePath)
+            except urllib.error.HTTPError as err:
+                self._log("Download failed with HTTP status code {}".format(err.code))
+                self.queue("PRIVMSG", message[2], "4/!\\ Download failed with HTTP status code {}!".format(err.code))
+                return
             _MiRCART = MiRCART.MiRCART(asciiTmpFilePath, imgTmpFilePath, "DejaVuSansMono.ttf", 11)
             imgurResponse = self._uploadToImgur(imgTmpFilePath, "MiRCART image", "MiRCART image", "c9a6efb3d7932fd")
             if imgurResponse[0] == 200:
@@ -125,7 +130,7 @@ class IrcMiRCARTBot(IrcClient.IrcClient):
                     self.queue("PRIVMSG", message[2], "8/!\\ Uploaded as: {}".format(imgurResponse[1]))
             else:
                     self._log("Upload failed with HTTP status code {}".format(imgurResponse[0]))
-                    self.queue("PRIVMSG", message[2], "4/!\\ Uploaded failed with HTTP status code {}!".format(imgurResponse[0]))
+                    self.queue("PRIVMSG", message[2], "4/!\\ Upload failed with HTTP status code {}!".format(imgurResponse[0]))
             if os.path.isfile(asciiTmpFilePath):
                 os.remove(asciiTmpFilePath)
             if os.path.isfile(imgTmpFilePath):
