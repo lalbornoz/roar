@@ -37,7 +37,7 @@ class IrcMiRCARTBot(IrcClient.IrcClient):
     def _dispatch001(self, message):
         self._log("Registered on {}:{} as {}, {}, {}.".format(self.serverHname, self.serverPort, self.clientNick, self.clientIdent, self.clientGecos))
         self._log("Attempting to join {} on {}:{}...".format(self.clientChannel, self.serverHname, self.serverPort))
-        self.sendline("JOIN", self.clientChannel)
+        self.queue("JOIN", self.clientChannel)
     # }}}
     # {{{ _dispatch353(): Dispatch single 353 (RPL_NAMREPLY)
     def _dispatch353(self, message):
@@ -96,7 +96,7 @@ class IrcMiRCARTBot(IrcClient.IrcClient):
     # }}}
     # {{{ _dispatchPing(): Dispatch single PING message from server
     def _dispatchPing(self, message):
-        self.sendline("PONG", message[2])
+        self.queue("PONG", message[2])
     # }}}
     # {{{ _dispatchPrivmsg(): Dispatch single PRIVMSG message from server
     def _dispatchPrivmsg(self, message):
@@ -122,10 +122,10 @@ class IrcMiRCARTBot(IrcClient.IrcClient):
             imgurResponse = self._uploadToImgur(imgTmpFilePath, "MiRCART image", "MiRCART image", "c9a6efb3d7932fd")
             if imgurResponse[0] == 200:
                     self._log("Uploaded as: {}".format(imgurResponse[1]))
-                    self.sendline("PRIVMSG", message[2], "8/!\\ Uploaded as: {}".format(imgurResponse[1]))
+                    self.queue("PRIVMSG", message[2], "8/!\\ Uploaded as: {}".format(imgurResponse[1]))
             else:
                     self._log("Upload failed with HTTP status code {}".format(imgurResponse[0]))
-                    self.sendline("PRIVMSG", message[2], "4/!\\ Uploaded failed with HTTP status code {}!".format(imgurResponse[0]))
+                    self.queue("PRIVMSG", message[2], "4/!\\ Uploaded failed with HTTP status code {}!".format(imgurResponse[0]))
             if os.path.isfile(asciiTmpFilePath):
                 os.remove(asciiTmpFilePath)
             if os.path.isfile(imgTmpFilePath):
@@ -135,7 +135,7 @@ class IrcMiRCARTBot(IrcClient.IrcClient):
     def _dispatchTimer(self):
         if self.clientChannelRejoin:
             self._log("Attempting to join {} on {}:{}...".format(self.clientChannel, self.serverHname, self.serverPort))
-            self.sendline("JOIN", self.clientChannel)
+            self.queue("JOIN", self.clientChannel)
             self.clientNextTimeout = time.time() + 15; self.clientChannelRejoin = True;
     # }}}
     # {{{ _log(): Log single message to stdout w/ timestamp
@@ -179,6 +179,7 @@ class IrcMiRCARTBot(IrcClient.IrcClient):
                 timeNow = time.time()
                 if self.clientNextTimeout <= timeNow:
                     self._dispatchTimer()
+            self.unqueue()
             serverMessage = self.readline()
             if serverMessage == None:
                 self._dispatchNone(); break;
