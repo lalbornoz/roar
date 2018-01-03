@@ -32,6 +32,12 @@ class IrcClient:
     clientSocket = clientSocketFile = None;
     clientNextTimeout = None
 
+    # {{{ close(): Close connection to server
+    def close(self):
+        if self.clientSocket != None:
+            self.clientSocket.close()
+        self.clientSocket = self.clientSocketFile = None;
+    # }}}
     # {{{ connect(): Connect to server and register w/ optional timeout
     def connect(self, timeout=None):
         self.clientSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -50,12 +56,6 @@ class IrcClient:
         self.sendline("NICK", self.clientNick)
         self.sendline("USER", self.clientIdent, "0", "0", self.clientGecos)
         return True
-    # }}}
-    # {{{ close(): Close connection to server
-    def close(self):
-        if self.clientSocket != None:
-            self.clientSocket.close()
-        self.clientSocket = self.clientSocketFile = None;
     # }}}
     # {{{ readline(): Read and parse single line from server into canonicalised list, honouring timers
     def readline(self):

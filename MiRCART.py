@@ -41,8 +41,8 @@ class MiRCART:
     state = None;
     inCurCol = None;
 
-    # {{{ ColourMapBold: mIRC colour number to RGBA map given ^B (bold)
-    ColourMapBold = [
+    # {{{ _ColourMapBold: mIRC colour number to RGBA map given ^B (bold)
+    _ColourMapBold = [
         (255, 255, 255, 255),   # White
         (85,  85,  85,  255),   # Grey
         (85,  85,  255, 255),   # Light Blue
@@ -61,8 +61,8 @@ class MiRCART:
         (255, 255, 255, 255),   # White
     ]
     # }}}
-    # {{{ ColourMapNormal: mIRC colour number to RGBA map given none of ^[BFV_] (bold, italic, reverse, underline)
-    ColourMapNormal = [
+    # {{{ _ColourMapNormal: mIRC colour number to RGBA map given none of ^[BFV_] (bold, italic, reverse, underline)
+    _ColourMapNormal = [
         (255, 255, 255, 255),   # White
         (0,   0,   0,   255),   # Black
         (0,   0,   187, 255),   # Blue
@@ -81,41 +81,41 @@ class MiRCART:
         (187, 187, 187, 255),   # Light Grey
     ]
     # }}}
-    # {{{ State: Parsing loop state
-    class State(Enum):
+    # {{{ _State: Parsing loop state
+    class _State(Enum):
         STATE_CHAR = 1
         STATE_COLOUR_SPEC = 2
     # }}}
 
-    # {{{ getMaxCols(): Calculate widest row in lines, ignoring non-printable & mIRC control code sequences
-    def getMaxCols(self, lines):
+    # {{{ _getMaxCols(): Calculate widest row in lines, ignoring non-printable & mIRC control code sequences
+    def _getMaxCols(self, lines):
         maxCols = 0;
         for curRow in range(0, len(lines)):
-            curRowCols = 0; curState = self.State.STATE_CHAR;
+            curRowCols = 0; curState = self._State.STATE_CHAR;
             curCol = 0; curColLen = len(lines[curRow]);
             while curCol < curColLen:
                 curChar = lines[curRow][curCol]
-                if curState == self.State.STATE_CHAR:
+                if curState == self._State.STATE_CHAR:
                     if curChar == "":
-                        curState = self.State.STATE_COLOUR_SPEC; curCol += 1;
+                        curState = self._State.STATE_COLOUR_SPEC; curCol += 1;
                     elif curChar in string.printable:
                         curRowCols += 1; curCol += 1;
                     else:
                         curCol += 1;
-                elif curState == self.State.STATE_COLOUR_SPEC:
+                elif curState == self._State.STATE_COLOUR_SPEC:
                     if curChar in set(",0123456789"):
                         curCol += 1;
                     else:
-                        curState = self.State.STATE_CHAR;
+                        curState = self._State.STATE_CHAR;
             maxCols = max(maxCols, curRowCols)
         return maxCols
     # }}}
-    # {{{ parseAsChar(): Parse single character as regular character and mutate state
-    def parseAsChar(self, char):
+    # {{{ _parseAsChar(): Parse single character as regular character and mutate state
+    def _parseAsChar(self, char):
             if char == "":
                 self.inCurCol += 1; self.inCurBold = 0 if self.inCurBold else 1;
             elif char == "":
-                self.state = self.State.STATE_COLOUR_SPEC; self.inCurCol += 1;
+                self._State = self._State.STATE_COLOUR_SPEC; self.inCurCol += 1;
             elif char == "":
                 self.inCurCol += 1; self.inCurItalic = 0 if self.inCurItalic else 1;
             elif char == "":
@@ -129,20 +129,20 @@ class MiRCART:
                 self.inCurCol += 1; self.inCurUnderline = 0 if self.inCurUnderline else 1;
             elif char == " ":
                 if self.inCurBold:
-                    colourBg = self.ColourMapBold[self.outCurColourBg]
+                    colourBg = self._ColourMapBold[self.outCurColourBg]
                 else:
-                    colourBg = self.ColourMapNormal[self.outCurColourBg]
+                    colourBg = self._ColourMapNormal[self.outCurColourBg]
                 self.outImgDraw.rectangle(((self.outCurX, self.outCurY), (self.outCurX + 7, self.outCurY + 14)), fill=colourBg)
                 if self.inCurUnderline:
                     self.outImgDraw.line((self.outCurX, self.outCurY + 11, self.outCurX + 7, self.outCurY + 11), fill=colourFg)
                 self.outCurX += 7; self.inCurCol += 1;
             else:
                 if self.inCurBold:
-                    colourBg = self.ColourMapBold[self.outCurColourBg]
-                    colourFg = self.ColourMapBold[self.outCurColourFg]
+                    colourBg = self._ColourMapBold[self.outCurColourBg]
+                    colourFg = self._ColourMapBold[self.outCurColourFg]
                 else:
-                    colourBg = self.ColourMapNormal[self.outCurColourBg]
-                    colourFg = self.ColourMapNormal[self.outCurColourFg]
+                    colourBg = self._ColourMapNormal[self.outCurColourBg]
+                    colourFg = self._ColourMapNormal[self.outCurColourFg]
                 self.outImgDraw.rectangle(((self.outCurX, self.outCurY), (self.outCurX + 7, self.outCurY + 14)), fill=colourBg)
                 # XXX implement italic
                 self.outImgDraw.text((self.outCurX, self.outCurY), char, colourFg, self.outImgFont)
@@ -150,8 +150,8 @@ class MiRCART:
                     self.outImgDraw.line((self.outCurX, self.outCurY + 11, self.outCurX + 7, self.outCurY + 11), fill=colourFg)
                 self.outCurX += 7; self.inCurCol += 1;
     # }}}
-    # {{{ parseAsColourSpec(): Parse single character as mIRC colour control code sequence and mutate state
-    def parseAsColourSpec(self, char):
+    # {{{ _parseAsColourSpec(): Parse single character as mIRC colour control code sequence and mutate state
+    def _parseAsColourSpec(self, char):
             if char in set(",0123456789"):
                 self.inCurColourSpec += char; self.inCurCol += 1;
             else:
@@ -163,7 +163,7 @@ class MiRCART:
                     self.outCurColourFg = int(self.inCurColourSpec[0])
                 else:
                     self.outCurColourBg = 1; self.outCurColourFg = 15;
-                self.inCurColourSpec = ""; self.state = self.State.STATE_CHAR;
+                self.inCurColourSpec = ""; self._State = self._State.STATE_CHAR;
     # }}}
 
     #
@@ -171,23 +171,23 @@ class MiRCART:
     def __init__(self, inFilePath, imgFilePath, fontFilePath="DejaVuSansMono.ttf", fontSize=11):
         self.inFilePath = inFilePath; self.inFile = open(inFilePath, "r");
         self.inLines = self.inFile.readlines()
-        self.inColsMax = self.getMaxCols(self.inLines)
+        self.inColsMax = self._getMaxCols(self.inLines)
         self.inRows = len(self.inLines)
         self.outFontFilePath = fontFilePath; self.outFontSize = int(fontSize);
-        self.outImg = Image.new("RGBA", (self.inColsMax * 7, self.inRows * 14), self.ColourMapNormal[1])
+        self.outImg = Image.new("RGBA", (self.inColsMax * 7, self.inRows * 14), self._ColourMapNormal[1])
         self.outImgDraw = ImageDraw.Draw(self.outImg)
         self.outImgFont = ImageFont.truetype(self.outFontFilePath, self.outFontSize)
         self.outCurColourBg = 1; self.outCurColourFg = 15;
         self.outCurX = 0; self.outCurY = 0;
         for inCurRow in range(0, len(self.inLines)):
             self.inCurBold = 0; self.inCurItalic = 0; self.inCurUnderline = 0;
-            self.inCurColourSpec = ""; self.state = self.State.STATE_CHAR;
+            self.inCurColourSpec = ""; self._State = self._State.STATE_CHAR;
             self.inCurCol = 0;
             while self.inCurCol < len(self.inLines[inCurRow]):
-                if self.state == self.State.STATE_CHAR:
-                    self.parseAsChar(self.inLines[inCurRow][self.inCurCol])
-                elif self.state == self.State.STATE_COLOUR_SPEC:
-                    self.parseAsColourSpec(self.inLines[inCurRow][self.inCurCol])
+                if self._State == self._State.STATE_CHAR:
+                    self._parseAsChar(self.inLines[inCurRow][self.inCurCol])
+                elif self._State == self._State.STATE_COLOUR_SPEC:
+                    self._parseAsColourSpec(self.inLines[inCurRow][self.inCurCol])
             self.outCurX = 0; self.outCurY += 13;
         self.inFile.close();
         self.outImg.save(imgFilePath);
