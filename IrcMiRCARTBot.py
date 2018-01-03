@@ -22,95 +22,13 @@
 # SOFTWARE.
 #
 
-from itertools import chain
 import base64
-import errno, os, select, socket, sys, time
+import os, sys, time
 import json
-import mirc2png
+import IrcClient, MiRCART
 import requests, urllib.request
 
-class IrcBot:
-    """Non-blocking abstraction over the IRC protocol"""
-    serverHname = serverPort = None;
-    clientNick = clientIdent = clientGecos = None;
-    clientSocket = clientSocketFile = None;
-    clientNextTimeout = None
-
-    # {{{ connect(): Connect to server and register w/ optional timeout
-    def connect(self, timeout=None):
-        self.clientSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.clientSocket.setblocking(0)
-        try:
-            self.clientSocket.connect((self.serverHname, int(self.serverPort)))
-        except BlockingIOError:
-            pass
-        if timeout:
-            readySet = select.select([], [self.clientSocket.fileno()], [], timeout)
-            if len(readySet[1]) == 0:
-                self.close(); return False;
-        else:
-            select.select([], [self.clientSocket.fileno()], [])
-        self.clientSocketFile = self.clientSocket.makefile()
-        self.sendline("NICK", self.clientNick)
-        self.sendline("USER", self.clientIdent, "0", "0", self.clientGecos)
-        return True
-    # }}}
-    # {{{ close(): Close connection to server
-    def close(self):
-        if self.clientSocket != None:
-            self.clientSocket.close()
-        self.clientSocket = self.clientSocketFile = None;
-    # }}}
-    # {{{ readline(): Read and parse single line from server into canonicalised list, honouring timers
-    def readline(self):
-        if self.clientNextTimeout:
-            timeNow = time.time()
-            if self.clientNextTimeout <= timeNow:
-                return ""
-            else:
-                readySet = select.select([self.clientSocket.fileno()], [], [], self.clientNextTimeout - timeNow)
-        else:
-            readySet = select.select([self.clientSocket.fileno()], [], [])
-        msg = self.clientSocketFile.readline()
-        if len(msg):
-            msg = msg.rstrip("\r\n")
-        else:
-            if len(readySet[0]) == 0:
-                return ""
-            else:
-                return None
-        msg = msg.split(" :", 1)
-        if len(msg) == 1:
-            msg = list(chain.from_iterable(m.split(" ") for m in msg))
-        elif len(msg) == 2:
-            msg = msg[0].split(" ") + [msg[1]]
-        if msg[0][0] == ':':
-            msg = [msg[0][1:]] + msg[1:]
-        else:
-            msg = [""] + msg[0:]
-        return msg
-    # }}}
-    # {{{ sendline(): Parse and send single line to server from list, ignoring timers
-    def sendline(self, *args):
-        msg = ""; argNumMax = len(args);
-        for argNum in range(0, argNumMax):
-            if argNum == (argNumMax - 1):
-                msg += ":" + args[argNum]
-            else:
-                msg += args[argNum] + " "
-        msg = (msg + "\r\n").encode(); msgLen = len(msg); msgBytesSent = 0;
-        while msgBytesSent < msgLen:
-            readySet = select.select([], [self.clientSocket.fileno()], [])
-            msgBytesSent = self.clientSocket.send(msg)
-            msg = msg[msgBytesSent:]; msgLen -= msgBytesSent;
-    # }}}
-    # {{{ Initialisation method
-    def __init__(self, serverHname, serverPort, clientNick, clientIdent, clientGecos):
-        self.serverHname = serverHname; self.serverPort = serverPort;
-        self.clientNick = clientNick; self.clientIdent = clientIdent; self.clientGecos = clientGecos;
-    # }}}
-
-class IrcMiRCARTBot(IrcBot):
+class IrcMiRCARTBot(IrcClient.IrcClient):
     """IRC<->MiRCART bot"""
     clientChannelLastMessage = clientChannelOps = clientChannel = None
     clientChannelRejoin = None
@@ -277,11 +195,12 @@ class IrcMiRCARTBot(IrcBot):
         else:
                 return [responseHttp.status_code]
     # }}}
-    # {{{ Initialisation method
+
+    #
+    # Initialisation method
     def __init__(self, serverHname, serverPort="6667", clientNick="pngbot", clientIdent="pngbot", clientGecos="pngbot", clientChannel="#MiRCART"):
         super().__init__(serverHname, serverPort, clientNick, clientIdent, clientGecos)
         self.clientChannel = clientChannel
-    # }}}
 
 #
 # Entry point

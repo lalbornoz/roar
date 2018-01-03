@@ -165,7 +165,9 @@ class MiRCART:
                     self.outCurColourBg = 1; self.outCurColourFg = 15;
                 self.inCurColourSpec = ""; self.state = self.State.STATE_CHAR;
     # }}}
-    # {{{ Initialisation method
+
+    #
+    # Initialisation method
     def __init__(self, inFilePath, imgFilePath, fontFilePath="DejaVuSansMono.ttf", fontSize=11):
         self.inFilePath = inFilePath; self.inFile = open(inFilePath, "r");
         self.inLines = self.inFile.readlines()
@@ -189,7 +191,6 @@ class MiRCART:
             self.outCurX = 0; self.outCurY += 13;
         self.inFile.close();
         self.outImg.save(imgFilePath);
-    # }}}
 
 #
 # Entry point
