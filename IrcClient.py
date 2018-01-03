@@ -109,6 +109,8 @@ class IrcClient:
                         self.clientQueue[0] = msg; return;
                     else:
                         readySet = select.select([], [self.clientSocket.fileno()], [], self.clientNextTimeout - timeNow)
+                        if len(readySet[1]) == 0:
+                            self.clientQueue[0] = msg; return;
                 else:
                     readySet = select.select([], [self.clientSocket.fileno()], [])
                 msgBytesSent = self.clientSocket.send(msg)
