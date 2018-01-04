@@ -112,58 +112,58 @@ class MiRC2png:
     # }}}
     # {{{ _parseAsChar(): Parse single character as regular character and mutate state
     def _parseAsChar(self, char):
-            if char == "":
-                self.inCurCol += 1; self.inCurBold = 0 if self.inCurBold else 1;
-            elif char == "":
-                self._State = self._State.STATE_COLOUR_SPEC; self.inCurCol += 1;
-            elif char == "":
-                self.inCurCol += 1; self.inCurItalic = 0 if self.inCurItalic else 1;
-            elif char == "":
-                self.inCurCol += 1;
-                self.inCurBold = 0; self.inCurItalic = 0; self.inCurUnderline = 0;
-                self.inCurColourSpec = "";
-            elif char == "":
-                self.inCurCol += 1
-                self.outCurColourBg, self.outCurColourFg = self.outCurColourFg, self.outCurColourBg;
-            elif char == "":
-                self.inCurCol += 1; self.inCurUnderline = 0 if self.inCurUnderline else 1;
-            elif char == " ":
-                if self.inCurBold:
-                    colourBg = self._ColourMapBold[self.outCurColourBg]
-                else:
-                    colourBg = self._ColourMapNormal[self.outCurColourBg]
-                self.outImgDraw.rectangle(((self.outCurX, self.outCurY), (self.outCurX + self.outImgFontSize[0], self.outCurY + self.outImgFontSize[1])), fill=colourBg)
-                if self.inCurUnderline:
-                    self.outImgDraw.line((self.outCurX, self.outCurY + (self.outImgFontSize[1] - 2), self.outCurX + self.outImgFontSize[0], self.outCurY + (self.outImgFontSize[1] - 2)), fill=colourFg)
-                self.outCurX += self.outImgFontSize[0]; self.inCurCol += 1;
+        if char == "":
+            self.inCurCol += 1; self.inCurBold = 0 if self.inCurBold else 1;
+        elif char == "":
+            self._State = self._State.STATE_COLOUR_SPEC; self.inCurCol += 1;
+        elif char == "":
+            self.inCurCol += 1; self.inCurItalic = 0 if self.inCurItalic else 1;
+        elif char == "":
+            self.inCurCol += 1;
+            self.inCurBold = 0; self.inCurItalic = 0; self.inCurUnderline = 0;
+            self.inCurColourSpec = "";
+        elif char == "":
+            self.inCurCol += 1
+            self.outCurColourBg, self.outCurColourFg = self.outCurColourFg, self.outCurColourBg;
+        elif char == "":
+            self.inCurCol += 1; self.inCurUnderline = 0 if self.inCurUnderline else 1;
+        elif char == " ":
+            if self.inCurBold:
+                colourBg = self._ColourMapBold[self.outCurColourBg]
             else:
-                if self.inCurBold:
-                    colourBg = self._ColourMapBold[self.outCurColourBg]
-                    colourFg = self._ColourMapBold[self.outCurColourFg]
-                else:
-                    colourBg = self._ColourMapNormal[self.outCurColourBg]
-                    colourFg = self._ColourMapNormal[self.outCurColourFg]
-                self.outImgDraw.rectangle(((self.outCurX, self.outCurY), (self.outCurX + self.outImgFontSize[0], self.outCurY + self.outImgFontSize[1])), fill=colourBg)
-                # XXX implement italic
-                self.outImgDraw.text((self.outCurX, self.outCurY), char, colourFg, self.outImgFont)
-                if self.inCurUnderline:
-                    self.outImgDraw.line((self.outCurX, self.outCurY + (self.outImgFontSize[1] - 2), self.outCurX + self.outImgFontSize[0], self.outCurY + (self.outImgFontSize[1] - 2)), fill=colourFg)
-                self.outCurX += self.outImgFontSize[0]; self.inCurCol += 1;
+                colourBg = self._ColourMapNormal[self.outCurColourBg]
+            self.outImgDraw.rectangle(((self.outCurX, self.outCurY), (self.outCurX + self.outImgFontSize[0], self.outCurY + self.outImgFontSize[1])), fill=colourBg)
+            if self.inCurUnderline:
+                self.outImgDraw.line((self.outCurX, self.outCurY + (self.outImgFontSize[1] - 2), self.outCurX + self.outImgFontSize[0], self.outCurY + (self.outImgFontSize[1] - 2)), fill=colourFg)
+            self.outCurX += self.outImgFontSize[0]; self.inCurCol += 1;
+        else:
+            if self.inCurBold:
+                colourBg = self._ColourMapBold[self.outCurColourBg]
+                colourFg = self._ColourMapBold[self.outCurColourFg]
+            else:
+                colourBg = self._ColourMapNormal[self.outCurColourBg]
+                colourFg = self._ColourMapNormal[self.outCurColourFg]
+            self.outImgDraw.rectangle(((self.outCurX, self.outCurY), (self.outCurX + self.outImgFontSize[0], self.outCurY + self.outImgFontSize[1])), fill=colourBg)
+            # XXX implement italic
+            self.outImgDraw.text((self.outCurX, self.outCurY), char, colourFg, self.outImgFont)
+            if self.inCurUnderline:
+                self.outImgDraw.line((self.outCurX, self.outCurY + (self.outImgFontSize[1] - 2), self.outCurX + self.outImgFontSize[0], self.outCurY + (self.outImgFontSize[1] - 2)), fill=colourFg)
+            self.outCurX += self.outImgFontSize[0]; self.inCurCol += 1;
     # }}}
     # {{{ _parseAsColourSpec(): Parse single character as mIRC colour control code sequence and mutate state
     def _parseAsColourSpec(self, char):
-            if char in set(",0123456789"):
-                self.inCurColourSpec += char; self.inCurCol += 1;
+        if char in set(",0123456789"):
+            self.inCurColourSpec += char; self.inCurCol += 1;
+        else:
+            self.inCurColourSpec = self.inCurColourSpec.split(",")
+            if len(self.inCurColourSpec) == 2:
+                self.outCurColourFg = int(self.inCurColourSpec[0])
+                self.outCurColourBg = int(self.inCurColourSpec[1] or self.outCurColourBg)
+            elif len(self.inCurColourSpec) == 1:
+                self.outCurColourFg = int(self.inCurColourSpec[0])
             else:
-                self.inCurColourSpec = self.inCurColourSpec.split(",")
-                if len(self.inCurColourSpec) == 2:
-                    self.outCurColourFg = int(self.inCurColourSpec[0])
-                    self.outCurColourBg = int(self.inCurColourSpec[1] or self.outCurColourBg)
-                elif len(self.inCurColourSpec) == 1:
-                    self.outCurColourFg = int(self.inCurColourSpec[0])
-                else:
-                    self.outCurColourBg = 1; self.outCurColourFg = 15;
-                self.inCurColourSpec = ""; self._State = self._State.STATE_CHAR;
+                self.outCurColourBg = 1; self.outCurColourFg = 15;
+            self.inCurColourSpec = ""; self._State = self._State.STATE_CHAR;
     # }}}
 
     #
