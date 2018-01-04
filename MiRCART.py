@@ -233,14 +233,10 @@ class MiRCARTToolRect(MiRCARTTool):
     # }}}
     # {{{ onMouseDown(): XXX
     def onMouseDown(self, event, mapX, mapY, isLeftDown, isRightDown):
-        print("mouse down")
         return self._draw(event, mapX, mapY, isLeftDown, isRightDown)
     # }}}
     # {{{ onMouseMotion(): XXX
     def onMouseMotion(self, event, mapX, mapY, isLeftDown, isRightDown):
-        print("mouse moving")
-        if isLeftDown or isRightDown:
-            print("mouse depressed")
         return self._draw(event, mapX, mapY, isLeftDown, isRightDown)
     # }}}
     # {{{ Initialisation method
