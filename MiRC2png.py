@@ -39,7 +39,7 @@ class MiRC2png:
     inCurBold = inCurItalic = inCurUnderline = None;
     inCurColourSpec = None;
     state = None;
-    inCurCol = None;
+    inCurCol = inCurDigits = None;
 
     # {{{ _ColourMapBold: mIRC colour number to RGBA map given ^B (bold)
     _ColourMapBold = [
@@ -85,48 +85,104 @@ class MiRC2png:
     class _State(Enum):
         STATE_CHAR = 1
         STATE_COLOUR_SPEC = 2
+        STATE_CSPEC_DIGIT0 = 2
+        STATE_CSPEC_DIGIT1 = 3
     # }}}
 
+    # {{{ _countChar(): XXX
+    def _countChar(self, char):
+        return True
+    # }}}
+    # {{{ _countColourSpecState(): XXX
+    def _countColourSpecState(self, colourSpec):
+        return 0
+    # }}}
+    # {{{ _render(): XXX
+    def _render(self):
+        self.outCurX = 0; self.outCurY = 0;
+        for inCurRow in range(0, len(self.inLines)):
+            self.inCurBold = 0; self.inCurItalic = 0; self.inCurUnderline = 0;
+            self.inCurColourSpec = ""; self._State = self._State.STATE_CHAR;
+            self.inCurCol = 0; self.inCurDigits = 0;
+            while self.inCurCol < len(self.inLines[inCurRow]):
+                if self._State == self._State.STATE_CHAR:
+                    self._parseAsChar(                                  \
+                        self.inLines[inCurRow][self.inCurCol],          \
+                        self._syncChar)
+                elif self._State == self._State.STATE_CSPEC_DIGIT0      \
+                or   self._State == self._State.STATE_CSPEC_DIGIT1:     \
+                    self._parseAsColourSpec(                            \
+                        self.inLines[inCurRow][self.inCurCol],          \
+                        self._syncColourSpecState)
+            self.outCurX = 0; self.outCurY += self.outImgFontSize[1];
+    # }}}
     # {{{ _getMaxCols(): Calculate widest row in lines, ignoring non-printable & mIRC control code sequences
     def _getMaxCols(self, lines):
         maxCols = 0;
-        for curRow in range(0, len(lines)):
-            curRowCols = 0; curState = self._State.STATE_CHAR;
-            curCol = 0; curColLen = len(lines[curRow]);
-            while curCol < curColLen:
-                curChar = lines[curRow][curCol]
-                if curState == self._State.STATE_CHAR:
-                    if curChar == "":
-                        curState = self._State.STATE_COLOUR_SPEC; curCol += 1;
-                    elif curChar in string.printable:
-                        curRowCols += 1; curCol += 1;
-                    else:
-                        curCol += 1;
-                elif curState == self._State.STATE_COLOUR_SPEC:
-                    if curChar in set(",0123456789"):
-                        curCol += 1;
-                    else:
-                        curState = self._State.STATE_CHAR;
+        for inCurRow in range(0, len(lines)):
+            self.inCurBold = 0; self.inCurItalic = 0; self.inCurUnderline = 0;
+            self.inCurColourSpec = ""; self._State = self._State.STATE_CHAR;
+            self.inCurCol = 0; self.inCurDigits = 0; curRowCols = 0;
+            while self.inCurCol < len(self.inLines[inCurRow]):
+                if self._State == self._State.STATE_CHAR:
+                    if self._parseAsChar(                               \
+                            self.inLines[inCurRow][self.inCurCol], self._countChar):
+                        curRowCols += 1
+                elif self._State == self._State.STATE_CSPEC_DIGIT0      \
+                or   self._State == self._State.STATE_CSPEC_DIGIT1:
+                    self._parseAsColourSpec(                            \
+                        self.inLines[inCurRow][self.inCurCol],          \
+                        self._countColourSpecState)
             maxCols = max(maxCols, curRowCols)
         return maxCols
     # }}}
     # {{{ _parseAsChar(): Parse single character as regular character and mutate state
-    def _parseAsChar(self, char):
+    def _parseAsChar(self, char, fn):
+        if char == "":
+            self._State = self._State.STATE_CSPEC_DIGIT0; self.inCurCol += 1;
+            return False
+        else:
+            self.inCurCol += 1; return fn(char);
+    # }}}
+    # {{{ _parseAsColourSpec(): Parse single character as mIRC colour control code sequence and mutate state
+    def _parseAsColourSpec(self, char, fn):
+        if  self._State == self._State.STATE_CSPEC_DIGIT0               \
+        and char == ",":
+            self.inCurColourSpec += char; self.inCurCol += 1;
+            self._State = self._State.STATE_CSPEC_DIGIT1;
+            self.inCurDigits = 0
+            return [False]
+        elif self._State == self._State.STATE_CSPEC_DIGIT0              \
+        and  char in set("0123456789")                                  \
+        and  self.inCurDigits <= 1:
+            self.inCurColourSpec += char; self.inCurCol += 1;
+            self.inCurDigits += 1
+            return [False]
+        elif self._State == self._State.STATE_CSPEC_DIGIT1              \
+        and  char in set("0123456789")                                  \
+        and  self.inCurDigits <= 1:
+            self.inCurColourSpec += char; self.inCurCol += 1;
+            self.inCurDigits += 1
+            return [False]
+        else:
+            result = fn(self.inCurColourSpec)
+            self.inCurColourSpec = ""; self._State = self._State.STATE_CHAR;
+            self.inCurDigits = 0
+            return [True, result]
+    # }}}
+    # {{{ _syncChar(): XXX
+    def _syncChar(self, char):
         if char == "":
-            self.inCurCol += 1; self.inCurBold = 0 if self.inCurBold else 1;
-        elif char == "":
-            self._State = self._State.STATE_COLOUR_SPEC; self.inCurCol += 1;
+            self.inCurBold = 0 if self.inCurBold else 1;
         elif char == "":
-            self.inCurCol += 1; self.inCurItalic = 0 if self.inCurItalic else 1;
+            self.inCurItalic = 0 if self.inCurItalic else 1;
         elif char == "":
-            self.inCurCol += 1;
             self.inCurBold = 0; self.inCurItalic = 0; self.inCurUnderline = 0;
             self.inCurColourSpec = "";
         elif char == "":
-            self.inCurCol += 1
             self.outCurColourBg, self.outCurColourFg = self.outCurColourFg, self.outCurColourBg;
         elif char == "":
-            self.inCurCol += 1; self.inCurUnderline = 0 if self.inCurUnderline else 1;
+            self.inCurUnderline = 0 if self.inCurUnderline else 1;
         elif char == " ":
             if self.inCurBold:
                 colourBg = self._ColourMapBold[self.outCurColourBg]
@@ -135,7 +191,7 @@ class MiRC2png:
             self.outImgDraw.rectangle(((self.outCurX, self.outCurY), (self.outCurX + self.outImgFontSize[0], self.outCurY + self.outImgFontSize[1])), fill=colourBg)
             if self.inCurUnderline:
                 self.outImgDraw.line((self.outCurX, self.outCurY + (self.outImgFontSize[1] - 2), self.outCurX + self.outImgFontSize[0], self.outCurY + (self.outImgFontSize[1] - 2)), fill=colourFg)
-            self.outCurX += self.outImgFontSize[0]; self.inCurCol += 1;
+            self.outCurX += self.outImgFontSize[0];
         else:
             if self.inCurBold:
                 colourBg = self._ColourMapBold[self.outCurColourBg]
@@ -148,22 +204,20 @@ class MiRC2png:
             self.outImgDraw.text((self.outCurX, self.outCurY), char, colourFg, self.outImgFont)
             if self.inCurUnderline:
                 self.outImgDraw.line((self.outCurX, self.outCurY + (self.outImgFontSize[1] - 2), self.outCurX + self.outImgFontSize[0], self.outCurY + (self.outImgFontSize[1] - 2)), fill=colourFg)
-            self.outCurX += self.outImgFontSize[0]; self.inCurCol += 1;
+            self.outCurX += self.outImgFontSize[0];
+        return True
     # }}}
-    # {{{ _parseAsColourSpec(): Parse single character as mIRC colour control code sequence and mutate state
-    def _parseAsColourSpec(self, char):
-        if char in set(",0123456789"):
-            self.inCurColourSpec += char; self.inCurCol += 1;
+    # {{{ _syncColourSpecState(): XXX
+    def _syncColourSpecState(self, colourSpec):
+        colourSpec = colourSpec.split(",")
+        if len(colourSpec) == 2:
+            self.outCurColourFg = int(colourSpec[0])
+            self.outCurColourBg = int(colourSpec[1] or self.outCurColourBg)
+        elif len(colourSpec) == 1:
+            self.outCurColourFg = int(colourSpec[0])
         else:
-            self.inCurColourSpec = self.inCurColourSpec.split(",")
-            if len(self.inCurColourSpec) == 2:
-                self.outCurColourFg = int(self.inCurColourSpec[0])
-                self.outCurColourBg = int(self.inCurColourSpec[1] or self.outCurColourBg)
-            elif len(self.inCurColourSpec) == 1:
-                self.outCurColourFg = int(self.inCurColourSpec[0])
-            else:
-                self.outCurColourBg = 1; self.outCurColourFg = 15;
-            self.inCurColourSpec = ""; self._State = self._State.STATE_CHAR;
+            self.outCurColourBg = 1; self.outCurColourFg = 15;
+        return True
     # }}}
 
     #
@@ -179,17 +233,7 @@ class MiRC2png:
         self.outImg = Image.new("RGBA", (self.inColsMax * self.outImgFontSize[0], self.inRows * self.outImgFontSize[1]), self._ColourMapNormal[1])
         self.outImgDraw = ImageDraw.Draw(self.outImg)
         self.outCurColourBg = 1; self.outCurColourFg = 15;
-        self.outCurX = 0; self.outCurY = 0;
-        for inCurRow in range(0, len(self.inLines)):
-            self.inCurBold = 0; self.inCurItalic = 0; self.inCurUnderline = 0;
-            self.inCurColourSpec = ""; self._State = self._State.STATE_CHAR;
-            self.inCurCol = 0;
-            while self.inCurCol < len(self.inLines[inCurRow]):
-                if self._State == self._State.STATE_CHAR:
-                    self._parseAsChar(self.inLines[inCurRow][self.inCurCol])
-                elif self._State == self._State.STATE_COLOUR_SPEC:
-                    self._parseAsColourSpec(self.inLines[inCurRow][self.inCurCol])
-            self.outCurX = 0; self.outCurY += self.outImgFontSize[1];
+        self._render()
         self.inFile.close();
         self.outImg.save(imgFilePath);
 
