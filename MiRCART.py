@@ -25,6 +25,27 @@
 import wx
 import sys
 
+# {{{ mircColours: mIRC colour number to RGBA map given none of ^[BFV_] (bold, italic, reverse, underline)
+mircColours = [
+    (255, 255, 255, 255),   # White
+    (0,   0,   0,   255),   # Black
+    (0,   0,   187, 255),   # Blue
+    (0,   187, 0,   255),   # Green
+    (255, 85,  85,  255),   # Light Red
+    (187, 0,   0,   255),   # Red
+    (187, 0,   187, 255),   # Purple
+    (187, 187, 0,   255),   # Yellow
+    (255, 255, 85,  255),   # Light Yellow
+    (85,  255, 85,  255),   # Light Green
+    (0,   187, 187, 255),   # Cyan
+    (85,  255, 255, 255),   # Light Cyan
+    (85,  85,  255, 255),   # Light Blue
+    (255, 85,  255, 255),   # Pink
+    (85,  85,  85,  255),   # Grey
+    (187, 187, 187, 255),   # Light Grey
+]
+# }}}
+
 class MiRCARTCanvas(wx.Panel):
     """XXX"""
     canvasPos = canvasSize = None
@@ -32,26 +53,6 @@ class MiRCARTCanvas(wx.Panel):
     cellPos = cellSize = None
     brushBg = brushFg = penBg = penFg = None
     mircBg = mircFg = None
-    # {{{ mircColours: mIRC colour number to RGBA map given none of ^[BFV_] (bold, italic, reverse, underline)
-    mircColours = [
-        (255, 255, 255, 255),   # White
-        (0,   0,   0,   255),   # Black
-        (0,   0,   187, 255),   # Blue
-        (0,   187, 0,   255),   # Green
-        (255, 85,  85,  255),   # Light Red
-        (187, 0,   0,   255),   # Red
-        (187, 0,   187, 255),   # Purple
-        (187, 187, 0,   255),   # Yellow
-        (255, 255, 85,  255),   # Light Yellow
-        (85,  255, 85,  255),   # Light Green
-        (0,   187, 187, 255),   # Cyan
-        (85,  255, 255, 255),   # Light Cyan
-        (85,  85,  255, 255),   # Light Blue
-        (255, 85,  255, 255),   # Pink
-        (85,  85,  85,  255),   # Grey
-        (187, 187, 187, 255),   # Light Grey
-    ]
-    # }}}
 
     # {{{ _onMouseEvent(): XXX
     def _onMouseEvent(self, event):
@@ -72,20 +73,21 @@ class MiRCARTCanvas(wx.Panel):
                 eventDc.SetBrush(self.brushBg);
                 eventDc.SetPen(self.penBg)
                 self.canvasMap[mapX][mapY] = [self.mircBg, self.mircBg, " "]
-            eventDc.DrawRectangle(rectX, rectY,             \
+            eventDc.DrawRectangle(rectX, rectY,                             \
                 self.cellSize[0], self.cellSize[1])
+    # }}}
+    # {{{ getBackgroundColour(): XXX
+    def getBackgroundColour(self):
+        return self.mircBg
+    # }}}
+    # {{{ getForegroundColour(): XXX
+    def getForegroundColour(self):
+        return self.mircFg
     # }}}
     # {{{ onCharHook(): XXX
     def onCharHook(self, event):
         keyCode = event.GetKeyCode()
-        if keyCode == wx.WXK_UP:
-            self.mircFg = self.mircFg + 1 if self.mircFg < 15 else 15
-        elif keyCode == wx.WXK_DOWN:
-            self.mircFg = self.mircFg - 1 if self.mircFg > 0 else 0
-        self.brushBg = wx.Brush(wx.Colour(self.mircColours[self.mircBg]), wx.BRUSHSTYLE_SOLID)
-        self.brushFg = wx.Brush(wx.Colour(self.mircColours[self.mircFg]), wx.BRUSHSTYLE_SOLID)
-        self.penBg = wx.Pen(wx.Colour(self.mircColours[self.mircBg]), 1)
-        self.penFg = wx.Pen(wx.Colour(self.mircColours[self.mircFg]), 1)
+        pass
     # }}}
     # {{{ onLeftDown(): XXX
     def onLeftDown(self, event):
@@ -102,32 +104,41 @@ class MiRCARTCanvas(wx.Panel):
         eventDc.Clear()
         for cellX in range(0, self.canvasSize[0]):
             for cellY in range(0, self.canvasSize[1]):
-                eventDc.SetBackground(wx.Brush(wx.Colour(self.mircColours[self.canvasMap[cellX][cellY][0]]), wx.BRUSHSTYLE_SOLID))
-                eventDc.SetBrush(wx.Brush(wx.Colour(self.mircColours[self.canvasMap[cellX][cellY][1]]), wx.BRUSHSTYLE_SOLID))
-                eventDc.SetPen(wx.Pen(wx.Colour(self.mircColours[self.canvasMap[cellX][cellY][1]]), 1))
+                eventDc.SetBackground(wx.Brush(wx.Colour(mircColours[self.canvasMap[cellX][cellY][0]]), wx.BRUSHSTYLE_SOLID))
+                eventDc.SetBrush(wx.Brush(wx.Colour(mircColours[self.canvasMap[cellX][cellY][1]]), wx.BRUSHSTYLE_SOLID))
+                eventDc.SetPen(wx.Pen(wx.Colour(mircColours[self.canvasMap[cellX][cellY][1]]), 1))
                 rectX = cellX * self.cellSize[0]; rectY = cellY * self.cellSize[1];
-                eventDc.DrawRectangle(rectX, rectY,         \
+                eventDc.DrawRectangle(rectX, rectY,                         \
                     self.cellSize[0], self.cellSize[1])
+    # }}}
+    # {{{ onPaletteEvent(): XXX
+    def onPaletteEvent(self, leftDown, rightDown, numColour):
+        if leftDown:
+            self.mircFg = numColour
+            self.brushFg = wx.Brush(wx.Colour(mircColours[self.mircFg]), wx.BRUSHSTYLE_SOLID)
+            self.penFg = wx.Pen(wx.Colour(mircColours[self.mircFg]), 1)
+        elif rightDown:
+            self.mircBg = numColour
+            self.brushBg = wx.Brush(wx.Colour(mircColours[self.mircBg]), wx.BRUSHSTYLE_SOLID)
+            self.penBg = wx.Pen(wx.Colour(mircColours[self.mircBg]), 1)
     # }}}
     # {{{ onRightDown(): XXX
     def onRightDown(self, event):
         self._onMouseEvent(event)
     # }}}
-
-    #
-    # Initialisation method
+    # {{{ Initialisation method
     def __init__(self, parent, canvasPos, cellSize, canvasSize):
-        super().__init__(parent, pos=canvasPos, size=(      \
+        super().__init__(parent, pos=canvasPos, size=(                      \
             cellSize[0] * canvasSize[0],
             cellSize[1] * canvasSize[1]))
 
         self.canvasPos = canvasPos; self.canvasSize = canvasSize;
         self.canvasMap = [[[1, 1, " "] for y in range(canvasSize[1])] for x in range(canvasSize[0])]
         self.cellPos = (0, 0); self.cellSize = cellSize;
-        self.brushBg = wx.Brush(wx.Colour(self.mircColours[1]), wx.BRUSHSTYLE_SOLID)
-        self.brushFg = wx.Brush(wx.Colour(self.mircColours[4]), wx.BRUSHSTYLE_SOLID)
-        self.penBg = wx.Pen(wx.Colour(self.mircColours[1]), 1)
-        self.penFg = wx.Pen(wx.Colour(self.mircColours[4]), 1)
+        self.brushBg = wx.Brush(wx.Colour(mircColours[1]), wx.BRUSHSTYLE_SOLID)
+        self.brushFg = wx.Brush(wx.Colour(mircColours[4]), wx.BRUSHSTYLE_SOLID)
+        self.penBg = wx.Pen(wx.Colour(mircColours[1]), 1)
+        self.penFg = wx.Pen(wx.Colour(mircColours[4]), 1)
         self.mircBg = 1; self.mircFg = 4;
         self.SetBackgroundStyle(wx.BG_STYLE_CUSTOM)
 
@@ -136,12 +147,55 @@ class MiRCARTCanvas(wx.Panel):
         self.Bind(wx.EVT_MOTION, self.onMotion)
         self.Bind(wx.EVT_PAINT, self.onPaint)
         self.Bind(wx.EVT_RIGHT_DOWN, self.onRightDown)
+    # }}}
+
+class MiRCARTPalette(wx.Panel):
+    """XXX"""
+    panelsByColour = onPaletteEvent = None
+
+    # {{{ onLeftDown(): XXX
+    def onLeftDown(self, event):
+        numColour = int(event.GetEventObject().GetName())
+        self.onPaletteEvent(True, False, numColour)
+    # }}}
+    # {{{ onRightDown(): XXX
+    def onRightDown(self, event):
+        numColour = int(event.GetEventObject().GetName())
+        self.onPaletteEvent(False, True, numColour)
+    # }}}
+    # {{{ Initialisation method
+    def __init__(self, parent, parentPos, cellSize, onPaletteEvent):
+        panelSizeW = 6 * cellSize[0]; panelSizeH = 2 * cellSize[1];
+        paletteSize = (panelSizeW * 16, panelSizeH)
+        super().__init__(parent, pos=parentPos, size=paletteSize)
+        self.panelsByColour = [None] * len(mircColours)
+        for numColour in range(0, len(mircColours)):
+            posX = (numColour * (cellSize[0] * 6))
+            self.panelsByColour[numColour] = wx.Panel(self,                 \
+                pos=(posX, 0), size=(panelSizeW, panelSizeH))
+            self.panelsByColour[numColour].SetBackgroundColour(             \
+                wx.Colour(mircColours[numColour]))
+            self.panelsByColour[numColour].Bind(wx.EVT_LEFT_DOWN, self.onLeftDown)
+            self.panelsByColour[numColour].Bind(wx.EVT_RIGHT_DOWN, self.onRightDown)
+            self.panelsByColour[numColour].SetName(str(numColour))
+        self.onPaletteEvent = onPaletteEvent
+    # }}}
 
 class MiRCARTFrame(wx.Frame):
     """XXX"""
     menuFile = menuFileSaveAs = menuFileExit = menuBar = None
-    panelSkin = panelCanvas = None
+    panelSkin = panelCanvas = panelPalette = None
+    statusBar = None
 
+    # {{{ _updateStatusBar(): XXX
+    def _updateStatusBar(self):
+        text = "Foreground colour:"
+        text += " " + str(self.panelCanvas.getForegroundColour())
+        text += " | "
+        text += "Background colour:"
+        text += " " + str(self.panelCanvas.getBackgroundColour())
+        self.statusBar.SetStatusText(text)
+    # }}}
     # {{{ onFileSaveAs(): XXX
     def onFileSaveAs(self, event):
         pass
@@ -150,27 +204,35 @@ class MiRCARTFrame(wx.Frame):
     def onFileExit(self, event):
         self.Close(True)
     # }}}
-
-    #
-    # Initialisation method
+    # {{{ onPaletteEvent(): XXX
+    def onPaletteEvent(self, leftDown, rightDown, numColour):
+        self.panelCanvas.onPaletteEvent(leftDown, rightDown, numColour)
+        self._updateStatusBar()
+    # }}}
+    # {{{ Initialisation method
     def __init__(self, parent, appSize=(1024, 768), canvasPos=(25, 25), cellSize=(7, 14), canvasSize=(80, 25)):
         super().__init__(parent, wx.ID_ANY, "MiRCART", size=appSize)
 
         self.menuFile = wx.Menu()
-        self.menuFileExit = self.menuFile.Append(wx.ID_EXIT, "E&xit", "Exit")
         self.menuFileSaveAs = self.menuFile.Append(wx.ID_SAVE, "Save &As...", "Save As...")
+        self.menuFileExit = self.menuFile.Append(wx.ID_EXIT, "E&xit", "Exit")
         self.menuBar = wx.MenuBar()
         self.menuBar.Append(self.menuFile, "&File")
 
         self.panelSkin = wx.Panel(self, wx.ID_ANY)
-        self.panelCanvas = MiRCARTCanvas(self.panelSkin,    \
+        self.panelCanvas = MiRCARTCanvas(self.panelSkin,                    \
             canvasPos=canvasPos, cellSize=cellSize, canvasSize=canvasSize)
+        self.panelPalette = MiRCARTPalette(self.panelSkin,                  \
+            (25, (canvasSize[1] + 3) * cellSize[1]), cellSize, self.onPaletteEvent)
+
+        self.statusBar = self.CreateStatusBar()
+        self._updateStatusBar()
 
         self.Bind(wx.EVT_MENU, self.onFileExit, self.menuFileExit)
         self.Bind(wx.EVT_MENU, self.onFileSaveAs, self.menuFileSaveAs)
-        self.CreateStatusBar()
         self.SetMenuBar(self.menuBar)
         self.Show(True)
+    # }}}
 
 #
 # Entry point
