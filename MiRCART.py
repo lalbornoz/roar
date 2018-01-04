@@ -48,46 +48,78 @@ mircColours = [
 
 class MiRCARTCanvas(wx.Panel):
     """XXX"""
-    canvasPos = canvasSize = None
-    canvasBitmap = canvasMap = None
-    cellPos = cellSize = None
-    brushBg = brushFg = penBg = penFg = None
-    mircBg = mircFg = None
+    canvasPos = canvasSize = canvasWinSize = cellPos = cellSize = None
+    canvasBitmap = canvasMap = canvasTools = None
+    mircBg = mircFg = mircBrushes = mircPens = None
+    patchesTmp = patchesUndo = None
 
+    # {{{ _drawPatch(): XXX
+    def _drawPatch(self, patch, eventDc, tmpDc, atX, atY):
+        patchXabs = (atX + patch[0]) * self.getCellWidth()
+        patchYabs = (atY + patch[1]) * self.getCellHeight()
+        brushFg = self.mircBrushes[patch[2]]
+        brushBg = self.mircBrushes[patch[3]]
+        pen = self.mircPens[patch[2]]
+        for dc in (eventDc, tmpDc):
+            dc.SetBrush(brushFg); dc.SetBackground(brushBg); dc.SetPen(pen);
+            dc.DrawRectangle(patchXabs, patchYabs,                  \
+                self.getCellWidth(), self.getCellHeight())
+    # }}}
+    # {{{ _eventPointToMapX(): XXX
+    def _eventPointToMapX(self, eventPoint):
+        rectX = eventPoint.x - (eventPoint.x % self.getCellWidth())
+        return int(rectX / self.getCellWidth() if rectX else 0)
+    # }}}
+    # {{{ _eventPointToMapY(): XXX
+    def _eventPointToMapY(self, eventPoint):
+        rectY = eventPoint.y - (eventPoint.y % self.getCellHeight())
+        return int(rectY / self.getCellHeight() if rectY else 0)
+    # }}}
     # {{{ _onMouseEvent(): XXX
     def _onMouseEvent(self, event):
         eventObject = event.GetEventObject()
-        if event.Dragging():
-            eventDc = wx.ClientDC(self)
-            tmpDc = wx.MemoryDC()
-            tmpDc.SelectObject(self.canvasBitmap)
-            eventPoint = event.GetLogicalPosition(eventDc)
-            rectX = eventPoint.x - (eventPoint.x % self.cellSize[0])
-            rectY = eventPoint.y - (eventPoint.y % self.cellSize[1])
-            mapX = int(rectX / 7 if rectX else 0)
-            mapY = int(rectY / 14 if rectY else 0)
-            eventDc.SetBackground(self.brushBg);
-            tmpDc.SetBackground(self.brushBg);
-            if event.LeftIsDown():
-                eventDc.SetBrush(self.brushFg);
-                eventDc.SetPen(self.penFg)
-                tmpDc.SetBrush(self.brushFg);
-                tmpDc.SetPen(self.penFg)
-                self.canvasMap[mapY][mapX] = [self.mircFg, self.mircFg, " "]
-            elif event.RightIsDown():
-                eventDc.SetBrush(self.brushBg);
-                eventDc.SetPen(self.penBg)
-                tmpDc.SetBrush(self.brushBg);
-                tmpDc.SetPen(self.penBg)
-                self.canvasMap[mapY][mapX] = [self.mircBg, self.mircBg, " "]
-            eventDc.DrawRectangle(rectX, rectY,                             \
-                self.cellSize[0], self.cellSize[1])
-            tmpDc.DrawRectangle(rectX, rectY,                               \
-                self.cellSize[0], self.cellSize[1])
+        eventDc = wx.ClientDC(self); tmpDc = wx.MemoryDC();
+        tmpDc.SelectObject(self.canvasBitmap)
+        eventPoint = event.GetLogicalPosition(eventDc)
+        mapX = self._eventPointToMapX(eventPoint)
+        mapY = self._eventPointToMapY(eventPoint)
+        for tool in self.canvasTools:
+            if event.Dragging():
+                mapPatches = tool.onMouseMotion(event, mapX, mapY, event.LeftIsDown(), event.RightIsDown())
+            else:
+                mapPatches = tool.onMouseDown(event, mapX, mapY, event.LeftIsDown(), event.RightIsDown())
+            self._processMapPatches(mapPatches, eventDc, tmpDc, mapX, mapY)
+    # }}}
+    # {{{ _processMapPatches(): XXX
+    def _processMapPatches(self, mapPatches, eventDc, tmpDc, atX, atY):
+        for mapPatch in mapPatches:
+            mapPatchTmp = mapPatch[0]; mapPatchW = mapPatch[1]; mapPatchH = mapPatch[2];
+            if mapPatchTmp and self.patchesTmp:
+                for patch in self.patchesTmp:
+                    self._drawPatch(patch, eventDc, tmpDc, 0, 0)
+                self.patchesTmp = []
+            for patch in mapPatch[3]:
+                if mapPatchTmp:
+                    mapItem = self.canvasMap[atY + patch[1]][atX + patch[0]]
+                    self.patchesTmp.append((atX + patch[0],         \
+                        atY + patch[1], mapItem[0], mapItem[1], mapItem[2]))
+                    self._drawPatch(patch, eventDc, tmpDc, atX, atY)
+                else:
+                    self._drawPatch(patch, eventDc, tmpDc, atX, atY)
+                    self.canvasMap[atY + patch[1]][atX + patch[0]] =\
+                        [patch[2], patch[3], " "];
     # }}}
     # {{{ getBackgroundColour(): XXX
     def getBackgroundColour(self):
         return self.mircBg
+    # }}}
+    # {{{ getCellHeight(): XXX
+    def getCellHeight(self):
+        return self.cellSize[1]
+    # }}}
+    # {{{ getCellWidth(): XXX
+    def getCellWidth(self):
+        return self.cellSize[0]
     # }}}
     # {{{ getForegroundColour(): XXX
     def getForegroundColour(self):
@@ -121,38 +153,99 @@ class MiRCARTCanvas(wx.Panel):
     def onPaletteEvent(self, leftDown, rightDown, numColour):
         if leftDown:
             self.mircFg = numColour
-            self.brushFg = wx.Brush(wx.Colour(mircColours[self.mircFg]), wx.BRUSHSTYLE_SOLID)
-            self.penFg = wx.Pen(wx.Colour(mircColours[self.mircFg]), 1)
         elif rightDown:
             self.mircBg = numColour
-            self.brushBg = wx.Brush(wx.Colour(mircColours[self.mircBg]), wx.BRUSHSTYLE_SOLID)
-            self.penBg = wx.Pen(wx.Colour(mircColours[self.mircBg]), 1)
     # }}}
     # {{{ onRightDown(): XXX
     def onRightDown(self, event):
         self._onMouseEvent(event)
     # }}}
     # {{{ Initialisation method
-    def __init__(self, parent, canvasPos, cellSize, canvasSize):
-        winSizeW = cellSize[0] * canvasSize[0]
-        winSizeH = cellSize[1] * canvasSize[1]
-        super().__init__(parent, pos=canvasPos, size=(winSizeW, winSizeH))
-
-        self.canvasPos = canvasPos; self.canvasSize = canvasSize;
-        self.canvasBitmap = wx.Bitmap(winSizeW, winSizeH)
-        self.canvasMap = [[[1, 1, " "] for x in range(canvasSize[0])] for y in range(canvasSize[1])]
+    def __init__(self, parent, canvasPos, cellSize, canvasSize, canvasTools):
+        canvasWinSize = (cellSize[0] * canvasSize[0], cellSize[1] * canvasSize[1])
+        super().__init__(parent, pos=canvasPos, size=canvasWinSize)
+        self.canvasPos = canvasPos; self.canvasSize = canvasSize; self.canvasWinSize = canvasWinSize;
         self.cellPos = (0, 0); self.cellSize = cellSize;
-        self.brushBg = wx.Brush(wx.Colour(mircColours[1]), wx.BRUSHSTYLE_SOLID)
-        self.brushFg = wx.Brush(wx.Colour(mircColours[4]), wx.BRUSHSTYLE_SOLID)
-        self.penBg = wx.Pen(wx.Colour(mircColours[1]), 1)
-        self.penFg = wx.Pen(wx.Colour(mircColours[4]), 1)
+
+        self.canvasBitmap = wx.Bitmap(canvasWinSize)
+        self.canvasMap = [[[1, 1, " "] for x in range(canvasSize[0])] for y in range(canvasSize[1])]
+        self.canvasTools = []
+        for canvasTool in canvasTools:
+            self.canvasTools.append(canvasTool(self))
+
         self.mircBg = 1; self.mircFg = 4;
-        self.SetBackgroundStyle(wx.BG_STYLE_CUSTOM)
+        self.mircBrushes = [None for x in range(len(mircColours))]
+        self.mircPens = [None for x in range(len(mircColours))]
+        for mircColour in range(0, len(mircColours)):
+            self.mircBrushes[mircColour] = wx.Brush(                \
+                wx.Colour(mircColours[mircColour]), wx.BRUSHSTYLE_SOLID)
+            self.mircPens[mircColour] = wx.Pen(                     \
+                wx.Colour(mircColours[mircColour]), 1)
+
+        self.patchesTmp = []; self.patchesUndo = [];
 
         self.Bind(wx.EVT_LEFT_DOWN, self.onLeftDown)
         self.Bind(wx.EVT_MOTION, self.onMotion)
         self.Bind(wx.EVT_PAINT, self.onPaint)
         self.Bind(wx.EVT_RIGHT_DOWN, self.onRightDown)
+    # }}}
+
+class MiRCARTTool():
+    """XXX"""
+    parentCanvas = None
+
+    # {{{ onMouseDown(): XXX
+    def onMouseDown(self, event, mapX, mapY, isLeftDown, isRightDown):
+        pass
+    # }}}
+    # {{{ onMouseMotion(): XXX
+    def onMouseMotion(self, event, mapX, mapY, isLeftDown, isRightDown):
+        pass
+    # }}}
+    # {{{ Initialisation method
+    def __init__(self, parentCanvas):
+        self.parentCanvas = parentCanvas
+    # }}}
+
+class MiRCARTToolRect(MiRCARTTool):
+    """XXX"""
+
+    # {{{ _draw(): XXX
+    def _draw(self, event, mapX, mapY, isLeftDown, isRightDown):
+        if isLeftDown:
+            return [[False, 1, 1, [[0, 0,                           \
+                self.parentCanvas.getForegroundColour(),            \
+                self.parentCanvas.getForegroundColour(), " "]]],
+                    [True, 1, 1, [[0, 0,                            \
+                self.parentCanvas.getForegroundColour(),            \
+                self.parentCanvas.getForegroundColour(), " "]]]]
+        elif isRightDown:
+            return [[False, 1, 1, [[0, 0,                           \
+                self.parentCanvas.getBackgroundColour(),            \
+                self.parentCanvas.getBackgroundColour(), " "]]],    \
+                    [True, 1, 1, [[0, 0,                            \
+                self.parentCanvas.getForegroundColour(),            \
+                self.parentCanvas.getForegroundColour(), " "]]]]
+        else:
+            return [[True, 1, 1, [[0, 0,                            \
+                self.parentCanvas.getForegroundColour(),            \
+                self.parentCanvas.getForegroundColour(), " "]]]]
+    # }}}
+    # {{{ onMouseDown(): XXX
+    def onMouseDown(self, event, mapX, mapY, isLeftDown, isRightDown):
+        print("mouse down")
+        return self._draw(event, mapX, mapY, isLeftDown, isRightDown)
+    # }}}
+    # {{{ onMouseMotion(): XXX
+    def onMouseMotion(self, event, mapX, mapY, isLeftDown, isRightDown):
+        print("mouse moving")
+        if isLeftDown or isRightDown:
+            print("mouse depressed")
+        return self._draw(event, mapX, mapY, isLeftDown, isRightDown)
+    # }}}
+    # {{{ Initialisation method
+    def __init__(self, parentCanvas):
+        super().__init__(parentCanvas)
     # }}}
 
 class MiRCARTPalette(wx.Panel):
@@ -177,9 +270,9 @@ class MiRCARTPalette(wx.Panel):
         self.panelsByColour = [None] * len(mircColours)
         for numColour in range(0, len(mircColours)):
             posX = (numColour * (cellSize[0] * 6))
-            self.panelsByColour[numColour] = wx.Panel(self,                 \
+            self.panelsByColour[numColour] = wx.Panel(self,         \
                 pos=(posX, 0), size=(panelSizeW, panelSizeH))
-            self.panelsByColour[numColour].SetBackgroundColour(             \
+            self.panelsByColour[numColour].SetBackgroundColour(     \
                 wx.Colour(mircColours[numColour]))
             self.panelsByColour[numColour].Bind(wx.EVT_LEFT_DOWN, self.onLeftDown)
             self.panelsByColour[numColour].Bind(wx.EVT_RIGHT_DOWN, self.onRightDown)
@@ -204,7 +297,7 @@ class MiRCARTFrame(wx.Frame):
     # }}}
     # {{{ onFileSaveAs(): XXX
     def onFileSaveAs(self, event):
-        with wx.FileDialog(self, "Save As...", os.getcwd(), "",             \
+        with wx.FileDialog(self, "Save As...", os.getcwd(), "",     \
                 "*.txt", wx.FD_SAVE|wx.FD_OVERWRITE_PROMPT) as dialog:
             if dialog.ShowModal() == wx.ID_CANCEL:
                 return
@@ -220,7 +313,7 @@ class MiRCARTFrame(wx.Frame):
                                 canvasColBg = canvasMap[canvasRow][canvasCol][0]
                                 canvasColFg = canvasMap[canvasRow][canvasCol][1]
                                 canvasColText = canvasMap[canvasRow][canvasCol][2]
-                                if colourLastBg != canvasColBg              \
+                                if colourLastBg != canvasColBg      \
                                 or colourLastFg != canvasColFg:
                                     colourLastBg = canvasColBg; colourLastFg = canvasColFg;
                                     file.write("" + str(canvasColFg) + "," + str(canvasColBg))
@@ -249,9 +342,10 @@ class MiRCARTFrame(wx.Frame):
         self.menuBar.Append(self.menuFile, "&File")
 
         self.panelSkin = wx.Panel(self, wx.ID_ANY)
-        self.panelCanvas = MiRCARTCanvas(self.panelSkin,                    \
-            canvasPos=canvasPos, cellSize=cellSize, canvasSize=canvasSize)
-        self.panelPalette = MiRCARTPalette(self.panelSkin,                  \
+        self.panelCanvas = MiRCARTCanvas(self.panelSkin,            \
+            canvasPos=canvasPos, cellSize=cellSize,                 \
+            canvasSize=canvasSize, canvasTools=[MiRCARTToolRect])
+        self.panelPalette = MiRCARTPalette(self.panelSkin,          \
             (25, (canvasSize[1] + 3) * cellSize[1]), cellSize, self.onPaletteEvent)
 
         self.statusBar = self.CreateStatusBar()
