@@ -23,7 +23,7 @@
 #
 
 import wx
-import sys
+import os, sys
 
 # {{{ mircColours: mIRC colour number to RGBA map given none of ^[BFV_] (bold, italic, reverse, underline)
 mircColours = [
@@ -68,11 +68,11 @@ class MiRCARTCanvas(wx.Panel):
             if event.LeftIsDown():
                 eventDc.SetBrush(self.brushFg);
                 eventDc.SetPen(self.penFg)
-                self.canvasMap[mapX][mapY] = [self.mircFg, self.mircFg, " "]
+                self.canvasMap[mapY][mapX] = [self.mircFg, self.mircFg, " "]
             elif event.RightIsDown():
                 eventDc.SetBrush(self.brushBg);
                 eventDc.SetPen(self.penBg)
-                self.canvasMap[mapX][mapY] = [self.mircBg, self.mircBg, " "]
+                self.canvasMap[mapY][mapX] = [self.mircBg, self.mircBg, " "]
             eventDc.DrawRectangle(rectX, rectY,                             \
                 self.cellSize[0], self.cellSize[1])
     # }}}
@@ -83,6 +83,18 @@ class MiRCARTCanvas(wx.Panel):
     # {{{ getForegroundColour(): XXX
     def getForegroundColour(self):
         return self.mircFg
+    # }}}
+    # {{{ getHeight(): XXX
+    def getHeight(self):
+        return self.canvasSize[1]
+    # }}}
+    # {{{ getMap(): XXX
+    def getMap(self):
+        return self.canvasMap
+    # }}}
+    # {{{ getWidth(): XXX
+    def getWidth(self):
+        return self.canvasSize[0]
     # }}}
     # {{{ onCharHook(): XXX
     def onCharHook(self, event):
@@ -104,9 +116,9 @@ class MiRCARTCanvas(wx.Panel):
         eventDc.Clear()
         for cellX in range(0, self.canvasSize[0]):
             for cellY in range(0, self.canvasSize[1]):
-                eventDc.SetBackground(wx.Brush(wx.Colour(mircColours[self.canvasMap[cellX][cellY][0]]), wx.BRUSHSTYLE_SOLID))
-                eventDc.SetBrush(wx.Brush(wx.Colour(mircColours[self.canvasMap[cellX][cellY][1]]), wx.BRUSHSTYLE_SOLID))
-                eventDc.SetPen(wx.Pen(wx.Colour(mircColours[self.canvasMap[cellX][cellY][1]]), 1))
+                eventDc.SetBackground(wx.Brush(wx.Colour(mircColours[self.canvasMap[cellY][cellX][0]]), wx.BRUSHSTYLE_SOLID))
+                eventDc.SetBrush(wx.Brush(wx.Colour(mircColours[self.canvasMap[cellY][cellX][1]]), wx.BRUSHSTYLE_SOLID))
+                eventDc.SetPen(wx.Pen(wx.Colour(mircColours[self.canvasMap[cellY][cellX][1]]), 1))
                 rectX = cellX * self.cellSize[0]; rectY = cellY * self.cellSize[1];
                 eventDc.DrawRectangle(rectX, rectY,                         \
                     self.cellSize[0], self.cellSize[1])
@@ -133,7 +145,7 @@ class MiRCARTCanvas(wx.Panel):
             cellSize[1] * canvasSize[1]))
 
         self.canvasPos = canvasPos; self.canvasSize = canvasSize;
-        self.canvasMap = [[[1, 1, " "] for y in range(canvasSize[1])] for x in range(canvasSize[0])]
+        self.canvasMap = [[[1, 1, " "] for x in range(canvasSize[0])] for y in range(canvasSize[1])]
         self.cellPos = (0, 0); self.cellSize = cellSize;
         self.brushBg = wx.Brush(wx.Colour(mircColours[1]), wx.BRUSHSTYLE_SOLID)
         self.brushFg = wx.Brush(wx.Colour(mircColours[4]), wx.BRUSHSTYLE_SOLID)
@@ -198,7 +210,30 @@ class MiRCARTFrame(wx.Frame):
     # }}}
     # {{{ onFileSaveAs(): XXX
     def onFileSaveAs(self, event):
-        pass
+        with wx.FileDialog(self, "Save As...", os.getcwd(), "",             \
+                "*.txt", wx.FD_SAVE|wx.FD_OVERWRITE_PROMPT) as dialog:
+            if dialog.ShowModal() == wx.ID_CANCEL:
+                return
+            else:
+                try:
+                    with open(dialog.GetPath(), "w") as file:
+                        canvasMap = self.panelCanvas.getMap()
+                        canvasHeight = self.panelCanvas.getHeight()
+                        canvasWidth = self.panelCanvas.getWidth()
+                        for canvasRow in range(0, canvasHeight):
+                            colourLastBg = colourLastFg = None;
+                            for canvasCol in range(0, canvasWidth):
+                                canvasColBg = canvasMap[canvasRow][canvasCol][0]
+                                canvasColFg = canvasMap[canvasRow][canvasCol][1]
+                                canvasColText = canvasMap[canvasRow][canvasCol][2]
+                                if colourLastBg != canvasColBg              \
+                                or colourLastFg != canvasColFg:
+                                    colourLastBg = canvasColBg; colourLastFg = canvasColFg;
+                                    file.write("" + str(canvasColFg) + "," + str(canvasColBg))
+                                file.write(canvasColText)
+                            file.write("\n")
+                except IOError as error:
+                    wx.LogError("IOError {}".format(error))
     # }}}
     # {{{ onFileExit(): XXX
     def onFileExit(self, event):
