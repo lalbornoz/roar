@@ -96,11 +96,6 @@ class MiRCARTCanvas(wx.Panel):
     def getWidth(self):
         return self.canvasSize[0]
     # }}}
-    # {{{ onCharHook(): XXX
-    def onCharHook(self, event):
-        keyCode = event.GetKeyCode()
-        pass
-    # }}}
     # {{{ onLeftDown(): XXX
     def onLeftDown(self, event):
         self._onMouseEvent(event)
@@ -154,7 +149,6 @@ class MiRCARTCanvas(wx.Panel):
         self.mircBg = 1; self.mircFg = 4;
         self.SetBackgroundStyle(wx.BG_STYLE_CUSTOM)
 
-        self.Bind(wx.EVT_CHAR_HOOK, self.onCharHook)
         self.Bind(wx.EVT_LEFT_DOWN, self.onLeftDown)
         self.Bind(wx.EVT_MOTION, self.onMotion)
         self.Bind(wx.EVT_PAINT, self.onPaint)
