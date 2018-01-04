@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 #
-# mirc2png -- convert ASCII w/ mIRC control codes to monospaced PNG (for EFnet #MiRCART)
+# IrcMiRCARTBot.py -- XXX
 # Copyright (c) 2018 Lucio Andrés Illanes Albornoz <lucio@lucioillanes.de>
 # 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -25,7 +25,7 @@
 import base64
 import os, sys, time
 import json
-import IrcClient, MiRCART
+import IrcClient, MiRC2png
 import requests, urllib.request
 
 class IrcMiRCARTBot(IrcClient.IrcClient):
@@ -106,7 +106,7 @@ class IrcMiRCARTBot(IrcClient.IrcClient):
     def _dispatchPrivmsg(self, message):
         if  message[2].lower() == self.clientChannel.lower()           \
         and message[3].startswith("!pngbot "):
-            if (int(time.time()) - self.clientLastMessage) < 45:
+            if (int(time.time()) - self.clientLastMessage) < 30:
                 self._log("Ignoring request on {} from {} due to rate limit: {}".format(message[2].lower(), message[0], message[3]))
                 return
             elif message[0].split("!")[0].lower() not in self.clientChannelOps:
@@ -138,7 +138,7 @@ class IrcMiRCARTBot(IrcClient.IrcClient):
                 self._log("Unknown URL type specified!")
                 self.queue("PRIVMSG", message[2], "4/!\\ Unknown URL type specified!")
                 return
-            _MiRCART = MiRCART.MiRCART(asciiTmpFilePath, imgTmpFilePath, "DejaVuSansMono.ttf", 11)
+            MiRC2png.MiRC2png(asciiTmpFilePath, imgTmpFilePath, "DejaVuSansMono.ttf", 11)
             imgurResponse = self._uploadToImgur(imgTmpFilePath, "MiRCART image", "MiRCART image", "c9a6efb3d7932fd")
             if imgurResponse[0] == 200:
                     self._log("Uploaded as: {}".format(imgurResponse[1]))
@@ -183,7 +183,7 @@ class IrcMiRCARTBot(IrcClient.IrcClient):
     # }}}
     # {{{ _urlretrieveReportHook(): Limit downloads to 1 MB
     def _urlretrieveReportHook(count, blockSize, totalSize):
-        if (totalSize > pow(2,10)):
+        if (totalSize > pow(2,20)):
             raise IrcMiRCARTBot.ContentTooLargeException
     # }}}
     # {{{ connect(): Connect to server and (re)initialise w/ optional timeout
@@ -256,4 +256,4 @@ if __name__ == "__main__":
     else:
         main(*sys.argv)
 
-# vim:expandtab foldmethod=marker sw=8 ts=8 tw=120
+# vim:expandtab foldmethod=marker sw=4 ts=4 tw=120
