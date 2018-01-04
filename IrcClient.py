@@ -123,4 +123,4 @@ class IrcClient:
         self.serverHname = serverHname; self.serverPort = serverPort;
         self.clientNick = clientNick; self.clientIdent = clientIdent; self.clientGecos = clientGecos;
 
-# vim:expandtab foldmethod=marker sw=8 ts=8 tw=120
+# vim:expandtab foldmethod=marker sw=4 ts=4 tw=120
