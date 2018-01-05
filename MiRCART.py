@@ -481,8 +481,10 @@ class MiRCARTFrame(wx.Frame):
 
         self.menuEdit = wx.Menu()
         self.menuEditUndo = self.menuEdit.Append(wx.ID_UNDO, "&Undo", "Undo")
+        self.menuEditUndo.Enable(False)
         self.Bind(wx.EVT_MENU, self.onEditUndo, self.menuEditUndo)
         self.menuEditRedo = self.menuEdit.Append(wx.ID_REDO, "&Redo", "Redo")
+        self.menuEditRedo.Enable(False)
         self.Bind(wx.EVT_MENU, self.onEditRedo, self.menuEditRedo)
         self.menuEdit.AppendSeparator()
         self.menuEditCut = self.menuEdit.Append(wx.ID_CUT, "Cu&t", "Cut")
