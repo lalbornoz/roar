@@ -316,7 +316,16 @@ class MiRCARTPalette(wx.Panel):
 
 class MiRCARTFrame(wx.Frame):
     """XXX"""
-    menuFile = menuFileRedo = menuFileUndo = menuFileSaveAs = menuFileExit = menuBar = None
+    menuFile = None
+    menuFileNew = menuFileOpen = menuFileSave = menuFileSaveAs = None
+    menuFileExportPastebin = menuFileExportPng = None
+    menuFileExit = None
+    menuEdit = None
+    menuEditRedo = menuEditUndo = None
+    menuEditCopy = menuEditCut = menuEditDelete = menuEditPaste = None
+    menuEditDecrBrush = menuEditIncrBrush = menuEditSolidBrush = None
+    menuTools = menuToolsCircle = menuToolsLine = menuToolsRect = None
+    menuBar = None
     panelSkin = panelCanvas = panelPalette = None
     accelRedoId = accelUndoId = accelTable = statusBar = None
 
@@ -337,13 +346,65 @@ class MiRCARTFrame(wx.Frame):
     def onAccelUndo(self, event):
         self.panelCanvas.undo()
     # }}}
-    # {{{ onFileRedo(): XXX
-    def onFileRedo(self, event):
+    # {{{ onEditCopy(): XXX
+    def onEditCopy(self, event):
+        pass
+    # }}}
+    # {{{ onEditCut(): XXX
+    def onEditCut(self, event):
+        pass
+    # }}}
+    # {{{ onEditDecrBrush(): XXX
+    def onEditDecrBrush(self, event):
+        pass
+    # }}}
+    # {{{ onEditDelete(): XXX
+    def onEditDelete(self, event):
+        pass
+    # }}}
+    # {{{ onEditIncrBrush(): XXX
+    def onEditIncrBrush(self, event):
+        pass
+    # }}}
+    # {{{ onEditPaste(): XXX
+    def onEditPaste(self, event):
+        pass
+    # }}}
+    # {{{ onEditRedo(): XXX
+    def onEditRedo(self, event):
         self.panelCanvas.redo()
     # }}}
-    # {{{ onFileUndo(): XXX
-    def onFileUndo(self, event):
+    # {{{ onEditSolidBrush(): XXX
+    def onEditSolidBrush(self, event):
+        pass
+    # }}}
+    # {{{ onEditUndo(): XXX
+    def onEditUndo(self, event):
         self.panelCanvas.undo()
+    # }}}
+    # {{{ onFileExit(): XXX
+    def onFileExit(self, event):
+        self.Close(True)
+    # }}}
+    # {{{ onFileExportPastebin(): XXX
+    def onFileExportPastebin(self, event):
+        pass
+    # }}}
+    # {{{ onFileExportPng(): XXX
+    def onFileExportPng(self, event):
+        pass
+    # }}}
+    # {{{ onFileNew(): XXX
+    def onFileNew(self, event):
+        pass
+    # }}}
+    # {{{ onFileOpen(): XXX
+    def onFileOpen(self, event):
+        pass
+    # }}}
+    # {{{ onFileSave(): XXX
+    def onFileSave(self, event):
+        pass
     # }}}
     # {{{ onFileSaveAs(): XXX
     def onFileSaveAs(self, event):
@@ -372,9 +433,17 @@ class MiRCARTFrame(wx.Frame):
                 except IOError as error:
                     wx.LogError("IOError {}".format(error))
     # }}}
-    # {{{ onFileExit(): XXX
-    def onFileExit(self, event):
-        self.Close(True)
+    # {{{ onToolsRect(): XXX
+    def onToolsRect(self, event):
+        pass
+    # }}}
+    # {{{ onToolsCircle(): XXX
+    def onToolsCircle(self, event):
+        pass
+    # }}}
+    # {{{ onToolsLine(): XXX
+    def onToolsLine(self, event):
+        pass
     # }}}
     # {{{ onPaletteEvent(): XXX
     def onPaletteEvent(self, leftDown, rightDown, numColour):
@@ -385,15 +454,6 @@ class MiRCARTFrame(wx.Frame):
     def __init__(self, parent, appSize=(1024, 768), canvasPos=(25, 25), cellSize=(7, 14), canvasSize=(80, 25)):
         super().__init__(parent, wx.ID_ANY, "MiRCART", size=appSize)
 
-        self.menuFile = wx.Menu()
-        self.menuFileRedo = self.menuFile.Append(wx.ID_REDO, "&Redo", "Redo")
-        self.menuFileUndo = self.menuFile.Append(wx.ID_UNDO, "&Undo", "Undo")
-        self.menuFileSaveAs = self.menuFile.Append(wx.ID_SAVE, "Save &As...", "Save As...")
-        self.menuFileExit = self.menuFile.Append(wx.ID_EXIT, "E&xit", "Exit")
-        self.menuBar = wx.MenuBar()
-        self.menuBar.Append(self.menuFile, "&File")
-        self.SetMenuBar(self.menuBar)
-
         self.panelSkin = wx.Panel(self, wx.ID_ANY)
         self.panelCanvas = MiRCARTCanvas(self.panelSkin,            \
             canvasPos=canvasPos, cellSize=cellSize,                 \
@@ -401,22 +461,74 @@ class MiRCARTFrame(wx.Frame):
         self.panelPalette = MiRCARTPalette(self.panelSkin,          \
             (25, (canvasSize[1] + 3) * cellSize[1]), cellSize, self.onPaletteEvent)
 
-        self.accelRedoId = wx.NewId(); self.accelUndoId = wx.NewId();
+        self.menuFile = wx.Menu()
+        self.menuFileNew = self.menuFile.Append(wx.ID_NEW, "&New", "New")
+        self.Bind(wx.EVT_MENU, self.onFileNew, self.menuFileNew)
+        self.menuFileOpen = self.menuFile.Append(wx.ID_OPEN, "&Open...", "Open...")
+        self.Bind(wx.EVT_MENU, self.onFileOpen, self.menuFileOpen)
+        self.menuFileSave = self.menuFile.Append(wx.ID_SAVE, "&Save", "Save")
+        self.Bind(wx.EVT_MENU, self.onFileSave, self.menuFileSave)
+        self.menuFileSaveAs = self.menuFile.Append(wx.ID_SAVEAS, "Save &As...", "Save As...")
+        self.Bind(wx.EVT_MENU, self.onFileSaveAs, self.menuFileSaveAs)
+        self.menuFile.AppendSeparator()
+        self.menuFileExportPastebin = self.menuFile.Append(wx.NewId(), "Export to &Pastebin...", "Export to Pastebin...")
+        self.Bind(wx.EVT_MENU, self.onFileExportPastebin, self.menuFileExportPastebin)
+        self.menuFileExportPng = self.menuFile.Append(wx.NewId(), "Export as &PNG...", "Export as PNG...")
+        self.Bind(wx.EVT_MENU, self.onFileExportPng, self.menuFileExportPng)
+        self.menuFile.AppendSeparator()
+        self.menuFileExit = self.menuFile.Append(wx.ID_EXIT, "E&xit", "Exit")
+        self.Bind(wx.EVT_MENU, self.onFileExit, self.menuFileExit)
+
+        self.menuEdit = wx.Menu()
+        self.menuEditUndo = self.menuEdit.Append(wx.ID_UNDO, "&Undo", "Undo")
+        self.Bind(wx.EVT_MENU, self.onEditUndo, self.menuEditUndo)
+        self.menuEditRedo = self.menuEdit.Append(wx.ID_REDO, "&Redo", "Redo")
+        self.Bind(wx.EVT_MENU, self.onEditRedo, self.menuEditRedo)
+        self.menuEdit.AppendSeparator()
+        self.menuEditCut = self.menuEdit.Append(wx.ID_CUT, "Cu&t", "Cut")
+        self.Bind(wx.EVT_MENU, self.onEditCut, self.menuEditCut)
+        self.menuEditCopy = self.menuEdit.Append(wx.ID_COPY, "&Copy", "Copy")
+        self.Bind(wx.EVT_MENU, self.onEditCopy, self.menuEditCopy)
+        self.menuEditPaste = self.menuEdit.Append(wx.ID_PASTE, "&Paste", "Paste")
+        self.Bind(wx.EVT_MENU, self.onEditPaste, self.menuEditPaste)
+        self.menuEditDelete = self.menuEdit.Append(wx.ID_DELETE, "De&lete", "Delete")
+        self.Bind(wx.EVT_MENU, self.onEditDelete, self.menuEditDelete)
+        self.menuEdit.AppendSeparator()
+        self.menuEditIncrBrush = self.menuEdit.Append(wx.NewId(), "&Increase brush size", "Increase brush size")
+        self.Bind(wx.EVT_MENU, self.onEditIncrBrush, self.menuEditIncrBrush)
+        self.menuEditDecrBrush = self.menuEdit.Append(wx.NewId(), "&Decrease brush size", "Decrease brush size")
+        self.Bind(wx.EVT_MENU, self.onEditDecrBrush, self.menuEditDecrBrush)
+        self.menuEditSolidBrush = self.menuEdit.AppendRadioItem(wx.NewId(), "&Solid brush", "Solid brush")
+        self.Bind(wx.EVT_MENU, self.onEditSolidBrush, self.menuEditSolidBrush)
+
+        self.menuTools = wx.Menu()
+        self.menuToolsRect = self.menuTools.AppendRadioItem(wx.NewId(), "&Rectangle", "Rectangle")
+        self.Bind(wx.EVT_MENU, self.onToolsRect, self.menuToolsRect)
+        self.menuToolsCircle = self.menuTools.AppendRadioItem(wx.NewId(), "&Circle", "Circle")
+        self.Bind(wx.EVT_MENU, self.onToolsCircle, self.menuToolsCircle)
+        self.menuToolsLine = self.menuTools.AppendRadioItem(wx.NewId(), "&Line", "Line")
+        self.Bind(wx.EVT_MENU, self.onToolsLine, self.menuToolsLine)
+
+        self.menuBar = wx.MenuBar()
+        self.menuBar.Append(self.menuFile, "&File")
+        self.menuBar.Append(self.menuEdit, "&Edit")
+        self.menuBar.Append(self.menuTools, "&Tools")
+        self.SetMenuBar(self.menuBar)
+
         accelTableEntries = [wx.AcceleratorEntry() for n in range(2)]
+        self.accelRedoId = wx.NewId()
         accelTableEntries[0].Set(wx.ACCEL_CTRL, ord('Y'), self.accelRedoId)
+        self.Bind(wx.EVT_MENU, self.onAccelRedo, id=self.accelRedoId)
+        self.accelUndoId = wx.NewId()
         accelTableEntries[1].Set(wx.ACCEL_CTRL, ord('Z'), self.accelUndoId)
+        self.Bind(wx.EVT_MENU, self.onAccelUndo, id=self.accelUndoId)
         self.accelTable = wx.AcceleratorTable(accelTableEntries)
         self.SetAcceleratorTable(self.accelTable)
+
         self.statusBar = self.CreateStatusBar()
         self._updateStatusBar()
-        self.SetFocus()
 
-        self.Bind(wx.EVT_MENU, self.onAccelRedo, id=self.accelRedoId)
-        self.Bind(wx.EVT_MENU, self.onAccelUndo, id=self.accelUndoId)
-        self.Bind(wx.EVT_MENU, self.onFileExit, self.menuFileExit)
-        self.Bind(wx.EVT_MENU, self.onFileSaveAs, self.menuFileSaveAs)
-        self.Bind(wx.EVT_MENU, self.onFileRedo, self.menuFileRedo)
-        self.Bind(wx.EVT_MENU, self.onFileUndo, self.menuFileUndo)
+        self.SetFocus()
         self.Show(True)
     # }}}
 
