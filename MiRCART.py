@@ -598,7 +598,6 @@ class MiRCARTFrame(wx.Frame):
             tmpDc.SetPen(self.panelCanvas.mircPens[numColour])
             tmpDc.DrawRectangle(0, 0, 16, 16)
             self.toolBarIdColours[numColour] = wx.NewId()
-            print(self.toolBarIdColours[numColour])
             self.toolBar.AddTool(self.toolBarIdColours[numColour],                      \
                 "mIRC colour #" + str(numColour), self.toolBarBitmapColours[numColour])
             self.Bind(wx.EVT_TOOL, self.onToolColourFg, id=self.toolBarIdColours[numColour])
