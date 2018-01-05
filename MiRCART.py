@@ -48,6 +48,7 @@ mircColours = [
 
 class MiRCARTCanvas(wx.Panel):
     """XXX"""
+    parentFrame = None
     canvasPos = canvasSize = canvasWinSize = cellPos = cellSize = None
     canvasBitmap = canvasMap = canvasTools = None
     mircBg = mircFg = mircBrushes = mircPens = None
@@ -117,6 +118,8 @@ class MiRCARTCanvas(wx.Panel):
                             (atX + patch[0], atY + patch[1], patch[2], patch[3], " ")))
                         self.canvasMap[atY + patch[1]][atX + patch[0]] = [patch[2], patch[3], " "];
                         self._drawPatch(patch, eventDc, tmpDc, atX, atY)
+            if len(mapPatch[3]):
+                self.parentFrame.onCanvasUpdate()
     # }}}
     # {{{ getBackgroundColour(): XXX
     def getBackgroundColour(self):
@@ -179,6 +182,7 @@ class MiRCARTCanvas(wx.Panel):
             eventDc = wx.ClientDC(self); tmpDc = wx.MemoryDC();
             tmpDc.SelectObject(self.canvasBitmap)
             self._drawPatch(redoPatch, eventDc, tmpDc, 0, 0)
+            self.parentFrame.onCanvasUpdate()
             return True
         else:
             return False
@@ -193,12 +197,14 @@ class MiRCARTCanvas(wx.Panel):
             tmpDc.SelectObject(self.canvasBitmap)
             self._drawPatch(undoPatch, eventDc, tmpDc, 0, 0)
             self.patchesUndoLevel += 1
+            self.parentFrame.onCanvasUpdate()
             return True
         else:
             return False
     # }}}
     # {{{ Initialisation method
-    def __init__(self, parent, canvasPos, cellSize, canvasSize, canvasTools):
+    def __init__(self, parent, parentFrame, canvasPos, cellSize, canvasSize, canvasTools):
+        self.parentFrame = parentFrame
         canvasWinSize = (cellSize[0] * canvasSize[0], cellSize[1] * canvasSize[1])
         super().__init__(parent, pos=canvasPos, size=canvasWinSize)
         self.canvasPos = canvasPos; self.canvasSize = canvasSize; self.canvasWinSize = canvasWinSize;
@@ -346,6 +352,17 @@ class MiRCARTFrame(wx.Frame):
     def onAccelUndo(self, event):
         self.panelCanvas.undo()
     # }}}
+    # {{{ onCanvasUpdate(): XXX
+    def onCanvasUpdate(self):
+        if self.panelCanvas.patchesUndo[self.panelCanvas.patchesUndoLevel] != None:
+            self.menuEditUndo.Enable(True)
+        else:
+            self.menuEditUndo.Enable(False)
+        if self.panelCanvas.patchesUndoLevel > 0:
+            self.menuEditRedo.Enable(True)
+        else:
+            self.menuEditRedo.Enable(False)
+    # }}}
     # {{{ onEditCopy(): XXX
     def onEditCopy(self, event):
         pass
@@ -433,6 +450,11 @@ class MiRCARTFrame(wx.Frame):
                 except IOError as error:
                     wx.LogError("IOError {}".format(error))
     # }}}
+    # {{{ onPaletteEvent(): XXX
+    def onPaletteEvent(self, leftDown, rightDown, numColour):
+        self.panelCanvas.onPaletteEvent(leftDown, rightDown, numColour)
+        self._updateStatusBar()
+    # }}}
     # {{{ onToolsRect(): XXX
     def onToolsRect(self, event):
         pass
@@ -445,20 +467,15 @@ class MiRCARTFrame(wx.Frame):
     def onToolsLine(self, event):
         pass
     # }}}
-    # {{{ onPaletteEvent(): XXX
-    def onPaletteEvent(self, leftDown, rightDown, numColour):
-        self.panelCanvas.onPaletteEvent(leftDown, rightDown, numColour)
-        self._updateStatusBar()
-    # }}}
     # {{{ Initialisation method
     def __init__(self, parent, appSize=(800, 600), canvasPos=(25, 25), cellSize=(7, 14), canvasSize=(80, 25)):
         super().__init__(parent, wx.ID_ANY, "MiRCART", size=appSize)
 
         self.panelSkin = wx.Panel(self, wx.ID_ANY)
-        self.panelCanvas = MiRCARTCanvas(self.panelSkin,            \
-            canvasPos=canvasPos, cellSize=cellSize,                 \
+        self.panelCanvas = MiRCARTCanvas(self.panelSkin,                \
+            parentFrame=self, canvasPos=canvasPos, cellSize=cellSize,   \
             canvasSize=canvasSize, canvasTools=[MiRCARTToolRect])
-        self.panelPalette = MiRCARTPalette(self.panelSkin,          \
+        self.panelPalette = MiRCARTPalette(self.panelSkin,              \
             (25, (canvasSize[1] + 3) * cellSize[1]), cellSize, self.onPaletteEvent)
 
         self.menuFile = wx.Menu()
