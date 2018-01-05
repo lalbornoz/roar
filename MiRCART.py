@@ -105,9 +105,15 @@ class MiRCARTCanvas(wx.Panel):
                         atY + patch[1], mapItem[0], mapItem[1], mapItem[2]))
                     self._drawPatch(patch, eventDc, tmpDc, atX, atY)
                 else:
-                    self._drawPatch(patch, eventDc, tmpDc, atX, atY)
-                    self.canvasMap[atY + patch[1]][atX + patch[0]] =\
-                        [patch[2], patch[3], " "];
+                    mapItem = self.canvasMap[atY + patch[1]][atX + patch[0]]
+                    if mapItem != [patch[2], patch[3], patch[4]]:
+                        self.patchesUndo.append((atX + patch[0],    \
+                            atY + patch[1], patch[2], patch[3], " "))
+                        self.patchesUndo.append((atX + patch[0],    \
+                            atY + patch[1], mapItem[0], mapItem[1], mapItem[2]))
+                        self.canvasMap[atY + patch[1]][atX + patch[0]] =\
+                            [patch[2], patch[3], " "];
+                        self._drawPatch(patch, eventDc, tmpDc, atX, atY)
     # }}}
     # {{{ getBackgroundColour(): XXX
     def getBackgroundColour(self):
@@ -159,6 +165,19 @@ class MiRCARTCanvas(wx.Panel):
     # {{{ onRightDown(): XXX
     def onRightDown(self, event):
         self._onMouseEvent(event)
+    # }}}
+    # {{{ undo(): XXX
+    def undo(self):
+        if len(self.patchesUndo) >= 2:
+            deltaPatch = self.patchesUndo[-1];
+            del self.patchesUndo[-1]; del self.patchesUndo[-1];
+            self.canvasMap[deltaPatch[1]][deltaPatch[0]] =          \
+                [deltaPatch[2], deltaPatch[3], deltaPatch[4]]
+            eventDc = wx.ClientDC(self); tmpDc = wx.MemoryDC();
+            tmpDc.SelectObject(self.canvasBitmap)
+            self._drawPatch(deltaPatch, eventDc, tmpDc, 0, 0)
+        else:
+            return False
     # }}}
     # {{{ Initialisation method
     def __init__(self, parent, canvasPos, cellSize, canvasSize, canvasTools):
@@ -278,7 +297,7 @@ class MiRCARTPalette(wx.Panel):
 
 class MiRCARTFrame(wx.Frame):
     """XXX"""
-    menuFile = menuFileSaveAs = menuFileExit = menuBar = None
+    menuFile = menuFileUndo = menuFileSaveAs = menuFileExit = menuBar = None
     panelSkin = panelCanvas = panelPalette = None
     statusBar = None
 
@@ -290,6 +309,10 @@ class MiRCARTFrame(wx.Frame):
         text += "Background colour:"
         text += " " + str(self.panelCanvas.getBackgroundColour())
         self.statusBar.SetStatusText(text)
+    # }}}
+    # {{{ onFileUndo(): XXX
+    def onFileUndo(self, event):
+        self.panelCanvas.undo()
     # }}}
     # {{{ onFileSaveAs(): XXX
     def onFileSaveAs(self, event):
@@ -332,6 +355,7 @@ class MiRCARTFrame(wx.Frame):
         super().__init__(parent, wx.ID_ANY, "MiRCART", size=appSize)
 
         self.menuFile = wx.Menu()
+        self.menuFileUndo = self.menuFile.Append(wx.ID_SAVE, "&Undo", "Undo")
         self.menuFileSaveAs = self.menuFile.Append(wx.ID_SAVE, "Save &As...", "Save As...")
         self.menuFileExit = self.menuFile.Append(wx.ID_EXIT, "E&xit", "Exit")
         self.menuBar = wx.MenuBar()
@@ -349,6 +373,7 @@ class MiRCARTFrame(wx.Frame):
 
         self.Bind(wx.EVT_MENU, self.onFileExit, self.menuFileExit)
         self.Bind(wx.EVT_MENU, self.onFileSaveAs, self.menuFileSaveAs)
+        self.Bind(wx.EVT_MENU, self.onFileUndo, self.menuFileUndo)
         self.SetMenuBar(self.menuBar)
         self.Show(True)
     # }}}
