@@ -288,38 +288,6 @@ class MiRCARTToolRect(MiRCARTTool):
         super().__init__(parentCanvas)
     # }}}
 
-class MiRCARTPalette(wx.Panel):
-    """XXX"""
-    panelsByColour = onPaletteEvent = None
-
-    # {{{ onLeftDown(): XXX
-    def onLeftDown(self, event):
-        numColour = int(event.GetEventObject().GetName())
-        self.onPaletteEvent(True, False, numColour)
-    # }}}
-    # {{{ onRightDown(): XXX
-    def onRightDown(self, event):
-        numColour = int(event.GetEventObject().GetName())
-        self.onPaletteEvent(False, True, numColour)
-    # }}}
-    # {{{ Initialisation method
-    def __init__(self, parent, parentPos, cellSize, onPaletteEvent):
-        panelSizeW = 6 * cellSize[0]; panelSizeH = 2 * cellSize[1];
-        paletteSize = (panelSizeW * 16, panelSizeH)
-        super().__init__(parent, pos=parentPos, size=paletteSize)
-        self.panelsByColour = [None] * len(mircColours)
-        for numColour in range(0, len(mircColours)):
-            posX = (numColour * (cellSize[0] * 6))
-            self.panelsByColour[numColour] = wx.Panel(self,         \
-                pos=(posX, 0), size=(panelSizeW, panelSizeH))
-            self.panelsByColour[numColour].SetBackgroundColour(     \
-                wx.Colour(mircColours[numColour]))
-            self.panelsByColour[numColour].Bind(wx.EVT_LEFT_DOWN, self.onLeftDown)
-            self.panelsByColour[numColour].Bind(wx.EVT_RIGHT_DOWN, self.onRightDown)
-            self.panelsByColour[numColour].SetName(str(numColour))
-        self.onPaletteEvent = onPaletteEvent
-    # }}}
-
 class MiRCARTFrame(wx.Frame):
     """XXX"""
     menuFile = None
@@ -332,7 +300,14 @@ class MiRCARTFrame(wx.Frame):
     menuEditDecrBrush = menuEditIncrBrush = menuEditSolidBrush = None
     menuTools = menuToolsCircle = menuToolsLine = menuToolsRect = None
     menuBar = None
-    panelSkin = panelCanvas = panelPalette = None
+    panelSkin = panelCanvas = None
+    toolBar = None
+    toolBarIdNew = toolBarIdOpen = toolBarIdSave = toolBarIdSaveAs = None
+    toolBarIdUndo = toolBarIdRedo = None
+    toolBarIdCut = toolBarIdCopy = toolBarIdPaste = toolBarIdDelete = None
+    toolBarIdIncrBrush = toolBarIdDecrBrush = toolBarIdSolidBrush = None
+    toolBarIdRect = toolBarIdCircle = toolBarIdLine = None
+    toolBarIdColours = toolBarBitmapColours = None
     accelRedoId = accelUndoId = accelTable = statusBar = None
 
     # {{{ _updateStatusBar(): XXX
@@ -455,6 +430,20 @@ class MiRCARTFrame(wx.Frame):
         self.panelCanvas.onPaletteEvent(leftDown, rightDown, numColour)
         self._updateStatusBar()
     # }}}
+    # {{{ onToolColourBg(): XXX
+    def onToolColourBg(self, event):
+        itemId = event.GetId()
+        for numColour in range(0, len(mircColours)):
+            if self.toolBarIdColours[numColour] == itemId:
+                self.onPaletteEvent(False, True, numColour)
+    # }}}
+    # {{{ onToolColourFg(): XXX
+    def onToolColourFg(self, event):
+        itemId = event.GetId()
+        for numColour in range(0, len(mircColours)):
+            if self.toolBarIdColours[numColour] == itemId:
+                self.onPaletteEvent(True, False, numColour)
+    # }}}
     # {{{ onToolsRect(): XXX
     def onToolsRect(self, event):
         pass
@@ -468,15 +457,13 @@ class MiRCARTFrame(wx.Frame):
         pass
     # }}}
     # {{{ Initialisation method
-    def __init__(self, parent, appSize=(800, 600), canvasPos=(25, 25), cellSize=(7, 14), canvasSize=(80, 25)):
+    def __init__(self, parent, appSize=(800, 600), canvasPos=(25, 50), cellSize=(7, 14), canvasSize=(80, 25)):
         super().__init__(parent, wx.ID_ANY, "MiRCART", size=appSize)
 
         self.panelSkin = wx.Panel(self, wx.ID_ANY)
-        self.panelCanvas = MiRCARTCanvas(self.panelSkin,                \
-            parentFrame=self, canvasPos=canvasPos, cellSize=cellSize,   \
+        self.panelCanvas = MiRCARTCanvas(self.panelSkin,                        \
+            parentFrame=self, canvasPos=canvasPos, cellSize=cellSize,           \
             canvasSize=canvasSize, canvasTools=[MiRCARTToolRect])
-        self.panelPalette = MiRCARTPalette(self.panelSkin,              \
-            (25, (canvasSize[1] + 3) * cellSize[1]), cellSize, self.onPaletteEvent)
 
         self.menuFile = wx.Menu()
         self.menuFileNew = self.menuFile.Append(wx.ID_NEW, "&New", "New")
@@ -546,6 +533,77 @@ class MiRCARTFrame(wx.Frame):
 
         self.statusBar = self.CreateStatusBar()
         self._updateStatusBar()
+
+        self.toolBar = wx.ToolBar(self.panelSkin, -1, style=wx.HORIZONTAL|wx.TB_FLAT|wx.TB_NODIVIDER)
+        self.toolBar.SetToolBitmapSize((16,16))
+        self.toolNew = self.toolBar.AddTool(wx.NewId(), "New",                          \
+            wx.ArtProvider.GetBitmap(wx.ART_NEW, wx.ART_TOOLBAR, (16,16)))
+        self.Bind(wx.EVT_TOOL, self.onFileNew, self.toolNew)
+        self.toolOpen = self.toolBar.AddTool(wx.NewId(), "Open",                        \
+            wx.ArtProvider.GetBitmap(wx.ART_FILE_OPEN, wx.ART_TOOLBAR, (16,16)))
+        self.Bind(wx.EVT_TOOL, self.onFileOpen, self.toolOpen)
+        self.toolSave = self.toolBar.AddTool(wx.NewId(), "Save",                        \
+            wx.ArtProvider.GetBitmap(wx.ART_FILE_SAVE, wx.ART_TOOLBAR, (16,16)))
+        self.Bind(wx.EVT_TOOL, self.onFileSave, self.toolSave)
+        self.toolSaveAs = self.toolBar.AddTool(wx.NewId(), "Save As...",                \
+            wx.ArtProvider.GetBitmap(wx.ART_FILE_SAVE_AS, wx.ART_TOOLBAR, (16,16)))
+        self.Bind(wx.EVT_TOOL, self.onFileSaveAs, self.toolSaveAs)
+        self.toolUndo = self.toolBar.AddTool(wx.NewId(), "Undo",                        \
+            wx.ArtProvider.GetBitmap(wx.ART_UNDO, wx.ART_TOOLBAR, (16,16)))
+        self.Bind(wx.EVT_TOOL, self.onEditUndo, self.toolUndo)
+        self.toolRedo = self.toolBar.AddTool(wx.NewId(), "Redo",                        \
+            wx.ArtProvider.GetBitmap(wx.ART_REDO, wx.ART_TOOLBAR, (16,16)))
+        self.Bind(wx.EVT_TOOL, self.onEditRedo, self.toolRedo)
+        self.toolBar.AddSeparator()
+        self.toolCut = self.toolBar.AddTool(wx.NewId(), "Cut",                          \
+            wx.ArtProvider.GetBitmap(wx.ART_CUT, wx.ART_TOOLBAR, (16,16)))
+        self.Bind(wx.EVT_TOOL, self.onEditCut, self.toolCut)
+        self.toolCopy = self.toolBar.AddTool(wx.NewId(), "Copy",                        \
+            wx.ArtProvider.GetBitmap(wx.ART_COPY, wx.ART_TOOLBAR, (16,16)))
+        self.Bind(wx.EVT_TOOL, self.onEditCopy, self.toolCopy)
+        self.toolPaste = self.toolBar.AddTool(wx.NewId(), "Paste",                      \
+            wx.ArtProvider.GetBitmap(wx.ART_PASTE, wx.ART_TOOLBAR, (16,16)))
+        self.Bind(wx.EVT_TOOL, self.onEditPaste, self.toolPaste)
+        self.toolDelete = self.toolBar.AddTool(wx.NewId(), "Delete",                    \
+            wx.ArtProvider.GetBitmap(wx.ART_DELETE, wx.ART_TOOLBAR, (16,16)))
+        self.Bind(wx.EVT_TOOL, self.onEditDelete, self.toolDelete)
+        self.toolBar.AddSeparator()
+        self.toolIncrBrush = self.toolBar.AddTool(wx.NewId(), "Increase brush size",    \
+            wx.ArtProvider.GetBitmap(wx.ART_PLUS, wx.ART_TOOLBAR, (16,16)))
+        self.Bind(wx.EVT_TOOL, self.onEditIncrBrush, self.toolIncrBrush)
+        self.toolDecrBrush = self.toolBar.AddTool(wx.NewId(), "Decrease brush size",    \
+            wx.ArtProvider.GetBitmap(wx.ART_MINUS, wx.ART_TOOLBAR, (16,16)))
+        self.Bind(wx.EVT_TOOL, self.onEditDecrBrush, self.toolDecrBrush)
+        self.toolSolidBrush = self.toolBar.AddTool(wx.NewId(), "Solid brush",           \
+            wx.ArtProvider.GetBitmap(wx.ART_HELP, wx.ART_TOOLBAR, (16,16)))
+        self.Bind(wx.EVT_TOOL, self.onEditSolidBrush, self.toolSolidBrush)
+        self.toolBar.AddSeparator()
+        self.toolRect = self.toolBar.AddTool(wx.NewId(), "Rectangle",                   \
+            wx.ArtProvider.GetBitmap(wx.ART_HELP, wx.ART_TOOLBAR, (16,16)))
+        self.Bind(wx.EVT_TOOL, self.onToolsRect, self.toolRect)
+        self.toolCircle = self.toolBar.AddTool(wx.NewId(), "Circle",                    \
+            wx.ArtProvider.GetBitmap(wx.ART_HELP, wx.ART_TOOLBAR, (16,16)))
+        self.Bind(wx.EVT_TOOL, self.onToolsCircle, self.toolCircle)
+        self.toolLine = self.toolBar.AddTool(wx.NewId(), "Line",                        \
+            wx.ArtProvider.GetBitmap(wx.ART_HELP, wx.ART_TOOLBAR, (16,16)))
+        self.Bind(wx.EVT_TOOL, self.onToolsLine, self.toolLine)
+        self.toolBar.AddSeparator()
+        self.toolBarIdColours = [None for x in range(0, len(mircColours))]
+        self.toolBarBitmapColours = [None for x in range(0, len(mircColours))]
+        for numColour in range(0, len(mircColours)):
+            self.toolBarBitmapColours[numColour] = wx.Bitmap((16,16))
+            tmpDc = wx.MemoryDC(); tmpDc.SelectObject(self.toolBarBitmapColours[numColour]);
+            tmpDc.SetBrush(self.panelCanvas.mircBrushes[numColour])
+            tmpDc.SetBackground(self.panelCanvas.mircBrushes[numColour])
+            tmpDc.SetPen(self.panelCanvas.mircPens[numColour])
+            tmpDc.DrawRectangle(0, 0, 16, 16)
+            self.toolBarIdColours[numColour] = wx.NewId()
+            print(self.toolBarIdColours[numColour])
+            self.toolBar.AddTool(self.toolBarIdColours[numColour],                      \
+                "mIRC colour #" + str(numColour), self.toolBarBitmapColours[numColour])
+            self.Bind(wx.EVT_TOOL, self.onToolColourFg, id=self.toolBarIdColours[numColour])
+            self.Bind(wx.EVT_TOOL_RCLICKED, self.onToolColourBg, id=self.toolBarIdColours[numColour])
+        self.toolBar.Realize(); self.toolBar.Fit();
 
         self.SetFocus()
         self.Show(True)
