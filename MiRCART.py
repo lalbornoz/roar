@@ -96,13 +96,16 @@ class MiRCARTCanvas(wx.Panel):
             mapPatchTmp = mapPatch[0]; mapPatchW = mapPatch[1]; mapPatchH = mapPatch[2];
             if mapPatchTmp and self.patchesTmp:
                 for patch in self.patchesTmp:
+                    patch[2] = self.canvasMap[patch[1]][patch[0]][0]
+                    patch[3] = self.canvasMap[patch[1]][patch[0]][1]
+                    patch[4] = self.canvasMap[patch[1]][patch[0]][2]
                     self._drawPatch(patch, eventDc, tmpDc, 0, 0)
                 self.patchesTmp = []
             for patch in mapPatch[3]:
                 if mapPatchTmp:
                     mapItem = self.canvasMap[atY + patch[1]][atX + patch[0]]
-                    self.patchesTmp.append((atX + patch[0],         \
-                        atY + patch[1], mapItem[0], mapItem[1], mapItem[2]))
+                    self.patchesTmp.append([atX + patch[0],         \
+                        atY + patch[1], None, None, None])
                     self._drawPatch(patch, eventDc, tmpDc, atX, atY)
                 else:
                     mapItem = self.canvasMap[atY + patch[1]][atX + patch[0]]
@@ -243,8 +246,8 @@ class MiRCARTToolRect(MiRCARTTool):
                 self.parentCanvas.getBackgroundColour(),            \
                 self.parentCanvas.getBackgroundColour(), " "]]],    \
                     [True, 1, 1, [[0, 0,                            \
-                self.parentCanvas.getForegroundColour(),            \
-                self.parentCanvas.getForegroundColour(), " "]]]]
+                self.parentCanvas.getBackgroundColour(),            \
+                self.parentCanvas.getBackgroundColour(), " "]]]]
         else:
             return [[True, 1, 1, [[0, 0,                            \
                 self.parentCanvas.getForegroundColour(),            \
