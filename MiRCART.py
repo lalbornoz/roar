@@ -451,7 +451,7 @@ class MiRCARTFrame(wx.Frame):
         self._updateStatusBar()
     # }}}
     # {{{ Initialisation method
-    def __init__(self, parent, appSize=(1024, 768), canvasPos=(25, 25), cellSize=(7, 14), canvasSize=(80, 25)):
+    def __init__(self, parent, appSize=(800, 600), canvasPos=(25, 25), cellSize=(7, 14), canvasSize=(80, 25)):
         super().__init__(parent, wx.ID_ANY, "MiRCART", size=appSize)
 
         self.panelSkin = wx.Panel(self, wx.ID_ANY)
