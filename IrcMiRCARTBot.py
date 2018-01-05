@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 #
-# IrcMiRCARTBot.py -- XXX
+# IrcMiRCARTBot.py -- IRC<->MiRC2png bot (for EFnet #MiRCART)
 # Copyright (c) 2018 Lucio Andrés Illanes Albornoz <lucio@lucioillanes.de>
 # 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -29,7 +29,7 @@ import IrcClient, MiRC2png
 import requests, urllib.request
 
 class IrcMiRCARTBot(IrcClient.IrcClient):
-    """IRC<->MiRCART bot"""
+    """IRC<->MiRC2png bot"""
     clientChannelLastMessage = clientChannelOps = clientChannel = None
     clientChannelRejoin = None
 
