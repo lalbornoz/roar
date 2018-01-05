@@ -209,14 +209,15 @@ class MiRC2png:
     # }}}
     # {{{ _syncColourSpecState(): XXX
     def _syncColourSpecState(self, colourSpec):
-        colourSpec = colourSpec.split(",")
-        if len(colourSpec) == 2:
-            self.outCurColourFg = int(colourSpec[0])
-            self.outCurColourBg = int(colourSpec[1] or self.outCurColourBg)
-        elif len(colourSpec) == 1:
-            self.outCurColourFg = int(colourSpec[0])
-        else:
-            self.outCurColourBg = 1; self.outCurColourFg = 15;
+        if len(colourSpec) > 0:
+            colourSpec = colourSpec.split(",")
+            if len(colourSpec) == 2:
+                self.outCurColourFg = int(colourSpec[0])
+                self.outCurColourBg = int(colourSpec[1] or self.outCurColourBg)
+            elif len(colourSpec) == 1:
+                self.outCurColourFg = int(colourSpec[0])
+            else:
+                self.outCurColourBg = 1; self.outCurColourFg = 15;
         return True
     # }}}
 
