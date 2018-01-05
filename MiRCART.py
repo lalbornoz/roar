@@ -299,7 +299,7 @@ class MiRCARTFrame(wx.Frame):
     """XXX"""
     menuFile = menuFileUndo = menuFileSaveAs = menuFileExit = menuBar = None
     panelSkin = panelCanvas = panelPalette = None
-    statusBar = None
+    accelUndoId = accelTable = statusBar = None
 
     # {{{ _updateStatusBar(): XXX
     def _updateStatusBar(self):
@@ -309,6 +309,10 @@ class MiRCARTFrame(wx.Frame):
         text += "Background colour:"
         text += " " + str(self.panelCanvas.getBackgroundColour())
         self.statusBar.SetStatusText(text)
+    # }}}
+    # {{{ onAccelUndo(): XXX
+    def onAccelUndo(self, event):
+        self.panelCanvas.undo()
     # }}}
     # {{{ onFileUndo(): XXX
     def onFileUndo(self, event):
@@ -355,11 +359,12 @@ class MiRCARTFrame(wx.Frame):
         super().__init__(parent, wx.ID_ANY, "MiRCART", size=appSize)
 
         self.menuFile = wx.Menu()
-        self.menuFileUndo = self.menuFile.Append(wx.ID_SAVE, "&Undo", "Undo")
+        self.menuFileUndo = self.menuFile.Append(wx.ID_UNDO, "&Undo", "Undo")
         self.menuFileSaveAs = self.menuFile.Append(wx.ID_SAVE, "Save &As...", "Save As...")
         self.menuFileExit = self.menuFile.Append(wx.ID_EXIT, "E&xit", "Exit")
         self.menuBar = wx.MenuBar()
         self.menuBar.Append(self.menuFile, "&File")
+        self.SetMenuBar(self.menuBar)
 
         self.panelSkin = wx.Panel(self, wx.ID_ANY)
         self.panelCanvas = MiRCARTCanvas(self.panelSkin,            \
@@ -368,13 +373,18 @@ class MiRCARTFrame(wx.Frame):
         self.panelPalette = MiRCARTPalette(self.panelSkin,          \
             (25, (canvasSize[1] + 3) * cellSize[1]), cellSize, self.onPaletteEvent)
 
+        self.accelUndoId = wx.NewId()
+        self.accelTable = wx.AcceleratorTable([(                    \
+            wx.ACCEL_CTRL, ord('Z'), self.accelUndoId)])
+        self.SetAcceleratorTable(self.accelTable)
         self.statusBar = self.CreateStatusBar()
         self._updateStatusBar()
+        self.SetFocus()
 
+        self.Bind(wx.EVT_MENU, self.onAccelUndo, id=self.accelUndoId)
         self.Bind(wx.EVT_MENU, self.onFileExit, self.menuFileExit)
         self.Bind(wx.EVT_MENU, self.onFileSaveAs, self.menuFileSaveAs)
         self.Bind(wx.EVT_MENU, self.onFileUndo, self.menuFileUndo)
-        self.SetMenuBar(self.menuBar)
         self.Show(True)
     # }}}
 
