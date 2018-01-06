@@ -52,7 +52,7 @@ class IrcClient:
                 self.close(); return False;
         else:
             select.select([], [self.clientSocket.fileno()], [])
-        self.clientSocketFile = self.clientSocket.makefile()
+        self.clientSocketFile = self.clientSocket.makefile(encoding="utf-8")
         self.clientQueue = []
         self.queue("NICK", self.clientNick)
         self.queue("USER", self.clientIdent, "0", "0", self.clientGecos)
