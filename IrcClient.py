@@ -32,13 +32,13 @@ class IrcClient:
     clientSocket = clientSocketFile = None;
     clientNextTimeout = None; clientQueue = None;
 
-    # {{{ close(): Close connection to server
+    # {{{ close(self): Close connection to server
     def close(self):
         if self.clientSocket != None:
             self.clientSocket.close()
         self.clientSocket = self.clientSocketFile = None;
     # }}}
-    # {{{ connect(): Connect to server and register w/ optional timeout
+    # {{{ connect(self, timeout=None): Connect to server and register w/ optional timeout
     def connect(self, timeout=None):
         self.clientSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.clientSocket.setblocking(0)
@@ -58,7 +58,7 @@ class IrcClient:
         self.queue("USER", self.clientIdent, "0", "0", self.clientGecos)
         return True
     # }}}
-    # {{{ readline(): Read and parse single line from server into canonicalised list, honouring timers
+    # {{{ readline(self): Read and parse single line from server into canonicalised list, honouring timers
     def readline(self):
         if self.clientNextTimeout:
             timeNow = time.time()
@@ -87,7 +87,7 @@ class IrcClient:
             msg = [""] + msg[0:]
         return msg
     # }}}
-    # {{{ queue(): Parse and queue single line to server from list
+    # {{{ queue(self, *args): Parse and queue single line to server from list
     def queue(self, *args):
         msg = ""; argNumMax = len(args);
         for argNum in range(0, argNumMax):
@@ -97,7 +97,7 @@ class IrcClient:
                 msg += args[argNum] + " "
         self.clientQueue.append((msg + "\r\n").encode())
     # }}}
-    # {{{ unqueue(): Send all queued lines to server, honouring timers
+    # {{{ unqueue(self): Send all queued lines to server, honouring timers
     def unqueue(self):
         while self.clientQueue:
             msg = self.clientQueue[0]; msgLen = len(msg); msgBytesSent = 0;
@@ -118,7 +118,7 @@ class IrcClient:
     # }}}
 
     #
-    # Initialisation method
+    # __init__(self, serverHname, serverPort, clientNick, clientIdent, clientGecos): initialisation method
     def __init__(self, serverHname, serverPort, clientNick, clientIdent, clientGecos):
         self.serverHname = serverHname; self.serverPort = serverPort;
         self.clientNick = clientNick; self.clientIdent = clientIdent; self.clientGecos = clientGecos;

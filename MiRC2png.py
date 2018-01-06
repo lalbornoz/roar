@@ -81,7 +81,7 @@ class MiRC2png:
         (187, 187, 187, 255),   # Light Grey
     ]
     # }}}
-    # {{{ _State: Parsing loop state
+    # {{{ _State(Enum): Parsing loop state
     class _State(Enum):
         STATE_CHAR = 1
         STATE_COLOUR_SPEC = 2
@@ -89,15 +89,15 @@ class MiRC2png:
         STATE_CSPEC_DIGIT1 = 3
     # }}}
 
-    # {{{ _countChar(): XXX
+    # {{{ _countChar(self, char): XXX
     def _countChar(self, char):
         return True
     # }}}
-    # {{{ _countColourSpecState(): XXX
+    # {{{ _countColourSpecState(self, colourSpec): XXX
     def _countColourSpecState(self, colourSpec):
         return 0
     # }}}
-    # {{{ _render(): XXX
+    # {{{ _render(self): XXX
     def _render(self):
         self.outCurX = 0; self.outCurY = 0;
         for inCurRow in range(0, len(self.inLines)):
@@ -116,7 +116,7 @@ class MiRC2png:
                         self._syncColourSpecState)
             self.outCurX = 0; self.outCurY += self.outImgFontSize[1];
     # }}}
-    # {{{ _getMaxCols(): Calculate widest row in lines, ignoring non-printable & mIRC control code sequences
+    # {{{ _getMaxCols(self, lines): Calculate widest row in lines, ignoring non-printable & mIRC control code sequences
     def _getMaxCols(self, lines):
         maxCols = 0;
         for inCurRow in range(0, len(lines)):
@@ -136,7 +136,7 @@ class MiRC2png:
             maxCols = max(maxCols, curRowCols)
         return maxCols
     # }}}
-    # {{{ _parseAsChar(): Parse single character as regular character and mutate state
+    # {{{ _parseAsChar(self, char, fn): Parse single character as regular character and mutate state
     def _parseAsChar(self, char, fn):
         if char == "":
             self._State = self._State.STATE_CSPEC_DIGIT0; self.inCurCol += 1;
@@ -144,7 +144,7 @@ class MiRC2png:
         else:
             self.inCurCol += 1; return fn(char);
     # }}}
-    # {{{ _parseAsColourSpec(): Parse single character as mIRC colour control code sequence and mutate state
+    # {{{ _parseAsColourSpec(self, char, fn): Parse single character as mIRC colour control code sequence and mutate state
     def _parseAsColourSpec(self, char, fn):
         if  self._State == self._State.STATE_CSPEC_DIGIT0               \
         and char == ",":
@@ -170,7 +170,7 @@ class MiRC2png:
             self.inCurDigits = 0
             return [True, result]
     # }}}
-    # {{{ _syncChar(): XXX
+    # {{{ _syncChar(self, char): XXX
     def _syncChar(self, char):
         if char == "":
             self.inCurBold = 0 if self.inCurBold else 1;
@@ -207,7 +207,7 @@ class MiRC2png:
             self.outCurX += self.outImgFontSize[0];
         return True
     # }}}
-    # {{{ _syncColourSpecState(): XXX
+    # {{{ _syncColourSpecState(self, colourSpec): XXX
     def _syncColourSpecState(self, colourSpec):
         if len(colourSpec) > 0:
             colourSpec = colourSpec.split(",")
@@ -222,7 +222,7 @@ class MiRC2png:
     # }}}
 
     #
-    # Initialisation method
+    # __init__(self, inFilePath, imgFilePath, fontFilePath="DejaVuSansMono.ttf", fontSize=11): initialisation method
     def __init__(self, inFilePath, imgFilePath, fontFilePath="DejaVuSansMono.ttf", fontSize=11):
         self.inFilePath = inFilePath; self.inFile = open(inFilePath, "r");
         self.inLines = self.inFile.readlines()
