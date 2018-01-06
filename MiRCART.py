@@ -22,6 +22,7 @@
 # SOFTWARE.
 #
 
+import enum
 import wx
 import os, sys
 
@@ -290,26 +291,164 @@ class MiRCARTToolRect(MiRCARTTool):
 
 class MiRCARTFrame(wx.Frame):
     """XXX"""
-    menuFile = None
-    menuFileNew = menuFileOpen = menuFileSave = menuFileSaveAs = None
-    menuFileExportPastebin = menuFileExportPng = None
-    menuFileExit = None
-    menuEdit = None
-    menuEditRedo = menuEditUndo = None
-    menuEditCopy = menuEditCut = menuEditDelete = menuEditPaste = None
-    menuEditDecrBrush = menuEditIncrBrush = menuEditSolidBrush = None
-    menuTools = menuToolsCircle = menuToolsLine = menuToolsRect = None
-    menuBar = None
     panelSkin = panelCanvas = None
-    toolBar = None
-    toolBarIdNew = toolBarIdOpen = toolBarIdSave = toolBarIdSaveAs = None
-    toolBarIdUndo = toolBarIdRedo = None
-    toolBarIdCut = toolBarIdCopy = toolBarIdPaste = toolBarIdDelete = None
-    toolBarIdIncrBrush = toolBarIdDecrBrush = toolBarIdSolidBrush = None
-    toolBarIdRect = toolBarIdCircle = toolBarIdLine = None
-    toolBarIdColours = toolBarBitmapColours = None
-    accelRedoId = accelUndoId = accelTable = statusBar = None
+    menuItemsById = menuBar = toolBar = accelTable = None
+    statusBar = None
 
+    # {{{ Types
+    TID_COMMAND         = (0x001)
+    TID_NOTHING         = (0x002)
+    TID_MENU            = (0x003)
+    TID_TOOLBAR         = (0x004)
+    TID_ACCELS          = (0x005)
+    # }}}
+    # {{{ Commands
+    #                      Id     Type Id      Labels                           Icon bitmap             Accelerator
+    CID_NEW             = (0x100, TID_COMMAND, "New", "&New",                   [wx.ART_NEW],           None)
+    CID_OPEN            = (0x101, TID_COMMAND, "Open", "&Open",                 [wx.ART_FILE_OPEN],     None)
+    CID_SAVE            = (0x102, TID_COMMAND, "Save", "&Save",                 [wx.ART_FILE_SAVE],     None)
+    CID_SAVEAS          = (0x103, TID_COMMAND, "Save As...", "Save &As...",     [wx.ART_FILE_SAVE_AS],  None)
+    CID_EXPORT_PASTEBIN = (0x104, TID_COMMAND, "Export to Pastebin...", "Export to Pasteb&in...", (),   None)
+    CID_EXPORT_AS_PNG   = (0x105, TID_COMMAND, "Export as PNG...", "Export as PN&G...", (),             None)
+    CID_EXIT            = (0x106, TID_COMMAND, "Exit", "E&xit",                 (),                     None)
+    CID_UNDO            = (0x107, TID_COMMAND, "Undo", "&Undo",                 [wx.ART_UNDO],          (wx.ACCEL_CTRL, ord("Z")))
+    CID_REDO            = (0x108, TID_COMMAND, "Redo", "&Redo",                 [wx.ART_REDO],          (wx.ACCEL_CTRL, ord("Y")))
+    CID_CUT             = (0x109, TID_COMMAND, "Cut", "Cu&t",                   [wx.ART_CUT],           None)
+    CID_COPY            = (0x10a, TID_COMMAND, "Copy", "&Copy",                 [wx.ART_COPY],          None)
+    CID_PASTE           = (0x10b, TID_COMMAND, "Paste", "&Paste",               [wx.ART_PASTE],         None)
+    CID_DELETE          = (0x10c, TID_COMMAND, "Delete", "De&lete",             [wx.ART_DELETE],        None)
+    CID_INCRBRUSH       = (0x10d, TID_COMMAND, "Increase brush size", "&Increase brush size", [wx.ART_PLUS], None)
+    CID_DECRBRUSH       = (0x10e, TID_COMMAND, "Decrease brush size", "&Decrease brush size", [wx.ART_MINUS], None)
+    CID_SOLIDBRUSH      = (0x10f, TID_COMMAND, "Solid brush", "&Solid brush",   [None],                 None)
+    CID_RECT            = (0x110, TID_COMMAND, "Rectangle", "&Rectangle",       [None],                 None)
+    CID_CIRCLE          = (0x111, TID_COMMAND, "Circle", "&Circle",             [None],                 None)
+    CID_LINE            = (0x112, TID_COMMAND, "Line", "&Line",                 [None],                 None)
+    CID_COLOUR00        = (0x113, TID_COMMAND, "Colour #00", "Colour #00",      mircColours[0],         None)
+    CID_COLOUR01        = (0x114, TID_COMMAND, "Colour #01", "Colour #01",      mircColours[1],         None)
+    CID_COLOUR02        = (0x115, TID_COMMAND, "Colour #02", "Colour #02",      mircColours[2],         None)
+    CID_COLOUR03        = (0x116, TID_COMMAND, "Colour #03", "Colour #03",      mircColours[3],         None)
+    CID_COLOUR04        = (0x117, TID_COMMAND, "Colour #04", "Colour #04",      mircColours[4],         None)
+    CID_COLOUR05        = (0x118, TID_COMMAND, "Colour #05", "Colour #05",      mircColours[5],         None)
+    CID_COLOUR06        = (0x119, TID_COMMAND, "Colour #06", "Colour #06",      mircColours[6],         None)
+    CID_COLOUR07        = (0x11a, TID_COMMAND, "Colour #07", "Colour #07",      mircColours[7],         None)
+    CID_COLOUR08        = (0x11b, TID_COMMAND, "Colour #08", "Colour #08",      mircColours[8],         None)
+    CID_COLOUR09        = (0x11c, TID_COMMAND, "Colour #09", "Colour #09",      mircColours[9],         None)
+    CID_COLOUR10        = (0x11d, TID_COMMAND, "Colour #10", "Colour #10",      mircColours[10],        None)
+    CID_COLOUR11        = (0x11e, TID_COMMAND, "Colour #11", "Colour #11",      mircColours[11],        None)
+    CID_COLOUR12        = (0x11f, TID_COMMAND, "Colour #12", "Colour #12",      mircColours[12],        None)
+    CID_COLOUR13        = (0x120, TID_COMMAND, "Colour #13", "Colour #13",      mircColours[13],        None)
+    CID_COLOUR14        = (0x121, TID_COMMAND, "Colour #14", "Colour #14",      mircColours[14],        None)
+    CID_COLOUR15        = (0x122, TID_COMMAND, "Colour #15", "Colour #15",      mircColours[15],        None)
+    # }}}
+    # {{{ Non-items
+    NID_MENU_SEP        = (0x200, TID_NOTHING)
+    NID_TOOLBAR_SEP     = (0x201, TID_NOTHING)
+    # }}}
+    # {{{ Menus
+    MID_FILE            = (0x300, TID_MENU, "File", "&File", (                  \
+        CID_NEW, CID_OPEN, CID_SAVE, CID_SAVEAS, NID_MENU_SEP,                  \
+        CID_EXPORT_PASTEBIN, CID_EXPORT_AS_PNG, NID_MENU_SEP,                   \
+        CID_EXIT))
+    MID_EDIT            = (0x301, TID_MENU, "Edit", "&Edit", (                  \
+        CID_UNDO, CID_REDO, NID_MENU_SEP,                                       \
+        CID_CUT, CID_COPY, CID_PASTE, CID_DELETE, NID_MENU_SEP,                 \
+        CID_INCRBRUSH, CID_DECRBRUSH, CID_SOLIDBRUSH))
+    MID_TOOLS           = (0x302, TID_MENU, "Tools", "&Tools", (                \
+        CID_RECT, CID_CIRCLE, CID_LINE))
+    # }}}
+    # {{{ Toolbars
+    BID_TOOLBAR         = (0x400, TID_TOOLBAR, (                                \
+        CID_NEW, CID_OPEN, CID_SAVE, CID_SAVEAS, NID_TOOLBAR_SEP,               \
+        CID_UNDO, CID_REDO, NID_TOOLBAR_SEP,                                    \
+        CID_CUT, CID_COPY, CID_PASTE, CID_DELETE, NID_TOOLBAR_SEP,              \
+        CID_INCRBRUSH, CID_DECRBRUSH, CID_SOLIDBRUSH, NID_TOOLBAR_SEP,          \
+        CID_RECT, CID_CIRCLE, CID_LINE, NID_TOOLBAR_SEP,                        \
+        CID_COLOUR00, CID_COLOUR01, CID_COLOUR02, CID_COLOUR03, CID_COLOUR04,   \
+        CID_COLOUR05, CID_COLOUR06, CID_COLOUR07, CID_COLOUR08, CID_COLOUR09,   \
+        CID_COLOUR10, CID_COLOUR11, CID_COLOUR12, CID_COLOUR13, CID_COLOUR14,   \
+        CID_COLOUR15))
+    # }}}
+    # {{{ Accelerators (hotkeys)
+    AID_EDIT            = (0x500, TID_ACCELS, (CID_UNDO, CID_REDO))
+    # }}}
+
+    # {{{ _drawIcon(): XXX
+    def _drawIcon(self, solidColour):
+        iconBitmap = wx.Bitmap((16,16))
+        iconDc = wx.MemoryDC(); iconDc.SelectObject(iconBitmap);
+        iconBrush = wx.Brush(wx.Colour(solidColour), wx.BRUSHSTYLE_SOLID)
+        iconDc.SetBrush(iconBrush); iconDc.SetBackground(iconBrush);
+        iconDc.SetPen(wx.Pen(wx.Colour(solidColour), 1))
+        iconDc.DrawRectangle(0, 0, 16, 16)
+        return iconBitmap
+    # }}}
+    # {{{ _initAccelTable(): XXX
+    def _initAccelTable(self, accelsDescr, handler):
+        accelTableEntries = [wx.AcceleratorEntry() for n in range(0, len(accelsDescr[2]))]
+        for numAccel in range(0, len(accelsDescr[2])):
+            accelDescr = accelsDescr[2][numAccel]
+            if accelDescr[5] != None:
+                accelTableEntries[numAccel].Set(accelDescr[5][0], accelDescr[5][1], accelDescr[0])
+                self.Bind(wx.EVT_MENU, handler, id=accelDescr[0])
+        return accelTableEntries
+    # }}}
+    # {{{ _initMenus(): XXX
+    def _initMenus(self, menuBar, menusDescr, handler):
+        for menuDescr in menusDescr:
+            menuWindow = wx.Menu()
+            for menuItem in menuDescr[4]:
+                if menuItem == self.NID_MENU_SEP:
+                    menuWindow.AppendSeparator()
+                else:
+                    menuItemWindow = menuWindow.Append(menuItem[0], menuItem[3], menuItem[2])
+                    self.menuItemsById[menuItem[0]] = menuItemWindow
+                    self.Bind(wx.EVT_MENU, handler, menuItemWindow)
+            menuBar.Append(menuWindow, menuDescr[3])
+    # }}}
+    # {{{ _initToolBars(): XXX
+    def _initToolBars(self, toolBar, toolBarsDescr, handler):
+        for toolBarDescr in toolBarsDescr:
+            for toolBarItem in toolBarDescr[2]:
+                if toolBarItem == self.NID_TOOLBAR_SEP:
+                    toolBar.AddSeparator()
+                else:
+                    if len(toolBarItem[4]) == 4:
+                        toolBarItemIcon = self._drawIcon(toolBarItem[4])
+                    elif len(toolBarItem[4]) == 1                               \
+                    and  toolBarItem[4][0] != None:
+                        toolBarItemIcon = wx.ArtProvider.GetBitmap(             \
+                            toolBarItem[4][0], wx.ART_TOOLBAR, (16,16))
+                    else:
+                        toolBarItemIcon = wx.ArtProvider.GetBitmap(             \
+                            wx.ART_HELP, wx.ART_TOOLBAR, (16,16))
+                    toolBarItemWindow = self.toolBar.AddTool(                   \
+                        toolBarItem[0], toolBarItem[2], toolBarItemIcon)
+                    self.Bind(wx.EVT_TOOL, handler, toolBarItemWindow)
+                    self.Bind(wx.EVT_TOOL_RCLICKED, handler, toolBarItemWindow)
+    # }}}
+    # {{{ _saveAs(): XXX
+    def _saveAs(self, pathName):
+        try:
+            with open(pathName, "w") as file:
+                canvasMap = self.panelCanvas.getMap()
+                canvasHeight = self.panelCanvas.getHeight()
+                canvasWidth = self.panelCanvas.getWidth()
+                for canvasRow in range(0, canvasHeight):
+                    colourLastBg = colourLastFg = None;
+                    for canvasCol in range(0, canvasWidth):
+                        canvasColBg = canvasMap[canvasRow][canvasCol][0]
+                        canvasColFg = canvasMap[canvasRow][canvasCol][1]
+                        canvasColText = canvasMap[canvasRow][canvasCol][2]
+                        if colourLastBg != canvasColBg      \
+                        or colourLastFg != canvasColFg:
+                            colourLastBg = canvasColBg; colourLastFg = canvasColFg;
+                            file.write("" + str(canvasColFg) + "," + str(canvasColBg))
+                        file.write(canvasColText)
+                    file.write("\n")
+                return [True]
+        except IOError as error:
+            return [False, error]
+    # }}}
     # {{{ _updateStatusBar(): XXX
     def _updateStatusBar(self):
         text = "Foreground colour:"
@@ -319,293 +458,99 @@ class MiRCARTFrame(wx.Frame):
         text += " " + str(self.panelCanvas.getBackgroundColour())
         self.statusBar.SetStatusText(text)
     # }}}
-    # {{{ onAccelRedo(): XXX
-    def onAccelRedo(self, event):
-        self.panelCanvas.redo()
-    # }}}
-    # {{{ onAccelUndo(): XXX
-    def onAccelUndo(self, event):
-        self.panelCanvas.undo()
-    # }}}
+
     # {{{ onCanvasUpdate(): XXX
     def onCanvasUpdate(self):
         if self.panelCanvas.patchesUndo[self.panelCanvas.patchesUndoLevel] != None:
-            self.menuEditUndo.Enable(True)
+            self.menuItemsById[self.CID_UNDO[0]].Enable(True)
         else:
-            self.menuEditUndo.Enable(False)
+            self.menuItemsById[self.CID_UNDO[0]].Enable(False)
         if self.panelCanvas.patchesUndoLevel > 0:
-            self.menuEditRedo.Enable(True)
+            self.menuItemsById[self.CID_REDO[0]].Enable(True)
         else:
-            self.menuEditRedo.Enable(False)
+            self.menuItemsById[self.CID_REDO[0]].Enable(False)
     # }}}
-    # {{{ onEditCopy(): XXX
-    def onEditCopy(self, event):
-        pass
-    # }}}
-    # {{{ onEditCut(): XXX
-    def onEditCut(self, event):
-        pass
-    # }}}
-    # {{{ onEditDecrBrush(): XXX
-    def onEditDecrBrush(self, event):
-        pass
-    # }}}
-    # {{{ onEditDelete(): XXX
-    def onEditDelete(self, event):
-        pass
-    # }}}
-    # {{{ onEditIncrBrush(): XXX
-    def onEditIncrBrush(self, event):
-        pass
-    # }}}
-    # {{{ onEditPaste(): XXX
-    def onEditPaste(self, event):
-        pass
-    # }}}
-    # {{{ onEditRedo(): XXX
-    def onEditRedo(self, event):
-        self.panelCanvas.redo()
-    # }}}
-    # {{{ onEditSolidBrush(): XXX
-    def onEditSolidBrush(self, event):
-        pass
-    # }}}
-    # {{{ onEditUndo(): XXX
-    def onEditUndo(self, event):
-        self.panelCanvas.undo()
-    # }}}
-    # {{{ onFileExit(): XXX
-    def onFileExit(self, event):
-        self.Close(True)
-    # }}}
-    # {{{ onFileExportPastebin(): XXX
-    def onFileExportPastebin(self, event):
-        pass
-    # }}}
-    # {{{ onFileExportPng(): XXX
-    def onFileExportPng(self, event):
-        pass
-    # }}}
-    # {{{ onFileNew(): XXX
-    def onFileNew(self, event):
-        pass
-    # }}}
-    # {{{ onFileOpen(): XXX
-    def onFileOpen(self, event):
-        pass
-    # }}}
-    # {{{ onFileSave(): XXX
-    def onFileSave(self, event):
-        pass
-    # }}}
-    # {{{ onFileSaveAs(): XXX
-    def onFileSaveAs(self, event):
-        with wx.FileDialog(self, "Save As...", os.getcwd(), "",     \
-                "*.txt", wx.FD_SAVE|wx.FD_OVERWRITE_PROMPT) as dialog:
-            if dialog.ShowModal() == wx.ID_CANCEL:
-                return
-            else:
-                try:
-                    with open(dialog.GetPath(), "w") as file:
-                        canvasMap = self.panelCanvas.getMap()
-                        canvasHeight = self.panelCanvas.getHeight()
-                        canvasWidth = self.panelCanvas.getWidth()
-                        for canvasRow in range(0, canvasHeight):
-                            colourLastBg = colourLastFg = None;
-                            for canvasCol in range(0, canvasWidth):
-                                canvasColBg = canvasMap[canvasRow][canvasCol][0]
-                                canvasColFg = canvasMap[canvasRow][canvasCol][1]
-                                canvasColText = canvasMap[canvasRow][canvasCol][2]
-                                if colourLastBg != canvasColBg      \
-                                or colourLastFg != canvasColFg:
-                                    colourLastBg = canvasColBg; colourLastFg = canvasColFg;
-                                    file.write("" + str(canvasColFg) + "," + str(canvasColBg))
-                                file.write(canvasColText)
-                            file.write("\n")
-                except IOError as error:
-                    wx.LogError("IOError {}".format(error))
-    # }}}
-    # {{{ onPaletteEvent(): XXX
-    def onPaletteEvent(self, leftDown, rightDown, numColour):
-        self.panelCanvas.onPaletteEvent(leftDown, rightDown, numColour)
-        self._updateStatusBar()
-    # }}}
-    # {{{ onToolColourBg(): XXX
-    def onToolColourBg(self, event):
-        itemId = event.GetId()
-        for numColour in range(0, len(mircColours)):
-            if self.toolBarIdColours[numColour] == itemId:
-                self.onPaletteEvent(False, True, numColour)
-    # }}}
-    # {{{ onToolColourFg(): XXX
-    def onToolColourFg(self, event):
-        itemId = event.GetId()
-        for numColour in range(0, len(mircColours)):
-            if self.toolBarIdColours[numColour] == itemId:
-                self.onPaletteEvent(True, False, numColour)
-    # }}}
-    # {{{ onToolsRect(): XXX
-    def onToolsRect(self, event):
-        pass
-    # }}}
-    # {{{ onToolsCircle(): XXX
-    def onToolsCircle(self, event):
-        pass
-    # }}}
-    # {{{ onToolsLine(): XXX
-    def onToolsLine(self, event):
-        pass
+    # {{{ onFrameCommand(): XXX
+    def onFrameCommand(self, event):
+        cid = event.GetId()
+        if cid == self.CID_NEW[0]:
+            pass
+        elif cid == self.CID_OPEN[0]:
+            pass
+        elif cid == self.CID_SAVE[0]:
+            pass
+        elif cid == self.CID_SAVEAS[0]:
+            with wx.FileDialog(self, self.CID_SAVEAS[2], os.getcwd(), "",   \
+                    "*.txt", wx.FD_SAVE|wx.FD_OVERWRITE_PROMPT) as dialog:
+                if dialog.ShowModal() == wx.ID_CANCEL:
+                    return
+                else:
+                    self._saveAs(dialog.GetPath())
+        elif cid == self.CID_EXPORT_PASTEBIN[0]:
+            pass
+        elif cid == self.CID_EXPORT_AS_PNG[0]:
+            pass
+        elif cid == self.CID_EXIT[0]:
+            self.Close(True)
+        elif cid == self.CID_UNDO[0]:
+            self.panelCanvas.undo()
+        elif cid == self.CID_REDO[0]:
+            self.panelCanvas.redo()
+        elif cid == self.CID_CUT[0]:
+            pass
+        elif cid == self.CID_COPY[0]:
+            pass
+        elif cid == self.CID_PASTE[0]:
+            pass
+        elif cid == self.CID_DELETE[0]:
+            pass
+        elif cid == self.CID_INCRBRUSH[0]:
+            pass
+        elif cid == self.CID_DECRBRUSH[0]:
+            pass
+        elif cid == self.CID_SOLIDBRUSH[0]:
+            pass
+        elif cid == self.CID_RECT[0]:
+            pass
+        elif cid == self.CID_CIRCLE[0]:
+            pass
+        elif cid == self.CID_LINE[0]:
+            pass
+        elif cid >= self.CID_COLOUR00[0]                                    \
+        and  cid <= self.CID_COLOUR15[0]:
+            if event.GetEventType() == wx.wxEVT_TOOL:
+                leftIsDown = True; rightIsDown = False;
+            elif event.GetEventType() == wx.wxEVT_TOOL_RCLICKED:
+                leftIsDown = False; rightIsDown = True;
+            numColour = cid - self.CID_COLOUR00[0]
+            self.panelCanvas.onPaletteEvent(leftIsDown, rightIsDown, numColour)
+            self._updateStatusBar()
     # }}}
     # {{{ Initialisation method
     def __init__(self, parent, appSize=(800, 600), canvasPos=(25, 50), cellSize=(7, 14), canvasSize=(80, 25)):
         super().__init__(parent, wx.ID_ANY, "MiRCART", size=appSize)
-
         self.panelSkin = wx.Panel(self, wx.ID_ANY)
-        self.panelCanvas = MiRCARTCanvas(self.panelSkin,                        \
-            parentFrame=self, canvasPos=canvasPos, cellSize=cellSize,           \
+        self.panelCanvas = MiRCARTCanvas(self.panelSkin,                    \
+            parentFrame=self, canvasPos=canvasPos, cellSize=cellSize,       \
             canvasSize=canvasSize, canvasTools=[MiRCARTToolRect])
 
-        self.menuFile = wx.Menu()
-        self.menuFileNew = self.menuFile.Append(wx.ID_NEW, "&New", "New")
-        self.Bind(wx.EVT_MENU, self.onFileNew, self.menuFileNew)
-        self.menuFileOpen = self.menuFile.Append(wx.ID_OPEN, "&Open...", "Open...")
-        self.Bind(wx.EVT_MENU, self.onFileOpen, self.menuFileOpen)
-        self.menuFileSave = self.menuFile.Append(wx.ID_SAVE, "&Save", "Save")
-        self.Bind(wx.EVT_MENU, self.onFileSave, self.menuFileSave)
-        self.menuFileSaveAs = self.menuFile.Append(wx.ID_SAVEAS, "Save &As...", "Save As...")
-        self.Bind(wx.EVT_MENU, self.onFileSaveAs, self.menuFileSaveAs)
-        self.menuFile.AppendSeparator()
-        self.menuFileExportPastebin = self.menuFile.Append(wx.NewId(), "Export to Pasteb&in...", "Export to Pastebin...")
-        self.Bind(wx.EVT_MENU, self.onFileExportPastebin, self.menuFileExportPastebin)
-        self.menuFileExportPng = self.menuFile.Append(wx.NewId(), "Export as PN&G...", "Export as PNG...")
-        self.Bind(wx.EVT_MENU, self.onFileExportPng, self.menuFileExportPng)
-        self.menuFile.AppendSeparator()
-        self.menuFileExit = self.menuFile.Append(wx.ID_EXIT, "E&xit", "Exit")
-        self.Bind(wx.EVT_MENU, self.onFileExit, self.menuFileExit)
-
-        self.menuEdit = wx.Menu()
-        self.menuEditUndo = self.menuEdit.Append(wx.ID_UNDO, "&Undo", "Undo")
-        self.menuEditUndo.Enable(False)
-        self.Bind(wx.EVT_MENU, self.onEditUndo, self.menuEditUndo)
-        self.menuEditRedo = self.menuEdit.Append(wx.ID_REDO, "&Redo", "Redo")
-        self.menuEditRedo.Enable(False)
-        self.Bind(wx.EVT_MENU, self.onEditRedo, self.menuEditRedo)
-        self.menuEdit.AppendSeparator()
-        self.menuEditCut = self.menuEdit.Append(wx.ID_CUT, "Cu&t", "Cut")
-        self.Bind(wx.EVT_MENU, self.onEditCut, self.menuEditCut)
-        self.menuEditCopy = self.menuEdit.Append(wx.ID_COPY, "&Copy", "Copy")
-        self.Bind(wx.EVT_MENU, self.onEditCopy, self.menuEditCopy)
-        self.menuEditPaste = self.menuEdit.Append(wx.ID_PASTE, "&Paste", "Paste")
-        self.Bind(wx.EVT_MENU, self.onEditPaste, self.menuEditPaste)
-        self.menuEditDelete = self.menuEdit.Append(wx.ID_DELETE, "De&lete", "Delete")
-        self.Bind(wx.EVT_MENU, self.onEditDelete, self.menuEditDelete)
-        self.menuEdit.AppendSeparator()
-        self.menuEditIncrBrush = self.menuEdit.Append(wx.NewId(), "&Increase brush size", "Increase brush size")
-        self.Bind(wx.EVT_MENU, self.onEditIncrBrush, self.menuEditIncrBrush)
-        self.menuEditDecrBrush = self.menuEdit.Append(wx.NewId(), "&Decrease brush size", "Decrease brush size")
-        self.Bind(wx.EVT_MENU, self.onEditDecrBrush, self.menuEditDecrBrush)
-        self.menuEditSolidBrush = self.menuEdit.AppendRadioItem(wx.NewId(), "&Solid brush", "Solid brush")
-        self.Bind(wx.EVT_MENU, self.onEditSolidBrush, self.menuEditSolidBrush)
-
-        self.menuTools = wx.Menu()
-        self.menuToolsRect = self.menuTools.AppendRadioItem(wx.NewId(), "&Rectangle", "Rectangle")
-        self.Bind(wx.EVT_MENU, self.onToolsRect, self.menuToolsRect)
-        self.menuToolsCircle = self.menuTools.AppendRadioItem(wx.NewId(), "&Circle", "Circle")
-        self.Bind(wx.EVT_MENU, self.onToolsCircle, self.menuToolsCircle)
-        self.menuToolsLine = self.menuTools.AppendRadioItem(wx.NewId(), "&Line", "Line")
-        self.Bind(wx.EVT_MENU, self.onToolsLine, self.menuToolsLine)
-
-        self.menuBar = wx.MenuBar()
-        self.menuBar.Append(self.menuFile, "&File")
-        self.menuBar.Append(self.menuEdit, "&Edit")
-        self.menuBar.Append(self.menuTools, "&Tools")
+        self.menuItemsById = {}; self.menuBar = wx.MenuBar();
+        self._initMenus(self.menuBar,                                       \
+            [self.MID_FILE, self.MID_EDIT, self.MID_TOOLS], self.onFrameCommand)
         self.SetMenuBar(self.menuBar)
 
-        accelTableEntries = [wx.AcceleratorEntry() for n in range(2)]
-        self.accelRedoId = wx.NewId()
-        accelTableEntries[0].Set(wx.ACCEL_CTRL, ord('Y'), self.accelRedoId)
-        self.Bind(wx.EVT_MENU, self.onAccelRedo, id=self.accelRedoId)
-        self.accelUndoId = wx.NewId()
-        accelTableEntries[1].Set(wx.ACCEL_CTRL, ord('Z'), self.accelUndoId)
-        self.Bind(wx.EVT_MENU, self.onAccelUndo, id=self.accelUndoId)
-        self.accelTable = wx.AcceleratorTable(accelTableEntries)
-        self.SetAcceleratorTable(self.accelTable)
-
-        self.statusBar = self.CreateStatusBar()
-        self._updateStatusBar()
-
-        self.toolBar = wx.ToolBar(self.panelSkin, -1, style=wx.HORIZONTAL|wx.TB_FLAT|wx.TB_NODIVIDER)
+        self.toolBar = wx.ToolBar(self.panelSkin, -1,                       \
+            style=wx.HORIZONTAL|wx.TB_FLAT|wx.TB_NODIVIDER)
         self.toolBar.SetToolBitmapSize((16,16))
-        self.toolNew = self.toolBar.AddTool(wx.NewId(), "New",                          \
-            wx.ArtProvider.GetBitmap(wx.ART_NEW, wx.ART_TOOLBAR, (16,16)))
-        self.Bind(wx.EVT_TOOL, self.onFileNew, self.toolNew)
-        self.toolOpen = self.toolBar.AddTool(wx.NewId(), "Open",                        \
-            wx.ArtProvider.GetBitmap(wx.ART_FILE_OPEN, wx.ART_TOOLBAR, (16,16)))
-        self.Bind(wx.EVT_TOOL, self.onFileOpen, self.toolOpen)
-        self.toolSave = self.toolBar.AddTool(wx.NewId(), "Save",                        \
-            wx.ArtProvider.GetBitmap(wx.ART_FILE_SAVE, wx.ART_TOOLBAR, (16,16)))
-        self.Bind(wx.EVT_TOOL, self.onFileSave, self.toolSave)
-        self.toolSaveAs = self.toolBar.AddTool(wx.NewId(), "Save As...",                \
-            wx.ArtProvider.GetBitmap(wx.ART_FILE_SAVE_AS, wx.ART_TOOLBAR, (16,16)))
-        self.Bind(wx.EVT_TOOL, self.onFileSaveAs, self.toolSaveAs)
-        self.toolUndo = self.toolBar.AddTool(wx.NewId(), "Undo",                        \
-            wx.ArtProvider.GetBitmap(wx.ART_UNDO, wx.ART_TOOLBAR, (16,16)))
-        self.Bind(wx.EVT_TOOL, self.onEditUndo, self.toolUndo)
-        self.toolRedo = self.toolBar.AddTool(wx.NewId(), "Redo",                        \
-            wx.ArtProvider.GetBitmap(wx.ART_REDO, wx.ART_TOOLBAR, (16,16)))
-        self.Bind(wx.EVT_TOOL, self.onEditRedo, self.toolRedo)
-        self.toolBar.AddSeparator()
-        self.toolCut = self.toolBar.AddTool(wx.NewId(), "Cut",                          \
-            wx.ArtProvider.GetBitmap(wx.ART_CUT, wx.ART_TOOLBAR, (16,16)))
-        self.Bind(wx.EVT_TOOL, self.onEditCut, self.toolCut)
-        self.toolCopy = self.toolBar.AddTool(wx.NewId(), "Copy",                        \
-            wx.ArtProvider.GetBitmap(wx.ART_COPY, wx.ART_TOOLBAR, (16,16)))
-        self.Bind(wx.EVT_TOOL, self.onEditCopy, self.toolCopy)
-        self.toolPaste = self.toolBar.AddTool(wx.NewId(), "Paste",                      \
-            wx.ArtProvider.GetBitmap(wx.ART_PASTE, wx.ART_TOOLBAR, (16,16)))
-        self.Bind(wx.EVT_TOOL, self.onEditPaste, self.toolPaste)
-        self.toolDelete = self.toolBar.AddTool(wx.NewId(), "Delete",                    \
-            wx.ArtProvider.GetBitmap(wx.ART_DELETE, wx.ART_TOOLBAR, (16,16)))
-        self.Bind(wx.EVT_TOOL, self.onEditDelete, self.toolDelete)
-        self.toolBar.AddSeparator()
-        self.toolIncrBrush = self.toolBar.AddTool(wx.NewId(), "Increase brush size",    \
-            wx.ArtProvider.GetBitmap(wx.ART_PLUS, wx.ART_TOOLBAR, (16,16)))
-        self.Bind(wx.EVT_TOOL, self.onEditIncrBrush, self.toolIncrBrush)
-        self.toolDecrBrush = self.toolBar.AddTool(wx.NewId(), "Decrease brush size",    \
-            wx.ArtProvider.GetBitmap(wx.ART_MINUS, wx.ART_TOOLBAR, (16,16)))
-        self.Bind(wx.EVT_TOOL, self.onEditDecrBrush, self.toolDecrBrush)
-        self.toolSolidBrush = self.toolBar.AddTool(wx.NewId(), "Solid brush",           \
-            wx.ArtProvider.GetBitmap(wx.ART_HELP, wx.ART_TOOLBAR, (16,16)))
-        self.Bind(wx.EVT_TOOL, self.onEditSolidBrush, self.toolSolidBrush)
-        self.toolBar.AddSeparator()
-        self.toolRect = self.toolBar.AddTool(wx.NewId(), "Rectangle",                   \
-            wx.ArtProvider.GetBitmap(wx.ART_HELP, wx.ART_TOOLBAR, (16,16)))
-        self.Bind(wx.EVT_TOOL, self.onToolsRect, self.toolRect)
-        self.toolCircle = self.toolBar.AddTool(wx.NewId(), "Circle",                    \
-            wx.ArtProvider.GetBitmap(wx.ART_HELP, wx.ART_TOOLBAR, (16,16)))
-        self.Bind(wx.EVT_TOOL, self.onToolsCircle, self.toolCircle)
-        self.toolLine = self.toolBar.AddTool(wx.NewId(), "Line",                        \
-            wx.ArtProvider.GetBitmap(wx.ART_HELP, wx.ART_TOOLBAR, (16,16)))
-        self.Bind(wx.EVT_TOOL, self.onToolsLine, self.toolLine)
-        self.toolBar.AddSeparator()
-        self.toolBarIdColours = [None for x in range(0, len(mircColours))]
-        self.toolBarBitmapColours = [None for x in range(0, len(mircColours))]
-        for numColour in range(0, len(mircColours)):
-            self.toolBarBitmapColours[numColour] = wx.Bitmap((16,16))
-            tmpDc = wx.MemoryDC(); tmpDc.SelectObject(self.toolBarBitmapColours[numColour]);
-            tmpDc.SetBrush(self.panelCanvas.mircBrushes[numColour])
-            tmpDc.SetBackground(self.panelCanvas.mircBrushes[numColour])
-            tmpDc.SetPen(self.panelCanvas.mircPens[numColour])
-            tmpDc.DrawRectangle(0, 0, 16, 16)
-            self.toolBarIdColours[numColour] = wx.NewId()
-            self.toolBar.AddTool(self.toolBarIdColours[numColour],                      \
-                "mIRC colour #" + str(numColour), self.toolBarBitmapColours[numColour])
-            self.Bind(wx.EVT_TOOL, self.onToolColourFg, id=self.toolBarIdColours[numColour])
-            self.Bind(wx.EVT_TOOL_RCLICKED, self.onToolColourBg, id=self.toolBarIdColours[numColour])
+        self._initToolBars(self.toolBar, [self.BID_TOOLBAR], self.onFrameCommand)
         self.toolBar.Realize(); self.toolBar.Fit();
 
-        self.SetFocus()
-        self.Show(True)
+        self.accelTable = wx.AcceleratorTable(                              \
+            self._initAccelTable(self.AID_EDIT, self.onFrameCommand))
+        self.SetAcceleratorTable(self.accelTable)
+
+        self.statusBar = self.CreateStatusBar(); self._updateStatusBar();
+        self.SetFocus(); self.Show(True); self.onCanvasUpdate();
     # }}}
 
 #
