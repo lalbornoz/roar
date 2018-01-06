@@ -130,10 +130,8 @@ class MiRCARTCanvas(wx.Panel):
         eventPoint = event.GetLogicalPosition(eventDc)
         mapPoint = self._eventPointToMapPoint(eventPoint)
         for tool in self.canvasTools:
-            if event.Dragging():
-                mapPatches = tool.onMouseMotion(event, mapPoint, event.LeftIsDown(), event.RightIsDown())
-            else:
-                mapPatches = tool.onMouseDown(event, mapPoint, event.LeftIsDown(), event.RightIsDown())
+            mapPatches = tool.onMouseEvent(event, mapPoint, event.Dragging(),   \
+                event.LeftIsDown(), event.RightIsDown())
             self._processMapPatches(mapPatches, eventDc, tmpDc, mapPoint)
     # }}}
     # {{{ onPaint(self, event): XXX
@@ -206,12 +204,8 @@ class MiRCARTTool():
     """XXX"""
     parentCanvas = None
 
-    # {{{ onMouseDown(self, event, mapPoint, isLeftDown, isRightDown): XXX
-    def onMouseDown(self, event, mapPoint, isLeftDown, isRightDown):
-        pass
-    # }}}
-    # {{{ onMouseMotion(self, event, mapPoint, isLeftDown, isRightDown): XXX
-    def onMouseMotion(self, event, mapPoint, isLeftDown, isRightDown):
+    # {{{ onMouseEvent(self, event, mapPoint, isDragging, isLeftDown, isRightDown): XXX
+    def onMouseEvent(self, event, mapPoint, isDragging, isLeftDown, isRightDown):
         pass
     # }}}
     # {{{ __init__(self, parentCanvas): initialisation method
@@ -222,8 +216,8 @@ class MiRCARTTool():
 class MiRCARTToolRect(MiRCARTTool):
     """XXX"""
 
-    # {{{ _draw(self, event, mapPoint, isLeftDown, isRightDown): XXX
-    def _draw(self, event, mapPoint, isLeftDown, isRightDown):
+    # {{{ onMouseEvent(self, event, mapPoint, isDragging, isLeftDown, isRightDown): XXX
+    def onMouseEvent(self, event, mapPoint, isDragging, isLeftDown, isRightDown):
         if isLeftDown:
             return [[False, [[0, 0,                 \
                 self.parentCanvas.mircFg,           \
@@ -242,18 +236,6 @@ class MiRCARTToolRect(MiRCARTTool):
             return [[True, [[0, 0,                  \
                 self.parentCanvas.mircFg,           \
                 self.parentCanvas.mircFg, " "]]]]
-    # }}}
-    # {{{ onMouseDown(self, event, mapPoint, isLeftDown, isRightDown): XXX
-    def onMouseDown(self, event, mapPoint, isLeftDown, isRightDown):
-        return self._draw(event, mapPoint, isLeftDown, isRightDown)
-    # }}}
-    # {{{ onMouseMotion(self, event, mapPoint, isLeftDown, isRightDown): XXX
-    def onMouseMotion(self, event, mapPoint, isLeftDown, isRightDown):
-        return self._draw(event, mapPoint, isLeftDown, isRightDown)
-    # }}}
-    # {{{ __init__(self, parentCanvas): initialisation method
-    def __init__(self, parentCanvas):
-        super().__init__(parentCanvas)
     # }}}
 
 class MiRCARTFrame(wx.Frame):
