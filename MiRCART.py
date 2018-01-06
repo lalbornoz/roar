@@ -47,13 +47,92 @@ mircColours = [
 ]
 # }}}
 
+class MiRCARTCanvasJournal():
+    """XXX"""
+    parentCanvas = None
+    patchesTmp = patchesUndo = patchesUndoLevel = None
+
+    # {{{ _popTmp(self, eventDc, tmpDc): XXX
+    def _popTmp(self, eventDc, tmpDc):
+        if self.patchesTmp:
+            for patch in self.patchesTmp:
+                patch[2:] = self.parentCanvas._getMapCell([patch[0], patch[1]])
+                self.parentCanvas.onJournalUpdate(True,  \
+                    (patch[0:2]), patch, eventDc, tmpDc, (0, 0))
+            self.patchesTmp = []
+    # }}}
+    # {{{ _pushTmp(self, atPoint, patch): XXX
+    def _pushTmp(self, absMapPoint):
+        self.patchesTmp.append([*absMapPoint, None, None, None])
+    # }}}
+    # {{{ _pushUndo(self, atPoint, patch): XXX
+    def _pushUndo(self, atPoint, patch, mapItem):
+        if self.patchesUndoLevel > 0:
+            del self.patchesUndo[0:self.patchesUndoLevel]
+            self.patchesUndoLevel = 0
+        absMapPoint = self._relMapPointToAbsMapPoint((patch[0], patch[1]), atPoint)
+        self.patchesUndo.insert(0, (                                                \
+            (absMapPoint[0], absMapPoint[1], mapItem[0], mapItem[1], mapItem[2]),   \
+            (absMapPoint[0], absMapPoint[1], patch[2], patch[3], patch[4])))
+    # }}}
+    # {{{ _relMapPointToAbsMapPoint(self, relMapPoint, atPoint): XXX
+    def _relMapPointToAbsMapPoint(self, relMapPoint, atPoint):
+        return (atPoint[0] + relMapPoint[0], atPoint[1] + relMapPoint[1])
+    # }}}
+    # {{{ merge(self, mapPatches, eventDc, tmpDc, atPoint): XXX
+    def merge(self, mapPatches, eventDc, tmpDc, atPoint):
+        for mapPatch in mapPatches:
+            mapPatchTmp = mapPatch[0]
+            if mapPatchTmp:
+                self._popTmp(eventDc, tmpDc)
+            for patch in mapPatch[1]:
+                absMapPoint = self._relMapPointToAbsMapPoint(patch[0:2], atPoint)
+                mapItem = self.parentCanvas._getMapCell(absMapPoint)
+                if mapPatchTmp:
+                    self._pushTmp(absMapPoint)
+                    self.parentCanvas.onJournalUpdate(mapPatchTmp,  \
+                        absMapPoint, patch, eventDc, tmpDc, atPoint)
+                elif mapItem != patch[2:5]:
+                    self._pushUndo(atPoint, patch, mapItem)
+                    self.parentCanvas.onJournalUpdate(mapPatchTmp,  \
+                        absMapPoint, patch, eventDc, tmpDc, atPoint)
+    # }}}
+    # {{{ redo(self): XXX
+    def redo(self):
+        if self.patchesUndoLevel > 0:
+            self.patchesUndoLevel -= 1
+            redoPatch = self.patchesUndo[self.patchesUndoLevel][1]
+            self.parentCanvas.onJournalUpdate(False,        \
+                (redoPatch[0:2]), redoPatch, None, None, (0, 0))
+            return True
+        else:
+            return False
+    # }}}
+    # {{{ undo(self): XXX
+    def undo(self):
+        if self.patchesUndo[self.patchesUndoLevel] != None:
+            undoPatch = self.patchesUndo[self.patchesUndoLevel][0]
+            self.patchesUndoLevel += 1
+            self.parentCanvas.onJournalUpdate(False,        \
+                (undoPatch[0:2]), undoPatch, None, None, (0, 0))
+            return True
+        else:
+            return False
+    # }}}
+    # {{{ __init__(self, parentCanvas): initialisation method
+    def __init__(self, parentCanvas):
+        self.parentCanvas = parentCanvas
+        self.patchesTmp = []
+        self.patchesUndo = [None]; self.patchesUndoLevel = 0;
+    # }}}
+
 class MiRCARTCanvas(wx.Panel):
     """XXX"""
     parentFrame = None
     canvasPos = canvasSize = canvasWinSize = cellPos = cellSize = None
     canvasBitmap = canvasMap = canvasTools = None
     mircBg = mircFg = mircBrushes = mircPens = None
-    patchesTmp = patchesUndo = patchesUndoLevel = None
+    canvasJournal = None
 
     # {{{ _drawPatch(self, patch, eventDc, tmpDc, atPoint): XXX
     def _drawPatch(self, patch, eventDc, tmpDc, atPoint):
@@ -76,41 +155,6 @@ class MiRCARTCanvas(wx.Panel):
     def _getMapCell(self, absMapPoint):
         return self.canvasMap[absMapPoint[1]][absMapPoint[0]]
     # }}}
-    # {{{ _processMapPatches(self, mapPatches, eventDc, tmpDc, atPoint): XXX
-    def _processMapPatches(self, mapPatches, eventDc, tmpDc, atPoint):
-        for mapPatch in mapPatches:
-            mapPatchTmp = mapPatch[0]
-            if mapPatchTmp and self.patchesTmp:
-                for patch in self.patchesTmp:
-                    patch[2:] = self._getMapCell([patch[0], patch[1]])
-                    self._drawPatch(patch, eventDc, tmpDc, (0, 0))
-                self.patchesTmp = []
-            for patch in mapPatch[1]:
-                absMapPoint = self._relMapPointToAbsMapPoint(patch[0:2], atPoint)
-                mapItem = self._getMapCell(absMapPoint)
-                if mapPatchTmp:
-                    self.patchesTmp.append([*absMapPoint, None, None, None])
-                    self._drawPatch(patch, eventDc, tmpDc, atPoint)
-                elif mapItem != patch[2:5]:
-                    self._pushUndo(atPoint, patch, mapItem)
-                    self._setMapCell(absMapPoint, *patch[2:5])
-                    self._drawPatch(patch, eventDc, tmpDc, atPoint)
-                self.parentFrame.onCanvasUpdate()
-    # }}}
-    # {{{ _pushUndo(self, atPoint, patch): XXX
-    def _pushUndo(self, atPoint, patch, mapItem):
-        if self.patchesUndoLevel > 0:
-            del self.patchesUndo[0:self.patchesUndoLevel]
-            self.patchesUndoLevel = 0
-        absMapPoint = self._relMapPointToAbsMapPoint((patch[0], patch[1]), atPoint)
-        self.patchesUndo.insert(0, (                                                \
-            (absMapPoint[0], absMapPoint[1], mapItem[0], mapItem[1], mapItem[2]),   \
-            (absMapPoint[0], absMapPoint[1], patch[2], patch[3], patch[4])))
-    # }}}
-    # {{{ _relMapPointToAbsMapPoint(self, relMapPoint, atPoint): XXX
-    def _relMapPointToAbsMapPoint(self, relMapPoint, atPoint):
-        return (atPoint[0] + relMapPoint[0], atPoint[1] + relMapPoint[1])
-    # }}}
     # {{{ _relMapPointToAbsPoint(self, relMapPoint, atPoint): XXX
     def _relMapPointToAbsPoint(self, relMapPoint, atPoint):
         absX = (atPoint[0] + relMapPoint[0]) * self.cellSize[0]
@@ -122,6 +166,19 @@ class MiRCARTCanvas(wx.Panel):
         self.canvasMap[absMapPoint[1]][absMapPoint[0]] = [colourFg, colourBg, char]
     # }}}
 
+    # {{{ onJournalUpdate(self, isTmp, absMapPoint, patch, eventDc, tmpDc, atPoint):
+    def onJournalUpdate(self, isTmp, absMapPoint, patch, eventDc, tmpDc, atPoint):
+        if eventDc == None:
+            eventDc = wx.ClientDC(self); tmpDc = wx.MemoryDC();
+        if tmpDc == None:
+            tmpDc.SelectObject(self.canvasBitmap)
+        if isTmp == True:
+            self._drawPatch(patch, eventDc, tmpDc, atPoint)
+        else:
+            self._setMapCell(absMapPoint, *patch[2:5])
+            self._drawPatch(patch, eventDc, tmpDc, atPoint)
+            self.parentFrame.onCanvasUpdate()
+    # }}}
     # {{{ onMouseEvent(self, event): XXX
     def onMouseEvent(self, event):
         eventObject = event.GetEventObject()
@@ -132,7 +189,7 @@ class MiRCARTCanvas(wx.Panel):
         for tool in self.canvasTools:
             mapPatches = tool.onMouseEvent(event, mapPoint, event.Dragging(),   \
                 event.LeftIsDown(), event.RightIsDown())
-            self._processMapPatches(mapPatches, eventDc, tmpDc, mapPoint)
+            self.canvasJournal.merge(mapPatches, eventDc, tmpDc, mapPoint)
     # }}}
     # {{{ onPaint(self, event): XXX
     def onPaint(self, event):
@@ -140,33 +197,11 @@ class MiRCARTCanvas(wx.Panel):
     # }}}
     # {{{ redo(self): XXX
     def redo(self):
-        if self.patchesUndoLevel > 0:
-            self.patchesUndoLevel -= 1
-            redoPatch = self.patchesUndo[self.patchesUndoLevel][1]
-            self._setMapCell([redoPatch[0], redoPatch[1]],  \
-                redoPatch[2], redoPatch[3], redoPatch[4])
-            eventDc = wx.ClientDC(self); tmpDc = wx.MemoryDC();
-            tmpDc.SelectObject(self.canvasBitmap)
-            self._drawPatch(redoPatch, eventDc, tmpDc, (0, 0))
-            self.parentFrame.onCanvasUpdate()
-            return True
-        else:
-            return False
+        return self.canvasJournal.redo()
     # }}}
     # {{{ undo(self): XXX
     def undo(self):
-        if self.patchesUndo[self.patchesUndoLevel] != None:
-            undoPatch = self.patchesUndo[self.patchesUndoLevel][0]
-            self._setMapCell([undoPatch[0], undoPatch[1]],  \
-                undoPatch[2], undoPatch[3], undoPatch[4])
-            eventDc = wx.ClientDC(self); tmpDc = wx.MemoryDC();
-            tmpDc.SelectObject(self.canvasBitmap)
-            self._drawPatch(undoPatch, eventDc, tmpDc, (0, 0))
-            self.patchesUndoLevel += 1
-            self.parentFrame.onCanvasUpdate()
-            return True
-        else:
-            return False
+        return self.canvasJournal.undo()
     # }}}
     # {{{ __init__(self, parent, parentFrame, canvasPos, cellSize, canvasSize, canvasTools): Initialisation method
     def __init__(self, parent, parentFrame, canvasPos, cellSize, canvasSize, canvasTools):
@@ -191,8 +226,7 @@ class MiRCARTCanvas(wx.Panel):
             self.mircPens[mircColour] = wx.Pen(                     \
                 wx.Colour(mircColours[mircColour]), 1)
 
-        self.patchesTmp = []
-        self.patchesUndo = [None]; self.patchesUndoLevel = 0;
+        self.canvasJournal = MiRCARTCanvasJournal(self)
 
         self.Bind(wx.EVT_LEFT_DOWN, self.onMouseEvent)
         self.Bind(wx.EVT_MOTION, self.onMouseEvent)
@@ -409,11 +443,11 @@ class MiRCARTFrame(wx.Frame):
 
     # {{{ onCanvasUpdate(self): XXX
     def onCanvasUpdate(self):
-        if self.panelCanvas.patchesUndo[self.panelCanvas.patchesUndoLevel] != None:
+        if self.panelCanvas.canvasJournal.patchesUndo[self.panelCanvas.canvasJournal.patchesUndoLevel] != None:
             self.menuItemsById[self.CID_UNDO[0]].Enable(True)
         else:
             self.menuItemsById[self.CID_UNDO[0]].Enable(False)
-        if self.panelCanvas.patchesUndoLevel > 0:
+        if self.panelCanvas.canvasJournal.patchesUndoLevel > 0:
             self.menuItemsById[self.CID_REDO[0]].Enable(True)
         else:
             self.menuItemsById[self.CID_REDO[0]].Enable(False)
