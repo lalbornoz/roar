@@ -33,14 +33,18 @@ class MiRCARTToolRect(MiRCARTTool):
         brushColours = brushColours.copy()
         if isLeftDown:
             brushColours[1] = brushColours[0]
-            return [[False, [[[0, 0], brushColours, 0, " "]]],  \
-                    [True,  [[[0, 0], brushColours, 0, " "]]]]
         elif isRightDown:
             brushColours[0] = brushColours[1]
-            return [[False, [[[0, 0], brushColours, 0, " "]]],  \
-                    [True,  [[[0, 0], brushColours, 0, " "]]]]
         else:
             brushColours[1] = brushColours[0]
-            return [[True, [[[0, 0], brushColours, 0, " "]]]]
+        brushPatches = []
+        for brushRow in range(brushSize[1]):
+            for brushCol in range(brushSize[0] * 2):
+                brushPatches.append([[brushCol, brushRow],  \
+                    brushColours, 0, " "])
+        if isLeftDown or isRightDown:
+            return [[False, brushPatches], [True, brushPatches]]
+        else: 
+            return [[True, brushPatches]]
 
 # vim:expandtab foldmethod=marker sw=4 ts=4 tw=120

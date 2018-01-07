@@ -221,6 +221,7 @@ class MiRCARTCanvas(wx.Panel):
 
         super().__init__(parent, pos=canvasPos, \
             size=[w*h for w,h in zip(canvasSize, cellSize)])
+        self.SetDoubleBuffered(True)
         self.Bind(wx.EVT_CLOSE, self.onClose)
         self.Bind(wx.EVT_ENTER_WINDOW, self.onMouseWindowEvent)
         self.Bind(wx.EVT_LEAVE_WINDOW, self.onMouseWindowEvent)

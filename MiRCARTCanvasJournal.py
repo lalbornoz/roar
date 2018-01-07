@@ -60,7 +60,10 @@ class MiRCARTCanvasJournal():
                 self._popTmp(eventDc, tmpDc)
             for patch in mapPatch[1]:
                 absMapPoint = self._relMapPointToAbsMapPoint(patch[0], atPoint)
-                if mapPatchTmp:
+                if absMapPoint[0] >= self.parentCanvas.canvasSize[0]    \
+                or absMapPoint[1] >= self.parentCanvas.canvasSize[1]:
+                    continue
+                elif mapPatchTmp:
                     self._pushTmp(absMapPoint)
                     self.parentCanvas.onJournalUpdate(mapPatchTmp,      \
                         absMapPoint, patch, eventDc, tmpDc, atPoint)
