@@ -28,25 +28,19 @@ class MiRCARTToolRect(MiRCARTTool):
     """XXX"""
 
     #
-    # onMouseEvent(self, event, mapPoint, isDragging, isLeftDown, isRightDown): XXX
-    def onMouseEvent(self, event, mapPoint, isDragging, isLeftDown, isRightDown):
+    # onMouseEvent(self, event, atPoint, brushColours, brushSize, isDragging, isLeftDown, isRightDown): XXX
+    def onMouseEvent(self, event, atPoint, brushColours, brushSize, isDragging, isLeftDown, isRightDown):
+        brushColours = brushColours.copy()
         if isLeftDown:
-            return [[False, [[0, 0,                 \
-                self.parentCanvas.mircFg,           \
-                self.parentCanvas.mircFg, " "]]],
-                    [True, [[0, 0,                  \
-                self.parentCanvas.mircFg,           \
-                self.parentCanvas.mircFg, " "]]]]
+            brushColours[1] = brushColours[0]
+            return [[False, [[[0, 0], brushColours, 0, " "]]],  \
+                    [True,  [[[0, 0], brushColours, 0, " "]]]]
         elif isRightDown:
-            return [[False, [[0, 0,                 \
-                self.parentCanvas.mircBg,           \
-                self.parentCanvas.mircBg, " "]]],   \
-                    [True, [[0, 0,                  \
-                self.parentCanvas.mircBg,           \
-                self.parentCanvas.mircBg, " "]]]]
+            brushColours[0] = brushColours[1]
+            return [[False, [[[0, 0], brushColours, 0, " "]]],  \
+                    [True,  [[[0, 0], brushColours, 0, " "]]]]
         else:
-            return [[True, [[0, 0,                  \
-                self.parentCanvas.mircFg,           \
-                self.parentCanvas.mircFg, " "]]]]
+            brushColours[1] = brushColours[0]
+            return [[True, [[[0, 0], brushColours, 0, " "]]]]
 
 # vim:expandtab foldmethod=marker sw=4 ts=4 tw=120

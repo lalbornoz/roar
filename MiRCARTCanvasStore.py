@@ -22,9 +22,13 @@
 # SOFTWARE.
 #
 
-import base64
 import io
-import wx
+
+try:
+    import wx
+    haveWx = True
+except ImportError:
+    haveWx = False
 
 try:
     from MiRCARTToPngFile import MiRCARTToPngFile
@@ -78,66 +82,59 @@ class MiRCARTCanvasStore():
             return cellState | bit
     # }}}
 
-    # {{{ exportPastebin(self, apiDevKey): XXX
-    def exportPastebin(self, apiDevKey):
+    # {{{ exportBitmapToPngFile(self, canvasBitmap, outPathName, outType): XXX
+    def exportBitmapToPngFile(self, canvasBitmap, outPathName, outType):
+        return canvasBitmap.ConvertToImage().SaveFile(outPathName, outType)
+    # }}}
+    # {{{ exportPastebin(self, apiDevKey, canvasMap, canvasSize, pasteName="", pastePrivate=0): XXX
+    def exportPastebin(self, apiDevKey, canvasMap, canvasSize, pasteName="", pastePrivate=0):
         if haveUrllib:
-            outFile = io.StringIO(); self.exportTextFile(outFile);
-            requestData = {                                                 \
-                "api_dev_key":          self.apiDevKey,                     \
-                "api_option":           "paste",                            \
-                "api_paste_code":       base64.b64encode(outFile.read()),   \
-                "api_paste_name":       pasteName,                          \
+            outFile = io.StringIO()
+            self.exportTextFile(canvasMap, canvasSize, outFile)
+            requestData = {                                                         \
+                "api_dev_key":          apiDevKey,                                  \
+                "api_option":           "paste",                                    \
+                "api_paste_code":       outFile.getvalue().encode(),                \
+                "api_paste_name":       pasteName,                                  \
                 "api_paste_private":    pastePrivate}
-            responseHttp = requests.post("https://pastebin.com/post.php",   \
+            responseHttp = requests.post("https://pastebin.com/api/api_post.php",   \
                     data=requestData)
             if responseHttp.status_code == 200:
-                return responseHttp.text
+                if responseHttp.text.startswith("http"):
+                    return (True, responseHttp.text)
+                else:
+                    return (False, responseHttp.text)
             else:
-                return None
+                return (False, str(responseHttp.status_code))
         else:
-            return None
+            return (False, "missing requests and/or urllib3 module(s)")
     # }}}
-    # {{{ exportPngFile(self): XXX
-    def exportPngFile(self, pathName):
+    # {{{ exportPngFile(self, canvasMap, outPathName): XXX
+    def exportPngFile(self, canvasMap, outPathName):
         if haveMiRCARTToPngFile:
-            outFile = io.StringIO(); self.exportTextFile(outFile);
-            MiRCARTToPng(outFile).export(pathName)
+            MiRCARTToPngFile(canvasMap).export(outPathName)
             return True
         else:
             return False
     # }}}
-    # {{{ exportTextFile(self, outFile): XXX
-    def exportTextFile(self, outFile):
-        canvasMap = self.parentCanvas.canvasMap
-        canvasSize = self.parentCanvas.canvasSize
-        for canvasRow in range(0, canvasSize[1]):
+    # {{{ exportTextFile(self, canvasMap, canvasSize, outFile): XXX
+    def exportTextFile(self, canvasMap, canvasSize, outFile):
+        for canvasRow in range(canvasSize[1]):
             canvasLastColours = []
-            for canvasCol in range(0, canvasSize[0]):
-                canvasColColours = canvasMap[canvasRow][canvasCol][0:2]
-                canvasColText = self.canvasMap[canvasRow][canvasCol][2]
-            if canvasColColours != canvasLastColours:
-                canvasLastColours = canvasColColours
-                outFile.write("\x03" +          \
-                    str(canvasColColours[0]) +  \
-                    "," + str(canvasColColours[1]))
+            for canvasCol in range(canvasSize[0]):
+                canvasColColours = canvasMap[canvasRow][canvasCol][0]
+                canvasColText = canvasMap[canvasRow][canvasCol][2]
+                if canvasColColours != canvasLastColours:
+                    canvasLastColours = canvasColColours
+                    outFile.write("\x03" +          \
+                        str(canvasColColours[0]) +  \
+                        "," + str(canvasColColours[1]))
                 outFile.write(canvasColText)
             outFile.write("\n")
     # }}}
     # {{{ importIntoPanel(self): XXX
     def importIntoPanel(self):
-        canvasSize = self.inSize; self.parentCanvas.resize(canvasSize);
-        self.parentCanvas.canvasJournal.reset()
-        eventDc = wx.ClientDC(self.parentCanvas); tmpDc = wx.MemoryDC();
-        tmpDc.SelectObject(self.parentCanvas.canvasBitmap)
-        for numRow in range(0, len(self.outMap)):
-            for numCol in range(0, len(self.outMap[numRow])):
-                self.parentCanvas.onJournalUpdate(False,  \
-                    (numCol, numRow), [numCol, numRow,    \
-                    self.outMap[numRow][numCol][0][0],    \
-                    self.outMap[numRow][numCol][0][1],    \
-                    self.outMap[numRow][numCol][2]],      \
-                    eventDc, tmpDc, (0, 0))
-        wx.SafeYield()
+        self.parentCanvas.onStoreUpdate(self.inSize, self.outMap)
     # }}}
     # {{{ importTextFile(self, pathName): XXX
     def importTextFile(self, pathName):
@@ -210,26 +207,7 @@ class MiRCARTCanvasStore():
     # }}}
     # {{{ importNew(self, newCanvasSize=None): XXX
     def importNew(self, newCanvasSize=None):
-        if newCanvasSize != None:
-            self.parentCanvas.resize(newCanvasSize)
-        self.parentCanvas.canvasJournal.reset()
-        self.parentCanvas.canvasMap = [[[1, 1, " "]                             \
-                for x in range(self.parentCanvas.canvasSize[0])]                \
-            for y in range(self.parentCanvas.canvasSize[1])]
-        canvasWinSize = (                                                       \
-            self.parentCanvas.cellSize[0] * self.parentCanvas.canvasSize[0],    \
-            self.parentCanvas.cellSize[1] * self.parentCanvas.canvasSize[1])
-        if self.parentCanvas.canvasBitmap != None:
-            self.parentCanvas.canvasBitmap.Destroy()
-        self.parentCanvas.canvasBitmap = wx.Bitmap(canvasWinSize)
-        eventDc = wx.ClientDC(self.parentCanvas); tmpDc = wx.MemoryDC();
-        tmpDc.SelectObject(self.parentCanvas.canvasBitmap)
-        for numRow in range(0, len(self.parentCanvas.canvasMap)):
-            for numCol in range(0, len(self.parentCanvas.canvasMap[numRow])):
-                self.parentCanvas.onJournalUpdate(False,                        \
-                    (numCol, numRow), [numCol, numRow, 1, 1, " "],              \
-                    eventDc, tmpDc, (0, 0))
-        wx.SafeYield()
+        self.parentCanvas.onStoreUpdate(newCanvasSize)
     # }}}
 
     #
