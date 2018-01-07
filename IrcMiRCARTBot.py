@@ -25,8 +25,9 @@
 import base64
 import os, sys, time
 import json
-import IrcClient, MiRC2png
+import IrcClient
 import requests, urllib.request
+from MiRCARTToPngFile import MiRCARTToPngFile
 
 class IrcMiRCARTBot(IrcClient.IrcClient):
     """IRC<->MiRC2png bot"""
@@ -138,7 +139,7 @@ class IrcMiRCARTBot(IrcClient.IrcClient):
                 self._log("Unknown URL type specified!")
                 self.queue("PRIVMSG", message[2], "4/!\\ Unknown URL type specified!")
                 return
-            MiRC2png.MiRC2png(asciiTmpFilePath, imgTmpFilePath, "DejaVuSansMono.ttf", 11)
+            MiRCARTToPngFile(asciiTmpFilePath, "DejaVuSansMono.ttf", 11).export(imgTmpFilePath)
             imgurResponse = self._uploadToImgur(imgTmpFilePath, "MiRCART image", "MiRCART image", "c9a6efb3d7932fd")
             if imgurResponse[0] == 200:
                     self._log("Uploaded as: {}".format(imgurResponse[1]))

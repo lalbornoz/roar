@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 #
-# MiRCART.py -- mIRC art editor for Windows & Linux
+# MiRCARTToolRect.py -- XXX
 # Copyright (c) 2018 Lucio Andrés Illanes Albornoz <lucio@lucioillanes.de>
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -22,17 +22,31 @@
 # SOFTWARE.
 #
 
-from MiRCARTFrame import MiRCARTFrame
-from MiRCARTToolRect import MiRCARTToolRect
-import sys, wx
+from MiRCARTTool import MiRCARTTool
 
-#
-# Entry point
-def main(*argv):
-    wxApp = wx.App(False)
-    MiRCARTFrame(None, canvasTools=[MiRCARTToolRect])
-    wxApp.MainLoop()
-if __name__ == "__main__":
-    main(*sys.argv)
+class MiRCARTToolRect(MiRCARTTool):
+    """XXX"""
+
+    #
+    # onMouseEvent(self, event, mapPoint, isDragging, isLeftDown, isRightDown): XXX
+    def onMouseEvent(self, event, mapPoint, isDragging, isLeftDown, isRightDown):
+        if isLeftDown:
+            return [[False, [[0, 0,                 \
+                self.parentCanvas.mircFg,           \
+                self.parentCanvas.mircFg, " "]]],
+                    [True, [[0, 0,                  \
+                self.parentCanvas.mircFg,           \
+                self.parentCanvas.mircFg, " "]]]]
+        elif isRightDown:
+            return [[False, [[0, 0,                 \
+                self.parentCanvas.mircBg,           \
+                self.parentCanvas.mircBg, " "]]],   \
+                    [True, [[0, 0,                  \
+                self.parentCanvas.mircBg,           \
+                self.parentCanvas.mircBg, " "]]]]
+        else:
+            return [[True, [[0, 0,                  \
+                self.parentCanvas.mircFg,           \
+                self.parentCanvas.mircFg, " "]]]]
 
 # vim:expandtab foldmethod=marker sw=4 ts=4 tw=120
