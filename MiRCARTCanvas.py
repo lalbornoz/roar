@@ -23,6 +23,7 @@
 #
 
 from MiRCARTCanvasJournal import MiRCARTCanvasJournal
+from MiRCARTCanvasStore import MiRCARTCanvasStore
 from MiRCARTColours import MiRCARTColours
 import wx
 
@@ -32,8 +33,18 @@ class MiRCARTCanvas(wx.Panel):
     canvasPos = canvasSize = canvasWinSize = cellPos = cellSize = None
     canvasBitmap = canvasMap = canvasTools = None
     mircBg = mircFg = mircBrushes = mircPens = None
-    canvasJournal = None
+    canvasJournal = canvasStore = None
 
+    # {{{ _initBrushesAndPens(self): XXX
+    def _initBrushesAndPens(self):
+        self.mircBrushes = [None for x in range(len(MiRCARTColours))]
+        self.mircPens = [None for x in range(len(MiRCARTColours))]
+        for mircColour in range(0, len(MiRCARTColours)):
+            self.mircBrushes[mircColour] = wx.Brush(    \
+                wx.Colour(MiRCARTColours[mircColour]), wx.BRUSHSTYLE_SOLID)
+            self.mircPens[mircColour] = wx.Pen(         \
+                wx.Colour(MiRCARTColours[mircColour]), 1)
+    # }}}
     # {{{ _drawPatch(self, patch, eventDc, tmpDc, atPoint): XXX
     def _drawPatch(self, patch, eventDc, tmpDc, atPoint):
         absPoint = self._relMapPointToAbsPoint((patch[0], patch[1]), atPoint)
@@ -69,6 +80,7 @@ class MiRCARTCanvas(wx.Panel):
     def _setMapCell(self, absMapPoint, colourFg, colourBg, char):
         self.canvasMap[absMapPoint[1]][absMapPoint[0]] = [colourFg, colourBg, char]
     # }}}
+
     # {{{ onClose(self, event): XXX
     def onClose(self, event):
         self.Destroy(); self.__del__();
@@ -106,10 +118,30 @@ class MiRCARTCanvas(wx.Panel):
     def redo(self):
         return self.canvasJournal.redo()
     # }}}
+    # {{{ resize(self, newCanvasSize): XXX
+    def resize(self, newCanvasSize):
+        if newCanvasSize != self.canvasSize:
+            self.SetSize(*self.canvasPos,                   \
+                newCanvasSize[0] * self.cellSize[0],        \
+                newCanvasSize[1] * self.cellSize[1])
+            for numRow in range(0, self.canvasSize[1]):
+                for numNewCol in range(self.canvasSize[0], newCanvasSize[0]):
+                    self.canvasMap[numRow].append([1, 1, " "])
+            for numNewRow in range(self.canvasSize[1], newCanvasSize[1]):
+                self.canvasMap.append([])
+                for numNewCol in range(0, newCanvasSize[0]):
+                    self.canvasMap[numNewRow].append([1, 1, " "])
+            self.canvasSize = newCanvasSize
+            canvasWinSize = (                               \
+                self.cellSize[0] * self.canvasSize[0],      \
+                self.cellSize[1] * self.canvasSize[1])
+            self.canvasBitmap = wx.Bitmap(canvasWinSize)
+    # }}}
     # {{{ undo(self): XXX
     def undo(self):
         return self.canvasJournal.undo()
     # }}}
+
     # {{{ __del__(self): destructor method
     def __del__(self):
         if self.canvasBitmap != None:
@@ -124,30 +156,19 @@ class MiRCARTCanvas(wx.Panel):
 
     #
     # _init__(self, parent, parentFrame, canvasPos, cellSize, canvasSize, canvasTools): initialisation method
-    def __init__(self, parent, parentFrame, canvasPos, cellSize, canvasSize, canvasTools):
+    def __init__(self, parent, parentFrame, canvasPos, canvasSize, canvasTools, cellSize):
         self.parentFrame = parentFrame
-        canvasWinSize = (cellSize[0] * canvasSize[0], cellSize[1] * canvasSize[1])
-        super().__init__(parent, pos=canvasPos, size=canvasWinSize)
-        self.canvasPos = canvasPos; self.canvasSize = canvasSize; self.canvasWinSize = canvasWinSize;
-        self.cellPos = (0, 0); self.cellSize = cellSize;
+        self.canvasPos = canvasPos; self.canvasSize = canvasSize;
+        self.canvasTools = [canvasTool(self) for canvasTool in canvasTools]
+        self.cellSize = cellSize
 
-        self.canvasBitmap = wx.Bitmap(canvasWinSize)
-        self.canvasMap = [[[1, 1, " "] for x in range(canvasSize[0])] for y in range(canvasSize[1])]
-        self.canvasTools = []
-        for canvasTool in canvasTools:
-            self.canvasTools.append(canvasTool(self))
+        self.cellPos = (0, 0)
+        self.mircBg = 1; self.mircFg = 4; self._initBrushesAndPens();
+        self.canvasJournal = MiRCARTCanvasJournal(parentCanvas=self)
+        self.canvasStore = MiRCARTCanvasStore(parentCanvas=self)
 
-        self.mircBg = 1; self.mircFg = 4;
-        self.mircBrushes = [None for x in range(len(MiRCARTColours))]
-        self.mircPens = [None for x in range(len(MiRCARTColours))]
-        for mircColour in range(0, len(MiRCARTColours)):
-            self.mircBrushes[mircColour] = wx.Brush(    \
-                wx.Colour(MiRCARTColours[mircColour]), wx.BRUSHSTYLE_SOLID)
-            self.mircPens[mircColour] = wx.Pen(         \
-                wx.Colour(MiRCARTColours[mircColour]), 1)
-
-        self.canvasJournal = MiRCARTCanvasJournal(self)
-
+        super().__init__(parent, pos=canvasPos, \
+            size=[w*h for w,h in zip(canvasSize, cellSize)])
         self.Bind(wx.EVT_CLOSE, self.onClose)
         self.Bind(wx.EVT_LEFT_DOWN, self.onMouseEvent)
         self.Bind(wx.EVT_MOTION, self.onMouseEvent)
