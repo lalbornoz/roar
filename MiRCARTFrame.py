@@ -26,18 +26,6 @@ from MiRCARTCanvas import MiRCARTCanvas
 from MiRCARTColours import MiRCARTColours
 import os, wx
 
-try:
-    from MiRCARTToPastebin import MiRCARTToPastebin
-    haveMiRCARTToPastebin = True
-except ImportError:
-    haveMiRCARTToPastebin = False
-
-try:
-    from MiRCARTToPngFile import MiRCARTToPngFile
-    haveMiRCARTToPngFile = True
-except ImportError:
-    haveMiRCARTToPngFile = False
-
 class MiRCARTFrame(wx.Frame):
     """XXX"""
     panelSkin = panelCanvas = canvasPathName = None
@@ -331,10 +319,12 @@ class MiRCARTFrame(wx.Frame):
         self._initMenus(self.menuBar,                                       \
             [self.MID_FILE, self.MID_EDIT, self.MID_TOOLS], self.onFrameCommand)
         self.SetMenuBar(self.menuBar)
-        if not haveMiRCARTToPastebin:
-            self.menuItemsById[self.CID_EXPORT_PASTEBIN[0]].Enable(False)
-        if not haveMiRCARTToPngFile:
-            self.menuItemsById[self.CID_EXPORT_AS_PNG[0]].Enable(False)
+        self.menuItemsById[self.CID_COPY[0]].Enable(False)
+        self.menuItemsById[self.CID_CUT[0]].Enable(False)
+        self.menuItemsById[self.CID_DELETE[0]].Enable(False)
+        self.menuItemsById[self.CID_PASTE[0]].Enable(False)
+        self.menuItemsById[self.CID_EXPORT_PASTEBIN[0]].Enable(False)
+        self.menuItemsById[self.CID_EXPORT_AS_PNG[0]].Enable(False)
 
         self.toolBar = wx.ToolBar(self.panelSkin, -1,                       \
             style=wx.HORIZONTAL|wx.TB_FLAT|wx.TB_NODIVIDER)
