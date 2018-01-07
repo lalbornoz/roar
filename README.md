@@ -1,6 +1,6 @@
 # MiRCART.py -- mIRC art editor for Windows & Linux (WIP)
-* Prerequisites on Windows: install Python v3.6.x[1] and wxPython v4.x.x w/ the following elevated command prompt command line:  
-  `pip install wxPython`
+* Prerequisites on Windows: install Python v3.6.x[1] and script dependencies w/ the following elevated command prompt command line:  
+  `pip install requests urllib3 wxPython`
 * Prerequisites on Linux: python3 && python-wx{gtk2.8,tools} on Debian-family Linux distributions
 * Screenshot:  
 ![Screenshot](https://github.com/lalbornoz/MiRCARTools/raw/master/MiRCART.png "Screenshot")

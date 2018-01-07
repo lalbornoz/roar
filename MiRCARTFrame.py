@@ -22,61 +22,59 @@
 # SOFTWARE.
 #
 
-from MiRCARTCanvas import MiRCARTCanvas
+from MiRCARTCanvas import MiRCARTCanvas, haveUrllib
 from MiRCARTColours import MiRCARTColours
+from MiRCARTGeneralFrame import MiRCARTGeneralFrame,    \
+    TID_COMMAND, TID_MENU, TID_NOTHING, TID_SELECT, TID_TOOLBAR, TID_ACCELS
+                
 import os, wx
 
-class MiRCARTFrame(wx.Frame):
+class MiRCARTFrame(MiRCARTGeneralFrame):
     """XXX"""
-    panelSkin = panelCanvas = canvasPathName = None
+    panelCanvas = canvasPathName = None
     canvasPos = canvasSize = canvasTools = cellSize = None
-    menuItemsById = menuBar = toolBar = accelTable = statusBar = None
 
-    # {{{ Types
-    TID_COMMAND         = (0x001)
-    TID_NOTHING         = (0x002)
-    TID_MENU            = (0x003)
-    TID_SELECT          = (0x004)
-    TID_TOOLBAR         = (0x005)
-    TID_ACCELS          = (0x006)
-    # }}}
     # {{{ Commands
     #                      Id     Type Id      Labels                           Icon bitmap             Accelerator                 [Initial state]
-    CID_NEW             = (0x100, TID_COMMAND, "New", "&New",                   [wx.ART_NEW],           None)
-    CID_OPEN            = (0x101, TID_COMMAND, "Open", "&Open",                 [wx.ART_FILE_OPEN],     None)
-    CID_SAVE            = (0x102, TID_COMMAND, "Save", "&Save",                 [wx.ART_FILE_SAVE],     None)
-    CID_SAVEAS          = (0x103, TID_COMMAND, "Save As...", "Save &As...",     [wx.ART_FILE_SAVE_AS],  None)
-    CID_EXPORT_AS_PNG   = (0x104, TID_COMMAND, "Export as PNG...", "Export as PN&G...", (),             None,                       False)
-    CID_EXPORT_PASTEBIN = (0x105, TID_COMMAND, "Export to Pastebin...", "Export to Pasteb&in...", (),   None,                       False)
-    CID_EXIT            = (0x106, TID_COMMAND, "Exit", "E&xit",                 (),                     None)
-    CID_UNDO            = (0x107, TID_COMMAND, "Undo", "&Undo",                 [wx.ART_UNDO],          (wx.ACCEL_CTRL, ord("Z")),  False)
-    CID_REDO            = (0x108, TID_COMMAND, "Redo", "&Redo",                 [wx.ART_REDO],          (wx.ACCEL_CTRL, ord("Y")),  False)
-    CID_CUT             = (0x109, TID_COMMAND, "Cut", "Cu&t",                   [wx.ART_CUT],           None,                       False)
-    CID_COPY            = (0x10a, TID_COMMAND, "Copy", "&Copy",                 [wx.ART_COPY],          None,                       False)
-    CID_PASTE           = (0x10b, TID_COMMAND, "Paste", "&Paste",               [wx.ART_PASTE],         None,                       False)
-    CID_DELETE          = (0x10c, TID_COMMAND, "Delete", "De&lete",             [wx.ART_DELETE],        None,                       False)
-    CID_INCRBRUSH       = (0x10d, TID_COMMAND, "Increase brush size", "&Increase brush size", [wx.ART_PLUS], None)
-    CID_DECRBRUSH       = (0x10e, TID_COMMAND, "Decrease brush size", "&Decrease brush size", [wx.ART_MINUS], None)
-    CID_SOLID_BRUSH     = (0x10f, TID_SELECT,  "Solid brush", "&Solid brush",   [None],                 None,                       True)
-    CID_RECT            = (0x110, TID_SELECT,  "Rectangle", "&Rectangle",       [None],                 None,                       True)
-    CID_CIRCLE          = (0x111, TID_SELECT,  "Circle", "&Circle",             [None],                 None,                       False)
-    CID_LINE            = (0x112, TID_SELECT,  "Line", "&Line",                 [None],                 None,                       False)
-    CID_COLOUR00        = (0x113, TID_COMMAND, "Colour #00", "Colour #00",      MiRCARTColours[0],      None)
-    CID_COLOUR01        = (0x114, TID_COMMAND, "Colour #01", "Colour #01",      MiRCARTColours[1],      None)
-    CID_COLOUR02        = (0x115, TID_COMMAND, "Colour #02", "Colour #02",      MiRCARTColours[2],      None)
-    CID_COLOUR03        = (0x116, TID_COMMAND, "Colour #03", "Colour #03",      MiRCARTColours[3],      None)
-    CID_COLOUR04        = (0x117, TID_COMMAND, "Colour #04", "Colour #04",      MiRCARTColours[4],      None)
-    CID_COLOUR05        = (0x118, TID_COMMAND, "Colour #05", "Colour #05",      MiRCARTColours[5],      None)
-    CID_COLOUR06        = (0x119, TID_COMMAND, "Colour #06", "Colour #06",      MiRCARTColours[6],      None)
-    CID_COLOUR07        = (0x11a, TID_COMMAND, "Colour #07", "Colour #07",      MiRCARTColours[7],      None)
-    CID_COLOUR08        = (0x11b, TID_COMMAND, "Colour #08", "Colour #08",      MiRCARTColours[8],      None)
-    CID_COLOUR09        = (0x11c, TID_COMMAND, "Colour #09", "Colour #09",      MiRCARTColours[9],      None)
-    CID_COLOUR10        = (0x11d, TID_COMMAND, "Colour #10", "Colour #10",      MiRCARTColours[10],     None)
-    CID_COLOUR11        = (0x11e, TID_COMMAND, "Colour #11", "Colour #11",      MiRCARTColours[11],     None)
-    CID_COLOUR12        = (0x11f, TID_COMMAND, "Colour #12", "Colour #12",      MiRCARTColours[12],     None)
-    CID_COLOUR13        = (0x120, TID_COMMAND, "Colour #13", "Colour #13",      MiRCARTColours[13],     None)
-    CID_COLOUR14        = (0x121, TID_COMMAND, "Colour #14", "Colour #14",      MiRCARTColours[14],     None)
-    CID_COLOUR15        = (0x122, TID_COMMAND, "Colour #15", "Colour #15",      MiRCARTColours[15],     None)
+    CID_NEW             = (0x100, TID_COMMAND, "New", "&New",                   wx.ART_NEW,             (wx.ACCEL_CTRL, ord("N")))
+    CID_OPEN            = (0x101, TID_COMMAND, "Open", "&Open",                 wx.ART_FILE_OPEN,       (wx.ACCEL_CTRL, ord("O")))
+    CID_SAVE            = (0x102, TID_COMMAND, "Save", "&Save",                 wx.ART_FILE_SAVE,       (wx.ACCEL_CTRL, ord("S")))
+    CID_SAVEAS          = (0x103, TID_COMMAND, "Save As...", "Save &As...",     wx.ART_FILE_SAVE_AS,    None)
+    CID_EXPORT_AS_PNG   = (0x104, TID_COMMAND, "Export as PNG...",              \
+                                               "Export as PN&G...",             None,                   None)
+    CID_EXPORT_PASTEBIN = (0x105, TID_COMMAND, "Export to Pastebin...",         \
+                                               "Export to Pasteb&in...",        None,                   None,                       haveUrllib)
+    CID_EXIT            = (0x106, TID_COMMAND, "Exit", "E&xit",                 None,                   None)
+    CID_UNDO            = (0x107, TID_COMMAND, "Undo", "&Undo",                 wx.ART_UNDO,            (wx.ACCEL_CTRL, ord("Z")),  False)
+    CID_REDO            = (0x108, TID_COMMAND, "Redo", "&Redo",                 wx.ART_REDO,            (wx.ACCEL_CTRL, ord("Y")),  False)
+    CID_CUT             = (0x109, TID_COMMAND, "Cut", "Cu&t",                   wx.ART_CUT,             None,                       False)
+    CID_COPY            = (0x10a, TID_COMMAND, "Copy", "&Copy",                 wx.ART_COPY,            None,                       False)
+    CID_PASTE           = (0x10b, TID_COMMAND, "Paste", "&Paste",               wx.ART_PASTE,           None,                       False)
+    CID_DELETE          = (0x10c, TID_COMMAND, "Delete", "De&lete",             wx.ART_DELETE,          None,                       False)
+    CID_INCRBRUSH       = (0x10d, TID_COMMAND, "Increase brush size",           \
+                                               "&Increase brush size",          wx.ART_PLUS,            None)
+    CID_DECRBRUSH       = (0x10e, TID_COMMAND, "Decrease brush size",           \
+                                               "&Decrease brush size",          wx.ART_MINUS,           None)
+    CID_SOLID_BRUSH     = (0x10f, TID_SELECT,  "Solid brush", "&Solid brush",   None,                   None,                       True)
+    CID_RECT            = (0x110, TID_SELECT,  "Rectangle", "&Rectangle",       None,                   None,                       True)
+    CID_CIRCLE          = (0x111, TID_SELECT,  "Circle", "&Circle",             None,                   None,                       False)
+    CID_LINE            = (0x112, TID_SELECT,  "Line", "&Line",                 None,                   None,                       False)
+    CID_COLOUR00        = (0x113, TID_COMMAND, "Colour #00", "Colour #00",      None,                   None)
+    CID_COLOUR01        = (0x114, TID_COMMAND, "Colour #01", "Colour #01",      None,                   None)
+    CID_COLOUR02        = (0x115, TID_COMMAND, "Colour #02", "Colour #02",      None,                   None)
+    CID_COLOUR03        = (0x116, TID_COMMAND, "Colour #03", "Colour #03",      None,                   None)
+    CID_COLOUR04        = (0x117, TID_COMMAND, "Colour #04", "Colour #04",      None,                   None)
+    CID_COLOUR05        = (0x118, TID_COMMAND, "Colour #05", "Colour #05",      None,                   None)
+    CID_COLOUR06        = (0x119, TID_COMMAND, "Colour #06", "Colour #06",      None,                   None)
+    CID_COLOUR07        = (0x11a, TID_COMMAND, "Colour #07", "Colour #07",      None,                   None)
+    CID_COLOUR08        = (0x11b, TID_COMMAND, "Colour #08", "Colour #08",      None,                   None)
+    CID_COLOUR09        = (0x11c, TID_COMMAND, "Colour #09", "Colour #09",      None,                   None)
+    CID_COLOUR10        = (0x11d, TID_COMMAND, "Colour #10", "Colour #10",      None,                   None)
+    CID_COLOUR11        = (0x11e, TID_COMMAND, "Colour #11", "Colour #11",      None,                   None)
+    CID_COLOUR12        = (0x11f, TID_COMMAND, "Colour #12", "Colour #12",      None,                   None)
+    CID_COLOUR13        = (0x120, TID_COMMAND, "Colour #13", "Colour #13",      None,                   None)
+    CID_COLOUR14        = (0x121, TID_COMMAND, "Colour #14", "Colour #14",      None,                   None)
+    CID_COLOUR15        = (0x122, TID_COMMAND, "Colour #15", "Colour #15",      None,                   None)
     # }}}
     # {{{ Non-items
     NID_MENU_SEP        = (0x200, TID_NOTHING)
@@ -107,79 +105,61 @@ class MiRCARTFrame(wx.Frame):
         CID_COLOUR15))
     # }}}
     # {{{ Accelerators (hotkeys)
-    AID_EDIT            = (0x500, TID_ACCELS, (CID_UNDO, CID_REDO))
+    AID_EDIT            = (0x500, TID_ACCELS, (                                 \
+        CID_NEW, CID_OPEN, CID_SAVE, CID_UNDO, CID_REDO))
     # }}}
 
-    # {{{ _drawIcon(self, solidColour): XXX
-    def _drawIcon(self, solidColour):
-        iconBitmap = wx.Bitmap((16,16))
-        iconDc = wx.MemoryDC(); iconDc.SelectObject(iconBitmap);
-        iconBrush = wx.Brush(wx.Colour(solidColour), wx.BRUSHSTYLE_SOLID)
-        iconDc.SetBrush(iconBrush); iconDc.SetBackground(iconBrush);
-        iconDc.SetPen(wx.Pen(wx.Colour(solidColour), 1))
-        iconDc.DrawRectangle(0, 0, 16, 16)
-        return iconBitmap
+    # {{{ _dialogSaveChanges(self)
+    def _dialogSaveChanges(self):
+        with wx.MessageDialog(self,                             \
+                "Do you want to save changes to {}?".format(    \
+                    self.canvasPathName), "MiRCART",            \
+                wx.CANCEL|wx.CANCEL_DEFAULT|wx.ICON_QUESTION|wx.YES_NO) as dialog:
+            dialogChoice = dialog.ShowModal()
+            return dialogChoice
     # }}}
-    # {{{ _initAccelTable(self, accelsDescr, handler): XXX
-    def _initAccelTable(self, accelsDescr, handler):
-        accelTableEntries = [wx.AcceleratorEntry() for n in range(0, len(accelsDescr[2]))]
-        for numAccel in range(0, len(accelsDescr[2])):
-            accelDescr = accelsDescr[2][numAccel]
-            if accelDescr[5] != None:
-                accelTableEntries[numAccel].Set(accelDescr[5][0], accelDescr[5][1], accelDescr[0])
-                self.Bind(wx.EVT_MENU, handler, id=accelDescr[0])
-        return accelTableEntries
+    # {{{ _setPaletteToolBitmaps(self): XXX
+    def _setPaletteToolBitmaps(self):
+        paletteDescr = (                                                                                        \
+                self.CID_COLOUR00, self.CID_COLOUR01, self.CID_COLOUR02, self.CID_COLOUR03, self.CID_COLOUR04,  \
+                self.CID_COLOUR05, self.CID_COLOUR06, self.CID_COLOUR07, self.CID_COLOUR08, self.CID_COLOUR09,  \
+                self.CID_COLOUR10, self.CID_COLOUR11, self.CID_COLOUR12, self.CID_COLOUR13, self.CID_COLOUR14,  \
+                self.CID_COLOUR15)
+        for numColour in range(len(paletteDescr)):
+            toolBitmapColour = MiRCARTColours[numColour][0:4]
+            toolBitmap = wx.Bitmap((16,16))
+            toolBitmapDc = wx.MemoryDC(); toolBitmapDc.SelectObject(toolBitmap);
+            toolBitmapBrush = wx.Brush(         \
+                wx.Colour(toolBitmapColour), wx.BRUSHSTYLE_SOLID)
+            toolBitmapDc.SetBrush(toolBitmapBrush)
+            toolBitmapDc.SetBackground(toolBitmapBrush)
+            toolBitmapDc.SetPen(wx.Pen(wx.Colour(toolBitmapColour), 1))
+            toolBitmapDc.DrawRectangle(0, 0, 16, 16)
+            self.toolBar.SetToolNormalBitmap(   \
+                paletteDescr[numColour][0], toolBitmap)
     # }}}
-    # {{{ _initMenus(self, menuBar, menusDescr, handler): XXX
-    def _initMenus(self, menuBar, menusDescr, handler):
-        for menuDescr in menusDescr:
-            menuWindow = wx.Menu()
-            for menuItem in menuDescr[4]:
-                if menuItem == self.NID_MENU_SEP:
-                    menuWindow.AppendSeparator()
-                elif menuItem[1] == self.TID_SELECT:
-                    menuItemWindow = menuWindow.AppendRadioItem(menuItem[0], menuItem[3], menuItem[2])
-                    self.menuItemsById[menuItem[0]] = menuItemWindow
-                    self.Bind(wx.EVT_MENU, handler, menuItemWindow)
-                    if len(menuItem) == 7:
-                        menuItemWindow.Check(menuItem[6])
-                else:
-                    menuItemWindow = menuWindow.Append(menuItem[0], menuItem[3], menuItem[2])
-                    self.menuItemsById[menuItem[0]] = menuItemWindow
-                    self.Bind(wx.EVT_MENU, handler, menuItemWindow)
-                    if len(menuItem) == 7:
-                        menuItemWindow.Enable(menuItem[6])
-            menuBar.Append(menuWindow, menuDescr[3])
-    # }}}
-    # {{{ _initToolBars(self, toolBar, toolBarsDescr, handler): XXX
-    def _initToolBars(self, toolBar, toolBarsDescr, handler):
-        for toolBarDescr in toolBarsDescr:
-            for toolBarItem in toolBarDescr[2]:
-                if toolBarItem == self.NID_TOOLBAR_SEP:
-                    toolBar.AddSeparator()
-                else:
-                    if len(toolBarItem[4]) == 4:
-                        toolBarItemIcon = self._drawIcon(toolBarItem[4])
-                    elif len(toolBarItem[4]) == 1                               \
-                    and  toolBarItem[4][0] != None:
-                        toolBarItemIcon = wx.ArtProvider.GetBitmap(             \
-                            toolBarItem[4][0], wx.ART_TOOLBAR, (16,16))
-                    else:
-                        toolBarItemIcon = wx.ArtProvider.GetBitmap(             \
-                            wx.ART_HELP, wx.ART_TOOLBAR, (16,16))
-                    toolBarItemWindow = self.toolBar.AddTool(                   \
-                        toolBarItem[0], toolBarItem[2], toolBarItemIcon)
-                    self.Bind(wx.EVT_TOOL, handler, toolBarItemWindow)
-                    self.Bind(wx.EVT_TOOL_RCLICKED, handler, toolBarItemWindow)
-    # }}}
-    # {{{ _updateStatusBar(self): XXX
-    def _updateStatusBar(self):
-        text = "Foreground colour:"
-        text += " " + str(self.panelCanvas.mircFg)
-        text += " | "
-        text += "Background colour:"
-        text += " " + str(self.panelCanvas.mircBg)
-        self.statusBar.SetStatusText(text)
+    # {{{ _updateStatusBar(self, showColours=None, showFileName=True, showPos=None): XXX
+    def _updateStatusBar(self, showColours=True, showFileName=True, showPos=True):
+        if showColours == True:
+            showColours = self.panelCanvas.brushColours
+        if showPos == True:
+            showPos = self.panelCanvas.brushPos
+        if showFileName == True:
+            showFileName = self.canvasPathName
+        textItems = []
+        if showPos != None:
+            textItems.append("X: {:03d} Y: {:03d}".format(      \
+                showPos[0], showPos[1]))
+        if showColours != None:
+            textItems.append("FG: {:02d}, BG: {:02d}".format(   \
+                showColours[0],showColours[1]))
+            textItems.append("{} on {}".format(                 \
+                MiRCARTColours[showColours[0]][4],              \
+                MiRCARTColours[showColours[1]][4]))
+        if showFileName != None:
+            textItems.append("Current file: {}".format(         \
+                os.path.basename(showFileName)))
+        self.statusBar.SetStatusText(" | ".join(textItems))
     # }}}
 
     # {{{ canvasExportAsPng(self): XXX
@@ -189,31 +169,57 @@ class MiRCARTFrame(wx.Frame):
             if dialog.ShowModal() == wx.ID_CANCEL:
                 return False
             else:
-                try:
-                    outPathName = dialog.GetPath()
-                    self.panelCanvas.exportPngFile(outhPathName)
-                    return True
-                except IOError as error:
-                    pass
+                outPathName = dialog.GetPath()
+                self.panelCanvas.canvasStore.exportBitmapToPngFile(     \
+                    self.panelCanvas.canvasBitmap, outPathName,         \
+                        wx.BITMAP_TYPE_PNG)
+                return True
     # }}}
     # {{{ canvasExportPastebin(self): XXX
     def canvasExportPastebin(self):
-        try:
-            self.panelCanvas.exportPastebin("")
-            return True
-        except IOError as error:
-            pass
+        pasteStatus, pasteResult =                                          \
+            self.panelCanvas.canvasStore.exportPastebin(                    \
+                "",                          \
+                self.panelCanvas.canvasMap,                                 \
+                self.panelCanvas.canvasSize)
+        if pasteStatus:
+            if not wx.TheClipboard.IsOpened():
+                wx.TheClipboard.Open()
+                wx.TheClipboard.SetData(wx.TextDataObject(pasteResult))
+                wx.TheClipboard.Close()
+            wx.MessageBox("Exported to Pastebin: " + pasteResult,           \
+                "Export to Pastebin", wx.OK|wx.ICON_INFORMATION)
+        else:
+            wx.MessageBox("Failed to export to Pastebin: " + pasteResult,   \
+                "Export to Pastebin", wx.OK|wx.ICON_EXCLAMATION)
     # }}}
     # {{{ canvasNew(self, newCanvasSize=None): XXX
     def canvasNew(self, newCanvasSize=None):
+        if self.canvasPathName != None:
+            saveChanges = self._dialogSaveChanges()
+            if saveChanges == wx.ID_CANCEL:
+                return
+            elif saveChanges == wx.ID_NO:
+                pass
+            elif saveChanges == wx.ID_YES:
+                self.canvasSave()
         if newCanvasSize == None:
             newCanvasSize = (100, 30)
         self.panelCanvas.canvasStore.importNew(newCanvasSize)
+        self.canvasPathName = None
         self._updateStatusBar(); self.onCanvasUpdate();
     # }}}
     # {{{ canvasOpen(self): XXX
     def canvasOpen(self):
-        with wx.FileDialog(self, self.CID_OPEN[2], os.getcwd(), "",     \
+        if self.canvasPathName != None:
+            saveChanges = self._dialogSaveChanges()
+            if saveChanges == wx.ID_CANCEL:
+                return
+            elif saveChanges == wx.ID_NO:
+                pass
+            elif saveChanges == wx.ID_YES:
+                self.canvasSave()
+        with wx.FileDialog(self, self.CID_OPEN[2], os.getcwd(), "", \
                 "*.txt", wx.FD_OPEN) as dialog:
             if dialog.ShowModal() == wx.ID_CANCEL:
                 return False
@@ -230,10 +236,13 @@ class MiRCARTFrame(wx.Frame):
             if self.canvasSaveAs() == False:
                 return
         try:
-            self.panelCanvas.exportTextFile(self.canvasPathName)
-            return True
+            with open(self.canvasPathName, "w") as outFile:
+                self.panelCanvas.canvasStore.exportTextFile(            \
+                    self.panelCanvas.canvasMap,                         \
+                    self.panelCanvas.canvasSize, outFile)
+                return True
         except IOError as error:
-            pass
+            return False
     # }}}
     # {{{ canvasSaveAs(self): XXX
     def canvasSaveAs(self):
@@ -243,22 +252,32 @@ class MiRCARTFrame(wx.Frame):
                 return False
             else:
                 self.canvasPathName = dialog.GetPath()
-                return True
+                return self.canvasSave()
+    # }}}
+    # {{{ onCanvasMotion(self, event): XXX
+    def onCanvasMotion(self, event, mapPoint=None):
+        eventType = event.GetEventType()
+        if eventType == wx.wxEVT_ENTER_WINDOW:
+            pass
+        elif eventType == wx.wxEVT_MOTION:
+            self._updateStatusBar(showPos=mapPoint)
+        elif eventType == wx.wxEVT_LEAVE_WINDOW:
+            pass
     # }}}
     # {{{ onCanvasUpdate(self): XXX
     def onCanvasUpdate(self):
         if self.panelCanvas.canvasJournal.patchesUndo[self.panelCanvas.canvasJournal.patchesUndoLevel] != None:
             self.menuItemsById[self.CID_UNDO[0]].Enable(True)
+            self.toolBar.EnableTool(self.CID_UNDO[0], True)
         else:
             self.menuItemsById[self.CID_UNDO[0]].Enable(False)
+            self.toolBar.EnableTool(self.CID_UNDO[0], False)
         if self.panelCanvas.canvasJournal.patchesUndoLevel > 0:
             self.menuItemsById[self.CID_REDO[0]].Enable(True)
+            self.toolBar.EnableTool(self.CID_REDO[0], True)
         else:
             self.menuItemsById[self.CID_REDO[0]].Enable(False)
-    # }}}
-    # {{{ onClose(self, event): XXX
-    def onClose(self, event):
-        self.Destroy(); self.__del__();
+            self.toolBar.EnableTool(self.CID_REDO[0], False)
     # }}}
     # {{{ onFrameCommand(self, event): XXX
     def onFrameCommand(self, event):
@@ -305,9 +324,9 @@ class MiRCARTFrame(wx.Frame):
         and  cid <= self.CID_COLOUR15[0]:
             numColour = cid - self.CID_COLOUR00[0]
             if event.GetEventType() == wx.wxEVT_TOOL:
-                self.panelCanvas.mircFg = numColour
+                self.panelCanvas.brushColours[0] = numColour
             elif event.GetEventType() == wx.wxEVT_TOOL_RCLICKED:
-                self.panelCanvas.mircBg = numColour
+                self.panelCanvas.brushColours[1] = numColour
             self._updateStatusBar()
     # }}}
     # {{{ __del__(self): destructor method
@@ -319,32 +338,13 @@ class MiRCARTFrame(wx.Frame):
     #
     # __init__(self, parent, appSize=(800, 600), canvasPos=(25, 50), cellSize=(7, 14), canvasSize=(100, 30), canvasTools=[]): initialisation method
     def __init__(self, parent, appSize=(800, 600), canvasPos=(25, 50), cellSize=(7, 14), canvasSize=(100, 30), canvasTools=[]):
-        super().__init__(parent, wx.ID_ANY, "MiRCART", size=appSize)
-        self.panelSkin = wx.Panel(self, wx.ID_ANY)
+        panelSkin = super().__init__(parent, wx.ID_ANY, "MiRCART", size=appSize)
+        self._setPaletteToolBitmaps()
         self.canvasPos = canvasPos; self.cellSize = cellSize; self.canvasSize = canvasSize;
         self.canvasPathName = None
-
-        self.menuItemsById = {}; self.menuBar = wx.MenuBar();
-        self._initMenus(self.menuBar,                                       \
-            [self.MID_FILE, self.MID_EDIT, self.MID_TOOLS], self.onFrameCommand)
-        self.SetMenuBar(self.menuBar)
-
-        self.toolBar = wx.ToolBar(self.panelSkin, -1,                       \
-            style=wx.HORIZONTAL|wx.TB_FLAT|wx.TB_NODIVIDER)
-        self.toolBar.SetToolBitmapSize((16,16))
-        self._initToolBars(self.toolBar, [self.BID_TOOLBAR], self.onFrameCommand)
-        self.toolBar.Realize(); self.toolBar.Fit();
-
-        self.accelTable = wx.AcceleratorTable(                              \
-            self._initAccelTable(self.AID_EDIT, self.onFrameCommand))
-        self.SetAcceleratorTable(self.accelTable)
-
-        self.Bind(wx.EVT_CLOSE, self.onClose)
-        self.statusBar = self.CreateStatusBar();
-        self.SetFocus(); self.Show(True);
         self.canvasTools = canvasTools
-        self.panelCanvas = MiRCARTCanvas(self.panelSkin, parentFrame=self,  \
-            canvasPos=self.canvasPos, canvasSize=self.canvasSize,           \
+        self.panelCanvas = MiRCARTCanvas(panelSkin, parentFrame=self,   \
+            canvasPos=self.canvasPos, canvasSize=self.canvasSize,       \
             canvasTools=self.canvasTools, cellSize=self.cellSize)
         self.canvasNew()
 

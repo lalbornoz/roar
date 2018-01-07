@@ -22,13 +22,13 @@
 # SOFTWARE.
 #
 
+import MiRCARTCanvasStore
 from PIL import Image, ImageDraw, ImageFont
-from MiRCARTFromTextFile import MiRCARTFromTextFile
 import string, sys
 
 class MiRCARTToPngFile:
     """XXX"""
-    inFile = inFilePath = inFromTextFile = None
+    inFile = inFromTextFile = None
     outFontFilePath = outFontSize = None
 
     # {{{ _ColourMapBold: mIRC colour number to RGBA map given ^B (bold)
@@ -81,23 +81,23 @@ class MiRCARTToPngFile:
     # }}}
     # {{{ export(self, outFilePath): XXX
     def export(self, outFilePath):
-        inSize = self.inFromTextFile.getSize();
-        outSize = [inSize[n] * self.outImgFontSize[n] for n in range(0, 2)]
+        inSize = (len(self.inCanvasMap[0]), len(self.inCanvasMap))
+        outSize = [a*b for a,b in zip(inSize, self.outImgFontSize)]
         outCurPos = [0, 0]
         outImg = Image.new("RGBA", outSize, (*self._ColourMapNormal[1], 255))
         outImgDraw = ImageDraw.Draw(outImg)
-        for inCurRow in range(0, inSize[1]):
-            for inCurCol in range(0, len(self.inFromTextFile.outMap[inCurRow])):
-                inCurCell = self.inFromTextFile.outMap[inCurRow][inCurCol]
+        for inCurRow in range(len(self.inCanvasMap)):
+            for inCurCol in range(len(self.inCanvasMap[inCurRow])):
+                inCurCell = self.inCanvasMap[inCurRow][inCurCol]
                 outColours = [0, 0]
-                if inCurCell[1] & MiRCARTFromTextFile._CellState.CS_BOLD:
+                if inCurCell[1] & 0x02:
                     if inCurCell[2] != " ":
                         outColours[0] = self._ColourMapBold[inCurCell[0][0]]
                     outColours[1] = self._ColourMapBold[inCurCell[0][1]]
                 else:
                     if inCurCell[2] != " ":
                         outColours[0] = self._ColourMapNormal[inCurCell[0][0]]
-                    outColours[1] = self._ColourMapNormal[inCurCell[0][1]]
+                outColours[1] = self._ColourMapNormal[inCurCell[0][1]]
                 outImgDraw.rectangle((*outCurPos,           \
                     outCurPos[0] + self.outImgFontSize[0],  \
                     outCurPos[1] + self.outImgFontSize[1]), \
@@ -107,7 +107,7 @@ class MiRCARTToPngFile:
                     # XXX implement italic
                     outImgDraw.text(outCurPos,              \
                         inCurCell[2], (*outColours[0], 255), self.outImgFont)
-                if inCurCell[1] & MiRCARTFromTextFile._CellState.CS_UNDERLINE:
+                if inCurCell[1] & 0x1f:
                     self._drawUnderLine(curPos, self.outImgFontSize, outImgDraw)
                 outCurPos[0] += self.outImgFontSize[0];
             outCurPos[0] = 0
@@ -116,11 +116,9 @@ class MiRCARTToPngFile:
     # }}}
 
     #
-    # __init__(self, inFilePath, fontFilePath="DejaVuSansMono.ttf", fontSize=11): initialisation method
-    def __init__(self, inFilePath, fontFilePath="DejaVuSansMono.ttf", fontSize=11):
-        self.inFilePath = inFilePath; self.inFile = open(inFilePath, "r");
-        self.inFromTextFile = MiRCARTFromTextFile(self.inFile)
-
+    # __init__(self, inCanvasMap, fontFilePath="DejaVuSansMono.ttf", fontSize=11): initialisation method
+    def __init__(self, inCanvasMap, fontFilePath="DejaVuSansMono.ttf", fontSize=11):
+        self.inCanvasMap = inCanvasMap
         self.outFontFilePath = fontFilePath; self.outFontSize = int(fontSize);
         self.outImgFont = ImageFont.truetype(           \
             self.outFontFilePath, self.outFontSize)
@@ -130,7 +128,8 @@ class MiRCARTToPngFile:
 #
 # Entry point
 def main(*argv):
-    MiRCARTToPngFile(argv[1], *argv[3:]).export(argv[2])
+    canvasStore = MiRCARTCanvasStore.MiRCARTCanvasStore(inFile=argv[1])
+    MiRCARTToPngFile(canvasStore.outMap, *argv[3:]).export(argv[2])
 if __name__ == "__main__":
     if ((len(sys.argv) - 1) < 2)\
     or ((len(sys.argv) - 1) > 4):

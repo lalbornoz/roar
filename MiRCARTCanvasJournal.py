@@ -31,28 +31,26 @@ class MiRCARTCanvasJournal():
     def _popTmp(self, eventDc, tmpDc):
         if self.patchesTmp:
             for patch in self.patchesTmp:
-                patch[2:] = self.parentCanvas._getMapCell([patch[0], patch[1]])
-                self.parentCanvas.onJournalUpdate(True,  \
-                    (patch[0:2]), patch, eventDc, tmpDc, (0, 0))
+                self.parentCanvas.onJournalUpdate(True,             \
+                    patch[0], patch, eventDc, tmpDc, (0, 0), True)
             self.patchesTmp = []
     # }}}
     # {{{ _pushTmp(self, atPoint, patch): XXX
     def _pushTmp(self, absMapPoint):
-        self.patchesTmp.append([*absMapPoint, None, None, None])
+        self.patchesTmp.append([absMapPoint, None, None, None])
     # }}}
-    # {{{ _pushUndo(self, atPoint, patch): XXX
-    def _pushUndo(self, atPoint, patch, mapItem):
+    # {{{ _pushUndo(self, atPoint, patchUndo, patchRedo): XXX
+    def _pushUndo(self, atPoint, patchUndo, patchRedo):
         if self.patchesUndoLevel > 0:
             del self.patchesUndo[0:self.patchesUndoLevel]
             self.patchesUndoLevel = 0
-        absMapPoint = self._relMapPointToAbsMapPoint((patch[0], patch[1]), atPoint)
-        self.patchesUndo.insert(0, (                                                \
-            (absMapPoint[0], absMapPoint[1], mapItem[0], mapItem[1], mapItem[2]),   \
-            (absMapPoint[0], absMapPoint[1], patch[2], patch[3], patch[4])))
+        absMapPoint = self._relMapPointToAbsMapPoint(patchUndo[0], atPoint)
+        self.patchesUndo.insert(0, [    \
+            [absMapPoint, *patchUndo[1:]], [absMapPoint, *patchRedo[1:]]])
     # }}}
     # {{{ _relMapPointToAbsMapPoint(self, relMapPoint, atPoint): XXX
     def _relMapPointToAbsMapPoint(self, relMapPoint, atPoint):
-        return (atPoint[0] + relMapPoint[0], atPoint[1] + relMapPoint[1])
+        return [a+b for a,b in zip(atPoint, relMapPoint)]
     # }}}
     # {{{ merge(self, mapPatches, eventDc, tmpDc, atPoint): XXX
     def merge(self, mapPatches, eventDc, tmpDc, atPoint):
@@ -61,40 +59,45 @@ class MiRCARTCanvasJournal():
             if mapPatchTmp:
                 self._popTmp(eventDc, tmpDc)
             for patch in mapPatch[1]:
-                absMapPoint = self._relMapPointToAbsMapPoint(patch[0:2], atPoint)
-                mapItem = self.parentCanvas._getMapCell(absMapPoint)
+                absMapPoint = self._relMapPointToAbsMapPoint(patch[0], atPoint)
                 if mapPatchTmp:
                     self._pushTmp(absMapPoint)
-                    self.parentCanvas.onJournalUpdate(mapPatchTmp,  \
+                    self.parentCanvas.onJournalUpdate(mapPatchTmp,      \
                         absMapPoint, patch, eventDc, tmpDc, atPoint)
-                elif mapItem != patch[2:5]:
-                    self._pushUndo(atPoint, patch, mapItem)
-                    self.parentCanvas.onJournalUpdate(mapPatchTmp,  \
-                        absMapPoint, patch, eventDc, tmpDc, atPoint)
+                else:
+                    patchUndo =                                         \
+                    self.parentCanvas.onJournalUpdate(mapPatchTmp,      \
+                        absMapPoint, patch, eventDc, tmpDc, atPoint, True)
+                    self._pushUndo(atPoint, patchUndo, patch)
     # }}}
     # {{{ redo(self): XXX
     def redo(self):
         if self.patchesUndoLevel > 0:
             self.patchesUndoLevel -= 1
             redoPatch = self.patchesUndo[self.patchesUndoLevel][1]
-            self.parentCanvas.onJournalUpdate(False,        \
-                (redoPatch[0:2]), redoPatch, None, None, (0, 0))
+            self.parentCanvas.onJournalUpdate(False,    \
+                redoPatch[0], redoPatch, None, None, (0, 0))
             return True
         else:
             return False
     # }}}
     # {{{ reset(self): XXX
     def reset(self):
-        self.patchesTmp = []
-        self.patchesUndo = [None]; self.patchesUndoLevel = 0;
+        self.patchesTmp = []; self.patchesUndo = [None]; self.patchesUndoLevel = 0;
+    # }}}
+    # {{{ resetCursor(self, eventDc, tmpDc): XXX
+    def resetCursor(self, eventDc, tmpDc):
+        if len(self.patchesTmp):
+            self._popTmp(eventDc, tmpDc)
+            self.patchesTmp = []
     # }}}
     # {{{ undo(self): XXX
     def undo(self):
         if self.patchesUndo[self.patchesUndoLevel] != None:
             undoPatch = self.patchesUndo[self.patchesUndoLevel][0]
             self.patchesUndoLevel += 1
-            self.parentCanvas.onJournalUpdate(False,        \
-                (undoPatch[0:2]), undoPatch, None, None, (0, 0))
+            self.parentCanvas.onJournalUpdate(False,    \
+                undoPatch[0], undoPatch, None, None, (0, 0))
             return True
         else:
             return False

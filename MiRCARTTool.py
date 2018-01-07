@@ -26,8 +26,8 @@ class MiRCARTTool():
     """XXX"""
     parentCanvas = None
 
-    # {{{ onMouseEvent(self, event, mapPoint, isDragging, isLeftDown, isRightDown): XXX
-    def onMouseEvent(self, event, mapPoint, isDragging, isLeftDown, isRightDown):
+    # {{{ onMouseEvent(self, event, atPoint, brushColours, brushSize, isDragging, isLeftDown, isRightDown): XXX
+    def onMouseEvent(self, event, atPoint, brushColours, brushSize, isDragging, isLeftDown, isRightDown):
         pass
     # }}}
 

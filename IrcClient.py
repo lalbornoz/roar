@@ -90,7 +90,7 @@ class IrcClient:
     # {{{ queue(self, *args): Parse and queue single line to server from list
     def queue(self, *args):
         msg = ""; argNumMax = len(args);
-        for argNum in range(0, argNumMax):
+        for argNum in range(argNumMax):
             if argNum == (argNumMax - 1):
                 msg += ":" + args[argNum]
             else:
