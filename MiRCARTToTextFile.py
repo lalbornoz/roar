@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 #
-# MiRCART.py -- mIRC art editor for Windows & Linux
+# MiRCARTToTextFile.py -- XXX
 # Copyright (c) 2018 Lucio Andrés Illanes Albornoz <lucio@lucioillanes.de>
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -22,17 +22,26 @@
 # SOFTWARE.
 #
 
-from MiRCARTFrame import MiRCARTFrame
-from MiRCARTToolRect import MiRCARTToolRect
-import sys, wx
+class MiRCARTToTextFile():
+    canvasMap = canvasSize = None
 
-#
-# Entry point
-def main(*argv):
-    wxApp = wx.App(False)
-    MiRCARTFrame(None, canvasTools=[MiRCARTToolRect])
-    wxApp.MainLoop()
-if __name__ == "__main__":
-    main(*sys.argv)
+    # export(self, outFile): XXX
+    def export(self, outFile):
+        for canvasRow in range(0, self.canvasSize[1]):
+            canvasLastColours = []
+            for canvasCol in range(0, self.canvasSize[0]):
+                canvasColColours = self.canvasMap[canvasRow][canvasCol][0:2]
+                canvasColText = self.canvasMap[canvasRow][canvasCol][2]
+                if canvasColColours != canvasLastColours:
+                    canvasLastColours = canvasColColours
+                    outFile.write("\x03" +          \
+                        str(canvasColColours[0]) +  \
+                        "," + str(canvasColColours[1]))
+                    outFile.write(canvasColText)
+                outFile.write("\n")
+
+    # __init__(self, canvasMap, canvasSize): XXX
+    def __init__(self, canvasMap, canvasSize):
+        self.canvasMap = canvasMap; self.canvasSize = canvasSize;
 
 # vim:expandtab foldmethod=marker sw=4 ts=4 tw=120
