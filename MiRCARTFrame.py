@@ -42,39 +42,41 @@ class MiRCARTFrame(MiRCARTGeneralFrame):
     CID_SAVEAS          = (0x103, TID_COMMAND, "Save As...", "Save &As...",     wx.ART_FILE_SAVE_AS,    None)
     CID_EXPORT_AS_PNG   = (0x104, TID_COMMAND, "Export as PNG...",              \
                                                "Export as PN&G...",             None,                   None)
-    CID_EXPORT_PASTEBIN = (0x105, TID_COMMAND, "Export to Pastebin...",         \
+    CID_EXPORT_IMGUR    = (0x105, TID_COMMAND, "Export to Imgur...",            \
+                                               "Export to I&mgur...",           None,                   None,                       haveUrllib)
+    CID_EXPORT_PASTEBIN = (0x106, TID_COMMAND, "Export to Pastebin...",         \
                                                "Export to Pasteb&in...",        None,                   None,                       haveUrllib)
-    CID_EXIT            = (0x106, TID_COMMAND, "Exit", "E&xit",                 None,                   None)
-    CID_UNDO            = (0x107, TID_COMMAND, "Undo", "&Undo",                 wx.ART_UNDO,            (wx.ACCEL_CTRL, ord("Z")),  False)
-    CID_REDO            = (0x108, TID_COMMAND, "Redo", "&Redo",                 wx.ART_REDO,            (wx.ACCEL_CTRL, ord("Y")),  False)
-    CID_CUT             = (0x109, TID_COMMAND, "Cut", "Cu&t",                   wx.ART_CUT,             None,                       False)
-    CID_COPY            = (0x10a, TID_COMMAND, "Copy", "&Copy",                 wx.ART_COPY,            None,                       False)
-    CID_PASTE           = (0x10b, TID_COMMAND, "Paste", "&Paste",               wx.ART_PASTE,           None,                       False)
-    CID_DELETE          = (0x10c, TID_COMMAND, "Delete", "De&lete",             wx.ART_DELETE,          None,                       False)
-    CID_INCRBRUSH       = (0x10d, TID_COMMAND, "Increase brush size",           \
+    CID_EXIT            = (0x107, TID_COMMAND, "Exit", "E&xit",                 None,                   None)
+    CID_UNDO            = (0x108, TID_COMMAND, "Undo", "&Undo",                 wx.ART_UNDO,            (wx.ACCEL_CTRL, ord("Z")),  False)
+    CID_REDO            = (0x109, TID_COMMAND, "Redo", "&Redo",                 wx.ART_REDO,            (wx.ACCEL_CTRL, ord("Y")),  False)
+    CID_CUT             = (0x10a, TID_COMMAND, "Cut", "Cu&t",                   wx.ART_CUT,             None,                       False)
+    CID_COPY            = (0x10b, TID_COMMAND, "Copy", "&Copy",                 wx.ART_COPY,            None,                       False)
+    CID_PASTE           = (0x10c, TID_COMMAND, "Paste", "&Paste",               wx.ART_PASTE,           None,                       False)
+    CID_DELETE          = (0x10d, TID_COMMAND, "Delete", "De&lete",             wx.ART_DELETE,          None,                       False)
+    CID_INCRBRUSH       = (0x10e, TID_COMMAND, "Increase brush size",           \
                                                "&Increase brush size",          wx.ART_PLUS,            None)
-    CID_DECRBRUSH       = (0x10e, TID_COMMAND, "Decrease brush size",           \
+    CID_DECRBRUSH       = (0x10f, TID_COMMAND, "Decrease brush size",           \
                                                "&Decrease brush size",          wx.ART_MINUS,           None)
-    CID_SOLID_BRUSH     = (0x10f, TID_SELECT,  "Solid brush", "&Solid brush",   None,                   None,                       True)
-    CID_RECT            = (0x110, TID_SELECT,  "Rectangle", "&Rectangle",       None,                   None,                       True)
-    CID_CIRCLE          = (0x111, TID_SELECT,  "Circle", "&Circle",             None,                   None,                       False)
-    CID_LINE            = (0x112, TID_SELECT,  "Line", "&Line",                 None,                   None,                       False)
-    CID_COLOUR00        = (0x113, TID_COMMAND, "Colour #00", "Colour #00",      None,                   None)
-    CID_COLOUR01        = (0x114, TID_COMMAND, "Colour #01", "Colour #01",      None,                   None)
-    CID_COLOUR02        = (0x115, TID_COMMAND, "Colour #02", "Colour #02",      None,                   None)
-    CID_COLOUR03        = (0x116, TID_COMMAND, "Colour #03", "Colour #03",      None,                   None)
-    CID_COLOUR04        = (0x117, TID_COMMAND, "Colour #04", "Colour #04",      None,                   None)
-    CID_COLOUR05        = (0x118, TID_COMMAND, "Colour #05", "Colour #05",      None,                   None)
-    CID_COLOUR06        = (0x119, TID_COMMAND, "Colour #06", "Colour #06",      None,                   None)
-    CID_COLOUR07        = (0x11a, TID_COMMAND, "Colour #07", "Colour #07",      None,                   None)
-    CID_COLOUR08        = (0x11b, TID_COMMAND, "Colour #08", "Colour #08",      None,                   None)
-    CID_COLOUR09        = (0x11c, TID_COMMAND, "Colour #09", "Colour #09",      None,                   None)
-    CID_COLOUR10        = (0x11d, TID_COMMAND, "Colour #10", "Colour #10",      None,                   None)
-    CID_COLOUR11        = (0x11e, TID_COMMAND, "Colour #11", "Colour #11",      None,                   None)
-    CID_COLOUR12        = (0x11f, TID_COMMAND, "Colour #12", "Colour #12",      None,                   None)
-    CID_COLOUR13        = (0x120, TID_COMMAND, "Colour #13", "Colour #13",      None,                   None)
-    CID_COLOUR14        = (0x121, TID_COMMAND, "Colour #14", "Colour #14",      None,                   None)
-    CID_COLOUR15        = (0x122, TID_COMMAND, "Colour #15", "Colour #15",      None,                   None)
+    CID_SOLID_BRUSH     = (0x110, TID_SELECT,  "Solid brush", "&Solid brush",   None,                   None,                       True)
+    CID_RECT            = (0x111, TID_SELECT,  "Rectangle", "&Rectangle",       None,                   None,                       True)
+    CID_CIRCLE          = (0x112, TID_SELECT,  "Circle", "&Circle",             None,                   None,                       False)
+    CID_LINE            = (0x113, TID_SELECT,  "Line", "&Line",                 None,                   None,                       False)
+    CID_COLOUR00        = (0x114, TID_COMMAND, "Colour #00", "Colour #00",      None,                   None)
+    CID_COLOUR01        = (0x115, TID_COMMAND, "Colour #01", "Colour #01",      None,                   None)
+    CID_COLOUR02        = (0x116, TID_COMMAND, "Colour #02", "Colour #02",      None,                   None)
+    CID_COLOUR03        = (0x117, TID_COMMAND, "Colour #03", "Colour #03",      None,                   None)
+    CID_COLOUR04        = (0x118, TID_COMMAND, "Colour #04", "Colour #04",      None,                   None)
+    CID_COLOUR05        = (0x119, TID_COMMAND, "Colour #05", "Colour #05",      None,                   None)
+    CID_COLOUR06        = (0x11a, TID_COMMAND, "Colour #06", "Colour #06",      None,                   None)
+    CID_COLOUR07        = (0x11b, TID_COMMAND, "Colour #07", "Colour #07",      None,                   None)
+    CID_COLOUR08        = (0x11c, TID_COMMAND, "Colour #08", "Colour #08",      None,                   None)
+    CID_COLOUR09        = (0x11d, TID_COMMAND, "Colour #09", "Colour #09",      None,                   None)
+    CID_COLOUR10        = (0x11e, TID_COMMAND, "Colour #10", "Colour #10",      None,                   None)
+    CID_COLOUR11        = (0x11f, TID_COMMAND, "Colour #11", "Colour #11",      None,                   None)
+    CID_COLOUR12        = (0x120, TID_COMMAND, "Colour #12", "Colour #12",      None,                   None)
+    CID_COLOUR13        = (0x121, TID_COMMAND, "Colour #13", "Colour #13",      None,                   None)
+    CID_COLOUR14        = (0x122, TID_COMMAND, "Colour #14", "Colour #14",      None,                   None)
+    CID_COLOUR15        = (0x123, TID_COMMAND, "Colour #15", "Colour #15",      None,                   None)
     # }}}
     # {{{ Non-items
     NID_MENU_SEP        = (0x200, TID_NOTHING)
@@ -83,7 +85,7 @@ class MiRCARTFrame(MiRCARTGeneralFrame):
     # {{{ Menus
     MID_FILE            = (0x300, TID_MENU, "File", "&File", (                  \
         CID_NEW, CID_OPEN, CID_SAVE, CID_SAVEAS, NID_MENU_SEP,                  \
-        CID_EXPORT_PASTEBIN, CID_EXPORT_AS_PNG, NID_MENU_SEP,                   \
+        CID_EXPORT_AS_PNG, CID_EXPORT_IMGUR, CID_EXPORT_PASTEBIN, NID_MENU_SEP, \
         CID_EXIT))
     MID_EDIT            = (0x301, TID_MENU, "Edit", "&Edit", (                  \
         CID_UNDO, CID_REDO, NID_MENU_SEP,                                       \
@@ -164,16 +166,31 @@ class MiRCARTFrame(MiRCARTGeneralFrame):
 
     # {{{ canvasExportAsPng(self): XXX
     def canvasExportAsPng(self):
-        with wx.FileDialog(self, self.CID_SAVEAS[2], os.getcwd(), "",   \
+        with wx.FileDialog(self, self.CID_SAVEAS[2], os.getcwd(), "",       \
                 "*.png", wx.FD_SAVE|wx.FD_OVERWRITE_PROMPT) as dialog:
             if dialog.ShowModal() == wx.ID_CANCEL:
                 return False
             else:
                 outPathName = dialog.GetPath()
-                self.panelCanvas.canvasStore.exportBitmapToPngFile(     \
-                    self.panelCanvas.canvasBitmap, outPathName,         \
+                self.panelCanvas.canvasStore.exportBitmapToPngFile(         \
+                    self.panelCanvas.canvasBitmap, outPathName,             \
                         wx.BITMAP_TYPE_PNG)
                 return True
+    # }}}
+    # {{{ canvasExportImgur(self): XXX
+    def canvasExportImgur(self):
+        imgurResult = self.panelCanvas.canvasStore.exportBitmapToImgur(     \
+            "c9a6efb3d7932fd", self.panelCanvas.canvasBitmap, "", "", wx.BITMAP_TYPE_PNG)
+        if imgurResult[0] == 200:
+            if not wx.TheClipboard.IsOpened():
+                wx.TheClipboard.Open()
+                wx.TheClipboard.SetData(wx.TextDataObject(imgurResult[1]))
+                wx.TheClipboard.Close()
+            wx.MessageBox("Exported to Imgur: " + imgurResult[1],           \
+                "Export to Imgur", wx.OK|wx.ICON_INFORMATION)
+        else:
+            wx.MessageBox("Failed to export to Imgur: " + imgurResult[1],   \
+                "Export to Imgur", wx.OK|wx.ICON_EXCLAMATION)
     # }}}
     # {{{ canvasExportPastebin(self): XXX
     def canvasExportPastebin(self):
@@ -292,6 +309,8 @@ class MiRCARTFrame(MiRCARTGeneralFrame):
             self.canvasSaveAs()
         elif cid == self.CID_EXPORT_AS_PNG[0]:
             self.canvasExportAsPng()
+        elif cid == self.CID_EXPORT_IMGUR[0]:
+            self.canvasExportImgur()
         elif cid == self.CID_EXPORT_PASTEBIN[0]:
             self.canvasExportPastebin()
         elif cid == self.CID_EXIT[0]:

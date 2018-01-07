@@ -22,7 +22,7 @@
 # SOFTWARE.
 #
 
-import io
+import io, os, tempfile
 
 try:
     import wx
@@ -37,7 +37,7 @@ except ImportError:
     haveMiRCARTToPngFile = False
 
 try:
-    import requests, urllib.request
+    import base64, json, requests, urllib.request
     haveUrllib = True
 except ImportError:
     haveUrllib = False
@@ -62,6 +62,32 @@ class MiRCARTCanvasStore():
         PS_COLOUR_DIGIT0    = 2
         PS_COLOUR_DIGIT1    = 3
 
+    # {{{ _exportFileToImgur(self, apiKey, imgName, imgTitle, pathName): upload single PNG file to Imgur
+    def _exportFileToImgur(self, apiKey, imgName, imgTitle, pathName):
+        requestImageData = open(pathName, "rb").read()
+        requestData = {                                     \
+            "image": base64.b64encode(requestImageData),    \
+            "key":   apiKey,                                \
+            "name":  imgName,                               \
+            "title": imgTitle,                              \
+            "type":  "base64"}
+        requestHeaders = {"Authorization": "Client-ID " + apiKey}
+        responseHttp = requests.post(                       \
+            "https://api.imgur.com/3/upload.json",          \
+            data=requestData, headers=requestHeaders)
+        responseDict = json.loads(responseHttp.text)
+        if responseHttp.status_code == 200:
+                return [200, responseDict.get("data").get("link")]
+        else:
+                return [responseHttp.status_code, ""]
+    # }}}
+    # {{{ _flipCellStateBit(self, cellState, bit): XXX
+    def _flipCellStateBit(self, cellState, bit):
+        if cellState & bit:
+            return cellState & ~bit
+        else:
+            return cellState | bit
+    # }}}
     # {{{ _parseCharAsColourSpec(self, colourSpec, curColours): XXX
     def _parseCharAsColourSpec(self, colourSpec, curColours):
         if len(colourSpec) > 0:
@@ -74,17 +100,19 @@ class MiRCARTCanvasStore():
         else:
             return (15, 1)
     # }}}
-    # {{{ _flipCellStateBit(self, cellState, bit): XXX
-    def _flipCellStateBit(self, cellState, bit):
-        if cellState & bit:
-            return cellState & ~bit
-        else:
-            return cellState | bit
-    # }}}
 
     # {{{ exportBitmapToPngFile(self, canvasBitmap, outPathName, outType): XXX
     def exportBitmapToPngFile(self, canvasBitmap, outPathName, outType):
         return canvasBitmap.ConvertToImage().SaveFile(outPathName, outType)
+    # }}}
+    # {{{ exportBitmapToImgur(self, apiKey, canvasBitmap, imgName, imgTitle, imgType): XXX
+    def exportBitmapToImgur(self, apiKey, canvasBitmap, imgName, imgTitle, imgType):
+        tmpPathName = tempfile.mkstemp()
+        os.close(tmpPathName[0])
+        canvasBitmap.ConvertToImage().SaveFile(tmpPathName[1], imgType)
+        imgurResult = self._exportFileToImgur(apiKey, imgName, imgTitle, tmpPathName[1])
+        os.remove(tmpPathName[1])
+        return imgurResult
     # }}}
     # {{{ exportPastebin(self, apiDevKey, canvasMap, canvasSize, pasteName="", pastePrivate=0): XXX
     def exportPastebin(self, apiDevKey, canvasMap, canvasSize, pasteName="", pastePrivate=0):
