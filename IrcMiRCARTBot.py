@@ -27,6 +27,7 @@ import os, sys, time
 import json
 import IrcClient
 import requests, urllib.request
+from MiRCARTCanvasStore import MiRCARTCanvasStore
 from MiRCARTToPngFile import MiRCARTToPngFile
 
 class IrcMiRCARTBot(IrcClient.IrcClient):
@@ -139,7 +140,9 @@ class IrcMiRCARTBot(IrcClient.IrcClient):
                 self._log("Unknown URL type specified!")
                 self.queue("PRIVMSG", message[2], "4/!\\ Unknown URL type specified!")
                 return
-            MiRCARTToPngFile(asciiTmpFilePath, "DejaVuSansMono.ttf", 11).export(imgTmpFilePath)
+
+            canvasStore = MiRCARTCanvasStore(inFile=asciiTmpFilePath)
+            MiRCARTToPngFile(canvasStore.outMap, "DejaVuSansMono.ttf", 11).export(imgTmpFilePath)
             imgurResponse = self._uploadToImgur(imgTmpFilePath, "MiRCART image", "MiRCART image", "c9a6efb3d7932fd")
             if imgurResponse[0] == 200:
                     self._log("Uploaded as: {}".format(imgurResponse[1]))
