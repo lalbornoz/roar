@@ -172,15 +172,19 @@ class MiRCARTFrame(MiRCARTGeneralFrame):
                 return False
             else:
                 outPathName = dialog.GetPath()
+                self.SetCursor(wx.Cursor(wx.CURSOR_WAIT))
                 self.panelCanvas.canvasStore.exportBitmapToPngFile(         \
                     self.panelCanvas.canvasBitmap, outPathName,             \
                         wx.BITMAP_TYPE_PNG)
+                self.SetCursor(wx.Cursor(wx.NullCursor))
                 return True
     # }}}
     # {{{ canvasExportImgur(self): XXX
     def canvasExportImgur(self):
+        self.SetCursor(wx.Cursor(wx.CURSOR_WAIT))
         imgurResult = self.panelCanvas.canvasStore.exportBitmapToImgur(     \
             "c9a6efb3d7932fd", self.panelCanvas.canvasBitmap, "", "", wx.BITMAP_TYPE_PNG)
+        self.SetCursor(wx.Cursor(wx.NullCursor))
         if imgurResult[0] == 200:
             if not wx.TheClipboard.IsOpened():
                 wx.TheClipboard.Open()
@@ -194,11 +198,13 @@ class MiRCARTFrame(MiRCARTGeneralFrame):
     # }}}
     # {{{ canvasExportPastebin(self): XXX
     def canvasExportPastebin(self):
+        self.SetCursor(wx.Cursor(wx.CURSOR_WAIT))
         pasteStatus, pasteResult =                                          \
             self.panelCanvas.canvasStore.exportPastebin(                    \
                 "",                          \
                 self.panelCanvas.canvasMap,                                 \
                 self.panelCanvas.canvasSize)
+        self.SetCursor(wx.Cursor(wx.NullCursor))
         if pasteStatus:
             if not wx.TheClipboard.IsOpened():
                 wx.TheClipboard.Open()
@@ -220,10 +226,12 @@ class MiRCARTFrame(MiRCARTGeneralFrame):
                 pass
             elif saveChanges == wx.ID_YES:
                 self.canvasSave()
+        self.SetCursor(wx.Cursor(wx.CURSOR_WAIT))
         if newCanvasSize == None:
             newCanvasSize = (100, 30)
         self.panelCanvas.canvasStore.importNew(newCanvasSize)
         self.canvasPathName = None
+        self.SetCursor(wx.Cursor(wx.NullCursor))
         self._updateStatusBar(); self.onCanvasUpdate();
     # }}}
     # {{{ canvasOpen(self): XXX
@@ -242,8 +250,10 @@ class MiRCARTFrame(MiRCARTGeneralFrame):
                 return False
             else:
                 self.canvasPathName = dialog.GetPath()
+                self.SetCursor(wx.Cursor(wx.CURSOR_WAIT))
                 self.panelCanvas.canvasStore.importTextFile(self.canvasPathName)
                 self.panelCanvas.canvasStore.importIntoPanel()
+                self.SetCursor(wx.Cursor(wx.NullCursor))
                 self._updateStatusBar(); self.onCanvasUpdate();
                 return True
     # }}}
@@ -254,9 +264,11 @@ class MiRCARTFrame(MiRCARTGeneralFrame):
                 return
         try:
             with open(self.canvasPathName, "w") as outFile:
+                self.SetCursor(wx.Cursor(wx.CURSOR_WAIT))
                 self.panelCanvas.canvasStore.exportTextFile(            \
                     self.panelCanvas.canvasMap,                         \
                     self.panelCanvas.canvasSize, outFile)
+                self.SetCursor(wx.Cursor(wx.NullCursor))
                 return True
         except IOError as error:
             return False
