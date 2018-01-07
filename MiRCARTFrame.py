@@ -24,8 +24,6 @@
 
 from MiRCARTCanvas import MiRCARTCanvas
 from MiRCARTColours import MiRCARTColours
-from MiRCARTFromTextFile import MiRCARTFromTextFile
-from MiRCARTToTextFile import MiRCARTToTextFile
 import os, wx
 
 try:
@@ -194,31 +192,26 @@ class MiRCARTFrame(wx.Frame):
             if dialog.ShowModal() == wx.ID_CANCEL:
                 return False
             else:
-                outPathName = dialog.GetPath()
-                outTmpFile = io.StringIO()
-                outToTextFile = MiRCARTToTextFile(                      \
-                    self.panelCanvas.canvasMap, self.canvasSize)
-                outToTextFile.export(outTmpFile)
-                MiRCARTToPngFile(tmpFile).export(outPathName)
-                return True
+                try:
+                    outPathName = dialog.GetPath()
+                    self.panelCanvas.exportPngFile(outhPathName)
+                    return True
+                except IOError as error:
+                    pass
     # }}}
     # {{{ canvasExportPastebin(self): XXX
     def canvasExportPastebin(self):
-        MiRCARTToPastebin("",            \
-            self.panelCanvas.canvasMap, self.canvasSize).export()
+        try:
+            self.panelCanvas.exportPastebin("")
+            return True
+        except IOError as error:
+            pass
     # }}}
-    # {{{ canvasNew(self, canvasPos=None, canvasSize=None, cellSize=None): XXX
-    def canvasNew(self, canvasPos=None, canvasSize=None, cellSize=None):
-        canvasPos = canvasPos if canvasPos != None else self.canvasPos
-        canvasSize = canvasSize if canvasSize != None else self.canvasSize
-        cellSize = cellSize if cellSize != None else self.cellSize
-        if self.panelCanvas != None:
-            self.panelCanvas.Close(); self.panelCanvas = None;
-        self.canvasPos = canvasPos; self.canvasSize = canvasSize;
-        self.cellSize = cellSize
-        self.panelCanvas = MiRCARTCanvas(self.panelSkin, parentFrame=self,  \
-            canvasPos=self.canvasPos, cellSize=self.cellSize,               \
-            canvasSize=self.canvasSize, canvasTools=self.canvasTools)
+    # {{{ canvasNew(self, newCanvasSize=None): XXX
+    def canvasNew(self, newCanvasSize=None):
+        if newCanvasSize == None:
+            newCanvasSize = (100, 30)
+        self.panelCanvas.canvasStore.importNew(newCanvasSize)
         self._updateStatusBar(); self.onCanvasUpdate();
     # }}}
     # {{{ canvasOpen(self): XXX
@@ -229,23 +222,10 @@ class MiRCARTFrame(wx.Frame):
                 return False
             else:
                 self.canvasPathName = dialog.GetPath()
-                with open(self.canvasPathName, "r") as newFile:
-                    newFromTextFile = MiRCARTFromTextFile(newFile)
-                    newMap = newFromTextFile.getMap()
-                    self.canvasNew(canvasSize=newFromTextFile.getSize())
-                    eventDc = wx.ClientDC(self); tmpDc = wx.MemoryDC();
-                    tmpDc.SelectObject(self.panelCanvas.canvasBitmap)
-                    for newNumRow in range(0, len(newMap)):
-                        for newNumCol in range(0, len(newMap[newNumRow])):
-                            self.panelCanvas.onJournalUpdate(False,     \
-                                (newNumCol, newNumRow),                 \
-                                [newNumCol, newNumRow,                  \
-                                newMap[newNumRow][newNumCol][0][0],     \
-                                newMap[newNumRow][newNumCol][0][1],     \
-                                newMap[newNumRow][newNumCol][2]],       \
-                                eventDc, tmpDc, (0, 0))
-                    wx.SafeYield()
-                    return True
+                self.panelCanvas.canvasStore.importTextFile(self.canvasPathName)
+                self.panelCanvas.canvasStore.importIntoPanel()
+                self._updateStatusBar(); self.onCanvasUpdate();
+                return True
     # }}}
     # {{{ canvasSave(self): XXX
     def canvasSave(self):
@@ -253,9 +233,8 @@ class MiRCARTFrame(wx.Frame):
             if self.canvasSaveAs() == False:
                 return
         try:
-            with open(self.canvasPathName, "w") as outFile:
-                MiRCARTToTextFile(self.panelCanvas.canvasMap,   \
-                    self.panelCanvas.canvasSize).export(outFile)
+            self.panelCanvas.exportTextFile(self.canvasPathName)
+            return True
         except IOError as error:
             pass
     # }}}
@@ -345,10 +324,11 @@ class MiRCARTFrame(wx.Frame):
     def __init__(self, parent, appSize=(800, 600), canvasPos=(25, 50), cellSize=(7, 14), canvasSize=(100, 30), canvasTools=[]):
         super().__init__(parent, wx.ID_ANY, "MiRCART", size=appSize)
         self.panelSkin = wx.Panel(self, wx.ID_ANY)
+        self.canvasPos = canvasPos; self.cellSize = cellSize; self.canvasSize = canvasSize;
         self.canvasPathName = None
 
         self.menuItemsById = {}; self.menuBar = wx.MenuBar();
-        self._initMenus(self.menuBar,                   \
+        self._initMenus(self.menuBar,                                       \
             [self.MID_FILE, self.MID_EDIT, self.MID_TOOLS], self.onFrameCommand)
         self.SetMenuBar(self.menuBar)
         if not haveMiRCARTToPastebin:
@@ -356,13 +336,13 @@ class MiRCARTFrame(wx.Frame):
         if not haveMiRCARTToPngFile:
             self.menuItemsById[self.CID_EXPORT_AS_PNG[0]].Enable(False)
 
-        self.toolBar = wx.ToolBar(self.panelSkin, -1,   \
+        self.toolBar = wx.ToolBar(self.panelSkin, -1,                       \
             style=wx.HORIZONTAL|wx.TB_FLAT|wx.TB_NODIVIDER)
         self.toolBar.SetToolBitmapSize((16,16))
         self._initToolBars(self.toolBar, [self.BID_TOOLBAR], self.onFrameCommand)
         self.toolBar.Realize(); self.toolBar.Fit();
 
-        self.accelTable = wx.AcceleratorTable(          \
+        self.accelTable = wx.AcceleratorTable(                              \
             self._initAccelTable(self.AID_EDIT, self.onFrameCommand))
         self.SetAcceleratorTable(self.accelTable)
 
@@ -370,6 +350,9 @@ class MiRCARTFrame(wx.Frame):
         self.statusBar = self.CreateStatusBar();
         self.SetFocus(); self.Show(True);
         self.canvasTools = canvasTools
-        self.canvasNew(canvasPos, canvasSize, cellSize)
+        self.panelCanvas = MiRCARTCanvas(self.panelSkin, parentFrame=self,  \
+            canvasPos=self.canvasPos, canvasSize=self.canvasSize,           \
+            canvasTools=self.canvasTools, cellSize=self.cellSize)
+        self.canvasNew()
 
 # vim:expandtab foldmethod=marker sw=4 ts=4 tw=120

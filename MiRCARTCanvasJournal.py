@@ -83,6 +83,11 @@ class MiRCARTCanvasJournal():
         else:
             return False
     # }}}
+    # {{{ reset(self): XXX
+    def reset(self):
+        self.patchesTmp = []
+        self.patchesUndo = [None]; self.patchesUndoLevel = 0;
+    # }}}
     # {{{ undo(self): XXX
     def undo(self):
         if self.patchesUndo[self.patchesUndoLevel] != None:
@@ -98,8 +103,6 @@ class MiRCARTCanvasJournal():
     #
     # __init__(self, parentCanvas): initialisation method
     def __init__(self, parentCanvas):
-        self.parentCanvas = parentCanvas
-        self.patchesTmp = []
-        self.patchesUndo = [None]; self.patchesUndoLevel = 0;
+        self.parentCanvas = parentCanvas; self.reset();
 
 # vim:expandtab foldmethod=marker sw=4 ts=4 tw=120
