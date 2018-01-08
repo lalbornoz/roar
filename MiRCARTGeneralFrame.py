@@ -26,12 +26,13 @@ import os, wx
 
 #
 # Types
-TID_COMMAND         = (0x001)
-TID_MENU            = (0x002)
-TID_NOTHING         = (0x003)
-TID_SELECT          = (0x004)
-TID_TOOLBAR         = (0x005)
-TID_ACCELS          = (0x006)
+TID_ACCELS          = (0x001)
+TID_COMMAND         = (0x002)
+TID_LIST            = (0x003)
+TID_MENU            = (0x004)
+TID_NOTHING         = (0x005)
+TID_SELECT          = (0x006)
+TID_TOOLBAR         = (0x007)
 
 class MiRCARTGeneralFrame(wx.Frame):
     """XXX"""
@@ -48,8 +49,9 @@ class MiRCARTGeneralFrame(wx.Frame):
                 self.Bind(wx.EVT_MENU, handler, id=accelDescr[0])
         return accelTableEntries
     # }}}
-    # {{{ _initMenus(self, menuBar, menusDescr, handler): XXX
-    def _initMenus(self, menuBar, menusDescr, handler):
+    # {{{ _initMenus(self, menusDescr, handler): XXX
+    def _initMenus(self, menusDescr, handler):
+        self.menuItemsById = {}; menuBar = wx.MenuBar();
         for menuDescr in menusDescr:
             menuWindow = wx.Menu()
             for menuItem in menuDescr[4]:
@@ -68,28 +70,33 @@ class MiRCARTGeneralFrame(wx.Frame):
                     if len(menuItem) == 7:
                         menuItemWindow.Enable(menuItem[6])
             menuBar.Append(menuWindow, menuDescr[3])
+        return menuBar
     # }}}
-    # {{{ _initToolBars(self, toolBar, toolBarsDescr, handler): XXX
-    def _initToolBars(self, toolBar, toolBarsDescr, handler):
-        for toolBarDescr in toolBarsDescr:
-            for toolBarItem in toolBarDescr[2]:
-                if toolBarItem == self.NID_TOOLBAR_SEP:
-                    toolBar.AddSeparator()
+    # {{{ _initToolBars(self, toolBarsDescr, handler): XXX
+    def _initToolBars(self, toolBarsDescr, handler, panelSkin):
+        self.toolBarItemsById = {}
+        self.toolBar = wx.ToolBar(panelSkin, -1,                    \
+            style=wx.HORIZONTAL|wx.TB_FLAT|wx.TB_NODIVIDER)
+        self.toolBar.SetToolBitmapSize((16,16))
+        for toolBarItem in toolBarsDescr[2]:
+            if toolBarItem == self.NID_TOOLBAR_SEP:
+                self.toolBar.AddSeparator()
+            else:
+                if toolBarItem[4] != None:
+                    toolBarItemIcon = wx.ArtProvider.GetBitmap(     \
+                        toolBarItem[4], wx.ART_TOOLBAR, (16,16))
                 else:
-                    if toolBarItem[4] != None:
-                        toolBarItemIcon = wx.ArtProvider.GetBitmap(     \
-                            toolBarItem[4], wx.ART_TOOLBAR, (16,16))
-                    else:
-                        toolBarItemIcon = wx.ArtProvider.GetBitmap(     \
-                            wx.ART_HELP, wx.ART_TOOLBAR, (16,16))
-                    toolBarItemWindow = self.toolBar.AddTool(           \
-                        toolBarItem[0], toolBarItem[2], toolBarItemIcon)
-                    self.toolBarItemsById[toolBarItem[0]] = toolBarItemWindow
-                    if  len(toolBarItem) == 7                           \
-                    and toolBarItem[1] == TID_COMMAND:
-                        toolBarItemWindow.Enable(toolBarItem[6])
-                    self.Bind(wx.EVT_TOOL, handler, toolBarItemWindow)
-                    self.Bind(wx.EVT_TOOL_RCLICKED, handler, toolBarItemWindow)
+                    toolBarItemIcon = wx.ArtProvider.GetBitmap(     \
+                        wx.ART_HELP, wx.ART_TOOLBAR, (16,16))
+                toolBarItemWindow = self.toolBar.AddTool(           \
+                    toolBarItem[0], toolBarItem[2], toolBarItemIcon)
+                self.toolBarItemsById[toolBarItem[0]] = toolBarItemWindow
+                if  len(toolBarItem) == 7                           \
+                and toolBarItem[1] == TID_COMMAND:
+                    toolBarItemWindow.Enable(toolBarItem[6])
+                self.Bind(wx.EVT_TOOL, handler, toolBarItemWindow)
+                self.Bind(wx.EVT_TOOL_RCLICKED, handler, toolBarItemWindow)
+        self.toolBar.Realize(); self.toolBar.Fit();
     # }}}
     # {{{ onClose(self, event): XXX
     def onClose(self, event):
@@ -107,23 +114,17 @@ class MiRCARTGeneralFrame(wx.Frame):
         panelSkin = wx.Panel(self, wx.ID_ANY)
 
         # Initialise menu bar, menus & menu items
-        self.menuItemsById = {}; menuBar = wx.MenuBar();
-        self._initMenus(menuBar,                    \
-            [self.MID_FILE, self.MID_EDIT, self.MID_TOOLS],
+        # Initialise toolbar & toolbar items
+        menuBar = self._initMenus(self.LID_MENUS[2],        \
             self.onFrameCommand)
         self.SetMenuBar(menuBar)
-
-        # Initialise toolbar & toolbar items
-        self.toolBarItemsById = {}
-        self.toolBar = wx.ToolBar(panelSkin, -1,    \
-            style=wx.HORIZONTAL|wx.TB_FLAT|wx.TB_NODIVIDER)
-        self.toolBar.SetToolBitmapSize((16,16))
-        self._initToolBars(self.toolBar, [self.BID_TOOLBAR], self.onFrameCommand)
-        self.toolBar.Realize(); self.toolBar.Fit();
+        toolBar = self._initToolBars(self.LID_TOOLBARS[2],  \
+            self.onFrameCommand, panelSkin)
 
         # Initialise accelerators (hotkeys)
-        accelTable = wx.AcceleratorTable(           \
-            self._initAccelTable(self.AID_EDIT, self.onFrameCommand))
+        accelTable = wx.AcceleratorTable(                   \
+            self._initAccelTable(self.LID_ACCELS[2],        \
+            self.onFrameCommand))
         self.SetAcceleratorTable(accelTable)
 
         # Initialise status bar

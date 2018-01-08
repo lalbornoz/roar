@@ -25,7 +25,7 @@
 from MiRCARTCanvas import MiRCARTCanvas, haveUrllib
 from MiRCARTColours import MiRCARTColours
 from MiRCARTGeneralFrame import MiRCARTGeneralFrame,    \
-    TID_COMMAND, TID_MENU, TID_NOTHING, TID_SELECT, TID_TOOLBAR, TID_ACCELS
+    TID_ACCELS, TID_COMMAND, TID_LIST, TID_MENU, TID_NOTHING, TID_SELECT, TID_TOOLBAR
                 
 import os, wx
 
@@ -109,6 +109,11 @@ class MiRCARTFrame(MiRCARTGeneralFrame):
     # {{{ Accelerators (hotkeys)
     AID_EDIT            = (0x500, TID_ACCELS, (                                 \
         CID_NEW, CID_OPEN, CID_SAVE, CID_UNDO, CID_REDO))
+    # }}}
+    # {{{ Lists
+    LID_ACCELS          = (0x600, TID_LIST, (AID_EDIT))
+    LID_MENUS           = (0x601, TID_LIST, (MID_FILE, MID_EDIT, MID_TOOLS))
+    LID_TOOLBARS        = (0x602, TID_LIST, (BID_TOOLBAR))
     # }}}
 
     # {{{ _dialogSaveChanges(self)
