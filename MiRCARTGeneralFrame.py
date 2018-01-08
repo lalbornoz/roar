@@ -75,28 +75,44 @@ class MiRCARTGeneralFrame(wx.Frame):
     # {{{ _initToolBars(self, toolBarsDescr, handler): XXX
     def _initToolBars(self, toolBarsDescr, handler, panelSkin):
         self.toolBarItemsById = {}
-        self.toolBar = wx.ToolBar(panelSkin, -1,                    \
+        self.toolBar = wx.ToolBar(panelSkin, -1,            \
             style=wx.HORIZONTAL|wx.TB_FLAT|wx.TB_NODIVIDER)
         self.toolBar.SetToolBitmapSize((16,16))
         for toolBarItem in toolBarsDescr[2]:
             if toolBarItem == self.NID_TOOLBAR_SEP:
                 self.toolBar.AddSeparator()
             else:
-                if toolBarItem[4] != None:
-                    toolBarItemIcon = wx.ArtProvider.GetBitmap(     \
-                        toolBarItem[4], wx.ART_TOOLBAR, (16,16))
-                else:
-                    toolBarItemIcon = wx.ArtProvider.GetBitmap(     \
-                        wx.ART_HELP, wx.ART_TOOLBAR, (16,16))
-                toolBarItemWindow = self.toolBar.AddTool(           \
-                    toolBarItem[0], toolBarItem[2], toolBarItemIcon)
+                toolBarItemWindow = self.toolBar.AddTool(   \
+                    toolBarItem[0], toolBarItem[2], toolBarItem[4][2])
                 self.toolBarItemsById[toolBarItem[0]] = toolBarItemWindow
-                if  len(toolBarItem) == 7                           \
+                if  len(toolBarItem) == 7                   \
                 and toolBarItem[1] == TID_COMMAND:
                     toolBarItemWindow.Enable(toolBarItem[6])
                 self.Bind(wx.EVT_TOOL, handler, toolBarItemWindow)
                 self.Bind(wx.EVT_TOOL_RCLICKED, handler, toolBarItemWindow)
         self.toolBar.Realize(); self.toolBar.Fit();
+    # }}}
+    # {{{ _initToolBitmaps(self): XXX
+    def _initToolBitmaps(self, toolBarsDescr):
+        for toolBarItem in toolBarsDescr[2]:
+            if toolBarItem == self.NID_TOOLBAR_SEP:
+                continue
+            elif toolBarItem[4] == None:
+                toolBarItem[4] = ["", None, wx.ArtProvider.GetBitmap(   \
+                        wx.ART_HELP, wx.ART_TOOLBAR, (16,16))]
+            elif toolBarItem[4][0] == ""                                \
+            and  toolBarItem[4][1] != None:
+                toolBarItem[4] = ["", None, wx.ArtProvider.GetBitmap(   \
+                    toolBarItem[4][1], wx.ART_TOOLBAR, (16,16))]
+            elif toolBarItem[4][0] == ""                                \
+            and  toolBarItem[4][1] == None:
+                toolBarItem[4] = ["", None, toolBarItem[4][2]]
+            elif toolBarItem[4][0] != "":
+                toolBitmap = wx.Bitmap((16,16))
+                toolBitmap.LoadFile(                                    \
+                    os.path.join("assets", toolBarItem[4][0]),          \
+                    wx.BITMAP_TYPE_ANY)
+                toolBarItem[4] = ["", None, toolBitmap]
     # }}}
     # {{{ onClose(self, event): XXX
     def onClose(self, event):
@@ -118,6 +134,7 @@ class MiRCARTGeneralFrame(wx.Frame):
         menuBar = self._initMenus(self.LID_MENUS[2],        \
             self.onFrameCommand)
         self.SetMenuBar(menuBar)
+        self._initToolBitmaps(self.LID_TOOLBARS[2])
         toolBar = self._initToolBars(self.LID_TOOLBARS[2],  \
             self.onFrameCommand, panelSkin)
 
