@@ -37,9 +37,12 @@ class MiRCARTToolRect(MiRCARTTool):
             brushColours[0] = brushColours[1]
         else:
             brushColours[1] = brushColours[0]
+        brushSize = brushSize.copy()
+        if brushSize[0] > 1:
+            brushSize[0] *= 2
         brushPatches = []
         for brushRow in range(brushSize[1]):
-            for brushCol in range(brushSize[0] * 2):
+            for brushCol in range(brushSize[0]):
                 brushPatches.append([[      \
                     atPoint[0] + brushCol,  \
                     atPoint[1] + brushRow], \

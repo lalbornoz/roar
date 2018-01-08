@@ -24,7 +24,7 @@
 
 import MiRCARTCanvasStore
 from PIL import Image, ImageDraw, ImageFont
-import string, sys
+import sys
 
 class MiRCARTToPngFile:
     """XXX"""
