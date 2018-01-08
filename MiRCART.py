@@ -23,14 +23,13 @@
 #
 
 from MiRCARTFrame import MiRCARTFrame
-from MiRCARTToolRect import MiRCARTToolRect
 import sys, wx
 
 #
 # Entry point
 def main(*argv):
     wxApp = wx.App(False)
-    MiRCARTFrame(None, canvasTools=[MiRCARTToolRect])
+    MiRCARTFrame(None)
     wxApp.MainLoop()
 if __name__ == "__main__":
     main(*sys.argv)

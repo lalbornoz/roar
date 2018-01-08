@@ -46,16 +46,11 @@ class MiRCARTCanvasJournal():
             self.patchesUndoLevel = 0
         patchesUndo = []
         for patch in patches:
-            absMapPoint = self._relMapPointToAbsMapPoint(patch[0][0], atPoint)
-            patchesUndo.append([                \
-                [absMapPoint, *patch[0][1:]],   \
-                [absMapPoint, *patch[1][1:]]])
+            patchesUndo.append([            \
+                [patch[0], *patch[0][1:]],  \
+                [patch[0], *patch[1][1:]]])
         if len(patchesUndo) > 0:
             self.patchesUndo.insert(0, patchesUndo)
-    # }}}
-    # {{{ _relMapPointToAbsMapPoint(self, relMapPoint, atPoint): XXX
-    def _relMapPointToAbsMapPoint(self, relMapPoint, atPoint):
-        return [a+b for a,b in zip(atPoint, relMapPoint)]
     # }}}
     # {{{ merge(self, mapPatches, eventDc, tmpDc, atPoint): XXX
     def merge(self, mapPatches, eventDc, tmpDc, atPoint):
@@ -65,18 +60,17 @@ class MiRCARTCanvasJournal():
             if mapPatchTmp:
                 self._popTmp(eventDc, tmpDc)
             for patch in mapPatch[1]:
-                absMapPoint = self._relMapPointToAbsMapPoint(patch[0], atPoint)
-                if absMapPoint[0] >= self.parentCanvas.canvasSize[0]    \
-                or absMapPoint[1] >= self.parentCanvas.canvasSize[1]:
+                if patch[0][0] >= self.parentCanvas.canvasSize[0]   \
+                or patch[0][1] >= self.parentCanvas.canvasSize[1]:
                     continue
                 elif mapPatchTmp:
-                    self._pushTmp(absMapPoint)
-                    self.parentCanvas.onJournalUpdate(mapPatchTmp,      \
-                        absMapPoint, patch, eventDc, tmpDc, atPoint)
+                    self._pushTmp(patch[0])
+                    self.parentCanvas.onJournalUpdate(mapPatchTmp,  \
+                        patch[0], patch, eventDc, tmpDc, (0, 0))
                 else:
-                    patchUndo =                                         \
-                    self.parentCanvas.onJournalUpdate(mapPatchTmp,      \
-                        absMapPoint, patch, eventDc, tmpDc, atPoint, True)
+                    patchUndo =                                     \
+                    self.parentCanvas.onJournalUpdate(mapPatchTmp,  \
+                        patch[0], patch, eventDc, tmpDc, (0, 0), True)
                     patchesUndo.append([patchUndo, patch])
         if len(patchesUndo) > 0:
             self._pushUndo(atPoint, patchesUndo)

@@ -40,7 +40,9 @@ class MiRCARTToolRect(MiRCARTTool):
         brushPatches = []
         for brushRow in range(brushSize[1]):
             for brushCol in range(brushSize[0] * 2):
-                brushPatches.append([[brushCol, brushRow],  \
+                brushPatches.append([[      \
+                    atPoint[0] + brushCol,  \
+                    atPoint[1] + brushRow], \
                     brushColours, 0, " "])
         if isLeftDown or isRightDown:
             return [[False, brushPatches], [True, brushPatches]]

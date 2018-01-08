@@ -31,10 +31,11 @@ class MiRCARTCanvas(wx.Panel):
     """XXX"""
     parentFrame = None
     canvasPos = canvasSize = canvasWinSize = cellSize = None
-    canvasBitmap = canvasMap = canvasTools = None
+    canvasBitmap = canvasMap = None
     brushColours = brushPos = brushSize = None
     mircBrushes = mircPens = None
     canvasJournal = canvasStore = None
+    canvasCurTool = None
 
     # {{{ _initBrushesAndPens(self): XXX
     def _initBrushesAndPens(self):
@@ -112,12 +113,12 @@ class MiRCARTCanvas(wx.Panel):
         tmpDc.SelectObject(self.canvasBitmap)
         eventPoint = event.GetLogicalPosition(eventDc)
         mapPoint = self._eventPointToMapPoint(eventPoint)
-        for tool in self.canvasTools:
-            mapPatches = tool.onMouseEvent(                             \
-                event, mapPoint, self.brushColours, self.brushSize,     \
-                event.Dragging(), event.LeftIsDown(), event.RightIsDown())
-            self.canvasJournal.merge(mapPatches, eventDc, tmpDc, mapPoint)
-            self.parentFrame.onCanvasUpdate()
+        tool = self.canvasCurTool
+        mapPatches = tool.onMouseEvent(                             \
+            event, mapPoint, self.brushColours, self.brushSize,     \
+            event.Dragging(), event.LeftIsDown(), event.RightIsDown())
+        self.canvasJournal.merge(mapPatches, eventDc, tmpDc, mapPoint)
+        self.parentFrame.onCanvasUpdate()
         self.parentFrame.onCanvasMotion(event, mapPoint)
     # }}}
     # {{{ onMouseWindowEvent(self, event): XXX
@@ -211,17 +212,17 @@ class MiRCARTCanvas(wx.Panel):
     # }}}
 
     #
-    # _init__(self, parent, parentFrame, canvasPos, cellSize, canvasSize, canvasTools): initialisation method
-    def __init__(self, parent, parentFrame, canvasPos, canvasSize, canvasTools, cellSize):
+    # _init__(self, parent, parentFrame, canvasPos, canvasSize, cellSize): initialisation method
+    def __init__(self, parent, parentFrame, canvasPos, canvasSize, cellSize):
         self.parentFrame = parentFrame
         self.canvasPos = canvasPos; self.canvasSize = canvasSize;
-        self.canvasTools = [canvasTool(self) for canvasTool in canvasTools]
         self.cellSize = cellSize
 
         self.brushColours = [4, 1]; self._initBrushesAndPens();
         self.brushPos = [0, 0]; self.brushSize = [1, 1];
         self.canvasJournal = MiRCARTCanvasJournal(parentCanvas=self)
         self.canvasStore = MiRCARTCanvasStore(parentCanvas=self)
+        self.canvasCurTool = None
 
         super().__init__(parent, pos=canvasPos, \
             size=[w*h for w,h in zip(canvasSize, cellSize)])
