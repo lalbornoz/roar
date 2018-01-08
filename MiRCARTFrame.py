@@ -36,7 +36,6 @@ import os, wx
 class MiRCARTFrame(MiRCARTGeneralFrame):
     """XXX"""
     panelCanvas = canvasPathName = None
-    canvasPos = canvasSize = cellSize = None
 
     # {{{ Commands
     #                      Id     Type Id      Labels                           Icon bitmap                 Accelerator                 [Initial state]
@@ -57,11 +56,15 @@ class MiRCARTFrame(MiRCARTGeneralFrame):
     CID_COPY            = [0x10b, TID_COMMAND, "Copy", "&Copy",                 ["", wx.ART_COPY],          None,                       False]
     CID_PASTE           = [0x10c, TID_COMMAND, "Paste", "&Paste",               ["", wx.ART_PASTE],         None,                       False]
     CID_DELETE          = [0x10d, TID_COMMAND, "Delete", "De&lete",             ["", wx.ART_DELETE],        None,                       False]
-    CID_INCRBRUSH       = [0x10e, TID_COMMAND, "Increase brush size",           \
+    CID_INCR_CANVAS     = [0x10e, TID_COMMAND, "Increase canvas size",          \
+                                               "&Increase canvas size",         ["", wx.ART_PLUS],          [wx.ACCEL_SHIFT, ord("+")]]
+    CID_DECR_CANVAS     = [0x10f, TID_COMMAND, "Decrease brush size",           \
+                                               "&Decrease brush size",          ["", wx.ART_MINUS],         [wx.ACCEL_SHIFT, ord("-")]]
+    CID_INCR_BRUSH      = [0x110, TID_COMMAND, "Increase brush size",           \
                                                "&Increase brush size",          ["", wx.ART_PLUS],          [wx.ACCEL_CTRL, ord("+")]]
-    CID_DECRBRUSH       = [0x10f, TID_COMMAND, "Decrease brush size",           \
+    CID_DECR_BRUSH      = [0x111, TID_COMMAND, "Decrease brush size",           \
                                                "&Decrease brush size",          ["", wx.ART_MINUS],         [wx.ACCEL_CTRL, ord("-")]]
-    CID_SOLID_BRUSH     = [0x110, TID_SELECT,  "Solid brush", "&Solid brush",   None,                       None,                       True]
+    CID_SOLID_BRUSH     = [0x112, TID_SELECT,  "Solid brush", "&Solid brush",   None,                       None,                       True]
 
     CID_RECT            = [0x150, TID_SELECT,  "Rectangle", "&Rectangle",       ["toolRect.png"],           [wx.ACCEL_CTRL, ord("R")],  True]
     CID_CIRCLE          = [0x151, TID_SELECT,  "Circle", "&Circle",             ["toolCircle.png"],         [wx.ACCEL_CTRL, ord("C")],  False]
@@ -97,7 +100,8 @@ class MiRCARTFrame(MiRCARTGeneralFrame):
     MID_EDIT            = (0x301, TID_MENU, "Edit", "&Edit", (                  \
         CID_UNDO, CID_REDO, NID_MENU_SEP,                                       \
         CID_CUT, CID_COPY, CID_PASTE, CID_DELETE, NID_MENU_SEP,                 \
-        CID_INCRBRUSH, CID_DECRBRUSH, CID_SOLID_BRUSH))
+        CID_INCR_CANVAS, CID_DECR_CANVAS, NID_MENU_SEP,                         \
+        CID_INCR_BRUSH, CID_DECR_BRUSH, CID_SOLID_BRUSH))
     MID_TOOLS           = (0x302, TID_MENU, "Tools", "&Tools", (                \
         CID_RECT, CID_CIRCLE, CID_LINE, CID_TEXT))
     # }}}
@@ -106,7 +110,7 @@ class MiRCARTFrame(MiRCARTGeneralFrame):
         CID_NEW, CID_OPEN, CID_SAVE, CID_SAVEAS, NID_TOOLBAR_SEP,               \
         CID_UNDO, CID_REDO, NID_TOOLBAR_SEP,                                    \
         CID_CUT, CID_COPY, CID_PASTE, CID_DELETE, NID_TOOLBAR_SEP,              \
-        CID_INCRBRUSH, CID_DECRBRUSH, CID_SOLID_BRUSH, NID_TOOLBAR_SEP,         \
+        CID_INCR_BRUSH, CID_DECR_BRUSH, NID_TOOLBAR_SEP,                        \
         CID_RECT, CID_CIRCLE, CID_LINE, CID_TEXT, NID_TOOLBAR_SEP,              \
         CID_COLOUR00, CID_COLOUR01, CID_COLOUR02, CID_COLOUR03, CID_COLOUR04,   \
         CID_COLOUR05, CID_COLOUR06, CID_COLOUR07, CID_COLOUR08, CID_COLOUR09,   \
@@ -115,7 +119,8 @@ class MiRCARTFrame(MiRCARTGeneralFrame):
     # }}}
     # {{{ Accelerators (hotkeys)
     AID_EDIT            = (0x500, TID_ACCELS, (                                 \
-        CID_NEW, CID_OPEN, CID_SAVE, CID_UNDO, CID_REDO, CID_INCRBRUSH, CID_DECRBRUSH))
+        CID_NEW, CID_OPEN, CID_SAVE, CID_UNDO, CID_REDO,                        \
+        CID_INCR_CANVAS, CID_INCR_BRUSH, CID_INCR_BRUSH, CID_DECR_BRUSH))
     # }}}
     # {{{ Lists
     LID_ACCELS          = (0x600, TID_LIST, (AID_EDIT))
@@ -177,15 +182,15 @@ class MiRCARTFrame(MiRCARTGeneralFrame):
 
     # {{{ canvasExportAsPng(self): XXX
     def canvasExportAsPng(self):
-        with wx.FileDialog(self, self.CID_SAVEAS[2], os.getcwd(), "",       \
+        with wx.FileDialog(self, self.CID_SAVEAS[2], os.getcwd(), "",           \
                 "*.png", wx.FD_SAVE|wx.FD_OVERWRITE_PROMPT) as dialog:
             if dialog.ShowModal() == wx.ID_CANCEL:
                 return False
             else:
                 outPathName = dialog.GetPath()
                 self.SetCursor(wx.Cursor(wx.CURSOR_WAIT))
-                self.panelCanvas.canvasStore.exportBitmapToPngFile(         \
-                    self.panelCanvas.canvasBitmap, outPathName,             \
+                self.panelCanvas.canvasStore.exportBitmapToPngFile(             \
+                    self.panelCanvas.canvasBackend.canvasBitmap, outPathName,   \
                         wx.BITMAP_TYPE_PNG)
                 self.SetCursor(wx.Cursor(wx.NullCursor))
                 return True
@@ -194,7 +199,8 @@ class MiRCARTFrame(MiRCARTGeneralFrame):
     def canvasExportImgur(self):
         self.SetCursor(wx.Cursor(wx.CURSOR_WAIT))
         imgurResult = self.panelCanvas.canvasStore.exportBitmapToImgur(     \
-            "c9a6efb3d7932fd", self.panelCanvas.canvasBitmap, "", "", wx.BITMAP_TYPE_PNG)
+            "c9a6efb3d7932fd", self.panelCanvas.canvasBackend.canvasBitmap, \
+            "", "", wx.BITMAP_TYPE_PNG)
         self.SetCursor(wx.Cursor(wx.NullCursor))
         if imgurResult[0] == 200:
             if not wx.TheClipboard.IsOpened():
@@ -295,12 +301,12 @@ class MiRCARTFrame(MiRCARTGeneralFrame):
                 return self.canvasSave()
     # }}}
     # {{{ onCanvasMotion(self, event): XXX
-    def onCanvasMotion(self, event, mapPoint=None):
+    def onCanvasMotion(self, event, atPoint=None):
         eventType = event.GetEventType()
         if eventType == wx.wxEVT_ENTER_WINDOW:
-            pass
+            self.SetFocus()
         elif eventType == wx.wxEVT_MOTION:
-            self._updateStatusBar(showPos=mapPoint)
+            self._updateStatusBar(showPos=atPoint)
         elif eventType == wx.wxEVT_LEAVE_WINDOW:
             pass
     # }}}
@@ -339,9 +345,9 @@ class MiRCARTFrame(MiRCARTGeneralFrame):
         elif cid == self.CID_EXIT[0]:
             self.Close(True)
         elif cid == self.CID_UNDO[0]:
-            self.panelCanvas.undo()
+            self.panelCanvas.popUndo()
         elif cid == self.CID_REDO[0]:
-            self.panelCanvas.redo()
+            self.panelCanvas.popRedo()
         elif cid == self.CID_CUT[0]:
             pass
         elif cid == self.CID_COPY[0]:
@@ -350,33 +356,52 @@ class MiRCARTFrame(MiRCARTGeneralFrame):
             pass
         elif cid == self.CID_DELETE[0]:
             pass
-        elif cid == self.CID_INCRBRUSH[0]:
-            self.panelCanvas.brushSize =        \
+        elif cid == self.CID_INCR_CANVAS[0]                         \
+        or   cid == self.CID_DECR_CANVAS[0]:
+            eventDc, tmpDc = self.panelCanvas.canvasBackend.getDeviceContexts(self)
+            if cid == self.CID_INCR_CANVAS[0]:
+                newCanvasSize = [a+1 for a in self.panelCanvas.canvasSize]
+            else:
+                newCanvasSize = [a-1 if a > 1 else a for a in self.panelCanvas.canvasSize]
+            self.panelCanvas.resize(newCanvasSize)
+            self.panelCanvas.canvasBackend.resize(                  \
+                newCanvasSize,                                      \
+                self.panelCanvas.canvasBackend.cellSize)
+            for numRow in range(self.panelCanvas.canvasSize[1] - 1):
+                self.panelCanvas.canvasMap.append([[1, 1], 0, " "])
+            self.panelCanvas.canvasMap.append([])
+            for numCol in range(self.panelCanvas.canvasSize[0]):
+                self.panelCanvas.canvasMap[-1].append([[1, 1], 0, " "])
+                self.panelCanvas.canvasBackend.drawPatch(eventDc,   \
+                    ([numCol, self.panelCanvas.canvasSize[1] - 1], *[[1, 1], 0, " "]), tmpDc)
+            wx.SafeYield()
+        elif cid == self.CID_INCR_BRUSH[0]:
+            self.panelCanvas.brushSize =                            \
                 [a+1 for a in self.panelCanvas.brushSize]
-        elif cid == self.CID_DECRBRUSH[0]       \
-        and  self.panelCanvas.brushSize[0] > 1  \
+        elif cid == self.CID_DECR_BRUSH[0]                          \
+        and  self.panelCanvas.brushSize[0] > 1                      \
         and  self.panelCanvas.brushSize[1] > 1:
-            self.panelCanvas.brushSize =        \
+            self.panelCanvas.brushSize =                            \
                 [a-1 for a in self.panelCanvas.brushSize]
         elif cid == self.CID_SOLID_BRUSH[0]:
             pass
         elif cid == self.CID_RECT[0]:
             self.menuItemsById[cid].Check(True)
-            self.panelCanvas.canvasCurTool =    \
+            self.panelCanvas.canvasCurTool =                        \
                 MiRCARTToolRect(self.panelCanvas)
         elif cid == self.CID_CIRCLE[0]:
             self.menuItemsById[cid].Check(True)
-            self.panelCanvas.canvasCurTool =    \
+            self.panelCanvas.canvasCurTool =                        \
                 MiRCARTToolCircle(self.panelCanvas)
         elif cid == self.CID_LINE[0]:
             self.menuItemsById[cid].Check(True)
-            self.panelCanvas.canvasCurTool =    \
+            self.panelCanvas.canvasCurTool =                        \
                 MiRCARTToolLine(self.panelCanvas)
         elif cid == self.CID_TEXT[0]:
             self.menuItemsById[cid].Check(True)
-            self.panelCanvas.canvasCurTool =    \
+            self.panelCanvas.canvasCurTool =                        \
                 MiRCARTToolText(self.panelCanvas)
-        elif cid >= self.CID_COLOUR00[0]        \
+        elif cid >= self.CID_COLOUR00[0]                            \
         and  cid <= self.CID_COLOUR15[0]:
             numColour = cid - self.CID_COLOUR00[0]
             if event.GetEventType() == wx.wxEVT_TOOL:
@@ -392,15 +417,13 @@ class MiRCARTFrame(MiRCARTGeneralFrame):
     # }}}
 
     #
-    # __init__(self, parent, appSize=(800, 600), canvasPos=(25, 50), canvasSize=(100, 30), cellSize=(7, 14)): initialisation method
-    def __init__(self, parent, appSize=(800, 600), canvasPos=(25, 50), canvasSize=(100, 30), cellSize=(7, 14)):
+    # __init__(self, parent, appSize=(840, 630), canvasPos=(25, 50), canvasSize=(125, 35), cellSize=(7, 14)): initialisation method
+    def __init__(self, parent, appSize=(840, 630), canvasPos=(25, 50), canvasSize=(125, 35), cellSize=(7, 14)):
         self._initPaletteToolBitmaps()
         panelSkin = super().__init__(parent, wx.ID_ANY, "MiRCART", size=appSize)
-        self.canvasPos = canvasPos; self.cellSize = cellSize; self.canvasSize = canvasSize;
         self.canvasPathName = None
         self.panelCanvas = MiRCARTCanvas(panelSkin, parentFrame=self,   \
-            canvasPos=self.canvasPos, canvasSize=self.canvasSize,       \
-            cellSize=self.cellSize)
+            canvasPos=canvasPos, canvasSize=canvasSize, cellSize=cellSize)
         self.panelCanvas.canvasCurTool = MiRCARTToolRect(self.panelCanvas)
         self.canvasNew()
 

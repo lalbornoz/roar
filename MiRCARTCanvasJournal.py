@@ -24,94 +24,58 @@
 
 class MiRCARTCanvasJournal():
     """XXX"""
-    parentCanvas = None
-    patchesTmp = patchesUndo = patchesUndoLevel = None
+    patchesCursor = patchesUndo = patchesUndoLevel = None
 
-    # {{{ _popTmp(self, eventDc, tmpDc): XXX
-    def _popTmp(self, eventDc, tmpDc):
-        if self.patchesTmp:
-            for patch in self.patchesTmp:
-                self.parentCanvas.onJournalUpdate(True,             \
-                    patch[0], patch, eventDc, tmpDc, (0, 0), True)
-            self.patchesTmp = []
+    # {{{ popCursor(self): XXX
+    def popCursor(self):
+        if len(self.patchesCursor):
+            patchesCursor = self.patchesCursor
+            self.patchesCursor = []
+            return patchesCursor
+        else:
+            return []
     # }}}
-    # {{{ _pushTmp(self, atPoint): XXX
-    def _pushTmp(self, atPoint):
-        self.patchesTmp.append([atPoint, None, None, None])
-    # }}}
-    # {{{ _pushUndo(self, atPoint, patches): XXX
-    def _pushUndo(self, atPoint, patches):
-        if self.patchesUndoLevel > 0:
-            del self.patchesUndo[0:self.patchesUndoLevel]
-            self.patchesUndoLevel = 0
-        patchesUndo = []
-        for patch in patches:
-            patchesUndo.append([            \
-                [patch[0], *patch[0][1:]],  \
-                [patch[0], *patch[1][1:]]])
-        if len(patchesUndo) > 0:
-            self.patchesUndo.insert(0, patchesUndo)
-    # }}}
-    # {{{ merge(self, mapPatches, eventDc, tmpDc, atPoint): XXX
-    def merge(self, mapPatches, eventDc, tmpDc, atPoint):
-        patchesUndo = []
-        for mapPatch in mapPatches:
-            mapPatchTmp = mapPatch[0]
-            if mapPatchTmp:
-                self._popTmp(eventDc, tmpDc)
-            for patch in mapPatch[1]:
-                if patch[0][0] >= self.parentCanvas.canvasSize[0]   \
-                or patch[0][1] >= self.parentCanvas.canvasSize[1]:
-                    continue
-                elif mapPatchTmp:
-                    self._pushTmp(patch[0])
-                    self.parentCanvas.onJournalUpdate(mapPatchTmp,  \
-                        patch[0], patch, eventDc, tmpDc, (0, 0))
-                else:
-                    patchUndo =                                     \
-                    self.parentCanvas.onJournalUpdate(mapPatchTmp,  \
-                        patch[0], patch, eventDc, tmpDc, (0, 0), True)
-                    patchesUndo.append([patchUndo, patch])
-        if len(patchesUndo) > 0:
-            self._pushUndo(atPoint, patchesUndo)
-    # }}}
-    # {{{ redo(self): XXX
-    def redo(self):
+    # {{{ popRedo(self): XXX
+    def popRedo(self):
         if self.patchesUndoLevel > 0:
             self.patchesUndoLevel -= 1
-            for patch in self.patchesUndo[self.patchesUndoLevel]:
-                self.parentCanvas.onJournalUpdate(False,    \
-                    patch[1][0], patch[1], None, None, (0, 0))
-            return True
+            patches = self.patchesUndo[self.patchesUndoLevel]
+            return patches[1]
         else:
-            return False
+            return []
     # }}}
-    # {{{ reset(self): XXX
-    def reset(self):
-        self.patchesTmp = []; self.patchesUndo = [None]; self.patchesUndoLevel = 0;
-    # }}}
-    # {{{ resetCursor(self, eventDc, tmpDc): XXX
-    def resetCursor(self, eventDc, tmpDc):
-        if len(self.patchesTmp):
-            self._popTmp(eventDc, tmpDc)
-            self.patchesTmp = []
-    # }}}
-    # {{{ undo(self): XXX
-    def undo(self):
+    # {{{ popUndo(self): XXX
+    def popUndo(self):
         if self.patchesUndo[self.patchesUndoLevel] != None:
             patches = self.patchesUndo[self.patchesUndoLevel]
             self.patchesUndoLevel += 1
-            for patch in patches:
-                self.parentCanvas.onJournalUpdate(False,    \
-                    patch[0][0], patch[0], None, None, (0, 0))
-            return True
+            return patches[0]
         else:
-            return False
+            return []
+    # }}}
+    # {{{ pushCursor(self, patches): XXX
+    def pushCursor(self, patches):
+        self.patchesCursor += patches
+    # }}}
+    # {{{ pushDeltas(self, undoPatches, redoPatches): XXX
+    def pushDeltas(self, undoPatches, redoPatches):
+        if self.patchesUndoLevel > 0:
+            del self.patchesUndo[0:self.patchesUndoLevel]
+            self.patchesUndoLevel = 0
+        self.patchesUndo.insert(0, [undoPatches, redoPatches])
+    # }}}
+    # {{{ resetCursor(self): XXX
+    def resetCursor(self):
+        self.patchesCursor = []
+    # }}}
+    # {{{ resetUndo(self): XXX
+    def resetUndo(self):
+        self.patchesUndo = [None]; self.patchesUndoLevel = 0;
     # }}}
 
     #
-    # __init__(self, parentCanvas): initialisation method
-    def __init__(self, parentCanvas):
-        self.parentCanvas = parentCanvas; self.reset();
+    # __init__(self): initialisation method
+    def __init__(self):
+        self.resetCursor(); self.resetUndo();
 
 # vim:expandtab foldmethod=marker sw=4 ts=4 tw=120
