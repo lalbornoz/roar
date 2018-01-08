@@ -54,9 +54,9 @@ class MiRCARTFrame(MiRCARTGeneralFrame):
     CID_PASTE           = (0x10c, TID_COMMAND, "Paste", "&Paste",               wx.ART_PASTE,           None,                       False)
     CID_DELETE          = (0x10d, TID_COMMAND, "Delete", "De&lete",             wx.ART_DELETE,          None,                       False)
     CID_INCRBRUSH       = (0x10e, TID_COMMAND, "Increase brush size",           \
-                                               "&Increase brush size",          wx.ART_PLUS,            None)
+                                               "&Increase brush size",          wx.ART_PLUS,            (wx.ACCEL_CTRL, ord("+")))
     CID_DECRBRUSH       = (0x10f, TID_COMMAND, "Decrease brush size",           \
-                                               "&Decrease brush size",          wx.ART_MINUS,           None)
+                                               "&Decrease brush size",          wx.ART_MINUS,           (wx.ACCEL_CTRL, ord("-")))
     CID_SOLID_BRUSH     = (0x110, TID_SELECT,  "Solid brush", "&Solid brush",   None,                   None,                       True)
     CID_RECT            = (0x111, TID_SELECT,  "Rectangle", "&Rectangle",       None,                   None,                       True)
     CID_CIRCLE          = (0x112, TID_SELECT,  "Circle", "&Circle",             None,                   None,                       False)
@@ -108,7 +108,7 @@ class MiRCARTFrame(MiRCARTGeneralFrame):
     # }}}
     # {{{ Accelerators (hotkeys)
     AID_EDIT            = (0x500, TID_ACCELS, (                                 \
-        CID_NEW, CID_OPEN, CID_SAVE, CID_UNDO, CID_REDO))
+        CID_NEW, CID_OPEN, CID_SAVE, CID_UNDO, CID_REDO, CID_INCRBRUSH, CID_DECRBRUSH))
     # }}}
     # {{{ Lists
     LID_ACCELS          = (0x600, TID_LIST, (AID_EDIT))
