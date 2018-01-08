@@ -26,13 +26,16 @@ from MiRCARTCanvas import MiRCARTCanvas, haveUrllib
 from MiRCARTColours import MiRCARTColours
 from MiRCARTGeneralFrame import MiRCARTGeneralFrame,    \
     TID_ACCELS, TID_COMMAND, TID_LIST, TID_MENU, TID_NOTHING, TID_SELECT, TID_TOOLBAR
+from MiRCARTToolCircle import MiRCARTToolCircle
+from MiRCARTToolLine import MiRCARTToolLine
+from MiRCARTToolRect import MiRCARTToolRect
                 
 import os, wx
 
 class MiRCARTFrame(MiRCARTGeneralFrame):
     """XXX"""
     panelCanvas = canvasPathName = None
-    canvasPos = canvasSize = canvasTools = cellSize = None
+    canvasPos = canvasSize = cellSize = None
 
     # {{{ Commands
     #                      Id     Type Id      Labels                           Icon bitmap             Accelerator                 [Initial state]
@@ -355,11 +358,17 @@ class MiRCARTFrame(MiRCARTGeneralFrame):
         elif cid == self.CID_SOLID_BRUSH[0]:
             pass
         elif cid == self.CID_RECT[0]:
-            pass
+            self.menuItemsById[cid].Check(True)
+            self.panelCanvas.canvasCurTool =    \
+                MiRCARTToolRect(self.panelCanvas)
         elif cid == self.CID_CIRCLE[0]:
-            pass
+            self.menuItemsById[cid].Check(True)
+            self.panelCanvas.canvasCurTool =    \
+                MiRCARTToolCircle(self.panelCanvas)
         elif cid == self.CID_LINE[0]:
-            pass
+            self.menuItemsById[cid].Check(True)
+            self.panelCanvas.canvasCurTool =    \
+                MiRCARTToolLine(self.panelCanvas)
         elif cid >= self.CID_COLOUR00[0]        \
         and  cid <= self.CID_COLOUR15[0]:
             numColour = cid - self.CID_COLOUR00[0]
@@ -376,16 +385,16 @@ class MiRCARTFrame(MiRCARTGeneralFrame):
     # }}}
 
     #
-    # __init__(self, parent, appSize=(800, 600), canvasPos=(25, 50), cellSize=(7, 14), canvasSize=(100, 30), canvasTools=[]): initialisation method
-    def __init__(self, parent, appSize=(800, 600), canvasPos=(25, 50), cellSize=(7, 14), canvasSize=(100, 30), canvasTools=[]):
+    # __init__(self, parent, appSize=(800, 600), canvasPos=(25, 50), canvasSize=(100, 30), cellSize=(7, 14)): initialisation method
+    def __init__(self, parent, appSize=(800, 600), canvasPos=(25, 50), canvasSize=(100, 30), cellSize=(7, 14)):
         panelSkin = super().__init__(parent, wx.ID_ANY, "MiRCART", size=appSize)
         self._setPaletteToolBitmaps()
         self.canvasPos = canvasPos; self.cellSize = cellSize; self.canvasSize = canvasSize;
         self.canvasPathName = None
-        self.canvasTools = canvasTools
         self.panelCanvas = MiRCARTCanvas(panelSkin, parentFrame=self,   \
             canvasPos=self.canvasPos, canvasSize=self.canvasSize,       \
-            canvasTools=self.canvasTools, cellSize=self.cellSize)
+            cellSize=self.cellSize)
+        self.panelCanvas.canvasCurTool = MiRCARTToolRect(self.panelCanvas)
         self.canvasNew()
 
 # vim:expandtab foldmethod=marker sw=4 ts=4 tw=120
