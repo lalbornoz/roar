@@ -23,30 +23,45 @@
 #
 
 from MiRCARTTool import MiRCARTTool
+import string
 
 class MiRCARTToolText(MiRCARTTool):
     """XXX"""
+    textColours = textPos = None
+
+    #
+    # onKeyboardEvent(self, event, atPoint, brushColours, brushSize, keyChar): XXX
+    def onKeyboardEvent(self, event, atPoint, brushColours, brushSize, keyChar):
+        if not keyChar in string.printable:
+            return []
+        else:
+            if self.textColours == None:
+                self.textColours = brushColours.copy()
+            if self.textPos == None:
+                self.textPos = list(atPoint)
+        patches = [[False, [[self.textPos, self.textColours, 0, keyChar]]]]
+        if self.textPos[0] < (self.parentCanvas.canvasSize[0] - 1):
+            self.textPos[0] += 1
+        elif self.textPos[1] < (self.parentCanvas.canvasSize[1] - 1):
+            self.textPos[0] = 0
+            self.textPos[1] += 1
+        else:
+            self.textPos = [0, 0]
+        return patches
 
     #
     # onMouseEvent(self, event, atPoint, brushColours, brushSize, isDragging, isLeftDown, isRightDown): XXX
     def onMouseEvent(self, event, atPoint, brushColours, brushSize, isDragging, isLeftDown, isRightDown):
-        brushColours = brushColours.copy()
         if isLeftDown:
-            brushColours[1] = brushColours[0]
+            self.textColours = brushColours.copy()
+            self.textPos = list(atPoint)
         elif isRightDown:
-            brushColours[0] = brushColours[1]
+            self.textColours = [brushColours[1], brushColours[0]]
+            self.textPos = list(atPoint)
         else:
-            brushColours[1] = brushColours[0]
-        brushPatches = []
-        for brushRow in range(brushSize[1]):
-            for brushCol in range(brushSize[0] * 2):
-                brushPatches.append([[      \
-                    atPoint[0] + brushCol,  \
-                    atPoint[1] + brushRow], \
-                    brushColours, 0, " "])
-        if isLeftDown or isRightDown:
-            return [[False, brushPatches], [True, brushPatches]]
-        else: 
-            return [[True, brushPatches]]
+            if self.textColours == None:
+                self.textColours = brushColours.copy()
+            self.textPos = list(atPoint)
+        return [[True, [[self.textPos, self.textColours, 0, "_"]]]]
 
 # vim:expandtab foldmethod=marker sw=4 ts=4 tw=120
