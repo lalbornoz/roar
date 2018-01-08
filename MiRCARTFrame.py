@@ -340,14 +340,13 @@ class MiRCARTFrame(MiRCARTGeneralFrame):
         elif cid == self.CID_DELETE[0]:
             pass
         elif cid == self.CID_INCRBRUSH[0]:
-            self.panelCanvas.brushSize =    \
+            self.panelCanvas.brushSize =        \
                 [a+1 for a in self.panelCanvas.brushSize]
-            print(self.panelCanvas.brushSize)
-        elif cid == self.CID_DECRBRUSH[0]   \
-        and  self.panelCanvas.brushSize != [0,0]:
-            self.panelCanvas.brushSize =    \
+        elif cid == self.CID_DECRBRUSH[0]       \
+        and  self.panelCanvas.brushSize[0] > 1  \
+        and  self.panelCanvas.brushSize[1] > 1:
+            self.panelCanvas.brushSize =        \
                 [a-1 for a in self.panelCanvas.brushSize]
-            print(self.panelCanvas.brushSize)
         elif cid == self.CID_SOLID_BRUSH[0]:
             pass
         elif cid == self.CID_RECT[0]:
@@ -356,7 +355,7 @@ class MiRCARTFrame(MiRCARTGeneralFrame):
             pass
         elif cid == self.CID_LINE[0]:
             pass
-        elif cid >= self.CID_COLOUR00[0]    \
+        elif cid >= self.CID_COLOUR00[0]        \
         and  cid <= self.CID_COLOUR15[0]:
             numColour = cid - self.CID_COLOUR00[0]
             if event.GetEventType() == wx.wxEVT_TOOL:
