@@ -35,18 +35,23 @@ class MiRCARTCanvasJournal():
                     patch[0], patch, eventDc, tmpDc, (0, 0), True)
             self.patchesTmp = []
     # }}}
-    # {{{ _pushTmp(self, atPoint, patch): XXX
-    def _pushTmp(self, absMapPoint):
-        self.patchesTmp.append([absMapPoint, None, None, None])
+    # {{{ _pushTmp(self, atPoint): XXX
+    def _pushTmp(self, atPoint):
+        self.patchesTmp.append([atPoint, None, None, None])
     # }}}
-    # {{{ _pushUndo(self, atPoint, patchUndo, patchRedo): XXX
-    def _pushUndo(self, atPoint, patchUndo, patchRedo):
+    # {{{ _pushUndo(self, atPoint, patches): XXX
+    def _pushUndo(self, atPoint, patches):
         if self.patchesUndoLevel > 0:
             del self.patchesUndo[0:self.patchesUndoLevel]
             self.patchesUndoLevel = 0
-        absMapPoint = self._relMapPointToAbsMapPoint(patchUndo[0], atPoint)
-        self.patchesUndo.insert(0, [    \
-            [absMapPoint, *patchUndo[1:]], [absMapPoint, *patchRedo[1:]]])
+        patchesUndo = []
+        for patch in patches:
+            absMapPoint = self._relMapPointToAbsMapPoint(patch[0][0], atPoint)
+            patchesUndo.append([                \
+                [absMapPoint, *patch[0][1:]],   \
+                [absMapPoint, *patch[1][1:]]])
+        if len(patchesUndo) > 0:
+            self.patchesUndo.insert(0, patchesUndo)
     # }}}
     # {{{ _relMapPointToAbsMapPoint(self, relMapPoint, atPoint): XXX
     def _relMapPointToAbsMapPoint(self, relMapPoint, atPoint):
@@ -54,6 +59,7 @@ class MiRCARTCanvasJournal():
     # }}}
     # {{{ merge(self, mapPatches, eventDc, tmpDc, atPoint): XXX
     def merge(self, mapPatches, eventDc, tmpDc, atPoint):
+        patchesUndo = []
         for mapPatch in mapPatches:
             mapPatchTmp = mapPatch[0]
             if mapPatchTmp:
@@ -71,15 +77,17 @@ class MiRCARTCanvasJournal():
                     patchUndo =                                         \
                     self.parentCanvas.onJournalUpdate(mapPatchTmp,      \
                         absMapPoint, patch, eventDc, tmpDc, atPoint, True)
-                    self._pushUndo(atPoint, patchUndo, patch)
+                    patchesUndo.append([patchUndo, patch])
+        if len(patchesUndo) > 0:
+            self._pushUndo(atPoint, patchesUndo)
     # }}}
     # {{{ redo(self): XXX
     def redo(self):
         if self.patchesUndoLevel > 0:
             self.patchesUndoLevel -= 1
-            redoPatch = self.patchesUndo[self.patchesUndoLevel][1]
-            self.parentCanvas.onJournalUpdate(False,    \
-                redoPatch[0], redoPatch, None, None, (0, 0))
+            for patch in self.patchesUndo[self.patchesUndoLevel]:
+                self.parentCanvas.onJournalUpdate(False,    \
+                    patch[1][0], patch[1], None, None, (0, 0))
             return True
         else:
             return False
@@ -97,10 +105,11 @@ class MiRCARTCanvasJournal():
     # {{{ undo(self): XXX
     def undo(self):
         if self.patchesUndo[self.patchesUndoLevel] != None:
-            undoPatch = self.patchesUndo[self.patchesUndoLevel][0]
+            patches = self.patchesUndo[self.patchesUndoLevel]
             self.patchesUndoLevel += 1
-            self.parentCanvas.onJournalUpdate(False,    \
-                undoPatch[0], undoPatch, None, None, (0, 0))
+            for patch in patches:
+                self.parentCanvas.onJournalUpdate(False,    \
+                    patch[0][0], patch[0], None, None, (0, 0))
             return True
         else:
             return False

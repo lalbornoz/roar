@@ -102,7 +102,6 @@ class MiRCARTCanvas(wx.Panel):
                 patchOld[1:] = self._getMapCell(patchOld[0])
             self._setMapCell(absMapPoint, *patch[1:])
             self._drawPatch(patch, eventDc, tmpDc, atPoint)
-            self.parentFrame.onCanvasUpdate()
             if isInherit:
                 return patchOld
     # }}}
@@ -118,6 +117,7 @@ class MiRCARTCanvas(wx.Panel):
                 event, mapPoint, self.brushColours, self.brushSize,     \
                 event.Dragging(), event.LeftIsDown(), event.RightIsDown())
             self.canvasJournal.merge(mapPatches, eventDc, tmpDc, mapPoint)
+            self.parentFrame.onCanvasUpdate()
         self.parentFrame.onCanvasMotion(event, mapPoint)
     # }}}
     # {{{ onMouseWindowEvent(self, event): XXX
@@ -168,7 +168,9 @@ class MiRCARTCanvas(wx.Panel):
     # }}}
     # {{{ redo(self): XXX
     def redo(self):
-        return self.canvasJournal.redo()
+        result = self.canvasJournal.redo()
+        self.parentFrame.onCanvasUpdate()
+        return result
     # }}}
     # {{{ resize(self, newCanvasSize): XXX
     def resize(self, newCanvasSize):
@@ -191,7 +193,9 @@ class MiRCARTCanvas(wx.Panel):
     # }}}
     # {{{ undo(self): XXX
     def undo(self):
-        return self.canvasJournal.undo()
+        result = self.canvasJournal.undo()
+        self.parentFrame.onCanvasUpdate()
+        return result
     # }}}
 
     # {{{ __del__(self): destructor method
