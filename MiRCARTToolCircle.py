@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 #
-# MiRCARTToolRect.py -- XXX
+# MiRCARTToolCircle.py -- XXX
 # Copyright (c) 2018 Lucio Andrés Illanes Albornoz <lucio@lucioillanes.de>
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -24,7 +24,7 @@
 
 from MiRCARTTool import MiRCARTTool
 
-class MiRCARTToolRect(MiRCARTTool):
+class MiRCARTToolCircle(MiRCARTTool):
     """XXX"""
 
     #
@@ -38,12 +38,16 @@ class MiRCARTToolRect(MiRCARTTool):
         else:
             brushColours[1] = brushColours[0]
         brushPatches = []
-        for brushRow in range(brushSize[1]):
-            for brushCol in range(brushSize[0] * 2):
-                brushPatches.append([[      \
-                    atPoint[0] + brushCol,  \
-                    atPoint[1] + brushRow], \
-                    brushColours, 0, " "])
+        _brushSize = brushSize[0]*2
+        originPoint = (_brushSize/2, _brushSize/2)
+        radius = _brushSize
+        for brushY in range(-radius, radius + 1):
+            for brushX in range(-radius, radius + 1):
+                if ((brushX**2)+(brushY**2) < (((radius**2)+radius)*0.8)):
+                    brushPatches.append([                           \
+                        [atPoint[0] + int(originPoint[0]+brushX),   \
+                         atPoint[1] + int(originPoint[1]+brushY)],  \
+                        brushColours, 0, " "])
         if isLeftDown or isRightDown:
             return [[False, brushPatches], [True, brushPatches]]
         else: 
