@@ -22,7 +22,7 @@
 # SOFTWARE.
 #
 
-import os, wx
+import os, sys, wx
 
 #
 # Types
@@ -108,10 +108,11 @@ class MiRCARTGeneralFrame(wx.Frame):
             and  toolBarItem[4][1] == None:
                 toolBarItem[4] = ["", None, toolBarItem[4][2]]
             elif toolBarItem[4][0] != "":
+                toolBitmapPathName = os.path.dirname(sys.argv[0])
+                toolBitmapPathName = os.path.join(toolBitmapPathName,   \
+                    "assets", toolBarItem[4][0])
                 toolBitmap = wx.Bitmap((16,16))
-                toolBitmap.LoadFile(                                    \
-                    os.path.join("assets", toolBarItem[4][0]),          \
-                    wx.BITMAP_TYPE_ANY)
+                toolBitmap.LoadFile(toolBitmapPathName, wx.BITMAP_TYPE_ANY)
                 toolBarItem[4] = ["", None, toolBitmap]
     # }}}
     # {{{ onClose(self, event): XXX
