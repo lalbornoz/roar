@@ -178,6 +178,7 @@ class MiRCARTCanvas(wx.Panel):
     def __init__(self, parent, parentFrame, canvasPos, canvasSize, cellSize):
         super().__init__(parent, pos=canvasPos,             \
             size=[w*h for w,h in zip(canvasSize, cellSize)])
+        self.SetDoubleBuffered(True)
 
         self.parentFrame = parentFrame
         self.canvasMap = None; self.canvasPos = canvasPos; self.canvasSize = canvasSize;
