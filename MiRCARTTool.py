@@ -26,12 +26,12 @@ class MiRCARTTool():
     """XXX"""
     parentCanvas = None
 
-    # {{{ onKeyboardEvent(self, event, atPoint, brushColours, brushSize, keyChar):
-    def onKeyboardEvent(self, event, atPoint, brushColours, brushSize, keyChar):
-        return ()
+    # {{{ onKeyboardEvent(self, event, atPoint, brushColours, brushSize, keyChar, dispatchFn, eventDc):
+    def onKeyboardEvent(self, event, atPoint, brushColours, brushSize, keyChar, dispatchFn, eventDc):
+        return True
     # }}}
-    # {{{ onMouseEvent(self, event, atPoint, brushColours, brushSize, isDragging, isLeftDown, isRightDown): XXX
-    def onMouseEvent(self, event, atPoint, brushColours, brushSize, isDragging, isLeftDown, isRightDown):
+    # {{{ onMouseEvent(self, event, atPoint, brushColours, brushSize, isDragging, isLeftDown, isRightDown, dispatchFn, eventDc): XXX
+    def onMouseEvent(self, event, atPoint, brushColours, brushSize, isDragging, isLeftDown, isRightDown, dispatchFn, eventDc):
         return ()
     # }}}
 

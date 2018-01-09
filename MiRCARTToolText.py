@@ -23,23 +23,27 @@
 #
 
 from MiRCARTTool import MiRCARTTool
-import string
+import string, wx
 
 class MiRCARTToolText(MiRCARTTool):
     """XXX"""
     textColours = textPos = None
 
     #
-    # onKeyboardEvent(self, event, atPoint, brushColours, brushSize, keyChar): XXX
-    def onKeyboardEvent(self, event, atPoint, brushColours, brushSize, keyChar):
-        if not keyChar in string.printable:
-            return []
+    # onKeyboardEvent(self, event, atPoint, brushColours, brushSize, keyChar, dispatchFn, eventDc): XXX
+    def onKeyboardEvent(self, event, atPoint, brushColours, brushSize, keyChar, dispatchFn, eventDc):
+        keyModifiers = event.GetModifiers()
+        if  keyModifiers != wx.MOD_NONE     \
+        and keyModifiers != wx.MOD_SHIFT:
+            return True
+        elif not keyChar in string.printable:
+            return True
         else:
             if self.textColours == None:
                 self.textColours = brushColours.copy()
             if self.textPos == None:
                 self.textPos = list(atPoint)
-        patches = [[False, [[self.textPos, self.textColours, 0, keyChar]]]]
+        dispatchFn(eventDc, False, [self.textPos, self.textColours, 0, keyChar])
         if self.textPos[0] < (self.parentCanvas.canvasSize[0] - 1):
             self.textPos[0] += 1
         elif self.textPos[1] < (self.parentCanvas.canvasSize[1] - 1):
@@ -47,11 +51,11 @@ class MiRCARTToolText(MiRCARTTool):
             self.textPos[1] += 1
         else:
             self.textPos = [0, 0]
-        return patches
+        return False
 
     #
-    # onMouseEvent(self, event, atPoint, brushColours, brushSize, isDragging, isLeftDown, isRightDown): XXX
-    def onMouseEvent(self, event, atPoint, brushColours, brushSize, isDragging, isLeftDown, isRightDown):
+    # onMouseEvent(self, event, atPoint, brushColours, brushSize, isDragging, isLeftDown, isRightDown, dispatchFn, eventDc): XXX
+    def onMouseEvent(self, event, atPoint, brushColours, brushSize, isDragging, isLeftDown, isRightDown, dispatchFn, eventDc):
         if isLeftDown:
             self.textColours = brushColours.copy()
             self.textPos = list(atPoint)
@@ -62,6 +66,6 @@ class MiRCARTToolText(MiRCARTTool):
             if self.textColours == None:
                 self.textColours = brushColours.copy()
             self.textPos = list(atPoint)
-        return [[True, [[self.textPos, self.textColours, 0, "_"]]]]
+        dispatchFn(eventDc, True, [self.textPos, self.textColours, 0, "_"])
 
 # vim:expandtab foldmethod=marker sw=4 ts=4 tw=120

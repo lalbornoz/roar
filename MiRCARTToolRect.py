@@ -28,8 +28,8 @@ class MiRCARTToolRect(MiRCARTTool):
     """XXX"""
 
     #
-    # onMouseEvent(self, event, atPoint, brushColours, brushSize, isDragging, isLeftDown, isRightDown): XXX
-    def onMouseEvent(self, event, atPoint, brushColours, brushSize, isDragging, isLeftDown, isRightDown):
+    # onMouseEvent(self, event, atPoint, brushColours, brushSize, isDragging, isLeftDown, isRightDown, dispatchFn, eventDc): XXX
+    def onMouseEvent(self, event, atPoint, brushColours, brushSize, isDragging, isLeftDown, isRightDown, dispatchFn, eventDc):
         brushColours = brushColours.copy()
         if isLeftDown:
             brushColours[1] = brushColours[0]
@@ -40,16 +40,12 @@ class MiRCARTToolRect(MiRCARTTool):
         brushSize = brushSize.copy()
         if brushSize[0] > 1:
             brushSize[0] *= 2
-        brushPatches = []
         for brushRow in range(brushSize[1]):
             for brushCol in range(brushSize[0]):
-                brushPatches.append([[      \
-                    atPoint[0] + brushCol,  \
-                    atPoint[1] + brushRow], \
-                    brushColours, 0, " "])
-        if isLeftDown or isRightDown:
-            return [[False, brushPatches], [True, brushPatches]]
-        else: 
-            return [[True, brushPatches]]
+                patch = [[atPoint[0] + brushCol, atPoint[1] + brushRow],brushColours, 0, " "]
+                if isLeftDown or isRightDown:
+                    dispatchFn(eventDc, False, patch); dispatchFn(eventDc, True, patch);
+                else: 
+                    dispatchFn(eventDc, True, patch)
 
 # vim:expandtab foldmethod=marker sw=4 ts=4 tw=120
