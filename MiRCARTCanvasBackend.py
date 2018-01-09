@@ -28,6 +28,7 @@ import wx
 class MiRCARTCanvasBackend():
     """XXX"""
     _font = _brushes = _pens = None
+    _lastBrush = _lastPen = None
     canvasBitmap = cellSize = None
 
     # {{{ _drawBrushPatch(self, eventDc, patch, tmpDc): XXX
@@ -36,9 +37,9 @@ class MiRCARTCanvasBackend():
         brushFg = self._brushes[patch[1][1]]
         brushBg = self._brushes[patch[1][0]]
         pen = self._pens[patch[1][1]]
-        for dc in (eventDc, tmpDc):
-            dc.SetBrush(brushFg); dc.SetBackground(brushBg); dc.SetPen(pen);
-            dc.DrawRectangle(*absPoint, *self.cellSize)
+        self._setBrushDc(brushBg, brushFg, (eventDc, tmpDc), pen)
+        eventDc.DrawRectangle(*absPoint, *self.cellSize)
+        tmpDc.DrawRectangle(*absPoint, *self.cellSize)
     # }}}
     # {{{ _drawCharPatch(self, eventDc, patch, tmpDc): XXX
     def _drawCharPatch(self, eventDc, patch, tmpDc):
@@ -65,6 +66,7 @@ class MiRCARTCanvasBackend():
         for pen in self._pens or []:
             pen.Destroy()
         self._pens = None
+        self._lastBrushBg = self._lastBrushFg = self._lastPen = None;
     # }}}
     # {{{ _initBrushesAndPens(self): XXX
     def _initBrushesAndPens(self):
@@ -75,6 +77,22 @@ class MiRCARTCanvasBackend():
                 wx.Colour(MiRCARTColours[mircColour][0:4]), wx.BRUSHSTYLE_SOLID)
             self._pens[mircColour] = wx.Pen(         \
                 wx.Colour(MiRCARTColours[mircColour][0:4]), 1)
+        self._lastBrushBg = self._lastBrushFg = self._lastPen = None;
+    # }}}
+    # {{{ _setBrushDc(self, brushBg, brushFg, dcList, pen): XXX
+    def _setBrushDc(self, brushBg, brushFg, dcList, pen):
+        if self._lastBrushBg != brushBg:
+            for dc in dcList:
+                dc.SetBackground(brushBg)
+            self._lastBrushBg = brushBg
+        if self._lastBrushFg != brushFg:
+            for dc in dcList:
+                dc.SetBrush(brushFg)
+            self._lastBrushFg = brushFg
+        if self._lastPen != pen:
+            for dc in dcList:
+                dc.SetPen(pen)
+            self._lastPen = pen
     # }}}
     # {{{ _xlatePoint(self, relMapPoint): XXX
     def _xlatePoint(self, relMapPoint):
@@ -102,6 +120,7 @@ class MiRCARTCanvasBackend():
     def getDeviceContexts(self, parentWindow):
         eventDc = wx.ClientDC(parentWindow); tmpDc = wx.MemoryDC();
         tmpDc.SelectObject(self.canvasBitmap)
+        self._lastBrushBg = self._lastBrushFg = self._lastPen = None;
         return (eventDc, tmpDc)
     # }}}
     # {{{ reset(self, canvasSize, cellSize):
