@@ -31,32 +31,30 @@ class MiRCARTCanvasBackend():
     _lastBrush = _lastPen = None
     canvasBitmap = cellSize = None
 
-    # {{{ _drawBrushPatch(self, eventDc, patch, tmpDc): XXX
-    def _drawBrushPatch(self, eventDc, patch, tmpDc):
+    # {{{ _drawBrushPatch(self, eventDc, patch): XXX
+    def _drawBrushPatch(self, eventDc, patch):
         absPoint = self._xlatePoint(patch[0])
         brushFg = self._brushes[patch[1][1]]
         brushBg = self._brushes[patch[1][0]]
         pen = self._pens[patch[1][1]]
-        self._setBrushDc(brushBg, brushFg, (eventDc, tmpDc), pen)
+        self._setBrushDc(brushBg, brushFg, eventDc, pen)
         eventDc.DrawRectangle(*absPoint, *self.cellSize)
-        tmpDc.DrawRectangle(*absPoint, *self.cellSize)
     # }}}
-    # {{{ _drawCharPatch(self, eventDc, patch, tmpDc): XXX
-    def _drawCharPatch(self, eventDc, patch, tmpDc):
+    # {{{ _drawCharPatch(self, eventDc, patch): XXX
+    def _drawCharPatch(self, eventDc, patch):
         absPoint = self._xlatePoint(patch[0])
         brushFg = self._brushes[patch[1][0]]
         brushBg = self._brushes[patch[1][1]]
         pen = self._pens[patch[1][1]]
-        for dc in (eventDc, tmpDc):
-            fontBitmap = wx.Bitmap(*self.cellSize)
-            fontDc = wx.MemoryDC(); fontDc.SelectObject(fontBitmap);
-            fontDc.SetTextForeground(wx.Colour(MiRCARTColours[patch[1][0]][0:4]))
-            fontDc.SetTextBackground(wx.Colour(MiRCARTColours[patch[1][1]][0:4]))
-            fontDc.SetBrush(brushBg); fontDc.SetBackground(brushBg); fontDc.SetPen(pen);
-            fontDc.SetFont(self._font)
-            fontDc.DrawRectangle(0, 0, *self.cellSize)
-            fontDc.DrawText(patch[3], 0, 0)
-            dc.Blit(*absPoint, *self.cellSize, fontDc, 0, 0)
+        fontBitmap = wx.Bitmap(*self.cellSize)
+        fontDc = wx.MemoryDC(); fontDc.SelectObject(fontBitmap);
+        fontDc.SetTextForeground(wx.Colour(MiRCARTColours[patch[1][0]][0:4]))
+        fontDc.SetTextBackground(wx.Colour(MiRCARTColours[patch[1][1]][0:4]))
+        fontDc.SetBrush(brushBg); fontDc.SetBackground(brushBg); fontDc.SetPen(pen);
+        fontDc.SetFont(self._font)
+        fontDc.DrawRectangle(0, 0, *self.cellSize)
+        fontDc.DrawText(patch[3], 0, 0)
+        eventDc.Blit(*absPoint, *self.cellSize, fontDc, 0, 0)
     # }}}
     # {{{ _finiBrushesAndPens(self): XXX
     def _finiBrushesAndPens(self):
@@ -79,19 +77,16 @@ class MiRCARTCanvasBackend():
                 wx.Colour(MiRCARTColours[mircColour][0:4]), 1)
         self._lastBrushBg = self._lastBrushFg = self._lastPen = None;
     # }}}
-    # {{{ _setBrushDc(self, brushBg, brushFg, dcList, pen): XXX
-    def _setBrushDc(self, brushBg, brushFg, dcList, pen):
+    # {{{ _setBrushDc(self, brushBg, brushFg, dc, pen): XXX
+    def _setBrushDc(self, brushBg, brushFg, dc, pen):
         if self._lastBrushBg != brushBg:
-            for dc in dcList:
-                dc.SetBackground(brushBg)
+            dc.SetBackground(brushBg)
             self._lastBrushBg = brushBg
         if self._lastBrushFg != brushFg:
-            for dc in dcList:
-                dc.SetBrush(brushFg)
+            dc.SetBrush(brushFg)
             self._lastBrushFg = brushFg
         if self._lastPen != pen:
-            for dc in dcList:
-                dc.SetPen(pen)
+            dc.SetPen(pen)
             self._lastPen = pen
     # }}}
     # {{{ _xlatePoint(self, relMapPoint): XXX
@@ -99,29 +94,34 @@ class MiRCARTCanvasBackend():
         return [a*b for a,b in zip(relMapPoint, self.cellSize)]
     # }}}
 
-    # {{{ drawPatch(self, eventDc, patch, tmpDc): XXX
-    def drawPatch(self, eventDc, patch, tmpDc):
+    # {{{ drawPatch(self, eventDc, patch): XXX
+    def drawPatch(self, eventDc, patch):
         if  patch[0][0] < self.canvasSize[0]    \
         and patch[0][1] < self.canvasSize[1]:
             if patch[3] == " ":
-                self._drawBrushPatch(eventDc, patch, tmpDc)
+                self._drawBrushPatch(eventDc, patch)
             else:
-                self._drawCharPatch(eventDc, patch, tmpDc)
+                self._drawCharPatch(eventDc, patch)
             return True
         else:
             return False
     # }}}
-    # {{{ drawCursorMaskWithJournal(self, canvasJournal, eventDc, tmpDc): XXX
-    def drawCursorMaskWithJournal(self, canvasJournal, eventDc, tmpDc):
+    # {{{ drawCursorMaskWithJournal(self, canvasJournal, eventDc): XXX
+    def drawCursorMaskWithJournal(self, canvasJournal, eventDc):
         for patch in canvasJournal.popCursor():
-            self.drawPatch(eventDc, patch, tmpDc)
+            self.drawPatch(eventDc, patch)
     # }}}
-    # {{{ getDeviceContexts(self, parentWindow): XXX
-    def getDeviceContexts(self, parentWindow):
-        eventDc = wx.ClientDC(parentWindow); tmpDc = wx.MemoryDC();
-        tmpDc.SelectObject(self.canvasBitmap)
+    # {{{ getDeviceContext(self, parentWindow): XXX
+    def getDeviceContext(self, parentWindow):
+        eventDc = wx.BufferedDC(    \
+            wx.ClientDC(parentWindow), self.canvasBitmap)
         self._lastBrushBg = self._lastBrushFg = self._lastPen = None;
-        return (eventDc, tmpDc)
+        return eventDc
+    # }}}
+    # {{{ onPanelPaintEvent(self, panelWindow, panelEvent): XXX
+    def onPanelPaintEvent(self, panelWindow, panelEvent):
+        if self.canvasBitmap != None:
+            eventDc = wx.BufferedPaintDC(panelWindow, self.canvasBitmap)
     # }}}
     # {{{ reset(self, canvasSize, cellSize):
     def reset(self, canvasSize, cellSize):

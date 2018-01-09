@@ -358,7 +358,7 @@ class MiRCARTFrame(MiRCARTGeneralFrame):
             pass
         elif cid == self.CID_INCR_CANVAS[0]                         \
         or   cid == self.CID_DECR_CANVAS[0]:
-            eventDc, tmpDc = self.panelCanvas.canvasBackend.getDeviceContexts(self)
+            eventDc = self.panelCanvas.canvasBackend.getDeviceContext(self)
             if cid == self.CID_INCR_CANVAS[0]:
                 newCanvasSize = [a+1 for a in self.panelCanvas.canvasSize]
             else:
@@ -373,7 +373,7 @@ class MiRCARTFrame(MiRCARTGeneralFrame):
             for numCol in range(self.panelCanvas.canvasSize[0]):
                 self.panelCanvas.canvasMap[-1].append([[1, 1], 0, " "])
                 self.panelCanvas.canvasBackend.drawPatch(eventDc,   \
-                    ([numCol, self.panelCanvas.canvasSize[1] - 1], *[[1, 1], 0, " "]), tmpDc)
+                    ([numCol, self.panelCanvas.canvasSize[1] - 1], *[[1, 1], 0, " "]))
             wx.SafeYield()
         elif cid == self.CID_INCR_BRUSH[0]:
             self.panelCanvas.brushSize =                            \

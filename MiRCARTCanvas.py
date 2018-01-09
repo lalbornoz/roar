@@ -39,15 +39,15 @@ class MiRCARTCanvas(wx.Panel):
     def _commitPatch(self, patch):
         self.canvasMap[patch[0][1]][patch[0][0]] = patch[1:]
     # }}}
-    # {{{ _dispatchInput(self, eventDc, patches, tmpDc): XXX
-    def _dispatchInput(self, eventDc, patches, tmpDc):
+    # {{{ _dispatchInput(self, eventDc, patches): XXX
+    def _dispatchInput(self, eventDc, patches):
         self.canvasBackend.drawCursorMaskWithJournal(   \
-            self.canvasJournal, eventDc, tmpDc)
+            self.canvasJournal, eventDc)
         cursorPatches = []; undoPatches = []; newPatches = [];
         for patchDescr in patches:
             patchIsCursor = patchDescr[0]
             for patch in patchDescr[1]:
-                if self.canvasBackend.drawPatch(eventDc, patch, tmpDc) == False:
+                if self.canvasBackend.drawPatch(eventDc, patch) == False:
                     continue
                 else:
                     patchDeltaCell = self.canvasMap[patch[0][1]][patch[0][0]]
@@ -69,7 +69,7 @@ class MiRCARTCanvas(wx.Panel):
     # }}}
     # {{{ onPanelKeyboardInput(self, event): XXX
     def onPanelKeyboardInput(self, event):
-        eventDc, tmpDc = self.canvasBackend.getDeviceContexts(self)
+        eventDc = self.canvasBackend.getDeviceContext(self)
         tool = self.canvasCurTool; mapPoint = self.brushPos;
         keyModifiers = event.GetModifiers()
         if  keyModifiers != wx.MOD_NONE                             \
@@ -80,12 +80,12 @@ class MiRCARTCanvas(wx.Panel):
                 event, mapPoint, self.brushColours, self.brushSize, \
                 chr(event.GetUnicodeKey()))
             if len(patches):
-                self._dispatchInput(eventDc, patches, tmpDc)
+                self._dispatchInput(eventDc, patches)
                 self.parentFrame.onCanvasUpdate()
     # }}}
     # {{{ onPanelMouseInput(self, event): XXX
     def onPanelMouseInput(self, event):
-        eventDc, tmpDc = self.canvasBackend.getDeviceContexts(self)
+        eventDc = self.canvasBackend.getDeviceContext(self)
         tool = self.canvasCurTool
         self.brushPos = mapPoint =                              \
             self.canvasBackend.xlateEventPoint(event, eventDc)
@@ -93,23 +93,21 @@ class MiRCARTCanvas(wx.Panel):
             event, mapPoint, self.brushColours, self.brushSize, \
             event.Dragging(), event.LeftIsDown(), event.RightIsDown())
         if len(patches):
-            self._dispatchInput(eventDc, patches, tmpDc)
+            self._dispatchInput(eventDc, patches)
             self.parentFrame.onCanvasUpdate()
         self.parentFrame.onCanvasMotion(event, mapPoint)
     # }}}
     # {{{ onPanelFocus(self, event): XXX
     def onPanelFocus(self, event):
         if event.GetEventType() == wx.wxEVT_LEAVE_WINDOW:
-            eventDc, tmpDc =                                \
-                self.canvasBackend.getDeviceContexts(self)
+            eventDc = self.canvasBackend.getDeviceContext(self)
             self.canvasBackend.drawCursorMaskWithJournal(  \
-                self.canvasJournal, eventDc, tmpDc)
+                self.canvasJournal, eventDc)
         self.parentFrame.onCanvasMotion(event)
     # }}}
     # {{{ onPanelPaint(self, event): XXX
     def onPanelPaint(self, event):
-        if self.canvasBackend.canvasBitmap != None:
-            eventDc = wx.BufferedPaintDC(self, self.canvasBackend.canvasBitmap)
+        self.canvasBackend.onPanelPaintEvent(self, event)
     # }}}
     # {{{ onStoreUpdate(self, newCanvasSize, newCanvas=None):
     def onStoreUpdate(self, newCanvasSize, newCanvas=None):
@@ -119,7 +117,7 @@ class MiRCARTCanvas(wx.Panel):
         self.canvasMap = [[[(1, 1), 0, " "]             \
                 for x in range(self.canvasSize[0])]     \
                     for y in range(self.canvasSize[1])]
-        eventDc, tmpDc = self.canvasBackend.getDeviceContexts(self)
+        eventDc = self.canvasBackend.getDeviceContext(self)
         for numRow in range(self.canvasSize[1]):
             for numCol in range(self.canvasSize[0]):
                 if  newCanvas != None                   \
@@ -129,15 +127,15 @@ class MiRCARTCanvas(wx.Panel):
                         [numCol, numRow], *newCanvas[numRow][numCol]])
                 self.canvasBackend.drawPatch(eventDc,   \
                     ([numCol, numRow],                  \
-                    *self.canvasMap[numRow][numCol]), tmpDc)
+                    *self.canvasMap[numRow][numCol]))
         wx.SafeYield()
     # }}}
     # {{{ popRedo(self):
     def popRedo(self):
-        eventDc, tmpDc = self.canvasBackend.getDeviceContexts(self)
+        eventDc = self.canvasBackend.getDeviceContext(self)
         patches = self.canvasJournal.popRedo()
         for patch in patches:
-            if self.canvasBackend.drawPatch(eventDc, patch, tmpDc) == False:
+            if self.canvasBackend.drawPatch(eventDc, patch) == False:
                 continue
             else:
                 self._commitPatch(patch)
@@ -145,10 +143,10 @@ class MiRCARTCanvas(wx.Panel):
     # }}}
     # {{{ popUndo(self):
     def popUndo(self):
-        eventDc, tmpDc = self.canvasBackend.getDeviceContexts(self)
+        eventDc = self.canvasBackend.getDeviceContext(self)
         patches = self.canvasJournal.popUndo()
         for patch in patches:
-            if self.canvasBackend.drawPatch(eventDc, patch, tmpDc) == False:
+            if self.canvasBackend.drawPatch(eventDc, patch) == False:
                 continue
             else:
                 self._commitPatch(patch)
@@ -178,7 +176,6 @@ class MiRCARTCanvas(wx.Panel):
     def __init__(self, parent, parentFrame, canvasPos, canvasSize, cellSize):
         super().__init__(parent, pos=canvasPos,             \
             size=[w*h for w,h in zip(canvasSize, cellSize)])
-        self.SetDoubleBuffered(True)
 
         self.parentFrame = parentFrame
         self.canvasMap = None; self.canvasPos = canvasPos; self.canvasSize = canvasSize;
