@@ -57,9 +57,9 @@ class MiRCARTFrame(MiRCARTGeneralFrame):
     CID_PASTE           = [0x10c, TID_COMMAND, "Paste", "&Paste",               ["", wx.ART_PASTE],         None,                       False]
     CID_DELETE          = [0x10d, TID_COMMAND, "Delete", "De&lete",             ["", wx.ART_DELETE],        None,                       False]
     CID_INCR_CANVAS     = [0x10e, TID_COMMAND, "Increase canvas size",          \
-                                               "&Increase canvas size",         ["", wx.ART_PLUS],          [wx.ACCEL_SHIFT, ord("+")]]
-    CID_DECR_CANVAS     = [0x10f, TID_COMMAND, "Decrease brush size",           \
-                                               "&Decrease brush size",          ["", wx.ART_MINUS],         [wx.ACCEL_SHIFT, ord("-")]]
+                                               "I&ncrease canvas size",         ["", wx.ART_PLUS],          [wx.ACCEL_ALT, ord("+")]]
+    CID_DECR_CANVAS     = [0x10f, TID_COMMAND, "Decrease canvas size",          \
+                                               "D&ecrease canvas size",         ["", wx.ART_MINUS],         [wx.ACCEL_ALT, ord("-")]]
     CID_INCR_BRUSH      = [0x110, TID_COMMAND, "Increase brush size",           \
                                                "&Increase brush size",          ["", wx.ART_PLUS],          [wx.ACCEL_CTRL, ord("+")]]
     CID_DECR_BRUSH      = [0x111, TID_COMMAND, "Decrease brush size",           \
@@ -120,7 +120,7 @@ class MiRCARTFrame(MiRCARTGeneralFrame):
     # {{{ Accelerators (hotkeys)
     AID_EDIT            = (0x500, TID_ACCELS, (                                 \
         CID_NEW, CID_OPEN, CID_SAVE, CID_UNDO, CID_REDO,                        \
-        CID_INCR_CANVAS, CID_INCR_BRUSH, CID_INCR_BRUSH, CID_DECR_BRUSH))
+        CID_INCR_CANVAS, CID_DECR_CANVAS, CID_INCR_BRUSH, CID_DECR_BRUSH))
     # }}}
     # {{{ Lists
     LID_ACCELS          = (0x600, TID_LIST, (AID_EDIT))
