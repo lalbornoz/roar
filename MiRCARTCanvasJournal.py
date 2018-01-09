@@ -55,14 +55,16 @@ class MiRCARTCanvasJournal():
     # }}}
     # {{{ pushCursor(self, patches): XXX
     def pushCursor(self, patches):
-        self.patchesCursor += patches
+        self.patchesCursor.append(patches)
     # }}}
     # {{{ pushDeltas(self, undoPatches, redoPatches): XXX
     def pushDeltas(self, undoPatches, redoPatches):
         if self.patchesUndoLevel > 0:
             del self.patchesUndo[0:self.patchesUndoLevel]
             self.patchesUndoLevel = 0
-        self.patchesUndo.insert(0, [undoPatches, redoPatches])
+        deltaItem = [undoPatches, redoPatches]
+        self.patchesUndo.insert(0, deltaItem)
+        return deltaItem
     # }}}
     # {{{ resetCursor(self): XXX
     def resetCursor(self):
@@ -71,6 +73,11 @@ class MiRCARTCanvasJournal():
     # {{{ resetUndo(self): XXX
     def resetUndo(self):
         self.patchesUndo = [None]; self.patchesUndoLevel = 0;
+    # }}}
+    # {{{ updateCurrentDeltas(self, undoPatches, redoPatches): XXX
+    def updateCurrentDeltas(self, undoPatches, redoPatches):
+        self.patchesUndo[0][0].append(undoPatches)
+        self.patchesUndo[0][1].append(redoPatches)
     # }}}
 
     #

@@ -39,8 +39,8 @@ class MiRCARTToolLine(MiRCARTTool):
     def _pointSwap(self, a, b):
         return [b, a]
     # }}}
-    # {{{ _getLine(self, brushColours, originPoint, targetPoint): XXX
-    def _getLine(self, brushColours, originPoint, targetPoint):
+    # {{{ _getLine(self, brushColours, eventDc, isCursor, originPoint, targetPoint, dispatchFn): XXX
+    def _getLine(self, brushColours, eventDc, isCursor, originPoint, targetPoint, dispatchFn):
         originPoint = originPoint.copy(); targetPoint = targetPoint.copy();
         pointDelta = self._pointDelta(originPoint, targetPoint)
         lineXSign = 1 if pointDelta[0] > 0 else -1;
@@ -52,21 +52,23 @@ class MiRCARTToolLine(MiRCARTTool):
             pointDelta = [pointDelta[1], pointDelta[0]]
             lineXX, lineXY, lineYX, lineYY = 0, lineYSign, lineXSign, 0
         lineD = 2 * pointDelta[1] - pointDelta[0]; lineY = 0;
-        linePatches = []
         for lineX in range(pointDelta[0] + 1):
-            linePatches.append([[                                   \
+            patch = [[                                              \
                     originPoint[0] + lineX*lineXX + lineY*lineYX,   \
                     originPoint[1] + lineX*lineXY + lineY*lineYY],  \
-                    brushColours, 0, " "])
+                    brushColours, 0, " "]
+            if isCursor:
+                dispatchFn(eventDc, False, patch); dispatchFn(eventDc, True, patch);
+            else:
+                dispatchFn(eventDc, True, patch)
             if lineD > 0:
                 lineD -= pointDelta[0]; lineY += 1;
             lineD += pointDelta[1]
-        return linePatches
     # }}}
 
     #
-    # onMouseEvent(self, event, atPoint, brushColours, brushSize, isDragging, isLeftDown, isRightDown): XXX
-    def onMouseEvent(self, event, atPoint, brushColours, brushSize, isDragging, isLeftDown, isRightDown):
+    # onMouseEvent(self, event, atPoint, brushColours, brushSize, isDragging, isLeftDown, isRightDown, dispatchFn, eventDc): XXX
+    def onMouseEvent(self, event, atPoint, brushColours, brushSize, isDragging, isLeftDown, isRightDown, dispatchFn, eventDc):
         brushColours = brushColours.copy()
         if isLeftDown:
             brushColours[1] = brushColours[0]
@@ -74,22 +76,19 @@ class MiRCARTToolLine(MiRCARTTool):
             brushColours[0] = brushColours[1]
         else:
             brushColours[1] = brushColours[0]
-        brushPatches = []; tmpPatches = [];
         if self.toolState == self.TS_NONE:
             if isLeftDown or isRightDown:
                 self.toolOriginPoint = list(atPoint)
                 self.toolState = self.TS_ORIGIN
-            tmpPatches.append([atPoint, brushColours, 0, " "])
-            return [[True, tmpPatches]]
+            dispatchFn(eventDc, True, [atPoint, brushColours, 0, " "])
         elif self.toolState == self.TS_ORIGIN:
             targetPoint = list(atPoint)
             originPoint = self.toolOriginPoint
-            brushPatches = self._getLine(brushColours, originPoint, targetPoint)
+            self._getLine(brushColours, eventDc,    \
+                isLeftDown or isRightDown,          \
+                originPoint, targetPoint, dispatchFn)
             if isLeftDown or isRightDown:
                 self.toolState = self.TS_NONE
-                return [[False, brushPatches], [True, brushPatches]]
-            else:
-                return [[True, brushPatches]]
 
     # __init__(self, *args): initialisation method
     def __init__(self, *args):
