@@ -71,7 +71,9 @@ class MiRCARTCanvas(wx.Panel):
     def onPanelKeyboardInput(self, event):
         eventDc, tmpDc = self.canvasBackend.getDeviceContexts(self)
         tool = self.canvasCurTool; mapPoint = self.brushPos;
-        if event.GetModifiers() != wx.MOD_NONE:
+        keyModifiers = event.GetModifiers()
+        if  keyModifiers != wx.MOD_NONE                             \
+        and keyModifiers != wx.MOD_SHIFT:
             event.Skip()
         else:
             patches = tool.onKeyboardEvent(                         \
