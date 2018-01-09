@@ -24,7 +24,8 @@
 
 from MiRCARTCanvasBackend import MiRCARTCanvasBackend
 from MiRCARTCanvasJournal import MiRCARTCanvasJournal
-from MiRCARTCanvasStore import MiRCARTCanvasStore, haveMiRCARTToPngFile, haveUrllib
+from MiRCARTCanvasExportStore import MiRCARTCanvasExportStore, haveMiRCARTToPngFile, haveUrllib
+from MiRCARTCanvasImportStore import MiRCARTCanvasImportStore
 from MiRCARTColours import MiRCARTColours
 import wx
 
@@ -33,7 +34,8 @@ class MiRCARTCanvas(wx.Panel):
     parentFrame = None
     canvasMap = canvasPos = canvasSize = None
     brushColours = brushPos = brushSize = None
-    canvasBackend = canvasCurTool = canvasJournal = canvasStore = None
+    canvasBackend = canvasCurTool = canvasJournal = None
+    canvasExportStore = canvasImportStore = None
 
     # {{{ _commitPatch(self, patch): XXX
     def _commitPatch(self, patch):
@@ -165,7 +167,8 @@ class MiRCARTCanvas(wx.Panel):
         self.canvasBackend = MiRCARTCanvasBackend(canvasSize, cellSize)
         self.canvasCurTool = None
         self.canvasJournal = MiRCARTCanvasJournal()
-        self.canvasStore = MiRCARTCanvasStore(parentCanvas=self)
+        self.canvasExportStore = MiRCARTCanvasExportStore(parentCanvas=self)
+        self.canvasImportStore = MiRCARTCanvasImportStore(parentCanvas=self)
 
         # Bind event handlers
         self.Bind(wx.EVT_CLOSE, self.onPanelClose)
