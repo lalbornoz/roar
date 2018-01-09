@@ -22,7 +22,7 @@
 # SOFTWARE.
 #
 
-import MiRCARTCanvasStore
+import MiRCARTCanvasImportStore
 from PIL import Image, ImageDraw, ImageFont
 import sys
 
@@ -128,7 +128,7 @@ class MiRCARTToPngFile:
 #
 # Entry point
 def main(*argv):
-    canvasStore = MiRCARTCanvasStore.MiRCARTCanvasStore(inFile=argv[1])
+    canvasStore = MiRCARTCanvasImportStore.MiRCARTCanvasImportStore(inFile=argv[1])
     MiRCARTToPngFile(canvasStore.outMap, *argv[3:]).export(argv[2])
 if __name__ == "__main__":
     if ((len(sys.argv) - 1) < 2)\
