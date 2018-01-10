@@ -23,6 +23,7 @@
 #
 
 from MiRCARTToolCircle import MiRCARTToolCircle
+from MiRCARTToolFill  import MiRCARTToolFill
 from MiRCARTToolLine import MiRCARTToolLine
 from MiRCARTToolSelectClone import MiRCARTToolSelectClone
 from MiRCARTToolSelectMove import MiRCARTToolSelectMove
@@ -262,6 +263,11 @@ class MiRCARTCanvasInterface():
     # {{{ canvasToolCircle(self, event): XXX
     def canvasToolCircle(self, event):
         self.canvasTool = MiRCARTToolCircle(self.parentCanvas)
+        self.parentFrame.onCanvasUpdate(toolName=self.canvasTool.name)
+    # }}}
+    # {{{ canvasToolFill(self, event): XXX
+    def canvasToolFill(self, event):
+        self.canvasTool = MiRCARTToolFill(self.parentCanvas)
         self.parentFrame.onCanvasUpdate(toolName=self.canvasTool.name)
     # }}}
     # {{{ canvasToolLine(self, event): XXX
