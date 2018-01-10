@@ -69,7 +69,7 @@ class MiRCARTCanvasInterface():
             self.parentCanvas.brushColours[0] = numColour
         elif event.GetEventType() == wx.wxEVT_TOOL_RCLICKED:
             self.parentCanvas.brushColours[1] = numColour
-        self.parentFrame.onStatusBarUpdate()
+        self.parentFrame.onCanvasUpdate(newColours=self.parentCanvas.brushColours)
     # }}}
     # {{{ canvasCopy(self, event): XXX
     def canvasCopy(self, event):
@@ -86,10 +86,19 @@ class MiRCARTCanvasInterface():
             self.parentCanvas.brushSize =        \
                 [a-1 for a in self.parentCanvas.brushSize]
     # }}}
-    # {{{ canvasDecrCanvas(self, event): XXX
-    def canvasDecrCanvas(self, event):
-        newCanvasSize = [a-1 if a > 1 else a for a in self.parentCanvas.canvasSize]
-        self._updateCanvasSize(newCanvasSize)
+    # {{{ canvasDecrCanvasHeight(self, event): XXX
+    def canvasDecrCanvasHeight(self, event):
+        if self.parentCanvas.canvasSize[1] > 1:
+            self._updateCanvasSize([                        \
+                    self.parentCanvas.canvasSize[0],        \
+                    self.parentCanvas.canvasSize[1]-1])
+    # }}}
+    # {{{ canvasDecrCanvasWidth(self, event): XXX
+    def canvasDecrCanvasWidth(self, event):
+        if self.parentCanvas.canvasSize[0] > 1:
+            self._updateCanvasSize([                        \
+                    self.parentCanvas.canvasSize[0]-1,        \
+                    self.parentCanvas.canvasSize[1]])
     # }}}
     # {{{ canvasDelete(self, event): XXX
     def canvasDelete(self, event):
@@ -157,10 +166,17 @@ class MiRCARTCanvasInterface():
         self.parentCanvas.brushSize =    \
                 [a+1 for a in self.parentCanvas.brushSize]
     # }}}
-    # {{{ canvasIncrCanvas(self, event): XXX
-    def canvasIncrCanvas(self, event):
-        newCanvasSize = [a+1 for a in self.parentCanvas.canvasSize]
-        self._updateCanvasSize(newCanvasSize)
+    # {{{ canvasIncrCanvasHeight(self, event): XXX
+    def canvasIncrCanvasHeight(self, event):
+        self._updateCanvasSize([                \
+            self.parentCanvas.canvasSize[0],    \
+            self.parentCanvas.canvasSize[1]+1])
+    # }}}
+    # {{{ canvasIncrCanvasWidth(self, event): XXX
+    def canvasIncrCanvasWidth(self, event):
+        self._updateCanvasSize([                \
+            self.parentCanvas.canvasSize[0]+1,  \
+            self.parentCanvas.canvasSize[1]])
     # }}}
     # {{{ canvasNew(self, event, newCanvasSize=None): XXX
     def canvasNew(self, event, newCanvasSize=None):
@@ -178,8 +194,8 @@ class MiRCARTCanvasInterface():
         self.parentCanvas.canvasImportStore.importNew(newCanvasSize)
         self.canvasPathName = None
         self.parentCanvas.SetCursor(wx.Cursor(wx.NullCursor))
-        self.parentFrame.onStatusBarUpdate()
-        self.parentFrame.onUndoUpdate()
+        self.parentFrame.onCanvasUpdate(    \
+            newPathName="", newUndoLevel=-1)
     # }}}
     # {{{ canvasOpen(self, event): XXX
     def canvasOpen(self, event):
@@ -201,8 +217,8 @@ class MiRCARTCanvasInterface():
                 self.parentCanvas.canvasImportStore.importTextFile(self.canvasPathName)
                 self.parentCanvas.canvasImportStore.importIntoPanel()
                 self.parentCanvas.SetCursor(wx.Cursor(wx.NullCursor))
-                self.parentFrame.onStatusBarUpdate(showFileName=self.canvasPathName)
-                self.parentFrame.onUndoUpdate()
+                self.parentFrame.onCanvasUpdate(                        \
+                    newPathName=self.canvasPathName, newUndoLevel=-1)
                 return True
     # }}}
     # {{{ canvasPaste(self, event): XXX
