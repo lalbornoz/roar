@@ -163,7 +163,8 @@ class MiRCARTCanvas(wx.Panel):
         self.parentFrame = parentFrame
         self.canvasMap = None; self.canvasPos = canvasPos; self.canvasSize = canvasSize;
         self.brushColours = [4, 1]; self.brushPos = [0, 0]; self.brushSize = [1, 1];
-        self.parentFrame.onCanvasUpdate(newColours=self.brushColours)
+        self.parentFrame.onCanvasUpdate(                    \
+            newBrushSize=self.brushSize, newColours=self.brushColours)
         self.canvasBackend = MiRCARTCanvasBackend(canvasSize, cellSize)
         self.canvasJournal = MiRCARTCanvasJournal()
         self.canvasExportStore = MiRCARTCanvasExportStore(parentCanvas=self)
