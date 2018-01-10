@@ -203,12 +203,14 @@ class MiRCARTFrame(MiRCARTGeneralFrame):
     # }}}
 
     #
-    # __init__(self, parent, appSize=(840, 630), canvasPos=(25, 50), canvasSize=(125, 35), cellSize=(7, 14)): initialisation method
-    def __init__(self, parent, appSize=(840, 630), canvasPos=(25, 50), canvasSize=(125, 35), cellSize=(7, 14)):
+    # __init__(self, parent, appSize=(840, 630), defaultCanvasPos=(25, 50), defaultCanvasSize=(100, 30), defaultCellSize=(7, 14)): initialisation method
+    def __init__(self, parent, appSize=(840, 630), defaultCanvasPos=(25, 50), defaultCanvasSize=(100, 30), defaultCellSize=(7, 14)):
         self._initPaletteToolBitmaps()
         panelSkin = super().__init__(parent, wx.ID_ANY, "MiRCART", size=appSize)
         self.panelCanvas = MiRCARTCanvas(panelSkin, parentFrame=self,   \
-            canvasPos=canvasPos, canvasSize=canvasSize, cellSize=cellSize)
+            defaultCanvasPos=defaultCanvasPos,                          \
+            defaultCanvasSize=defaultCanvasSize,                        \
+            defaultCellSize=defaultCellSize)
         self.panelCanvas.canvasInterface.canvasNew(None)
 
 # vim:expandtab foldmethod=marker sw=4 ts=4 tw=120

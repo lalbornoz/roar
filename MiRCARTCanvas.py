@@ -32,6 +32,7 @@ import wx
 class MiRCARTCanvas(wx.Panel):
     """XXX"""
     parentFrame = None
+    defaultCanvasPos = defaultCanvasSize = defaultCellSize = None
     canvasMap = canvasPos = canvasSize = None
     brushColours = brushPos = brushSize = None
     canvasBackend = canvasJournal = None
@@ -155,17 +156,19 @@ class MiRCARTCanvas(wx.Panel):
     # }}}
 
     #
-    # _init__(self, parent, parentFrame, canvasPos, canvasSize, cellSize): initialisation method
-    def __init__(self, parent, parentFrame, canvasPos, canvasSize, cellSize):
-        super().__init__(parent, pos=canvasPos,             \
-            size=[w*h for w,h in zip(canvasSize, cellSize)])
+    # _init__(self, parent, parentFrame, defaultCanvasPos, defaultCanvasSize, defaultCellSize): initialisation method
+    def __init__(self, parent, parentFrame, defaultCanvasPos, defaultCanvasSize, defaultCellSize):
+        super().__init__(parent, pos=defaultCanvasPos,      \
+            size=[w*h for w,h in zip(defaultCanvasSize, defaultCellSize)])
 
         self.parentFrame = parentFrame
-        self.canvasMap = None; self.canvasPos = canvasPos; self.canvasSize = canvasSize;
+        self.canvasMap = None
+        self.canvasPos = defaultCanvasPos; self.canvasSize = defaultCanvasSize;
+        self.defaultCanvasPos = defaultCanvasPos; self.defaultCanvasSize = defaultCanvasSize;
         self.brushColours = [4, 1]; self.brushPos = [0, 0]; self.brushSize = [1, 1];
         self.parentFrame.onCanvasUpdate(                    \
             brushSize=self.brushSize, colours=self.brushColours)
-        self.canvasBackend = MiRCARTCanvasBackend(canvasSize, cellSize)
+        self.canvasBackend = MiRCARTCanvasBackend(defaultCanvasSize, defaultCellSize)
         self.canvasJournal = MiRCARTCanvasJournal()
         self.canvasExportStore = MiRCARTCanvasExportStore(parentCanvas=self)
         self.canvasImportStore = MiRCARTCanvasImportStore(parentCanvas=self)

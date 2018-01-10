@@ -192,7 +192,7 @@ class MiRCARTCanvasInterface():
                 self.canvasSave()
         self.parentCanvas.SetCursor(wx.Cursor(wx.CURSOR_WAIT))
         if newCanvasSize == None:
-            newCanvasSize = (100, 30)
+            newCanvasSize = list(self.parentCanvas.defaultCanvasSize)
         self.parentCanvas.canvasImportStore.importNew(newCanvasSize)
         self.canvasPathName = None
         self.parentCanvas.SetCursor(wx.Cursor(wx.NullCursor))
