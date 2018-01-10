@@ -27,7 +27,7 @@ from MiRCARTTool import MiRCARTTool
 class MiRCARTToolLine(MiRCARTTool):
     """XXX"""
     name = "Line"
-    toolOriginPoint = toolState = None
+    toolColours = toolOriginPoint = toolState = None
 
     TS_NONE     = 0
     TS_ORIGIN   = 1
@@ -80,21 +80,25 @@ class MiRCARTToolLine(MiRCARTTool):
             brushColours[1] = brushColours[0]
         if self.toolState == self.TS_NONE:
             if isLeftDown or isRightDown:
+                self.toolColours = brushColours
                 self.toolOriginPoint = list(atPoint)
                 self.toolState = self.TS_ORIGIN
             dispatchFn(eventDc, True, [atPoint, brushColours, 0, " "])
         elif self.toolState == self.TS_ORIGIN:
             targetPoint = list(atPoint)
             originPoint = self.toolOriginPoint
-            self._getLine(brushColours, brushSize,  \
-                eventDc, isLeftDown or isRightDown, \
+            self._getLine(self.toolColours, brushSize,  \
+                eventDc, isLeftDown or isRightDown,     \
                 originPoint, targetPoint, dispatchFn)
             if isLeftDown or isRightDown:
+                self.toolColours = None
+                self.toolOriginPoint = None
                 self.toolState = self.TS_NONE
 
     # __init__(self, *args): initialisation method
     def __init__(self, *args):
         super().__init__(*args)
+        self.toolColours = None
         self.toolOriginPoint = None
         self.toolState = self.TS_NONE
 
