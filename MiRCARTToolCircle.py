@@ -26,6 +26,7 @@ from MiRCARTTool import MiRCARTTool
 
 class MiRCARTToolCircle(MiRCARTTool):
     """XXX"""
+    name = "Circle"
 
     #
     # onMouseEvent(self, event, atPoint, brushColours, brushSize, isDragging, isLeftDown, isRightDown, dispatchFn, eventDc): XXX
