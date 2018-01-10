@@ -37,12 +37,14 @@ TID_TOOLBAR         = (0x007)
 #
 # Non-items
 NID_MENU_SEP        = (0x200, TID_NOTHING)
-NID_TOOLBAR_SEP     = (0x201, TID_NOTHING)
+NID_TOOLBAR_HSEP    = (0x201, TID_NOTHING)
+NID_TOOLBAR_VSEP    = (0x202, TID_NOTHING)
 
 class MiRCARTGeneralFrame(wx.Frame):
     """XXX"""
     itemsById = menuItemsById = toolBarItemsById = None
-    statusBar = toolBar = None
+    statusBar = toolBars = None
+    panelSkin = sizerSkin = None
 
     # {{{ _initAccelTable(self, accelsDescr): XXX
     def _initAccelTable(self, accelsDescr):
@@ -83,28 +85,41 @@ class MiRCARTGeneralFrame(wx.Frame):
     # {{{ _initToolBars(self, toolBarsDescr, panelSkin): XXX
     def _initToolBars(self, toolBarsDescr, panelSkin):
         self.toolBarItemsById = {}
-        self.toolBar = wx.ToolBar(panelSkin, -1,            \
-            style=wx.HORIZONTAL|wx.TB_FLAT|wx.TB_NODIVIDER)
-        self.toolBar.SetToolBitmapSize((16,16))
+        self.sizerSkin = wx.BoxSizer(wx.VERTICAL)
+        self.toolBars = [None]; numToolBar = 0;
         for toolBarItem in toolBarsDescr[2]:
-            if toolBarItem == NID_TOOLBAR_SEP:
-                self.toolBar.AddSeparator()
+            if self.toolBars[numToolBar] == None:
+                self.toolBars[numToolBar] =                 \
+                    wx.ToolBar(panelSkin, -1,               \
+                        style=wx.HORIZONTAL|wx.TB_FLAT|wx.TB_NODIVIDER)
+                self.toolBars[numToolBar].SetToolBitmapSize((16,16))
+            if toolBarItem == NID_TOOLBAR_HSEP:
+                self.toolBars[numToolBar].AddSeparator()
+            elif toolBarItem == NID_TOOLBAR_VSEP:
+                numToolBar += 1; self.toolBars.append(None);
             else:
                 self.itemsById[toolBarItem[0]] = toolBarItem
-                toolBarItemWindow = self.toolBar.AddTool(   \
-                    toolBarItem[0], toolBarItem[2], toolBarItem[4][2])
+                toolBarItemWindow =                         \
+                    self.toolBars[numToolBar].AddTool(      \
+                        toolBarItem[0], toolBarItem[2],     \
+                        toolBarItem[4][2])
                 self.toolBarItemsById[toolBarItem[0]] = toolBarItemWindow
                 if  toolBarItem[6] != None                  \
                 and toolBarItem[1] == TID_COMMAND:
                     toolBarItemWindow.Enable(toolBarItem[6])
                 self.Bind(wx.EVT_TOOL, self.onInput, toolBarItemWindow)
                 self.Bind(wx.EVT_TOOL_RCLICKED, self.onInput, toolBarItemWindow)
-        self.toolBar.Realize(); self.toolBar.Fit();
+        for numToolBar in range(len(self.toolBars)):
+            self.sizerSkin.Add(                          \
+                self.toolBars[numToolBar], 0, wx.ALIGN_LEFT, 4)
+            self.toolBars[numToolBar].Realize()
+            self.toolBars[numToolBar].Fit()
     # }}}
     # {{{ _initToolBitmaps(self, toolBarsDescr): XXX
     def _initToolBitmaps(self, toolBarsDescr):
         for toolBarItem in toolBarsDescr[2]:
-            if toolBarItem == NID_TOOLBAR_SEP:
+            if toolBarItem == NID_TOOLBAR_HSEP                          \
+            or toolBarItem == NID_TOOLBAR_VSEP:
                 continue
             elif toolBarItem[4] == None:
                 toolBarItem[4] = ["", None, wx.ArtProvider.GetBitmap(   \
