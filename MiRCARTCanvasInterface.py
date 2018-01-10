@@ -24,6 +24,8 @@
 
 from MiRCARTToolCircle import MiRCARTToolCircle
 from MiRCARTToolLine import MiRCARTToolLine
+from MiRCARTToolSelectClone import MiRCARTToolSelectClone
+from MiRCARTToolSelectMove import MiRCARTToolSelectMove
 from MiRCARTToolRect import MiRCARTToolRect
 from MiRCARTToolText import MiRCARTToolText
                 
@@ -265,6 +267,16 @@ class MiRCARTCanvasInterface():
     # {{{ canvasToolLine(self, event): XXX
     def canvasToolLine(self, event):
         self.canvasTool = MiRCARTToolLine(self.parentCanvas)
+        self.parentFrame.onCanvasUpdate(toolName=self.canvasTool.name)
+    # }}}
+    # {{{ canvasToolSelectClone(self, event): XXX
+    def canvasToolSelectClone(self, event):
+        self.canvasTool = MiRCARTToolSelectClone(self.parentCanvas)
+        self.parentFrame.onCanvasUpdate(toolName=self.canvasTool.name)
+    # }}}
+    # {{{ canvasToolSelectMove(self, event): XXX
+    def canvasToolSelectMove(self, event):
+        self.canvasTool = MiRCARTToolSelectMove(self.parentCanvas)
         self.parentFrame.onCanvasUpdate(toolName=self.canvasTool.name)
     # }}}
     # {{{ canvasToolRect(self, event): XXX

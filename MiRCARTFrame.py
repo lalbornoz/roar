@@ -72,6 +72,8 @@ class MiRCARTFrame(MiRCARTGeneralFrame):
     CID_CIRCLE          = [0x151, TID_SELECT,  "Circle", "&Circle",             ["toolCircle.png"],         [wx.ACCEL_CTRL, ord("C")],  False,          MiRCARTCanvasInterface.canvasToolCircle]
     CID_LINE            = [0x152, TID_SELECT,  "Line", "&Line",                 ["toolLine.png"],           [wx.ACCEL_CTRL, ord("L")],  False,          MiRCARTCanvasInterface.canvasToolLine]
     CID_TEXT            = [0x153, TID_SELECT,  "Text", "&Text",                 ["toolText.png"],           [wx.ACCEL_CTRL, ord("T")],  False,          MiRCARTCanvasInterface.canvasToolText]
+    CID_CLONE_SELECT    = [0x154, TID_SELECT,  "Clone", "Cl&one",               ["toolClone.png"],          [wx.ACCEL_CTRL, ord("E")],  False,          MiRCARTCanvasInterface.canvasToolSelectClone]
+    CID_MOVE_SELECT     = [0x155, TID_SELECT,  "Move", "&Move",                 ["toolMove.png"],           [wx.ACCEL_CTRL, ord("M")],  False,          MiRCARTCanvasInterface.canvasToolSelectMove]
 
     CID_COLOUR00        = [0x1a0, TID_COMMAND, "Colour #00", "Colour #00",      None,                       None,                       None,           MiRCARTCanvasInterface.canvasColour]
     CID_COLOUR01        = [0x1a1, TID_COMMAND, "Colour #01", "Colour #01",      None,                       None,                       None,           MiRCARTCanvasInterface.canvasColour]
@@ -91,35 +93,36 @@ class MiRCARTFrame(MiRCARTGeneralFrame):
     CID_COLOUR15        = [0x1af, TID_COMMAND, "Colour #15", "Colour #15",      None,                       None,                       None,           MiRCARTCanvasInterface.canvasColour]
     # }}}
     # {{{ Menus
-    MID_FILE            = (0x300, TID_MENU, "File", "&File", (                                  \
-        CID_NEW, CID_OPEN, CID_SAVE, CID_SAVEAS, NID_MENU_SEP,                                  \
-        CID_EXPORT_AS_PNG, CID_EXPORT_IMGUR, CID_EXPORT_PASTEBIN, NID_MENU_SEP,                 \
+    MID_FILE            = (0x300, TID_MENU, "File", "&File", (                                          \
+        CID_NEW, CID_OPEN, CID_SAVE, CID_SAVEAS, NID_MENU_SEP,                                          \
+        CID_EXPORT_AS_PNG, CID_EXPORT_IMGUR, CID_EXPORT_PASTEBIN, NID_MENU_SEP,                         \
         CID_EXIT))
-    MID_EDIT            = (0x301, TID_MENU, "Edit", "&Edit", (                                  \
-        CID_UNDO, CID_REDO, NID_MENU_SEP,                                                       \
-        CID_CUT, CID_COPY, CID_PASTE, CID_DELETE, NID_MENU_SEP,                                 \
-        CID_INCRW_CANVAS, CID_DECRW_CANVAS, CID_INCRH_CANVAS, CID_DECRH_CANVAS, NID_MENU_SEP,   \
+    MID_EDIT            = (0x301, TID_MENU, "Edit", "&Edit", (                                          \
+        CID_UNDO, CID_REDO, NID_MENU_SEP,                                                               \
+        CID_CUT, CID_COPY, CID_PASTE, CID_DELETE, NID_MENU_SEP,                                         \
+        CID_INCRW_CANVAS, CID_DECRW_CANVAS, CID_INCRH_CANVAS, CID_DECRH_CANVAS, NID_MENU_SEP,           \
         CID_INCR_BRUSH, CID_DECR_BRUSH, CID_SOLID_BRUSH))
-    MID_TOOLS           = (0x302, TID_MENU, "Tools", "&Tools", (                                \
-        CID_RECT, CID_CIRCLE, CID_LINE, CID_TEXT))
+    MID_TOOLS           = (0x302, TID_MENU, "Tools", "&Tools", (                                        \
+        CID_RECT, CID_CIRCLE, CID_LINE, CID_TEXT, CID_CLONE_SELECT, CID_MOVE_SELECT))
     # }}}
     # {{{ Toolbars
-    BID_TOOLBAR         = (0x400, TID_TOOLBAR, (                                                \
-        CID_NEW, CID_OPEN, CID_SAVE, CID_SAVEAS, NID_TOOLBAR_SEP,                               \
-        CID_UNDO, CID_REDO, NID_TOOLBAR_SEP,                                                    \
-        CID_CUT, CID_COPY, CID_PASTE, CID_DELETE, NID_TOOLBAR_SEP,                              \
-        CID_INCR_BRUSH, CID_DECR_BRUSH, NID_TOOLBAR_SEP,                                        \
-        CID_RECT, CID_CIRCLE, CID_LINE, CID_TEXT, NID_TOOLBAR_SEP,                              \
-        CID_COLOUR00, CID_COLOUR01, CID_COLOUR02, CID_COLOUR03, CID_COLOUR04,                   \
-        CID_COLOUR05, CID_COLOUR06, CID_COLOUR07, CID_COLOUR08, CID_COLOUR09,                   \
-        CID_COLOUR10, CID_COLOUR11, CID_COLOUR12, CID_COLOUR13, CID_COLOUR14,                   \
+    BID_TOOLBAR         = (0x400, TID_TOOLBAR, (                                                        \
+        CID_NEW, CID_OPEN, CID_SAVE, CID_SAVEAS, NID_TOOLBAR_SEP,                                       \
+        CID_UNDO, CID_REDO, NID_TOOLBAR_SEP,                                                            \
+        CID_CUT, CID_COPY, CID_PASTE, CID_DELETE, NID_TOOLBAR_SEP,                                      \
+        CID_INCR_BRUSH, CID_DECR_BRUSH, NID_TOOLBAR_SEP,                                                \
+        CID_RECT, CID_CIRCLE, CID_LINE, CID_TEXT, CID_CLONE_SELECT, CID_MOVE_SELECT, NID_TOOLBAR_SEP,   \
+        CID_COLOUR00, CID_COLOUR01, CID_COLOUR02, CID_COLOUR03, CID_COLOUR04,                           \
+        CID_COLOUR05, CID_COLOUR06, CID_COLOUR07, CID_COLOUR08, CID_COLOUR09,                           \
+        CID_COLOUR10, CID_COLOUR11, CID_COLOUR12, CID_COLOUR13, CID_COLOUR14,                           \
         CID_COLOUR15))
     # }}}
     # {{{ Accelerators (hotkeys)
-    AID_EDIT            = (0x500, TID_ACCELS, (                                                 \
-        CID_NEW, CID_OPEN, CID_SAVE, CID_UNDO, CID_REDO,                                        \
-        CID_INCRW_CANVAS, CID_DECRW_CANVAS, CID_INCRH_CANVAS, CID_DECRH_CANVAS,                 \
-        CID_INCR_BRUSH, CID_DECR_BRUSH))
+    AID_EDIT            = (0x500, TID_ACCELS, (                                                         \
+        CID_NEW, CID_OPEN, CID_SAVE, CID_UNDO, CID_REDO,                                                \
+        CID_INCRW_CANVAS, CID_DECRW_CANVAS, CID_INCRH_CANVAS, CID_DECRH_CANVAS,                         \
+        CID_INCR_BRUSH, CID_DECR_BRUSH,                                                                 \
+        CID_RECT, CID_CIRCLE, CID_LINE, CID_TEXT, CID_CLONE_SELECT, CID_MOVE_SELECT))
     # }}}
     # {{{ Lists
     LID_ACCELS          = (0x600, TID_LIST, (AID_EDIT))
