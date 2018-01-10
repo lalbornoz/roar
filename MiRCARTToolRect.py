@@ -26,6 +26,7 @@ from MiRCARTTool import MiRCARTTool
 
 class MiRCARTToolRect(MiRCARTTool):
     """XXX"""
+    name = "Rectangle"
 
     #
     # onMouseEvent(self, event, atPoint, brushColours, brushSize, isDragging, isLeftDown, isRightDown, dispatchFn, eventDc): XXX

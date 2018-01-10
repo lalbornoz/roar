@@ -261,18 +261,22 @@ class MiRCARTCanvasInterface():
     # {{{ canvasToolCircle(self, event): XXX
     def canvasToolCircle(self, event):
         self.canvasTool = MiRCARTToolCircle(self.parentCanvas)
+        self.parentFrame.onCanvasUpdate(newToolName=self.canvasTool.name)
     # }}}
     # {{{ canvasToolLine(self, event): XXX
     def canvasToolLine(self, event):
         self.canvasTool = MiRCARTToolLine(self.parentCanvas)
+        self.parentFrame.onCanvasUpdate(newToolName=self.canvasTool.name)
     # }}}
     # {{{ canvasToolRect(self, event): XXX
     def canvasToolRect(self, event):
         self.canvasTool = MiRCARTToolRect(self.parentCanvas)
+        self.parentFrame.onCanvasUpdate(newToolName=self.canvasTool.name)
     # }}}
     # {{{ canvasToolText(self, event): XXX
     def canvasToolText(self, event):
         self.canvasTool = MiRCARTToolText(self.parentCanvas)
+        self.parentFrame.onCanvasUpdate(newToolName=self.canvasTool.name)
     # }}}
     # {{{ canvasUndo(self, event): XXX
     def canvasUndo(self, event):

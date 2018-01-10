@@ -27,6 +27,7 @@ import wx
 
 class MiRCARTToolText(MiRCARTTool):
     """XXX"""
+    name = "Text"
     textColours = textPos = None
 
     #
