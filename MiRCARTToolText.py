@@ -23,7 +23,7 @@
 #
 
 from MiRCARTTool import MiRCARTTool
-import string, wx
+import wx
 
 class MiRCARTToolText(MiRCARTTool):
     """XXX"""
@@ -35,8 +35,6 @@ class MiRCARTToolText(MiRCARTTool):
         keyModifiers = event.GetModifiers()
         if  keyModifiers != wx.MOD_NONE     \
         and keyModifiers != wx.MOD_SHIFT:
-            return True
-        elif not keyChar in string.printable:
             return True
         else:
             if self.textColours == None:
