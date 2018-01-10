@@ -48,7 +48,7 @@ class MiRCARTCanvas(wx.Panel):
         for patch in deltaPatches:
             if self.canvasBackend.drawPatch(eventDc, patch):
                 self._commitPatch(patch)
-        self.parentFrame.onCanvasUpdate(newUndoLevel=self.canvasJournal.patchesUndoLevel)
+        self.parentFrame.onCanvasUpdate(undoLevel=self.canvasJournal.patchesUndoLevel)
     # }}}
     # {{{ _dispatchPatch(self, eventDc, isCursor, patch): XXX
     def _dispatchPatch(self, eventDc, isCursor, patch):
@@ -98,10 +98,10 @@ class MiRCARTCanvas(wx.Panel):
                 event.Dragging(), event.LeftIsDown(), event.RightIsDown(),  \
                 self._dispatchPatch, eventDc)
         if self._canvasDirty:
-            self.parentFrame.onCanvasUpdate(newCellPos=self.brushPos,       \
-                newUndoLevel=self.canvasJournal.patchesUndoLevel)
+            self.parentFrame.onCanvasUpdate(cellPos=self.brushPos,          \
+                undoLevel=self.canvasJournal.patchesUndoLevel)
         if eventType == wx.wxEVT_MOTION:
-            self.parentFrame.onCanvasUpdate(newCellPos=mapPoint)
+            self.parentFrame.onCanvasUpdate(cellPos=mapPoint)
     # }}}
     # {{{ onPanelLeaveWindow(self, event): XXX
     def onPanelLeaveWindow(self, event):
@@ -151,7 +151,7 @@ class MiRCARTCanvas(wx.Panel):
             self.canvasBackend.reset(self.canvasSize, self.canvasBackend.cellSize)
             self.canvasJournal.resetCursor(); self.canvasJournal.resetUndo();
             self.parentFrame.onCanvasUpdate(                \
-                newSize=self.canvasSize, newUndoLevel=-1)
+                size=self.canvasSize, undoLevel=-1)
     # }}}
 
     #
@@ -164,7 +164,7 @@ class MiRCARTCanvas(wx.Panel):
         self.canvasMap = None; self.canvasPos = canvasPos; self.canvasSize = canvasSize;
         self.brushColours = [4, 1]; self.brushPos = [0, 0]; self.brushSize = [1, 1];
         self.parentFrame.onCanvasUpdate(                    \
-            newBrushSize=self.brushSize, newColours=self.brushColours)
+            brushSize=self.brushSize, colours=self.brushColours)
         self.canvasBackend = MiRCARTCanvasBackend(canvasSize, cellSize)
         self.canvasJournal = MiRCARTCanvasJournal()
         self.canvasExportStore = MiRCARTCanvasExportStore(parentCanvas=self)
