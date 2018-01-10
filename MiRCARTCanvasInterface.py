@@ -85,6 +85,7 @@ class MiRCARTCanvasInterface():
         and self.parentCanvas.brushSize[1] > 1:
             self.parentCanvas.brushSize =        \
                 [a-1 for a in self.parentCanvas.brushSize]
+            self.parentFrame.onCanvasUpdate(newBrushSize=self.parentCanvas.brushSize)
     # }}}
     # {{{ canvasDecrCanvasHeight(self, event): XXX
     def canvasDecrCanvasHeight(self, event):
@@ -165,6 +166,7 @@ class MiRCARTCanvasInterface():
     def canvasIncrBrush(self, event):
         self.parentCanvas.brushSize =    \
                 [a+1 for a in self.parentCanvas.brushSize]
+        self.parentFrame.onCanvasUpdate(newBrushSize=self.parentCanvas.brushSize)
     # }}}
     # {{{ canvasIncrCanvasHeight(self, event): XXX
     def canvasIncrCanvasHeight(self, event):
