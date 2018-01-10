@@ -42,18 +42,20 @@ NID_TOOLBAR_VSEP    = (0x202, TID_NOTHING)
 
 class MiRCARTGeneralFrame(wx.Frame):
     """XXX"""
-    itemsById = menuItemsById = toolBarItemsById = None
+    accelItemsById = itemsById = menuItemsById = toolBarItemsById = None
     statusBar = toolBars = None
     panelSkin = sizerSkin = None
 
     # {{{ _initAccelTable(self, accelsDescr): XXX
     def _initAccelTable(self, accelsDescr):
         accelTableEntries = [wx.AcceleratorEntry() for n in range(len(accelsDescr[2]))]
+        self.accelItemsById = {}
         for numAccel in range(len(accelsDescr[2])):
             accelDescr = accelsDescr[2][numAccel]
             if accelDescr[5] != None:
                 self.itemsById[accelDescr[0]] = accelDescr
                 accelTableEntries[numAccel].Set(*accelDescr[5], accelDescr[0])
+                self.accelItemsById[accelDescr[0]] = accelTableEntries[numAccel]
                 self.Bind(wx.EVT_MENU, self.onInput, id=accelDescr[0])
         return accelTableEntries
     # }}}
@@ -68,6 +70,8 @@ class MiRCARTGeneralFrame(wx.Frame):
                 elif menuItem[1] == TID_SELECT:
                     self.itemsById[menuItem[0]] = menuItem
                     menuItemWindow = menuWindow.AppendRadioItem(menuItem[0], menuItem[3], menuItem[2])
+                    if menuItem[5] != None:
+                        menuItemWindow.SetAccel(self.accelItemsById[menuItem[0]])
                     self.menuItemsById[menuItem[0]] = menuItemWindow
                     self.Bind(wx.EVT_MENU, self.onInput, menuItemWindow)
                     if menuItem[6] != None:
@@ -75,6 +79,8 @@ class MiRCARTGeneralFrame(wx.Frame):
                 else:
                     self.itemsById[menuItem[0]] = menuItem
                     menuItemWindow = menuWindow.Append(menuItem[0], menuItem[3], menuItem[2])
+                    if menuItem[5] != None:
+                        menuItemWindow.SetAccel(self.accelItemsById[menuItem[0]])
                     self.menuItemsById[menuItem[0]] = menuItemWindow
                     self.Bind(wx.EVT_MENU, self.onInput, menuItemWindow)
                     if menuItem[6] != None:
@@ -150,17 +156,17 @@ class MiRCARTGeneralFrame(wx.Frame):
         super().__init__(*args, **kwargs); self.itemsById = {};
         panelSkin = wx.Panel(self, wx.ID_ANY)
 
+        # Initialise accelerators (hotkeys)
+        accelTable = wx.AcceleratorTable(                   \
+            self._initAccelTable(self.LID_ACCELS[2]))
+        self.SetAcceleratorTable(accelTable)
+
         # Initialise menu bar, menus & menu items
         # Initialise toolbar & toolbar items
         menuBar = self._initMenus(self.LID_MENUS[2])
         self.SetMenuBar(menuBar)
         self._initToolBitmaps(self.LID_TOOLBARS[2])
         toolBar = self._initToolBars(self.LID_TOOLBARS[2], panelSkin)
-
-        # Initialise accelerators (hotkeys)
-        accelTable = wx.AcceleratorTable(                   \
-            self._initAccelTable(self.LID_ACCELS[2]))
-        self.SetAcceleratorTable(accelTable)
 
         # Initialise status bar
         self.statusBar = self.CreateStatusBar()
