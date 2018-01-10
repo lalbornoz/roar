@@ -221,7 +221,7 @@ class MiRCARTFrame(MiRCARTGeneralFrame):
             defaultCellSize=defaultCellSize)
         self.panelCanvas.canvasInterface.canvasNew(None)
         self.sizerSkin.AddSpacer(5)
-        self.sizerSkin.Add(self.panelCanvas, wx.ALL|wx.EXPAND)
+        self.sizerSkin.Add(self.panelCanvas, 0, wx.ALL|wx.EXPAND, 14)
         self.panelSkin.SetSizer(self.sizerSkin)
         self.panelSkin.SetAutoLayout(1)
         self.sizerSkin.Fit(self.panelSkin)
