@@ -39,8 +39,8 @@ class MiRCARTToolLine(MiRCARTTool):
     def _pointSwap(self, a, b):
         return [b, a]
     # }}}
-    # {{{ _getLine(self, brushColours, eventDc, isCursor, originPoint, targetPoint, dispatchFn): XXX
-    def _getLine(self, brushColours, eventDc, isCursor, originPoint, targetPoint, dispatchFn):
+    # {{{ _getLine(self, brushColours, brushSize, eventDc, isCursor, originPoint, targetPoint, dispatchFn): XXX
+    def _getLine(self, brushColours, brushSize, eventDc, isCursor, originPoint, targetPoint, dispatchFn):
         originPoint = originPoint.copy(); targetPoint = targetPoint.copy();
         pointDelta = self._pointDelta(originPoint, targetPoint)
         lineXSign = 1 if pointDelta[0] > 0 else -1;
@@ -53,14 +53,15 @@ class MiRCARTToolLine(MiRCARTTool):
             lineXX, lineXY, lineYX, lineYY = 0, lineYSign, lineXSign, 0
         lineD = 2 * pointDelta[1] - pointDelta[0]; lineY = 0;
         for lineX in range(pointDelta[0] + 1):
-            patch = [[                                              \
-                    originPoint[0] + lineX*lineXX + lineY*lineYX,   \
-                    originPoint[1] + lineX*lineXY + lineY*lineYY],  \
-                    brushColours, 0, " "]
-            if isCursor:
-                dispatchFn(eventDc, False, patch); dispatchFn(eventDc, True, patch);
-            else:
-                dispatchFn(eventDc, True, patch)
+            for brushStep in range(brushSize[0]):
+                patch = [[                                                          \
+                        originPoint[0] + lineX*lineXX + lineY*lineYX + brushStep,   \
+                        originPoint[1] + lineX*lineXY + lineY*lineYY],              \
+                        brushColours, 0, " "]
+                if isCursor:
+                    dispatchFn(eventDc, False, patch); dispatchFn(eventDc, True, patch);
+                else:
+                    dispatchFn(eventDc, True, patch)
             if lineD > 0:
                 lineD -= pointDelta[0]; lineY += 1;
             lineD += pointDelta[1]
@@ -84,8 +85,8 @@ class MiRCARTToolLine(MiRCARTTool):
         elif self.toolState == self.TS_ORIGIN:
             targetPoint = list(atPoint)
             originPoint = self.toolOriginPoint
-            self._getLine(brushColours, eventDc,    \
-                isLeftDown or isRightDown,          \
+            self._getLine(brushColours, brushSize,  \
+                eventDc, isLeftDown or isRightDown, \
                 originPoint, targetPoint, dispatchFn)
             if isLeftDown or isRightDown:
                 self.toolState = self.TS_NONE
