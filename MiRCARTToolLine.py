@@ -26,6 +26,7 @@ from MiRCARTTool import MiRCARTTool
 
 class MiRCARTToolLine(MiRCARTTool):
     """XXX"""
+    name = "Line"
     toolOriginPoint = toolState = None
 
     TS_NONE     = 0

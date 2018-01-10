@@ -34,7 +34,7 @@ import os, wx
 class MiRCARTFrame(MiRCARTGeneralFrame):
     """XXX"""
     panelCanvas = None
-    lastBrushSize = lastCellPos = lastColours = lastPathName = lastSize = lastUndoLevel = None
+    lastBrushSize = lastCellPos = lastColours = lastPathName = lastSize = lastToolName = lastUndoLevel = None
 
     # {{{ Commands
     #                      Id     Type Id      Labels                           Icon bitmap                 Accelerator                 [Initial state]
@@ -158,8 +158,8 @@ class MiRCARTFrame(MiRCARTGeneralFrame):
         else:
             self.itemsById[eventId][7](self.panelCanvas.canvasInterface, event)
     # }}}
-    # {{{ onCanvasUpdate(self, newBrushSize=None, newCellPos=None, newColours=None, newPathName=None, newSize=None, newUndoLevel=None): XXX
-    def onCanvasUpdate(self, newBrushSize=None, newCellPos=None, newColours=None, newPathName=None, newSize=None, newUndoLevel=None):
+    # {{{ onCanvasUpdate(self, newBrushSize=None, newCellPos=None, newColours=None, newPathName=None, newSize=None, newToolName=None, newUndoLevel=None): XXX
+    def onCanvasUpdate(self, newBrushSize=None, newCellPos=None, newColours=None, newPathName=None, newSize=None, newToolName=None, newUndoLevel=None):
         if newBrushSize != None:
             self.lastBrushSize = newBrushSize
         if newCellPos != None:
@@ -170,6 +170,8 @@ class MiRCARTFrame(MiRCARTGeneralFrame):
             self.lastPathName = newPathName
         if newSize != None:
             self.lastSize = newSize
+        if newToolName != None:
+            self.lastToolName = newToolName
         if newUndoLevel != None:
             self.lastUndoLevel = newUndoLevel
         textItems = []
@@ -195,6 +197,8 @@ class MiRCARTFrame(MiRCARTGeneralFrame):
                 self.SetTitle("{} - MiRCART".format(basePathName))
             else:
                 self.SetTitle("MiRCART")
+        if self.lastToolName != None:
+            textItems.append("Current tool: {}".format(self.lastToolName))
         self.statusBar.SetStatusText(" | ".join(textItems))
         if self.lastUndoLevel != None: 
             if self.lastUndoLevel >= 0:
