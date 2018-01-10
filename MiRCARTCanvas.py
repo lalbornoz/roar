@@ -150,7 +150,8 @@ class MiRCARTCanvas(wx.Panel):
                     self.canvasBackend.cellSize)])
             self.canvasBackend.reset(self.canvasSize, self.canvasBackend.cellSize)
             self.canvasJournal.resetCursor(); self.canvasJournal.resetUndo();
-            self.parentFrame.onCanvasUpdate(newUndoLevel=-1)
+            self.parentFrame.onCanvasUpdate(                \
+                newSize=self.canvasSize, newUndoLevel=-1)
     # }}}
 
     #
