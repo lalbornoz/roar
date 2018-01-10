@@ -34,7 +34,7 @@ import os, wx
 class MiRCARTFrame(MiRCARTGeneralFrame):
     """XXX"""
     panelCanvas = None
-    lastCellPos = lastColours = lastPathName = lastSize = lastUndoLevel = None
+    lastBrushSize = lastCellPos = lastColours = lastPathName = lastSize = lastUndoLevel = None
 
     # {{{ Commands
     #                      Id     Type Id      Labels                           Icon bitmap                 Accelerator                 [Initial state]
@@ -158,8 +158,10 @@ class MiRCARTFrame(MiRCARTGeneralFrame):
         else:
             self.itemsById[eventId][7](self.panelCanvas.canvasInterface, event)
     # }}}
-    # {{{ onCanvasUpdate(self, newCellPos=None, newColours=None, newPathName=None, newSize=None, newUndoLevel=None): XXX
-    def onCanvasUpdate(self, newCellPos=None, newColours=None, newPathName=None, newSize=None, newUndoLevel=None):
+    # {{{ onCanvasUpdate(self, newBrushSize=None, newCellPos=None, newColours=None, newPathName=None, newSize=None, newUndoLevel=None): XXX
+    def onCanvasUpdate(self, newBrushSize=None, newCellPos=None, newColours=None, newPathName=None, newSize=None, newUndoLevel=None):
+        if newBrushSize != None:
+            self.lastBrushSize = newBrushSize
         if newCellPos != None:
             self.lastCellPos = newCellPos
         if newColours != None:
@@ -175,22 +177,24 @@ class MiRCARTFrame(MiRCARTGeneralFrame):
             textItems.append("X: {:03d} Y: {:03d}".format(      \
                 *self.lastCellPos))
         if self.lastSize != None:
-            textItems.append("W: {:03d} H: {:03d}".format(*self.lastSize))
+            textItems.append("W: {:03d} H: {:03d}".format(      \
+                *self.lastSize))
+        if self.lastBrushSize != None:
+            textItems.append("Brush: {:02d}x{:02d}".format(     \
+                *self.lastBrushSize))
         if self.lastColours != None:
             textItems.append("FG: {:02d}, BG: {:02d}".format(   \
                 *self.lastColours))
             textItems.append("{} on {}".format(                 \
                 MiRCARTColours[self.lastColours[0]][4],         \
                 MiRCARTColours[self.lastColours[1]][4]))
-        if  self.lastPathName != None:
+        if self.lastPathName != None:
             if self.lastPathName != "":
                 basePathName = os.path.basename(self.lastPathName)
                 textItems.append("Current file: {}".format(basePathName))
                 self.SetTitle("{} - MiRCART".format(basePathName))
             else:
                 self.SetTitle("MiRCART")
-        if self.lastUndoLevel != None:
-            textItems.append("Undo level: {}".format(self.lastUndoLevel))
         self.statusBar.SetStatusText(" | ".join(textItems))
         if self.lastUndoLevel != None: 
             if self.lastUndoLevel >= 0:
