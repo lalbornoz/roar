@@ -97,7 +97,9 @@ class MiRCARTCanvasBackend():
     # {{{ drawPatch(self, eventDc, patch): XXX
     def drawPatch(self, eventDc, patch):
         if  patch[0][0] < self.canvasSize[0]    \
-        and patch[0][1] < self.canvasSize[1]:
+        and patch[0][0] >= 0                    \
+        and patch[0][1] < self.canvasSize[1]    \
+        and patch[0][1] >= 0:
             if patch[3] == " ":
                 self._drawBrushPatch(eventDc, patch)
             else:
