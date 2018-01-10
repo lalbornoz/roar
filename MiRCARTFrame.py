@@ -34,6 +34,7 @@ import os, wx
 class MiRCARTFrame(MiRCARTGeneralFrame):
     """XXX"""
     panelCanvas = None
+    lastCellPos = lastColours = lastPathName = lastUndoLevel = None
 
     # {{{ Commands
     #                      Id     Type Id      Labels                           Icon bitmap                 Accelerator                 [Initial state]
@@ -54,15 +55,19 @@ class MiRCARTFrame(MiRCARTGeneralFrame):
     CID_COPY            = [0x10b, TID_COMMAND, "Copy", "&Copy",                 ["", wx.ART_COPY],          None,                       False,          MiRCARTCanvasInterface.canvasCopy]
     CID_PASTE           = [0x10c, TID_COMMAND, "Paste", "&Paste",               ["", wx.ART_PASTE],         None,                       False,          MiRCARTCanvasInterface.canvasPaste]
     CID_DELETE          = [0x10d, TID_COMMAND, "Delete", "De&lete",             ["", wx.ART_DELETE],        None,                       False,          MiRCARTCanvasInterface.canvasDelete]
-    CID_INCR_CANVAS     = [0x10e, TID_COMMAND, "Increase canvas size",          \
-                                               "I&ncrease canvas size",         ["", wx.ART_PLUS],          [wx.ACCEL_ALT, ord("+")],   None,           MiRCARTCanvasInterface.canvasIncrCanvas]
-    CID_DECR_CANVAS     = [0x10f, TID_COMMAND, "Decrease canvas size",          \
-                                               "D&ecrease canvas size",         ["", wx.ART_MINUS],         [wx.ACCEL_ALT, ord("-")],   None,           MiRCARTCanvasInterface.canvasDecrCanvas]
-    CID_INCR_BRUSH      = [0x110, TID_COMMAND, "Increase brush size",           \
-                                               "&Increase brush size",          ["", wx.ART_PLUS],          [wx.ACCEL_CTRL, ord("+")],  None,           MiRCARTCanvasInterface.canvasIncrBrush]
-    CID_DECR_BRUSH      = [0x111, TID_COMMAND, "Decrease brush size",           \
+    CID_INCRW_CANVAS    = [0x10e, TID_COMMAND, "Increase canvas width",         \
+                                               "Increase canvas &width",        ["", wx.ART_PLUS],          [wx.ACCEL_ALT, ord("D")],   None,           MiRCARTCanvasInterface.canvasIncrCanvasWidth]
+    CID_DECRW_CANVAS    = [0x10f, TID_COMMAND, "Decrease canvas width",         \
+                                               "Decrease canvas w&idth",        ["", wx.ART_MINUS],         [wx.ACCEL_ALT, ord("A")],   None,           MiRCARTCanvasInterface.canvasDecrCanvasWidth]
+    CID_INCRH_CANVAS    = [0x110, TID_COMMAND, "Increase canvas height",        \
+                                               "Increase canvas &height",       ["", wx.ART_PLUS],          [wx.ACCEL_ALT, ord("S")],   None,           MiRCARTCanvasInterface.canvasIncrCanvasHeight]
+    CID_DECRH_CANVAS    = [0x111, TID_COMMAND, "Decrease canvas height",        \
+                                               "Decrease canvas h&eight",       ["", wx.ART_MINUS],         [wx.ACCEL_ALT, ord("W")],   None,           MiRCARTCanvasInterface.canvasDecrCanvasHeight]
+    CID_INCR_BRUSH      = [0x112, TID_COMMAND, "Increase brush size",           \
+                                               "I&ncrease brush size",          ["", wx.ART_PLUS],          [wx.ACCEL_CTRL, ord("+")],  None,           MiRCARTCanvasInterface.canvasIncrBrush]
+    CID_DECR_BRUSH      = [0x113, TID_COMMAND, "Decrease brush size",           \
                                                "&Decrease brush size",          ["", wx.ART_MINUS],         [wx.ACCEL_CTRL, ord("-")],  None,           MiRCARTCanvasInterface.canvasDecrBrush]
-    CID_SOLID_BRUSH     = [0x112, TID_SELECT,  "Solid brush", "&Solid brush",   None,                       None,                       True,           MiRCARTCanvasInterface.canvasBrushSolid]
+    CID_SOLID_BRUSH     = [0x114, TID_SELECT,  "Solid brush", "&Solid brush",   None,                       None,                       True,           MiRCARTCanvasInterface.canvasBrushSolid]
 
     CID_RECT            = [0x150, TID_SELECT,  "Rectangle", "&Rectangle",       ["toolRect.png"],           [wx.ACCEL_CTRL, ord("R")],  True,           MiRCARTCanvasInterface.canvasToolRect]
     CID_CIRCLE          = [0x151, TID_SELECT,  "Circle", "&Circle",             ["toolCircle.png"],         [wx.ACCEL_CTRL, ord("C")],  False,          MiRCARTCanvasInterface.canvasToolCircle]
@@ -87,34 +92,35 @@ class MiRCARTFrame(MiRCARTGeneralFrame):
     CID_COLOUR15        = [0x1af, TID_COMMAND, "Colour #15", "Colour #15",      None,                       None,                       None,           MiRCARTCanvasInterface.canvasColour]
     # }}}
     # {{{ Menus
-    MID_FILE            = (0x300, TID_MENU, "File", "&File", (                  \
-        CID_NEW, CID_OPEN, CID_SAVE, CID_SAVEAS, NID_MENU_SEP,                  \
-        CID_EXPORT_AS_PNG, CID_EXPORT_IMGUR, CID_EXPORT_PASTEBIN, NID_MENU_SEP, \
+    MID_FILE            = (0x300, TID_MENU, "File", "&File", (                                  \
+        CID_NEW, CID_OPEN, CID_SAVE, CID_SAVEAS, NID_MENU_SEP,                                  \
+        CID_EXPORT_AS_PNG, CID_EXPORT_IMGUR, CID_EXPORT_PASTEBIN, NID_MENU_SEP,                 \
         CID_EXIT))
-    MID_EDIT            = (0x301, TID_MENU, "Edit", "&Edit", (                  \
-        CID_UNDO, CID_REDO, NID_MENU_SEP,                                       \
-        CID_CUT, CID_COPY, CID_PASTE, CID_DELETE, NID_MENU_SEP,                 \
-        CID_INCR_CANVAS, CID_DECR_CANVAS, NID_MENU_SEP,                         \
+    MID_EDIT            = (0x301, TID_MENU, "Edit", "&Edit", (                                  \
+        CID_UNDO, CID_REDO, NID_MENU_SEP,                                                       \
+        CID_CUT, CID_COPY, CID_PASTE, CID_DELETE, NID_MENU_SEP,                                 \
+        CID_INCRW_CANVAS, CID_DECRW_CANVAS, CID_INCRH_CANVAS, CID_DECRH_CANVAS, NID_MENU_SEP,   \
         CID_INCR_BRUSH, CID_DECR_BRUSH, CID_SOLID_BRUSH))
-    MID_TOOLS           = (0x302, TID_MENU, "Tools", "&Tools", (                \
+    MID_TOOLS           = (0x302, TID_MENU, "Tools", "&Tools", (                                \
         CID_RECT, CID_CIRCLE, CID_LINE, CID_TEXT))
     # }}}
     # {{{ Toolbars
-    BID_TOOLBAR         = (0x400, TID_TOOLBAR, (                                \
-        CID_NEW, CID_OPEN, CID_SAVE, CID_SAVEAS, NID_TOOLBAR_SEP,               \
-        CID_UNDO, CID_REDO, NID_TOOLBAR_SEP,                                    \
-        CID_CUT, CID_COPY, CID_PASTE, CID_DELETE, NID_TOOLBAR_SEP,              \
-        CID_INCR_BRUSH, CID_DECR_BRUSH, NID_TOOLBAR_SEP,                        \
-        CID_RECT, CID_CIRCLE, CID_LINE, CID_TEXT, NID_TOOLBAR_SEP,              \
-        CID_COLOUR00, CID_COLOUR01, CID_COLOUR02, CID_COLOUR03, CID_COLOUR04,   \
-        CID_COLOUR05, CID_COLOUR06, CID_COLOUR07, CID_COLOUR08, CID_COLOUR09,   \
-        CID_COLOUR10, CID_COLOUR11, CID_COLOUR12, CID_COLOUR13, CID_COLOUR14,   \
+    BID_TOOLBAR         = (0x400, TID_TOOLBAR, (                                                \
+        CID_NEW, CID_OPEN, CID_SAVE, CID_SAVEAS, NID_TOOLBAR_SEP,                               \
+        CID_UNDO, CID_REDO, NID_TOOLBAR_SEP,                                                    \
+        CID_CUT, CID_COPY, CID_PASTE, CID_DELETE, NID_TOOLBAR_SEP,                              \
+        CID_INCR_BRUSH, CID_DECR_BRUSH, NID_TOOLBAR_SEP,                                        \
+        CID_RECT, CID_CIRCLE, CID_LINE, CID_TEXT, NID_TOOLBAR_SEP,                              \
+        CID_COLOUR00, CID_COLOUR01, CID_COLOUR02, CID_COLOUR03, CID_COLOUR04,                   \
+        CID_COLOUR05, CID_COLOUR06, CID_COLOUR07, CID_COLOUR08, CID_COLOUR09,                   \
+        CID_COLOUR10, CID_COLOUR11, CID_COLOUR12, CID_COLOUR13, CID_COLOUR14,                   \
         CID_COLOUR15))
     # }}}
     # {{{ Accelerators (hotkeys)
-    AID_EDIT            = (0x500, TID_ACCELS, (                                 \
-        CID_NEW, CID_OPEN, CID_SAVE, CID_UNDO, CID_REDO,                        \
-        CID_INCR_CANVAS, CID_DECR_CANVAS, CID_INCR_BRUSH, CID_DECR_BRUSH))
+    AID_EDIT            = (0x500, TID_ACCELS, (                                                 \
+        CID_NEW, CID_OPEN, CID_SAVE, CID_UNDO, CID_REDO,                                        \
+        CID_INCRW_CANVAS, CID_DECRW_CANVAS, CID_INCRH_CANVAS, CID_DECRH_CANVAS,                 \
+        CID_INCR_BRUSH, CID_DECR_BRUSH))
     # }}}
     # {{{ Lists
     LID_ACCELS          = (0x600, TID_LIST, (AID_EDIT))
@@ -152,43 +158,49 @@ class MiRCARTFrame(MiRCARTGeneralFrame):
         else:
             self.itemsById[eventId][7](self.panelCanvas.canvasInterface, event)
     # }}}
-    # {{{ onStatusBarUpdate(self, showColours=None, showFileName=True, showPos=None): XXX
-    def onStatusBarUpdate(self, showColours=True, showFileName=True, showPos=True):
-        if showColours == True:
-            showColours = self.panelCanvas.brushColours
-        if showPos == True:
-            showPos = self.panelCanvas.brushPos
-        if showFileName == True:
-            showFileName = self.panelCanvas.canvasInterface.canvasPathName
+    # {{{ onCanvasUpdate(self, newCellPos=None, newColours=None, newPathName=None, newUndoLevel=None): XXX
+    def onCanvasUpdate(self, newCellPos=None, newColours=None, newPathName=None, newUndoLevel=None):
+        if newCellPos != None:
+            self.lastCellPos = newCellPos
+        if newColours != None:
+            self.lastColours = newColours
+        if newPathName != None:
+            self.lastPathName = newPathName
+        if newUndoLevel != None:
+            self.lastUndoLevel = newUndoLevel
         textItems = []
-        if showPos != None:
+        if self.lastCellPos != None:
             textItems.append("X: {:03d} Y: {:03d}".format(      \
-                showPos[0], showPos[1]))
-        if showColours != None:
+                *self.lastCellPos))
+        if self.lastColours != None:
             textItems.append("FG: {:02d}, BG: {:02d}".format(   \
-                showColours[0],showColours[1]))
+                *self.lastColours))
             textItems.append("{} on {}".format(                 \
-                MiRCARTColours[showColours[0]][4],              \
-                MiRCARTColours[showColours[1]][4]))
-        if showFileName != None:
-            textItems.append("Current file: {}".format(         \
-                os.path.basename(showFileName)))
+                MiRCARTColours[self.lastColours[0]][4],         \
+                MiRCARTColours[self.lastColours[1]][4]))
+        if  self.lastPathName != None:
+            if self.lastPathName != "":
+                basePathName = os.path.basename(self.lastPathName)
+                textItems.append("Current file: {}".format(basePathName))
+                self.SetTitle("{} - MiRCART".format(basePathName))
+            else:
+                self.SetTitle("MiRCART")
+        if self.lastUndoLevel != None:
+            textItems.append("Undo level: {}".format(self.lastUndoLevel))
         self.statusBar.SetStatusText(" | ".join(textItems))
-    # }}}
-    # {{{ onUndoUpdate(self): XXX
-    def onUndoUpdate(self):
-        if self.panelCanvas.canvasJournal.patchesUndo[self.panelCanvas.canvasJournal.patchesUndoLevel] != None:
-            self.menuItemsById[self.CID_UNDO[0]].Enable(True)
-            self.toolBar.EnableTool(self.CID_UNDO[0], True)
-        else:
-            self.menuItemsById[self.CID_UNDO[0]].Enable(False)
-            self.toolBar.EnableTool(self.CID_UNDO[0], False)
-        if self.panelCanvas.canvasJournal.patchesUndoLevel > 0:
-            self.menuItemsById[self.CID_REDO[0]].Enable(True)
-            self.toolBar.EnableTool(self.CID_REDO[0], True)
-        else:
-            self.menuItemsById[self.CID_REDO[0]].Enable(False)
-            self.toolBar.EnableTool(self.CID_REDO[0], False)
+        if self.lastUndoLevel != None: 
+            if self.lastUndoLevel >= 0:
+                self.menuItemsById[self.CID_UNDO[0]].Enable(True)
+                self.toolBar.EnableTool(self.CID_UNDO[0], True)
+            else:
+                self.menuItemsById[self.CID_UNDO[0]].Enable(False)
+                self.toolBar.EnableTool(self.CID_UNDO[0], False)
+            if self.lastUndoLevel > 0:
+                self.menuItemsById[self.CID_REDO[0]].Enable(True)
+                self.toolBar.EnableTool(self.CID_REDO[0], True)
+            else:
+                self.menuItemsById[self.CID_REDO[0]].Enable(False)
+                self.toolBar.EnableTool(self.CID_REDO[0], False)
     # }}}
 
     #
