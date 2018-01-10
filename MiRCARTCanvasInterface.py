@@ -119,18 +119,18 @@ class MiRCARTCanvasInterface():
                 return False
             else:
                 outPathName = dialog.GetPath()
-                self.SetCursor(wx.Cursor(wx.CURSOR_WAIT))
+                self.parentCanvas.SetCursor(wx.Cursor(wx.CURSOR_WAIT))
                 self.parentCanvas.canvasExportStore.exportBitmapToPngFile(      \
                     self.parentCanvas.canvasBackend.canvasBitmap, outPathName,  \
                         wx.BITMAP_TYPE_PNG)
-                self.SetCursor(wx.Cursor(wx.NullCursor))
+                self.parentCanvas.SetCursor(wx.Cursor(wx.NullCursor))
                 return True
     # }}}
     # {{{ canvasExportImgur(self, event): XXX
     def canvasExportImgur(self, event):
         self.parentCanvas.SetCursor(wx.Cursor(wx.CURSOR_WAIT))
         imgurResult = self.parentCanvas.canvasExportStore.exportBitmapToImgur(   \
-            "c9a6efb3d7932fd", self.parentCanvas.canvasBackend.canvasBitmap,     \
+            "c9a6efb3d7932fd", self.parentCanvas.canvasBackend.canvasBitmap,    \
             "", "", wx.BITMAP_TYPE_PNG)
         self.parentCanvas.SetCursor(wx.Cursor(wx.NullCursor))
         if imgurResult[0] == 200:
@@ -138,21 +138,21 @@ class MiRCARTCanvasInterface():
                 wx.TheClipboard.Open()
                 wx.TheClipboard.SetData(wx.TextDataObject(imgurResult[1]))
                 wx.TheClipboard.Close()
-            wx.MessageBox("Exported to Imgur: " + imgurResult[1],           \
+            wx.MessageBox("Exported to Imgur: " + imgurResult[1],               \
                 "Export to Imgur", wx.OK|wx.ICON_INFORMATION)
         else:
-            wx.MessageBox("Failed to export to Imgur: " + imgurResult[1],   \
+            wx.MessageBox("Failed to export to Imgur: " + imgurResult[1],       \
                 "Export to Imgur", wx.OK|wx.ICON_EXCLAMATION)
     # }}}
     # {{{ canvasExportPastebin(self, event): XXX
     def canvasExportPastebin(self, event):
-        self.SetCursor(wx.Cursor(wx.CURSOR_WAIT))
+        self.parentCanvas.SetCursor(wx.Cursor(wx.CURSOR_WAIT))
         pasteStatus, pasteResult =                                          \
-            self.parentCanvas.canvasExportStore.exportPastebin(              \
+            self.parentCanvas.canvasExportStore.exportPastebin(             \
                 "",                          \
-                self.parentCanvas.canvasMap,                                 \
+                self.parentCanvas.canvasMap,                                \
                 self.parentCanvas.canvasSize)
-        self.SetCursor(wx.Cursor(wx.NullCursor))
+        self.parentCanvas.SetCursor(wx.Cursor(wx.NullCursor))
         if pasteStatus:
             if not wx.TheClipboard.IsOpened():
                 wx.TheClipboard.Open()
@@ -240,11 +240,11 @@ class MiRCARTCanvasInterface():
                 return
         try:
             with open(self.canvasPathName, "w") as outFile:
-                self.SetCursor(wx.Cursor(wx.CURSOR_WAIT))
+                self.parentCanvas.SetCursor(wx.Cursor(wx.CURSOR_WAIT))
                 self.parentCanvas.canvasExportStore.exportTextFile(      \
                     self.parentCanvas.canvasMap,                         \
                     self.parentCanvas.canvasSize, outFile)
-                self.SetCursor(wx.Cursor(wx.NullCursor))
+                self.parentCanvas.SetCursor(wx.Cursor(wx.NullCursor))
                 return True
         except IOError as error:
             return False
