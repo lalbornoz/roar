@@ -69,7 +69,7 @@ class MiRCARTCanvasInterface():
             self.parentCanvas.brushColours[0] = numColour
         elif event.GetEventType() == wx.wxEVT_TOOL_RCLICKED:
             self.parentCanvas.brushColours[1] = numColour
-        self.parentFrame.onCanvasUpdate(newColours=self.parentCanvas.brushColours)
+        self.parentFrame.onCanvasUpdate(colours=self.parentCanvas.brushColours)
     # }}}
     # {{{ canvasCopy(self, event): XXX
     def canvasCopy(self, event):
@@ -85,7 +85,7 @@ class MiRCARTCanvasInterface():
         and self.parentCanvas.brushSize[1] > 1:
             self.parentCanvas.brushSize =        \
                 [a-1 for a in self.parentCanvas.brushSize]
-            self.parentFrame.onCanvasUpdate(newBrushSize=self.parentCanvas.brushSize)
+            self.parentFrame.onCanvasUpdate(brushSize=self.parentCanvas.brushSize)
     # }}}
     # {{{ canvasDecrCanvasHeight(self, event): XXX
     def canvasDecrCanvasHeight(self, event):
@@ -166,7 +166,7 @@ class MiRCARTCanvasInterface():
     def canvasIncrBrush(self, event):
         self.parentCanvas.brushSize =    \
                 [a+1 for a in self.parentCanvas.brushSize]
-        self.parentFrame.onCanvasUpdate(newBrushSize=self.parentCanvas.brushSize)
+        self.parentFrame.onCanvasUpdate(brushSize=self.parentCanvas.brushSize)
     # }}}
     # {{{ canvasIncrCanvasHeight(self, event): XXX
     def canvasIncrCanvasHeight(self, event):
@@ -196,8 +196,7 @@ class MiRCARTCanvasInterface():
         self.parentCanvas.canvasImportStore.importNew(newCanvasSize)
         self.canvasPathName = None
         self.parentCanvas.SetCursor(wx.Cursor(wx.NullCursor))
-        self.parentFrame.onCanvasUpdate(    \
-            newPathName="", newUndoLevel=-1)
+        self.parentFrame.onCanvasUpdate(pathName="", undoLevel=-1)
     # }}}
     # {{{ canvasOpen(self, event): XXX
     def canvasOpen(self, event):
@@ -220,7 +219,7 @@ class MiRCARTCanvasInterface():
                 self.parentCanvas.canvasImportStore.importIntoPanel()
                 self.parentCanvas.SetCursor(wx.Cursor(wx.NullCursor))
                 self.parentFrame.onCanvasUpdate(                        \
-                    newPathName=self.canvasPathName, newUndoLevel=-1)
+                    pathName=self.canvasPathName, undoLevel=-1)
                 return True
     # }}}
     # {{{ canvasPaste(self, event): XXX
@@ -261,22 +260,22 @@ class MiRCARTCanvasInterface():
     # {{{ canvasToolCircle(self, event): XXX
     def canvasToolCircle(self, event):
         self.canvasTool = MiRCARTToolCircle(self.parentCanvas)
-        self.parentFrame.onCanvasUpdate(newToolName=self.canvasTool.name)
+        self.parentFrame.onCanvasUpdate(toolName=self.canvasTool.name)
     # }}}
     # {{{ canvasToolLine(self, event): XXX
     def canvasToolLine(self, event):
         self.canvasTool = MiRCARTToolLine(self.parentCanvas)
-        self.parentFrame.onCanvasUpdate(newToolName=self.canvasTool.name)
+        self.parentFrame.onCanvasUpdate(toolName=self.canvasTool.name)
     # }}}
     # {{{ canvasToolRect(self, event): XXX
     def canvasToolRect(self, event):
         self.canvasTool = MiRCARTToolRect(self.parentCanvas)
-        self.parentFrame.onCanvasUpdate(newToolName=self.canvasTool.name)
+        self.parentFrame.onCanvasUpdate(toolName=self.canvasTool.name)
     # }}}
     # {{{ canvasToolText(self, event): XXX
     def canvasToolText(self, event):
         self.canvasTool = MiRCARTToolText(self.parentCanvas)
-        self.parentFrame.onCanvasUpdate(newToolName=self.canvasTool.name)
+        self.parentFrame.onCanvasUpdate(toolName=self.canvasTool.name)
     # }}}
     # {{{ canvasUndo(self, event): XXX
     def canvasUndo(self, event):
