@@ -26,7 +26,7 @@ from MiRCARTCanvasBackend import MiRCARTCanvasBackend
 from MiRCARTCanvasJournal import MiRCARTCanvasJournal
 from MiRCARTCanvasExportStore import MiRCARTCanvasExportStore, haveMiRCARTToPngFile, haveUrllib
 from MiRCARTCanvasImportStore import MiRCARTCanvasImportStore
-from MiRCARTColours import MiRCARTColours
+from MiRCARTCanvasInterface import MiRCARTCanvasInterface
 import wx
 
 class MiRCARTCanvas(wx.Panel):
@@ -34,8 +34,9 @@ class MiRCARTCanvas(wx.Panel):
     parentFrame = None
     canvasMap = canvasPos = canvasSize = None
     brushColours = brushPos = brushSize = None
-    canvasBackend = canvasCurTool = canvasJournal = None
+    canvasBackend = canvasJournal = None
     canvasExportStore = canvasImportStore = None
+    canvasInterface = None
 
     # {{{ _commitPatch(self, patch): XXX
     def _commitPatch(self, patch):
@@ -47,7 +48,7 @@ class MiRCARTCanvas(wx.Panel):
         for patch in deltaPatches:
             if self.canvasBackend.drawPatch(eventDc, patch):
                 self._commitPatch(patch)
-        self.parentFrame.onCanvasUpdate()
+        self.parentFrame.onUndoUpdate()
     # }}}
     # {{{ _dispatchPatch(self, eventDc, isCursor, patch): XXX
     def _dispatchPatch(self, eventDc, isCursor, patch):
@@ -72,12 +73,16 @@ class MiRCARTCanvas(wx.Panel):
     def onPanelClose(self, event):
         self.Destroy()
     # }}}
+    # {{{ onPanelEnterWindow(self, event): XXX
+    def onPanelEnterWindow(self, event):
+        self.parentFrame.SetFocus()
+    # }}}
     # {{{ onPanelInput(self, event): XXX
     def onPanelInput(self, event):
         eventDc = self.canvasBackend.getDeviceContext(self)
         eventType = event.GetEventType()
         self._canvasDirty = self._canvasDirtyCursor = False
-        tool = self.canvasCurTool
+        tool = self.canvasInterface.canvasTool
         if eventType == wx.wxEVT_CHAR:
             mapPoint = self.brushPos
             doSkip = tool.onKeyboardEvent(                                  \
@@ -93,15 +98,15 @@ class MiRCARTCanvas(wx.Panel):
                 event.Dragging(), event.LeftIsDown(), event.RightIsDown(),  \
                 self._dispatchPatch, eventDc)
         if self._canvasDirty:
-            self.parentFrame.onCanvasUpdate()
-        self.parentFrame.onCanvasMotion(event, mapPoint)
+            self.parentFrame.onUndoUpdate()
+        if eventType == wx.wxEVT_MOTION:
+            self.parentFrame.onStatusBarUpdate(showPos=mapPoint)
     # }}}
     # {{{ onPanelLeaveWindow(self, event): XXX
     def onPanelLeaveWindow(self, event):
         eventDc = self.canvasBackend.getDeviceContext(self)
         self.canvasBackend.drawCursorMaskWithJournal(  \
             self.canvasJournal, eventDc)
-        self.parentFrame.onCanvasMotion(event)
     # }}}
     # {{{ onPanelPaint(self, event): XXX
     def onPanelPaint(self, event):
@@ -122,14 +127,6 @@ class MiRCARTCanvas(wx.Panel):
                     ([numCol, numRow],                  \
                     *self.canvasMap[numRow][numCol]))
         wx.SafeYield()
-    # }}}
-    # {{{ popRedo(self): XXX
-    def popRedo(self):
-        self._dispatchDeltaPatches(self.canvasJournal.popRedo())
-    # }}}
-    # {{{ popUndo(self): XXX
-    def popUndo(self):
-        self._dispatchDeltaPatches(self.canvasJournal.popUndo())
     # }}}
     # {{{ resize(self, newCanvasSize): XXX
     def resize(self, newCanvasSize):
@@ -152,7 +149,7 @@ class MiRCARTCanvas(wx.Panel):
                     self.canvasBackend.cellSize)])
             self.canvasBackend.reset(self.canvasSize, self.canvasBackend.cellSize)
             self.canvasJournal.resetCursor(); self.canvasJournal.resetUndo();
-            self.parentFrame.onCanvasUpdate()
+            self.parentFrame.onUndoUpdate()
     # }}}
 
     #
@@ -165,13 +162,14 @@ class MiRCARTCanvas(wx.Panel):
         self.canvasMap = None; self.canvasPos = canvasPos; self.canvasSize = canvasSize;
         self.brushColours = [4, 1]; self.brushPos = [0, 0]; self.brushSize = [1, 1];
         self.canvasBackend = MiRCARTCanvasBackend(canvasSize, cellSize)
-        self.canvasCurTool = None
         self.canvasJournal = MiRCARTCanvasJournal()
         self.canvasExportStore = MiRCARTCanvasExportStore(parentCanvas=self)
         self.canvasImportStore = MiRCARTCanvasImportStore(parentCanvas=self)
+        self.canvasInterface = MiRCARTCanvasInterface(self, parentFrame)
 
         # Bind event handlers
         self.Bind(wx.EVT_CLOSE, self.onPanelClose)
+        self.Bind(wx.EVT_ENTER_WINDOW, self.onPanelEnterWindow)
         self.Bind(wx.EVT_LEAVE_WINDOW, self.onPanelLeaveWindow)
         self.parentFrame.Bind(wx.EVT_CHAR, self.onPanelInput)
         for eventType in(                                   \
