@@ -263,36 +263,43 @@ class MiRCARTCanvasInterface():
     # {{{ canvasToolCircle(self, event): XXX
     def canvasToolCircle(self, event):
         self.canvasTool = MiRCARTToolCircle(self.parentCanvas)
+        self.parentFrame.menuItemsById[self.parentFrame.CID_CIRCLE[0]].Check(True)
         self.parentFrame.onCanvasUpdate(toolName=self.canvasTool.name)
     # }}}
     # {{{ canvasToolFill(self, event): XXX
     def canvasToolFill(self, event):
         self.canvasTool = MiRCARTToolFill(self.parentCanvas)
+        self.parentFrame.menuItemsById[self.parentFrame.CID_FILL[0]].Check(True)
         self.parentFrame.onCanvasUpdate(toolName=self.canvasTool.name)
     # }}}
     # {{{ canvasToolLine(self, event): XXX
     def canvasToolLine(self, event):
         self.canvasTool = MiRCARTToolLine(self.parentCanvas)
+        self.parentFrame.menuItemsById[self.parentFrame.CID_LINE[0]].Check(True)
         self.parentFrame.onCanvasUpdate(toolName=self.canvasTool.name)
     # }}}
     # {{{ canvasToolSelectClone(self, event): XXX
     def canvasToolSelectClone(self, event):
         self.canvasTool = MiRCARTToolSelectClone(self.parentCanvas)
+        self.parentFrame.menuItemsById[self.parentFrame.CID_CLONE_SELECT[0]].Check(True)
         self.parentFrame.onCanvasUpdate(toolName=self.canvasTool.name)
     # }}}
     # {{{ canvasToolSelectMove(self, event): XXX
     def canvasToolSelectMove(self, event):
         self.canvasTool = MiRCARTToolSelectMove(self.parentCanvas)
+        self.parentFrame.menuItemsById[self.parentFrame.CID_MOVE_SELECT[0]].Check(True)
         self.parentFrame.onCanvasUpdate(toolName=self.canvasTool.name)
     # }}}
     # {{{ canvasToolRect(self, event): XXX
     def canvasToolRect(self, event):
         self.canvasTool = MiRCARTToolRect(self.parentCanvas)
+        self.parentFrame.menuItemsById[self.parentFrame.CID_RECT[0]].Check(True)
         self.parentFrame.onCanvasUpdate(toolName=self.canvasTool.name)
     # }}}
     # {{{ canvasToolText(self, event): XXX
     def canvasToolText(self, event):
         self.canvasTool = MiRCARTToolText(self.parentCanvas)
+        self.parentFrame.menuItemsById[self.parentFrame.CID_TEXT[0]].Check(True)
         self.parentFrame.onCanvasUpdate(toolName=self.canvasTool.name)
     # }}}
     # {{{ canvasUndo(self, event): XXX
