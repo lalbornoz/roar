@@ -50,10 +50,13 @@ class MiRCARTToolSelectMove(MiRCARTToolSelect):
             isCursor = True
         for numRow in range(len(self.toolSelectMap)):
             for numCol in range(len(self.toolSelectMap[numRow])):
+                dispatchFn(eventDc, isCursor, [[self.srcRect[0] + numCol,   \
+                    self.srcRect[1] + numRow], [1, 1], 0, " "])
+        for numRow in range(len(self.toolSelectMap)):
+            for numCol in range(len(self.toolSelectMap[numRow])):
                 cellOld = self.toolSelectMap[numRow][numCol]
                 rectY = selectRect[0][1] + numRow
                 rectX = selectRect[0][0] + numCol
-                dispatchFn(eventDc, isCursor, [[self.srcRect[0] + numCol, self.srcRect[1] + numRow], [1, 1], 0, " "])
                 dispatchFn(eventDc, isCursor, [[rectX+disp[0], rectY+disp[1]], *cellOld])
         self._drawSelectRect(newToolRect, dispatchFn, eventDc)
         self.toolRect = newToolRect
