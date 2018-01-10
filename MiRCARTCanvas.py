@@ -146,9 +146,14 @@ class MiRCARTCanvas(wx.Panel):
                     for numNewCol in range(newCanvasSize[0]):
                         self.canvasMap[numNewRow].append([[1, 1], 0, " "])
             self.canvasSize = newCanvasSize
-            self.SetSize(*self.canvasPos,                   \
-                *[a*b for a,b in zip(self.canvasSize,       \
-                    self.canvasBackend.cellSize)])
+            newWinSize = [a*b for a,b in                    \
+                zip(self.canvasSize, self.canvasBackend.cellSize)]
+            self.SetMinSize(newWinSize)
+            self.SetSize(wx.DefaultCoord, wx.DefaultCoord, *newWinSize)
+            curWindow = self
+            while curWindow != None:
+                curWindow.Layout()
+                curWindow = curWindow.GetParent()
             self.canvasBackend.reset(self.canvasSize, self.canvasBackend.cellSize)
             self.canvasJournal.resetCursor(); self.canvasJournal.resetUndo();
             self.parentFrame.onCanvasUpdate(                \

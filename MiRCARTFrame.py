@@ -27,7 +27,7 @@ from MiRCARTCanvasInterface import MiRCARTCanvasInterface
 from MiRCARTColours import MiRCARTColours
 from MiRCARTGeneralFrame import MiRCARTGeneralFrame,                                    \
     TID_ACCELS, TID_COMMAND, TID_LIST, TID_MENU, TID_NOTHING, TID_SELECT, TID_TOOLBAR,  \
-    NID_MENU_SEP, NID_TOOLBAR_SEP
+    NID_MENU_SEP, NID_TOOLBAR_HSEP, NID_TOOLBAR_VSEP
 
 import os, wx
 
@@ -107,11 +107,12 @@ class MiRCARTFrame(MiRCARTGeneralFrame):
     # }}}
     # {{{ Toolbars
     BID_TOOLBAR         = (0x400, TID_TOOLBAR, (                                                        \
-        CID_NEW, CID_OPEN, CID_SAVE, CID_SAVEAS, NID_TOOLBAR_SEP,                                       \
-        CID_UNDO, CID_REDO, NID_TOOLBAR_SEP,                                                            \
-        CID_CUT, CID_COPY, CID_PASTE, CID_DELETE, NID_TOOLBAR_SEP,                                      \
-        CID_INCR_BRUSH, CID_DECR_BRUSH, NID_TOOLBAR_SEP,                                                \
-        CID_RECT, CID_CIRCLE, CID_LINE, CID_TEXT, CID_CLONE_SELECT, CID_MOVE_SELECT, NID_TOOLBAR_SEP,   \
+        CID_NEW, CID_OPEN, CID_SAVE, CID_SAVEAS, NID_TOOLBAR_HSEP,                                      \
+        CID_UNDO, CID_REDO, NID_TOOLBAR_HSEP,                                                           \
+        CID_CUT, CID_COPY, CID_PASTE, CID_DELETE, NID_TOOLBAR_HSEP,                                     \
+        CID_INCR_BRUSH, CID_DECR_BRUSH, NID_TOOLBAR_HSEP,                                               \
+        CID_RECT, CID_CIRCLE, CID_LINE, CID_TEXT, CID_CLONE_SELECT, CID_MOVE_SELECT,                    \
+        NID_TOOLBAR_VSEP,                                                                               \
         CID_COLOUR00, CID_COLOUR01, CID_COLOUR02, CID_COLOUR03, CID_COLOUR04,                           \
         CID_COLOUR05, CID_COLOUR06, CID_COLOUR07, CID_COLOUR08, CID_COLOUR09,                           \
         CID_COLOUR10, CID_COLOUR11, CID_COLOUR12, CID_COLOUR13, CID_COLOUR14,                           \
@@ -193,27 +194,36 @@ class MiRCARTFrame(MiRCARTGeneralFrame):
         if "undoLevel" in self.lastPanelState: 
             if self.lastPanelState["undoLevel"] >= 0:
                 self.menuItemsById[self.CID_UNDO[0]].Enable(True)
-                self.toolBar.EnableTool(self.CID_UNDO[0], True)
+                toolBar = self.toolBarItemsById[self.CID_UNDO[0]].GetToolBar()
+                toolBar.EnableTool(self.CID_UNDO[0], True)
             else:
                 self.menuItemsById[self.CID_UNDO[0]].Enable(False)
-                self.toolBar.EnableTool(self.CID_UNDO[0], False)
+                toolBar = self.toolBarItemsById[self.CID_UNDO[0]].GetToolBar()
+                toolBar.EnableTool(self.CID_UNDO[0], False)
             if self.lastPanelState["undoLevel"] > 0:
                 self.menuItemsById[self.CID_REDO[0]].Enable(True)
-                self.toolBar.EnableTool(self.CID_REDO[0], True)
+                toolBar = self.toolBarItemsById[self.CID_REDO[0]].GetToolBar()
+                toolBar.EnableTool(self.CID_REDO[0], True)
             else:
                 self.menuItemsById[self.CID_REDO[0]].Enable(False)
-                self.toolBar.EnableTool(self.CID_REDO[0], False)
+                toolBar = self.toolBarItemsById[self.CID_REDO[0]].GetToolBar()
+                toolBar.EnableTool(self.CID_REDO[0], False)
     # }}}
 
     #
-    # __init__(self, parent, appSize=(840, 630), defaultCanvasPos=(25, 50), defaultCanvasSize=(100, 30), defaultCellSize=(7, 14)): initialisation method
-    def __init__(self, parent, appSize=(840, 630), defaultCanvasPos=(25, 50), defaultCanvasSize=(100, 30), defaultCellSize=(7, 14)):
+    # __init__(self, parent, appSize=(840, 630), defaultCanvasPos=(0, 75), defaultCanvasSize=(100, 30), defaultCellSize=(7, 14)): initialisation method
+    def __init__(self, parent, appSize=(840, 630), defaultCanvasPos=(0, 75), defaultCanvasSize=(100, 30), defaultCellSize=(7, 14)):
         self._initPaletteToolBitmaps()
-        panelSkin = super().__init__(parent, wx.ID_ANY, "MiRCART", size=appSize)
-        self.panelCanvas = MiRCARTCanvas(panelSkin, parentFrame=self,   \
-            defaultCanvasPos=defaultCanvasPos,                          \
-            defaultCanvasSize=defaultCanvasSize,                        \
+        self.panelSkin = super().__init__(parent, wx.ID_ANY, "MiRCART", size=appSize)
+        self.panelCanvas = MiRCARTCanvas(self.panelSkin, parentFrame=self,      \
+            defaultCanvasPos=defaultCanvasPos,                                  \
+            defaultCanvasSize=defaultCanvasSize,                                \
             defaultCellSize=defaultCellSize)
         self.panelCanvas.canvasInterface.canvasNew(None)
+        self.sizerSkin.AddSpacer(5)
+        self.sizerSkin.Add(self.panelCanvas, wx.ALL|wx.EXPAND)
+        self.panelSkin.SetSizer(self.sizerSkin)
+        self.panelSkin.SetAutoLayout(1)
+        self.sizerSkin.Fit(self.panelSkin)
 
 # vim:expandtab foldmethod=marker sw=4 ts=4 tw=120
