@@ -111,7 +111,7 @@ class MiRCARTGeneralFrame(wx.Frame):
                 self.Bind(wx.EVT_TOOL_RCLICKED, self.onInput, toolBarItemWindow)
         for numToolBar in range(len(self.toolBars)):
             self.sizerSkin.Add(                          \
-                self.toolBars[numToolBar], 0, wx.ALIGN_LEFT, 4)
+                self.toolBars[numToolBar], 0, wx.ALL|wx.ALIGN_LEFT, 3)
             self.toolBars[numToolBar].Realize()
             self.toolBars[numToolBar].Fit()
     # }}}
