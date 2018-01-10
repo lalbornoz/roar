@@ -33,8 +33,7 @@ import os, wx
 
 class MiRCARTFrame(MiRCARTGeneralFrame):
     """XXX"""
-    panelCanvas = None
-    lastBrushSize = lastCellPos = lastColours = lastPathName = lastSize = lastToolName = lastUndoLevel = None
+    panelCanvas = None; lastPanelState = {};
 
     # {{{ Commands
     #                      Id     Type Id      Labels                           Icon bitmap                 Accelerator                 [Initial state]
@@ -159,55 +158,43 @@ class MiRCARTFrame(MiRCARTGeneralFrame):
             self.itemsById[eventId][7](self.panelCanvas.canvasInterface, event)
     # }}}
     # {{{ onCanvasUpdate(self, newBrushSize=None, newCellPos=None, newColours=None, newPathName=None, newSize=None, newToolName=None, newUndoLevel=None): XXX
-    def onCanvasUpdate(self, newBrushSize=None, newCellPos=None, newColours=None, newPathName=None, newSize=None, newToolName=None, newUndoLevel=None):
-        if newBrushSize != None:
-            self.lastBrushSize = newBrushSize
-        if newCellPos != None:
-            self.lastCellPos = newCellPos
-        if newColours != None:
-            self.lastColours = newColours
-        if newPathName != None:
-            self.lastPathName = newPathName
-        if newSize != None:
-            self.lastSize = newSize
-        if newToolName != None:
-            self.lastToolName = newToolName
-        if newUndoLevel != None:
-            self.lastUndoLevel = newUndoLevel
+    def onCanvasUpdate(self, **kwargs):
+        self.lastPanelState.update(kwargs)
         textItems = []
-        if self.lastCellPos != None:
-            textItems.append("X: {:03d} Y: {:03d}".format(      \
-                *self.lastCellPos))
-        if self.lastSize != None:
-            textItems.append("W: {:03d} H: {:03d}".format(      \
-                *self.lastSize))
-        if self.lastBrushSize != None:
-            textItems.append("Brush: {:02d}x{:02d}".format(     \
-                *self.lastBrushSize))
-        if self.lastColours != None:
-            textItems.append("FG: {:02d}, BG: {:02d}".format(   \
-                *self.lastColours))
-            textItems.append("{} on {}".format(                 \
-                MiRCARTColours[self.lastColours[0]][4],         \
-                MiRCARTColours[self.lastColours[1]][4]))
-        if self.lastPathName != None:
-            if self.lastPathName != "":
-                basePathName = os.path.basename(self.lastPathName)
+        if "cellPos" in self.lastPanelState:
+            textItems.append("X: {:03d} Y: {:03d}".format(              \
+                *self.lastPanelState["cellPos"]))
+        if "size" in self.lastPanelState:
+            textItems.append("W: {:03d} H: {:03d}".format(              \
+                *self.lastPanelState["size"]))
+        if "brushSize" in self.lastPanelState:
+            textItems.append("Brush: {:02d}x{:02d}".format(             \
+                *self.lastPanelState["brushSize"]))
+        if "colours" in self.lastPanelState:
+            textItems.append("FG: {:02d}, BG: {:02d}".format(           \
+                *self.lastPanelState["colours"]))
+            textItems.append("{} on {}".format(                         \
+                MiRCARTColours[self.lastPanelState["colours"][0]][4],   \
+                MiRCARTColours[self.lastPanelState["colours"][1]][4]))
+        if "pathName" in self.lastPanelState:
+            if self.lastPanelState["pathName"] != "":
+                basePathName = os.path.basename(self.lastPanelState["pathName"])
                 textItems.append("Current file: {}".format(basePathName))
                 self.SetTitle("{} - MiRCART".format(basePathName))
             else:
                 self.SetTitle("MiRCART")
-        if self.lastToolName != None:
-            textItems.append("Current tool: {}".format(self.lastToolName))
+        if "toolName" in self.lastPanelState:
+            textItems.append("Current tool: {}".format(                 \
+                self.lastPanelState["toolName"]))
         self.statusBar.SetStatusText(" | ".join(textItems))
-        if self.lastUndoLevel != None: 
-            if self.lastUndoLevel >= 0:
+        if "undoLevel" in self.lastPanelState: 
+            if self.lastPanelState["undoLevel"] >= 0:
                 self.menuItemsById[self.CID_UNDO[0]].Enable(True)
                 self.toolBar.EnableTool(self.CID_UNDO[0], True)
             else:
                 self.menuItemsById[self.CID_UNDO[0]].Enable(False)
                 self.toolBar.EnableTool(self.CID_UNDO[0], False)
-            if self.lastUndoLevel > 0:
+            if self.lastPanelState["undoLevel"] > 0:
                 self.menuItemsById[self.CID_REDO[0]].Enable(True)
                 self.toolBar.EnableTool(self.CID_REDO[0], True)
             else:
