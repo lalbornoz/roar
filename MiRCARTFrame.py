@@ -34,7 +34,7 @@ import os, wx
 class MiRCARTFrame(MiRCARTGeneralFrame):
     """XXX"""
     panelCanvas = None
-    lastCellPos = lastColours = lastPathName = lastUndoLevel = None
+    lastCellPos = lastColours = lastPathName = lastSize = lastUndoLevel = None
 
     # {{{ Commands
     #                      Id     Type Id      Labels                           Icon bitmap                 Accelerator                 [Initial state]
@@ -158,20 +158,24 @@ class MiRCARTFrame(MiRCARTGeneralFrame):
         else:
             self.itemsById[eventId][7](self.panelCanvas.canvasInterface, event)
     # }}}
-    # {{{ onCanvasUpdate(self, newCellPos=None, newColours=None, newPathName=None, newUndoLevel=None): XXX
-    def onCanvasUpdate(self, newCellPos=None, newColours=None, newPathName=None, newUndoLevel=None):
+    # {{{ onCanvasUpdate(self, newCellPos=None, newColours=None, newPathName=None, newSize=None, newUndoLevel=None): XXX
+    def onCanvasUpdate(self, newCellPos=None, newColours=None, newPathName=None, newSize=None, newUndoLevel=None):
         if newCellPos != None:
             self.lastCellPos = newCellPos
         if newColours != None:
             self.lastColours = newColours
         if newPathName != None:
             self.lastPathName = newPathName
+        if newSize != None:
+            self.lastSize = newSize
         if newUndoLevel != None:
             self.lastUndoLevel = newUndoLevel
         textItems = []
         if self.lastCellPos != None:
             textItems.append("X: {:03d} Y: {:03d}".format(      \
                 *self.lastCellPos))
+        if self.lastSize != None:
+            textItems.append("W: {:03d} H: {:03d}".format(*self.lastSize))
         if self.lastColours != None:
             textItems.append("FG: {:02d}, BG: {:02d}".format(   \
                 *self.lastColours))
