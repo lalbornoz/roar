@@ -137,9 +137,9 @@ class MiRCARTCanvasImportStore():
     # }}}
     # {{{ importNew(self, newCanvasSize=None): XXX
     def importNew(self, newCanvasSize=None):
-        newMap = [[[(1, 1), 0, " "]                                 \
-                for x in range(self.parentCanvas.canvasSize[0])]    \
-                    for y in range(self.parentCanvas.canvasSize[1])]
+        newMap = [[[[1, 1], 0, " "]                  \
+                for x in range(newCanvasSize[0])]    \
+                    for y in range(newCanvasSize[1])]
         self.parentCanvas.onStoreUpdate(newCanvasSize, newMap)
     # }}}
 
