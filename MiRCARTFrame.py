@@ -76,11 +76,11 @@ class MiRCARTFrame(MiRCARTGeneralFrame):
     CID_CLONE_SELECT    = [0x155, TID_SELECT,  "Clone", "Cl&one",               ["toolClone.png"],          [wx.ACCEL_CTRL, ord("E")],  False,          MiRCARTCanvasInterface.canvasToolSelectClone]
     CID_MOVE_SELECT     = [0x156, TID_SELECT,  "Move", "&Move",                 ["toolMove.png"],           [wx.ACCEL_CTRL, ord("M")],  False,          MiRCARTCanvasInterface.canvasToolSelectMove]
 
-    CID_COLOUR00        = [0x1a0, TID_SELECT,  "Colour #00", "Colour #00",      None,                       None,                       True,           MiRCARTCanvasInterface.canvasColour]
+    CID_COLOUR00        = [0x1a0, TID_SELECT,  "Colour #00", "Colour #00",      None,                       None,                       False,          MiRCARTCanvasInterface.canvasColour]
     CID_COLOUR01        = [0x1a1, TID_SELECT,  "Colour #01", "Colour #01",      None,                       None,                       False,          MiRCARTCanvasInterface.canvasColour]
     CID_COLOUR02        = [0x1a2, TID_SELECT,  "Colour #02", "Colour #02",      None,                       None,                       False,          MiRCARTCanvasInterface.canvasColour]
     CID_COLOUR03        = [0x1a3, TID_SELECT,  "Colour #03", "Colour #03",      None,                       None,                       False,          MiRCARTCanvasInterface.canvasColour]
-    CID_COLOUR04        = [0x1a4, TID_SELECT,  "Colour #04", "Colour #04",      None,                       None,                       False,          MiRCARTCanvasInterface.canvasColour]
+    CID_COLOUR04        = [0x1a4, TID_SELECT,  "Colour #04", "Colour #04",      None,                       None,                       True,           MiRCARTCanvasInterface.canvasColour]
     CID_COLOUR05        = [0x1a5, TID_SELECT,  "Colour #05", "Colour #05",      None,                       None,                       False,          MiRCARTCanvasInterface.canvasColour]
     CID_COLOUR06        = [0x1a6, TID_SELECT,  "Colour #06", "Colour #06",      None,                       None,                       False,          MiRCARTCanvasInterface.canvasColour]
     CID_COLOUR07        = [0x1a7, TID_SELECT,  "Colour #07", "Colour #07",      None,                       None,                       False,          MiRCARTCanvasInterface.canvasColour]
