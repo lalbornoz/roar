@@ -103,20 +103,28 @@ class MiRCARTGeneralFrame(wx.Frame):
                 self.toolBars[numToolBar].AddSeparator()
             elif toolBarItem == NID_TOOLBAR_VSEP:
                 numToolBar += 1; self.toolBars.append(None);
+            elif toolBarItem[1] == TID_SELECT:
+                self.itemsById[toolBarItem[0]] = toolBarItem
+                toolBarItemWindow =                         \
+                    self.toolBars[numToolBar].AddRadioTool( \
+                        toolBarItem[0], toolBarItem[2], toolBarItem[4][2])
+                self.toolBarItemsById[toolBarItem[0]] = toolBarItemWindow
+                if  toolBarItem[6] != None:
+                    toolBarItemWindow.Toggle(toolBarItem[6])
+                self.Bind(wx.EVT_TOOL, self.onInput, toolBarItemWindow)
+                self.Bind(wx.EVT_TOOL_RCLICKED, self.onInput, toolBarItemWindow)
             else:
                 self.itemsById[toolBarItem[0]] = toolBarItem
                 toolBarItemWindow =                         \
                     self.toolBars[numToolBar].AddTool(      \
-                        toolBarItem[0], toolBarItem[2],     \
-                        toolBarItem[4][2])
+                        toolBarItem[0], toolBarItem[2], toolBarItem[4][2])
                 self.toolBarItemsById[toolBarItem[0]] = toolBarItemWindow
-                if  toolBarItem[6] != None                  \
-                and toolBarItem[1] == TID_COMMAND:
+                if  toolBarItem[6] != None:
                     toolBarItemWindow.Enable(toolBarItem[6])
                 self.Bind(wx.EVT_TOOL, self.onInput, toolBarItemWindow)
                 self.Bind(wx.EVT_TOOL_RCLICKED, self.onInput, toolBarItemWindow)
         for numToolBar in range(len(self.toolBars)):
-            self.sizerSkin.Add(                          \
+            self.sizerSkin.Add(                             \
                 self.toolBars[numToolBar], 0, wx.ALL|wx.ALIGN_LEFT, 3)
             self.toolBars[numToolBar].Realize()
             self.toolBars[numToolBar].Fit()
