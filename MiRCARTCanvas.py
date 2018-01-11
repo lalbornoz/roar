@@ -93,6 +93,9 @@ class MiRCARTCanvas(wx.Panel):
                 event.Skip(); return;
         else:
             mapPoint = self.canvasBackend.xlateEventPoint(event, eventDc)
+            if mapPoint[0] >= self.canvasSize[0]                            \
+            or mapPoint[1] >= self.canvasSize[1]:
+                return
             self.brushPos = mapPoint
             tool.onMouseEvent(                                              \
                 event, mapPoint, self.brushColours, self.brushSize,         \
