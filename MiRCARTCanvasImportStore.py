@@ -57,7 +57,7 @@ class MiRCARTCanvasImportStore():
                 return (int(colourSpec[0] or curColours[0]),    \
                     int(colourSpec[1]))
             elif len(colourSpec) == 1:
-                return (int(colourSpec[0]), curColours[0])
+                return (int(colourSpec[0]), curColours[1])
         else:
             return (15, 1)
     # }}}
