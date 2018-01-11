@@ -110,6 +110,14 @@ class MiRCARTCanvasInterface():
     # }}}
     # {{{ canvasExit(self, event): XXX
     def canvasExit(self, event):
+        if self.canvasPathName != None:
+            saveChanges = self._dialogSaveChanges()
+            if saveChanges == wx.ID_CANCEL:
+                return
+            elif saveChanges == wx.ID_NO:
+                pass
+            elif saveChanges == wx.ID_YES:
+                self.canvasSave()
         self.parentFrame.Close(True)
     # }}}
     # {{{ canvasExportAsPng(self, event): XXX
