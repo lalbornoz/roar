@@ -97,7 +97,7 @@ class MiRCARTToPngFile:
                 else:
                     if inCurCell[2] != " ":
                         outColours[0] = self._ColourMapNormal[inCurCell[0][0]]
-                outColours[1] = self._ColourMapNormal[inCurCell[0][1]]
+                    outColours[1] = self._ColourMapNormal[inCurCell[0][1]]
                 outImgDraw.rectangle((*outCurPos,           \
                     outCurPos[0] + self.outImgFontSize[0],  \
                     outCurPos[1] + self.outImgFontSize[1]), \
