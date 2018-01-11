@@ -55,13 +55,13 @@ class MiRCARTFrame(MiRCARTGeneralFrame):
     CID_PASTE           = [0x10c, TID_COMMAND, "Paste", "&Paste",               ["", wx.ART_PASTE],         None,                       False,          MiRCARTCanvasInterface.canvasPaste]
     CID_DELETE          = [0x10d, TID_COMMAND, "Delete", "De&lete",             ["", wx.ART_DELETE],        None,                       False,          MiRCARTCanvasInterface.canvasDelete]
     CID_INCRW_CANVAS    = [0x10e, TID_COMMAND, "Increase canvas width",         \
-                                               "Increase canvas &width",        ["", wx.ART_PLUS],          [wx.ACCEL_ALT, ord("D")],   None,           MiRCARTCanvasInterface.canvasIncrCanvasWidth]
+                                               "Increase canvas &width",        ["toolIncrCanvasW.png"],    [wx.ACCEL_ALT, ord("D")],   None,           MiRCARTCanvasInterface.canvasIncrCanvasWidth]
     CID_DECRW_CANVAS    = [0x10f, TID_COMMAND, "Decrease canvas width",         \
-                                               "Decrease canvas w&idth",        ["", wx.ART_MINUS],         [wx.ACCEL_ALT, ord("A")],   None,           MiRCARTCanvasInterface.canvasDecrCanvasWidth]
+                                               "Decrease canvas w&idth",        ["toolDecrCanvasW.png"],    [wx.ACCEL_ALT, ord("A")],   None,           MiRCARTCanvasInterface.canvasDecrCanvasWidth]
     CID_INCRH_CANVAS    = [0x110, TID_COMMAND, "Increase canvas height",        \
-                                               "Increase canvas &height",       ["", wx.ART_PLUS],          [wx.ACCEL_ALT, ord("S")],   None,           MiRCARTCanvasInterface.canvasIncrCanvasHeight]
+                                               "Increase canvas &height",       ["toolIncrCanvasH.png"],    [wx.ACCEL_ALT, ord("S")],   None,           MiRCARTCanvasInterface.canvasIncrCanvasHeight]
     CID_DECRH_CANVAS    = [0x111, TID_COMMAND, "Decrease canvas height",        \
-                                               "Decrease canvas h&eight",       ["", wx.ART_MINUS],         [wx.ACCEL_ALT, ord("W")],   None,           MiRCARTCanvasInterface.canvasDecrCanvasHeight]
+                                               "Decrease canvas h&eight",       ["toolDecrCanvasH.png"],    [wx.ACCEL_ALT, ord("W")],   None,           MiRCARTCanvasInterface.canvasDecrCanvasHeight]
     CID_INCR_BRUSH      = [0x112, TID_COMMAND, "Increase brush size",           \
                                                "I&ncrease brush size",          ["", wx.ART_PLUS],          [wx.ACCEL_CTRL, ord("+")],  None,           MiRCARTCanvasInterface.canvasIncrBrush]
     CID_DECR_BRUSH      = [0x113, TID_COMMAND, "Decrease brush size",           \
@@ -112,6 +112,7 @@ class MiRCARTFrame(MiRCARTGeneralFrame):
         CID_UNDO, CID_REDO, NID_TOOLBAR_HSEP,                                                           \
         CID_CUT, CID_COPY, CID_PASTE, CID_DELETE, NID_TOOLBAR_HSEP,                                     \
         CID_INCR_BRUSH, CID_DECR_BRUSH, NID_TOOLBAR_HSEP,                                               \
+        CID_INCRW_CANVAS, CID_DECRW_CANVAS, CID_INCRH_CANVAS, CID_DECRH_CANVAS, NID_TOOLBAR_HSEP,       \
         CID_RECT, CID_CIRCLE, CID_FILL, CID_LINE, CID_TEXT, CID_CLONE_SELECT, CID_MOVE_SELECT,          \
         NID_TOOLBAR_VSEP,                                                                               \
         CID_COLOUR00, CID_COLOUR01, CID_COLOUR02, CID_COLOUR03, CID_COLOUR04,                           \
