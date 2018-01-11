@@ -47,7 +47,7 @@ class MiRCARTFrame(MiRCARTGeneralFrame):
                                                "Export to I&mgur...",           None,                       None,                       haveUrllib,     MiRCARTCanvasInterface.canvasExportImgur]
     CID_EXPORT_PASTEBIN = [0x106, TID_COMMAND, "Export to Pastebin...",         \
                                                "Export to Pasteb&in...",        None,                       None,                       haveUrllib,     MiRCARTCanvasInterface.canvasExportPastebin]
-    CID_EXIT            = [0x107, TID_COMMAND, "Exit", "E&xit",                 None,                       None,                       None,           MiRCARTCanvasInterface.canvasExit]
+    CID_EXIT            = [0x107, TID_COMMAND, "Exit", "E&xit",                 None,                       [wx.ACCEL_CTRL, ord("X")],  None,           MiRCARTCanvasInterface.canvasExit]
     CID_UNDO            = [0x108, TID_COMMAND, "Undo", "&Undo",                 ["", wx.ART_UNDO],          [wx.ACCEL_CTRL, ord("Z")],  False,          MiRCARTCanvasInterface.canvasUndo]
     CID_REDO            = [0x109, TID_COMMAND, "Redo", "&Redo",                 ["", wx.ART_REDO],          [wx.ACCEL_CTRL, ord("Y")],  False,          MiRCARTCanvasInterface.canvasRedo]
     CID_CUT             = [0x10a, TID_COMMAND, "Cut", "Cu&t",                   ["", wx.ART_CUT],           None,                       False,          MiRCARTCanvasInterface.canvasCut]
@@ -121,7 +121,7 @@ class MiRCARTFrame(MiRCARTGeneralFrame):
     # }}}
     # {{{ Accelerators (hotkeys)
     AID_EDIT            = (0x500, TID_ACCELS, (                                                         \
-        CID_NEW, CID_OPEN, CID_SAVE, CID_UNDO, CID_REDO,                                                \
+        CID_NEW, CID_OPEN, CID_SAVE, CID_EXIT, CID_UNDO, CID_REDO,                                      \
         CID_INCRW_CANVAS, CID_DECRW_CANVAS, CID_INCRH_CANVAS, CID_DECRH_CANVAS,                         \
         CID_INCR_BRUSH, CID_DECR_BRUSH,                                                                 \
         CID_RECT, CID_CIRCLE, CID_FILL, CID_LINE, CID_TEXT, CID_CLONE_SELECT, CID_MOVE_SELECT))
