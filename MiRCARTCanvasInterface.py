@@ -106,12 +106,21 @@ class MiRCARTCanvasInterface():
     def canvasCut(self, event):
         pass
     # }}}
-    # {{{ canvasDecrBrush(self, event): XXX
-    def canvasDecrBrush(self, event):
-        if  self.parentCanvas.brushSize[0] > 1   \
-        and self.parentCanvas.brushSize[1] > 1:
-            self.parentCanvas.brushSize =        \
-                [a-1 for a in self.parentCanvas.brushSize]
+    # {{{ canvasDecrBrushHeight(self, event): XXX
+    def canvasDecrBrushHeight(self, event):
+        if  self.parentCanvas.brushSize[1] > 1:
+            self.parentCanvas.brushSize[1] -= 1
+            self.parentFrame.onCanvasUpdate(brushSize=self.parentCanvas.brushSize)
+    # }}}
+    # {{{ canvasDecrBrushHeightWidth(self, event): XXX
+    def canvasDecrBrushHeightWidth(self, event):
+        self.canvasDecrBrushHeight(event)
+        self.canvasDecrBrushWidth(event)
+    # }}}
+    # {{{ canvasDecrBrushWidth(self, event): XXX
+    def canvasDecrBrushWidth(self, event):
+        if  self.parentCanvas.brushSize[0] > 1:
+            self.parentCanvas.brushSize[0] -= 1
             self.parentFrame.onCanvasUpdate(brushSize=self.parentCanvas.brushSize)
     # }}}
     # {{{ canvasDecrCanvasHeight(self, event): XXX
@@ -120,6 +129,11 @@ class MiRCARTCanvasInterface():
             self._updateCanvasSize([                        \
                     self.parentCanvas.canvasSize[0],        \
                     self.parentCanvas.canvasSize[1]-1])
+    # }}}
+    # {{{ canvasDecrCanvasHeightWidth(self, event): XXX
+    def canvasDecrCanvasHeightWidth(self, event):
+        self.canvasDecrCanvasHeight(event)
+        self.canvasDecrCanvasWidth(event)
     # }}}
     # {{{ canvasDecrCanvasWidth(self, event): XXX
     def canvasDecrCanvasWidth(self, event):
@@ -197,10 +211,19 @@ class MiRCARTCanvasInterface():
             wx.MessageBox("Failed to export to Pastebin: " + pasteResult,   \
                 "Export to Pastebin", wx.OK|wx.ICON_EXCLAMATION)
     # }}}
-    # {{{ canvasIncrBrush(self, event): XXX
-    def canvasIncrBrush(self, event):
-        self.parentCanvas.brushSize =    \
-                [a+1 for a in self.parentCanvas.brushSize]
+    # {{{ canvasIncrBrushHeight(self, event): XXX
+    def canvasIncrBrushHeight(self, event):
+        self.parentCanvas.brushSize[1] += 1
+        self.parentFrame.onCanvasUpdate(brushSize=self.parentCanvas.brushSize)
+    # }}}
+    # {{{ canvasIncrBrushHeightWidth(self, event): XXX
+    def canvasIncrBrushHeightWidth(self, event):
+        self.canvasIncrBrushHeight(event)
+        self.canvasIncrBrushWidth(event)
+    # }}}
+    # {{{ canvasIncrBrushWidth(self, event): XXX
+    def canvasIncrBrushWidth(self, event):
+        self.parentCanvas.brushSize[0] += 1
         self.parentFrame.onCanvasUpdate(brushSize=self.parentCanvas.brushSize)
     # }}}
     # {{{ canvasIncrCanvasHeight(self, event): XXX
@@ -208,6 +231,11 @@ class MiRCARTCanvasInterface():
         self._updateCanvasSize([                \
             self.parentCanvas.canvasSize[0],    \
             self.parentCanvas.canvasSize[1]+1])
+    # }}}
+    # {{{ canvasIncrCanvasHeightWidth(self, event): XXX
+    def canvasIncrCanvasHeightWidth(self, event):
+        self.canvasIncrCanvasHeight(event)
+        self.canvasIncrCanvasWidth(event)
     # }}}
     # {{{ canvasIncrCanvasWidth(self, event): XXX
     def canvasIncrCanvasWidth(self, event):
