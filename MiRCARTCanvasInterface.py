@@ -48,6 +48,8 @@ class MiRCARTCanvasInterface():
     # {{{ _updateCanvasSize(self, newCanvasSize): XXX
     def _updateCanvasSize(self, newCanvasSize):
         eventDc = self.parentCanvas.canvasBackend.getDeviceContext(self.parentCanvas)
+        self.parentCanvas.canvasBackend.drawCursorMaskWithJournal(  \
+            self.parentCanvas.canvasJournal, eventDc)
         oldCanvasSize = self.parentCanvas.canvasSize
         self.parentCanvas.resize(newCanvasSize)
         self.parentCanvas.canvasBackend.resize(                     \
