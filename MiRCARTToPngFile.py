@@ -92,17 +92,27 @@ class MiRCARTToPngFile:
                 outColours = [0, 0]
                 if inCurCell[1] & 0x02:
                     if inCurCell[2] != " ":
-                        outColours[0] = self._ColourMapBold[inCurCell[0][0]]
-                    outColours[1] = self._ColourMapBold[inCurCell[0][1]]
+                        if inCurCell[2] == "█":
+                            outColours[1] = self._ColourMapBold[inCurCell[0][0]]
+                        else:
+                            outColours[0] = self._ColourMapBold[inCurCell[0][0]]
+                            outColours[1] = self._ColourMapBold[inCurCell[0][1]]
+                    else:
+                        outColours[1] = self._ColourMapBold[inCurCell[0][1]]
                 else:
                     if inCurCell[2] != " ":
-                        outColours[0] = self._ColourMapNormal[inCurCell[0][0]]
-                    outColours[1] = self._ColourMapNormal[inCurCell[0][1]]
+                        if inCurCell[2] == "█":
+                            outColours[1] = self._ColourMapNormal[inCurCell[0][0]]
+                        else:
+                            outColours[0] = self._ColourMapNormal[inCurCell[0][0]]
+                            outColours[1] = self._ColourMapNormal[inCurCell[0][1]]
+                    else:
+                        outColours[1] = self._ColourMapNormal[inCurCell[0][1]]
                 outImgDraw.rectangle((*outCurPos,           \
                     outCurPos[0] + self.outImgFontSize[0],  \
                     outCurPos[1] + self.outImgFontSize[1]), \
                     fill=(*outColours[1], 255))
-                if  inCurCell[2] != " "                     \
+                if  not inCurCell[2] in " █"                \
                 and outColours[0] != outColours[1]:
                     # XXX implement italic
                     outImgDraw.text(outCurPos,              \
