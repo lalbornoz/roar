@@ -48,17 +48,39 @@ class MiRCARTCanvasInterface():
     # {{{ _updateCanvasSize(self, newCanvasSize): XXX
     def _updateCanvasSize(self, newCanvasSize):
         eventDc = self.parentCanvas.canvasBackend.getDeviceContext(self.parentCanvas)
+        oldCanvasSize = self.parentCanvas.canvasSize
         self.parentCanvas.resize(newCanvasSize)
-        self.parentCanvas.canvasBackend.resize(                  \
-            newCanvasSize,                                      \
+        self.parentCanvas.canvasBackend.resize(                     \
+            newCanvasSize,                                          \
             self.parentCanvas.canvasBackend.cellSize)
-        for numRow in range(self.parentCanvas.canvasSize[1] - 1):
-            self.parentCanvas.canvasMap.append([[1, 1], 0, " "])
-        self.parentCanvas.canvasMap.append([])
-        for numCol in range(self.parentCanvas.canvasSize[0]):
-            self.parentCanvas.canvasMap[-1].append([[1, 1], 0, " "])
-            self.parentCanvas.canvasBackend.drawPatch(eventDc,   \
-                ([numCol, self.parentCanvas.canvasSize[1] - 1], *[[1, 1], 0, " "]))
+        if (newCanvasSize[1] - oldCanvasSize[1]) < 0:
+            for numRowOff in range(1, (oldCanvasSize[1] - newCanvasSize[1]) + 1):
+                numRow = oldCanvasSize[1] - numRowOff
+                del self.parentCanvas.canvasMap[numRow]
+        else:
+            for numRowOff in range(oldCanvasSize[1] - newCanvasSize[1]):
+                numRow = oldCanvasSize[1] + numRowOff
+                self.parentCanvas.canvasMap.append(None)
+                self.parentCanvas.canvasMap[numRow] =               \
+                    [[[1, 1], 0, " "]] * oldCanvasSize[0]
+                self.parentCanvas.canvasBackend.drawPatch(          \
+                    eventDc,                                        \
+                    [[numCol, numRow], *[[1, 1], 0, " "]])
+        if (newCanvasSize[0] - oldCanvasSize[0]) < 0:
+            for numRow in range(newCanvasSize[1]):
+                for numColOff in range(1, (oldCanvasSize[0] - newCanvasSize[0]) + 1):
+                    numCol = oldCanvasSize[0] - numColOff
+                    del self.parentCanvas.canvasMap[numRow][numCol]
+        else:
+            for numRow in range(newCanvasSize[1]):
+                for numColOff in range(newCanvasSize[0] - oldCanvasSize[0]):
+                    numCol = oldCanvasSize[0] + numColOff
+                    self.parentCanvas.canvasMap[numRow].append(None)
+                    self.parentCanvas.canvasMap[numRow][numCol] =   \
+                        [[1, 1], 0, " "]
+                    self.parentCanvas.canvasBackend.drawPatch(      \
+                        eventDc,                                    \
+                        [[numCol, numRow], *[[1, 1], 0, " "]])
         wx.SafeYield()
     # }}}
 
