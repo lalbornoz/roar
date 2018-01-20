@@ -71,13 +71,12 @@ class MiRCARTToPngFile:
         [187, 187, 187],    # Light Grey
     ]
     # }}}
-    # {{{ _drawUnderline(self, curPos, fontSize, imgDraw): XXX
-    def _drawUnderLine(self, curPos, fontSize, imgDraw):
-        imgDraw.line(                           \
-            (curPos[0],                         \
-             curPos[1] + (fontSize[1] - 2)),    \
-            (curPos[0] + fontSize[0],           \
-             curPos[1] + (fontSize[1] - 2)), fill=outColours[0])
+    # {{{ _drawUnderline(self, curPos, fontSize, imgDraw, fillColour): XXX
+    def _drawUnderLine(self, curPos, fontSize, imgDraw, fillColour):
+        imgDraw.line(                                                       \
+            xy=(curPos[0], curPos[1] + (fontSize[1] - 2),                   \
+                curPos[0] + fontSize[0], curPos[1] + (fontSize[1] - 2)),    \
+                fill=fillColour)
     # }}}
     # {{{ export(self, outFilePath): XXX
     def export(self, outFilePath):
@@ -90,15 +89,15 @@ class MiRCARTToPngFile:
             for inCurCol in range(len(self.inCanvasMap[inCurRow])):
                 inCurCell = self.inCanvasMap[inCurRow][inCurCol]
                 outColours = [0, 0]
-                if inCurCell[1] & 0x02:
+                if inCurCell[1] & MiRCARTCanvasImportStore.MiRCARTCanvasImportStore._CellState.CS_BOLD:
                     if inCurCell[2] != " ":
                         if inCurCell[2] == "█":
-                            outColours[1] = self._ColourMapBold[inCurCell[0][0]]
+                            outColours[1] = self._ColourMapNormal[inCurCell[0][0]]
                         else:
                             outColours[0] = self._ColourMapBold[inCurCell[0][0]]
-                            outColours[1] = self._ColourMapBold[inCurCell[0][1]]
+                            outColours[1] = self._ColourMapNormal[inCurCell[0][1]]
                     else:
-                        outColours[1] = self._ColourMapBold[inCurCell[0][1]]
+                        outColours[1] = self._ColourMapNormal[inCurCell[0][1]]
                 else:
                     if inCurCell[2] != " ":
                         if inCurCell[2] == "█":
@@ -117,8 +116,11 @@ class MiRCARTToPngFile:
                     # XXX implement italic
                     outImgDraw.text(outCurPos,              \
                         inCurCell[2], (*outColours[0], 255), self.outImgFont)
-                if inCurCell[1] & 0x1f:
-                    self._drawUnderLine(curPos, self.outImgFontSize, outImgDraw)
+                if inCurCell[1] & MiRCARTCanvasImportStore.MiRCARTCanvasImportStore._CellState.CS_UNDERLINE:
+                    outColours[0] = self._ColourMapNormal[inCurCell[0][0]]
+                    self._drawUnderLine(outCurPos,          \
+                        self.outImgFontSize,                \
+                        outImgDraw, (*outColours[0], 255))
                 outCurPos[0] += self.outImgFontSize[0];
             outCurPos[0] = 0
             outCurPos[1] += self.outImgFontSize[1]

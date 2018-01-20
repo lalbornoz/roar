@@ -53,10 +53,12 @@ class MiRCARTCanvasImportStore():
     def _parseCharAsColourSpec(self, colourSpec, curColours):
         if len(colourSpec) > 0:
             colourSpec = colourSpec.split(",")
-            if len(colourSpec) == 2:
+            if  len(colourSpec) == 2                             \
+            and len(colourSpec[1]) > 0:
                 return (int(colourSpec[0] or curColours[0]),    \
                     int(colourSpec[1]))
-            elif len(colourSpec) == 1:
+            elif len(colourSpec) == 1                           \
+            or   len(colourSpec[1]) == 0:
                 return (int(colourSpec[0]), curColours[1])
         else:
             return (15, 1)
@@ -108,9 +110,16 @@ class MiRCARTCanvasImportStore():
                 or   inParseState == self._ParseState.PS_COLOUR_DIGIT1:
                     if  inChar == ","                                       \
                     and inParseState == self._ParseState.PS_COLOUR_DIGIT0:
-                        inCurCol += 1
-                        inCurColourDigits = 0; inCurColourSpec += inChar;
-                        inParseState = self._ParseState.PS_COLOUR_DIGIT1
+                        if  (inCurCol + 1) < inMaxCol                       \
+                        and not inLine[inCurCol + 1] in set("0123456789"):
+                            inCurColours = self._parseCharAsColourSpec(      \
+                                inCurColourSpec, inCurColours)
+                            inCurColourDigits = 0; inCurColourSpec = "";
+                            inParseState = self._ParseState.PS_CHAR
+                        else:
+                            inCurCol += 1
+                            inCurColourDigits = 0; inCurColourSpec += inChar;
+                            inParseState = self._ParseState.PS_COLOUR_DIGIT1
                     elif inChar in set("0123456789")                        \
                     and  inCurColourDigits == 0:
                         inCurCol += 1
