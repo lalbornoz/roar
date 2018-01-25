@@ -137,30 +137,48 @@ class MiRCARTCanvas(wx.Panel):
     def resize(self, newCanvasSize):
         if newCanvasSize != self.canvasSize:
             if self.canvasMap == None:
-                self.canvasMap = [[[(1, 1), 0, " "]         \
-                        for x in range(self.canvasSize[0])] \
-                            for y in range(self.canvasSize[1])]
+                self.canvasMap = []; oldCanvasSize = [0, 0];
             else:
-                for numRow in range(self.canvasSize[1]):
-                    for numNewCol in range(self.canvasSize[0], newCanvasSize[0]):
-                        self.canvasMap[numRow].append([[1, 1], 0, " "])
-                for numNewRow in range(self.canvasSize[1], newCanvasSize[1]):
-                    self.canvasMap.append([])
-                    for numNewCol in range(newCanvasSize[0]):
-                        self.canvasMap[numNewRow].append([[1, 1], 0, " "])
-            self.canvasSize = newCanvasSize
-            newWinSize = [a*b for a,b in                    \
-                zip(self.canvasSize, self.canvasBackend.cellSize)]
+                oldCanvasSize = self.canvasSize
+            deltaCanvasSize = [b-a for a,b in zip(oldCanvasSize, newCanvasSize)]
+
+            newWinSize = [a*b for a,b in zip(newCanvasSize, self.canvasBackend.cellSize)]
             self.SetMinSize(newWinSize)
             self.SetSize(wx.DefaultCoord, wx.DefaultCoord, *newWinSize)
             curWindow = self
             while curWindow != None:
                 curWindow.Layout()
                 curWindow = curWindow.GetParent()
-            self.canvasBackend.reset(self.canvasSize, self.canvasBackend.cellSize)
+
+            self.canvasBackend.resize(newCanvasSize, self.canvasBackend.cellSize)
+            eventDc = self.canvasBackend.getDeviceContext(self)
             self.canvasJournal.resetCursor(); self.canvasJournal.resetUndo();
-            self.parentFrame.onCanvasUpdate(                \
-                size=self.canvasSize, undoLevel=-1)
+
+            if deltaCanvasSize[0] < 0:
+                for numRow in range(oldCanvasSize[1]):
+                    del self.canvasMap[numRow][-1:(deltaCanvasSize[0]-1):-1]
+            else:
+                for numRow in range(oldCanvasSize[1]):
+                    self.canvasMap[numRow].extend(              \
+                            [[[1, 1], 0, " "]] * deltaCanvasSize[0])
+                    for numNewCol in range(oldCanvasSize[0], newCanvasSize[0]):
+                        self.canvasBackend.drawPatch(           \
+                            eventDc, [[numNewCol, numRow],      \
+                            *self.canvasMap[numRow][-1]])
+            if deltaCanvasSize[1] < 0:
+                del self.canvasMap[-1:(deltaCanvasSize[1]-1):-1]
+            else:
+                for numNewRow in range(oldCanvasSize[1], newCanvasSize[1]):
+                    self.canvasMap.extend(                      \
+                                [[[[1, 1], 0, " "]] * newCanvasSize[0]])
+                    for numNewCol in range(newCanvasSize[0]):
+                        self.canvasBackend.drawPatch(           \
+                            eventDc, [[numNewCol, numNewRow],   \
+                            *self.canvasMap[-1][-1]])
+
+            self.canvasSize = newCanvasSize
+            wx.SafeYield()
+            self.parentFrame.onCanvasUpdate(size=newCanvasSize, undoLevel=-1)
     # }}}
 
     #

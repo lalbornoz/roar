@@ -45,46 +45,6 @@ class MiRCARTCanvasInterface():
             dialogChoice = dialog.ShowModal()
             return dialogChoice
     # }}}
-    # {{{ _updateCanvasSize(self, newCanvasSize): XXX
-    def _updateCanvasSize(self, newCanvasSize):
-        eventDc = self.parentCanvas.canvasBackend.getDeviceContext(self.parentCanvas)
-        self.parentCanvas.canvasBackend.drawCursorMaskWithJournal(  \
-            self.parentCanvas.canvasJournal, eventDc)
-        oldCanvasSize = self.parentCanvas.canvasSize
-        self.parentCanvas.resize(newCanvasSize)
-        self.parentCanvas.canvasBackend.resize(                     \
-            newCanvasSize,                                          \
-            self.parentCanvas.canvasBackend.cellSize)
-        if (newCanvasSize[1] - oldCanvasSize[1]) < 0:
-            for numRowOff in range(1, (oldCanvasSize[1] - newCanvasSize[1]) + 1):
-                numRow = oldCanvasSize[1] - numRowOff
-                del self.parentCanvas.canvasMap[numRow]
-        else:
-            for numRowOff in range(oldCanvasSize[1] - newCanvasSize[1]):
-                numRow = oldCanvasSize[1] + numRowOff
-                self.parentCanvas.canvasMap.append(None)
-                self.parentCanvas.canvasMap[numRow] =               \
-                    [[[1, 1], 0, " "]] * oldCanvasSize[0]
-                self.parentCanvas.canvasBackend.drawPatch(          \
-                    eventDc,                                        \
-                    [[numCol, numRow], *[[1, 1], 0, " "]])
-        if (newCanvasSize[0] - oldCanvasSize[0]) < 0:
-            for numRow in range(newCanvasSize[1]):
-                for numColOff in range(1, (oldCanvasSize[0] - newCanvasSize[0]) + 1):
-                    numCol = oldCanvasSize[0] - numColOff
-                    del self.parentCanvas.canvasMap[numRow][numCol]
-        else:
-            for numRow in range(newCanvasSize[1]):
-                for numColOff in range(newCanvasSize[0] - oldCanvasSize[0]):
-                    numCol = oldCanvasSize[0] + numColOff
-                    self.parentCanvas.canvasMap[numRow].append(None)
-                    self.parentCanvas.canvasMap[numRow][numCol] =   \
-                        [[1, 1], 0, " "]
-                    self.parentCanvas.canvasBackend.drawPatch(      \
-                        eventDc,                                    \
-                        [[numCol, numRow], *[[1, 1], 0, " "]])
-        wx.SafeYield()
-    # }}}
 
     # {{{ canvasBrushSolid(self, event): XXX
     def canvasBrushSolid(self, event):
@@ -126,8 +86,8 @@ class MiRCARTCanvasInterface():
     # {{{ canvasDecrCanvasHeight(self, event): XXX
     def canvasDecrCanvasHeight(self, event):
         if self.parentCanvas.canvasSize[1] > 1:
-            self._updateCanvasSize([                        \
-                    self.parentCanvas.canvasSize[0],        \
+            self.parentCanvas.resize([                  \
+                    self.parentCanvas.canvasSize[0],    \
                     self.parentCanvas.canvasSize[1]-1])
     # }}}
     # {{{ canvasDecrCanvasHeightWidth(self, event): XXX
@@ -138,8 +98,8 @@ class MiRCARTCanvasInterface():
     # {{{ canvasDecrCanvasWidth(self, event): XXX
     def canvasDecrCanvasWidth(self, event):
         if self.parentCanvas.canvasSize[0] > 1:
-            self._updateCanvasSize([                        \
-                    self.parentCanvas.canvasSize[0]-1,        \
+            self.parentCanvas.resize([                  \
+                    self.parentCanvas.canvasSize[0]-1,  \
                     self.parentCanvas.canvasSize[1]])
     # }}}
     # {{{ canvasDelete(self, event): XXX
@@ -228,7 +188,7 @@ class MiRCARTCanvasInterface():
     # }}}
     # {{{ canvasIncrCanvasHeight(self, event): XXX
     def canvasIncrCanvasHeight(self, event):
-        self._updateCanvasSize([                \
+        self.parentCanvas.resize([              \
             self.parentCanvas.canvasSize[0],    \
             self.parentCanvas.canvasSize[1]+1])
     # }}}
@@ -239,7 +199,7 @@ class MiRCARTCanvasInterface():
     # }}}
     # {{{ canvasIncrCanvasWidth(self, event): XXX
     def canvasIncrCanvasWidth(self, event):
-        self._updateCanvasSize([                \
+        self.parentCanvas.resize([              \
             self.parentCanvas.canvasSize[0]+1,  \
             self.parentCanvas.canvasSize[1]])
     # }}}
