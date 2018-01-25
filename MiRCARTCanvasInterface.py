@@ -115,7 +115,7 @@ class MiRCARTCanvasInterface():
             elif saveChanges == wx.ID_NO:
                 pass
             elif saveChanges == wx.ID_YES:
-                self.canvasSave()
+                self.canvasSave(event)
         self.parentFrame.Close(True)
     # }}}
     # {{{ canvasExportAsPng(self, event): XXX
@@ -212,7 +212,7 @@ class MiRCARTCanvasInterface():
             elif saveChanges == wx.ID_NO:
                 pass
             elif saveChanges == wx.ID_YES:
-                self.canvasSave()
+                self.canvasSave(event)
         self.parentCanvas.SetCursor(wx.Cursor(wx.CURSOR_WAIT))
         if newCanvasSize == None:
             newCanvasSize = list(self.parentCanvas.defaultCanvasSize)
@@ -230,7 +230,7 @@ class MiRCARTCanvasInterface():
             elif saveChanges == wx.ID_NO:
                 pass
             elif saveChanges == wx.ID_YES:
-                self.canvasSave()
+                self.canvasSave(event)
         with wx.FileDialog(self.parentCanvas, "Open", os.getcwd(), "",  \
                 "*.txt", wx.FD_OPEN) as dialog:
             if dialog.ShowModal() == wx.ID_CANCEL:
