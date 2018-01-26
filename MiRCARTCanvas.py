@@ -181,8 +181,14 @@ class MiRCARTCanvas(wx.Panel):
             self.parentFrame.onCanvasUpdate(size=newCanvasSize, undoLevel=-1)
     # }}}
 
+    # {{{ __del__(self): destructor method
+    def __del__(self):
+        if self.canvasMap != None:
+            self.canvasMap.clear(); self.canvasMap = None;
+    # }}}
+
     #
-    # _init__(self, parent, parentFrame, defaultCanvasPos, defaultCanvasSize, defaultCellSize): initialisation method
+    # __init__(self, parent, parentFrame, defaultCanvasPos, defaultCanvasSize, defaultCellSize): initialisation method
     def __init__(self, parent, parentFrame, defaultCanvasPos, defaultCanvasSize, defaultCellSize):
         super().__init__(parent, pos=defaultCanvasPos,      \
             size=[w*h for w,h in zip(defaultCanvasSize, defaultCellSize)])
