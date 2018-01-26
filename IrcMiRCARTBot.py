@@ -180,7 +180,8 @@ class IrcMiRCARTBot(IrcClient.IrcClient):
     # }}}
     # {{{ _uploadToImgur(self, imgFilePath, imgName, imgTitle, apiKey): Upload single file to Imgur
     def _uploadToImgur(self, imgFilePath, imgName, imgTitle, apiKey):
-        requestImageData = open(imgFilePath, "rb").read()
+        with open(imgFilePath, "rb") as requestImage:
+            requestImageData = requestImage.read()
         requestData = {                                     \
             "image": base64.b64encode(requestImageData),    \
             "key":   apiKey,                                \
