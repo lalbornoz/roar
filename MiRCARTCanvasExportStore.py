@@ -42,7 +42,8 @@ class MiRCARTCanvasExportStore():
 
     # {{{ _exportFileToImgur(self, apiKey, imgName, imgTitle, pathName): upload single PNG file to Imgur
     def _exportFileToImgur(self, apiKey, imgName, imgTitle, pathName):
-        requestImageData = open(pathName, "rb").read()
+        with open(pathName, "rb") as requestImage:
+            requestImageData = requestImage.read()
         requestData = {                                     \
             "image": base64.b64encode(requestImageData),    \
             "key":   apiKey,                                \
