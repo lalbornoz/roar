@@ -227,6 +227,12 @@ class MiRCARTFrame(MiRCARTGeneralFrame):
                 toolBar.EnableTool(self.CID_REDO[0], False)
     # }}}
 
+    # {{{ __del__(self): destructor method
+    def __del__(self):
+        if self.panelCanvas != None:
+            del self.panelCanvas; self.panelCanvas = None;
+    # }}}
+
     #
     # __init__(self, parent, appSize=(840, 630), defaultCanvasPos=(0, 75), defaultCanvasSize=(100, 30), defaultCellSize=(7, 14)): initialisation method
     def __init__(self, parent, appSize=(840, 630), defaultCanvasPos=(0, 75), defaultCanvasSize=(100, 30), defaultCellSize=(7, 14)):
