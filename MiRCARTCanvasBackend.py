@@ -141,7 +141,8 @@ class MiRCARTCanvasBackend():
             newBitmap = wx.Bitmap(winSize)
             newDc.SelectObject(newBitmap)
             newDc.Blit(0, 0, *self.canvasBitmap.GetSize(), oldDc, 0, 0)
-            self.canvasBitmap = newBitmap
+            oldDc.SelectObject(wx.NullBitmap)
+            self.canvasBitmap.Destroy(); self.canvasBitmap = newBitmap;
         self.canvasSize = canvasSize; self.cellSize = cellSize;
         self._font = wx.Font(       \
             8,                      \
@@ -166,7 +167,7 @@ class MiRCARTCanvasBackend():
     # }}}
 
     #
-    # _init__(self, canvasSize, cellSize): initialisation method
+    # __init__(self, canvasSize, cellSize): initialisation method
     def __init__(self, canvasSize, cellSize):
         self._initBrushesAndPens()
         self.reset(canvasSize, cellSize)
