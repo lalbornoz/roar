@@ -33,27 +33,27 @@ class MiRCARTCanvasBackend():
 
     # {{{ _drawBrushPatch(self, eventDc, patch): XXX
     def _drawBrushPatch(self, eventDc, patch):
-        absPoint = self._xlatePoint(patch[0])
-        brushFg = self._brushes[patch[1][1]]
-        brushBg = self._brushes[patch[1][0]]
-        pen = self._pens[patch[1][1]]
+        absPoint = self._xlatePoint(patch)
+        brushFg = self._brushes[patch[3]]
+        brushBg = self._brushes[patch[2]]
+        pen = self._pens[patch[3]]
         self._setBrushDc(brushBg, brushFg, eventDc, pen)
         eventDc.DrawRectangle(*absPoint, *self.cellSize)
     # }}}
     # {{{ _drawCharPatch(self, eventDc, patch): XXX
     def _drawCharPatch(self, eventDc, patch):
-        absPoint = self._xlatePoint(patch[0])
-        brushFg = self._brushes[patch[1][0]]
-        brushBg = self._brushes[patch[1][1]]
-        pen = self._pens[patch[1][1]]
+        absPoint = self._xlatePoint(patch)
+        brushFg = self._brushes[patch[2]]
+        brushBg = self._brushes[patch[3]]
+        pen = self._pens[patch[3]]
         fontBitmap = wx.Bitmap(*self.cellSize)
         fontDc = wx.MemoryDC(); fontDc.SelectObject(fontBitmap);
-        fontDc.SetTextForeground(wx.Colour(MiRCARTColours[patch[1][0]][0:4]))
-        fontDc.SetTextBackground(wx.Colour(MiRCARTColours[patch[1][1]][0:4]))
+        fontDc.SetTextForeground(wx.Colour(MiRCARTColours[patch[2]][0:4]))
+        fontDc.SetTextBackground(wx.Colour(MiRCARTColours[patch[3]][0:4]))
         fontDc.SetBrush(brushBg); fontDc.SetBackground(brushBg); fontDc.SetPen(pen);
         fontDc.SetFont(self._font)
         fontDc.DrawRectangle(0, 0, *self.cellSize)
-        fontDc.DrawText(patch[3], 0, 0)
+        fontDc.DrawText(patch[5], 0, 0)
         eventDc.Blit(*absPoint, *self.cellSize, fontDc, 0, 0)
     # }}}
     # {{{ _finiBrushesAndPens(self): XXX
@@ -89,18 +89,18 @@ class MiRCARTCanvasBackend():
             dc.SetPen(pen)
             self._lastPen = pen
     # }}}
-    # {{{ _xlatePoint(self, relMapPoint): XXX
-    def _xlatePoint(self, relMapPoint):
-        return [a*b for a,b in zip(relMapPoint, self.cellSize)]
+    # {{{ _xlatePoint(self, patch): XXX
+    def _xlatePoint(self, patch):
+        return [a*b for a,b in zip(patch[0:2], self.cellSize)]
     # }}}
 
     # {{{ drawPatch(self, eventDc, patch): XXX
     def drawPatch(self, eventDc, patch):
-        if  patch[0][0] < self.canvasSize[0]    \
-        and patch[0][0] >= 0                    \
-        and patch[0][1] < self.canvasSize[1]    \
-        and patch[0][1] >= 0:
-            if patch[3] == " ":
+        if  patch[0] < self.canvasSize[0]    \
+        and patch[0] >= 0                    \
+        and patch[1] < self.canvasSize[1]    \
+        and patch[1] >= 0:
+            if patch[5] == " ":
                 self._drawBrushPatch(eventDc, patch)
             else:
                 self._drawCharPatch(eventDc, patch)

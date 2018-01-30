@@ -45,9 +45,9 @@ class MiRCARTToolCircle(MiRCARTTool):
             for brushX in range(-radius, radius + 1):
                 if ((brushX**2)+(brushY**2) < (((radius**2)+radius)*0.8)):
                     patch = [                                       \
-                        [atPoint[0] + int(originPoint[0]+brushX),   \
-                         atPoint[1] + int(originPoint[1]+brushY)],  \
-                        brushColours, 0, " "]
+                        atPoint[0] + int(originPoint[0]+brushX),    \
+                        atPoint[1] + int(originPoint[1]+brushY),    \
+                        *brushColours, 0, " "]
                     if isLeftDown or isRightDown:
                         dispatchFn(eventDc, False, patch); dispatchFn(eventDc, True, patch);
                     else:

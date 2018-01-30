@@ -42,7 +42,7 @@ class MiRCARTToolText(MiRCARTTool):
                 self.textColours = brushColours.copy()
             if self.textPos == None:
                 self.textPos = list(atPoint)
-        dispatchFn(eventDc, False, [self.textPos, self.textColours, 0, keyChar])
+        dispatchFn(eventDc, False, [*self.textPos, *self.textColours, 0, keyChar])
         if self.textPos[0] < (self.parentCanvas.canvasSize[0] - 1):
             self.textPos[0] += 1
         elif self.textPos[1] < (self.parentCanvas.canvasSize[1] - 1):
@@ -65,6 +65,6 @@ class MiRCARTToolText(MiRCARTTool):
             if self.textColours == None:
                 self.textColours = brushColours.copy()
             self.textPos = list(atPoint)
-        dispatchFn(eventDc, True, [self.textPos, self.textColours, 0, "_"])
+        dispatchFn(eventDc, True, [*self.textPos, *self.textColours, 0, "_"])
 
 # vim:expandtab foldmethod=marker sw=4 ts=4 tw=120

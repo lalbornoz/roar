@@ -53,18 +53,18 @@ class MiRCARTToolSelect(MiRCARTTool):
             else:
                 curColours = [0, 0]
             dispatchFn(eventDc, True,           \
-                    [[rectX, rectFrame[0][1]], curColours, 0, " "])
+                    [rectX, rectFrame[0][1], *curColours, 0, " "])
             dispatchFn(eventDc, True,           \
-                    [[rectX, rectFrame[1][1]], curColours, 0, " "])
+                    [rectX, rectFrame[1][1], *curColours, 0, " "])
         for rectY in range(rectFrame[0][1], rectFrame[1][1]+1):
             if curColours == [0, 0]:
                 curColours = [1, 1]
             else:
                 curColours = [0, 0]
             dispatchFn(eventDc, True,           \
-                    [[rectFrame[0][0], rectY], curColours, 0, " "])
+                    [rectFrame[0][0], rectY, *curColours, 0, " "])
             dispatchFn(eventDc, True,           \
-                    [[rectFrame[1][0], rectY], curColours, 0, " "])
+                    [rectFrame[1][0], rectY, *curColours, 0, " "])
     # }}}
 
     #
@@ -82,7 +82,7 @@ class MiRCARTToolSelect(MiRCARTTool):
                 self.toolState = self.TS_ORIGIN
             else:
                 dispatchFn(eventDc, True,                                       \
-                    [list(atPoint), brushColours.copy(), 0, " "])
+                    [*atPoint, *brushColours, 0, " "])
         elif self.toolState == self.TS_ORIGIN:
             self.toolRect[1] = list(atPoint)
             if isLeftDown or isRightDown:

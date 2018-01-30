@@ -41,7 +41,7 @@ class MiRCARTCanvas(wx.Panel):
 
     # {{{ _commitPatch(self, patch): XXX
     def _commitPatch(self, patch):
-        self.canvasMap[patch[0][1]][patch[0][0]] = patch[1:]
+        self.canvasMap[patch[1]][patch[0]] = patch[2:]
     # }}}
     # {{{ _dispatchDeltaPatches(self, deltaPatches): XXX
     def _dispatchDeltaPatches(self, deltaPatches):
@@ -58,8 +58,8 @@ class MiRCARTCanvas(wx.Panel):
                 self.canvasJournal, eventDc)
             self._canvasDirtyCursor = True
         if self.canvasBackend.drawPatch(eventDc, patch):
-            patchDeltaCell = self.canvasMap[patch[0][1]][patch[0][0]]
-            patchDelta = [list(patch[0]), *patchDeltaCell.copy()]
+            patchDeltaCell = self.canvasMap[patch[1]][patch[0]]
+            patchDelta = [*patch[0:2], *patchDeltaCell]
             if isCursor:
                 self.canvasJournal.pushCursor(patchDelta)
             else:
@@ -127,10 +127,10 @@ class MiRCARTCanvas(wx.Panel):
                 and numRow < len(newCanvas)             \
                 and numCol < len(newCanvas[numRow]):
                     self._commitPatch([                 \
-                        [numCol, numRow], *newCanvas[numRow][numCol]])
+                        numCol, numRow, *newCanvas[numRow][numCol]])
                 self.canvasBackend.drawPatch(eventDc,   \
-                    ([numCol, numRow],                  \
-                    *self.canvasMap[numRow][numCol]))
+                    [numCol, numRow,                    \
+                    *self.canvasMap[numRow][numCol]])
         wx.SafeYield()
     # }}}
     # {{{ resize(self, newCanvasSize): XXX
@@ -160,20 +160,20 @@ class MiRCARTCanvas(wx.Panel):
             else:
                 for numRow in range(oldCanvasSize[1]):
                     self.canvasMap[numRow].extend(              \
-                            [[[1, 1], 0, " "]] * deltaCanvasSize[0])
+                            [[1, 1, 0, " "]] * deltaCanvasSize[0])
                     for numNewCol in range(oldCanvasSize[0], newCanvasSize[0]):
                         self.canvasBackend.drawPatch(           \
-                            eventDc, [[numNewCol, numRow],      \
+                            eventDc, [numNewCol, numRow,        \
                             *self.canvasMap[numRow][-1]])
             if deltaCanvasSize[1] < 0:
                 del self.canvasMap[-1:(deltaCanvasSize[1]-1):-1]
             else:
                 for numNewRow in range(oldCanvasSize[1], newCanvasSize[1]):
                     self.canvasMap.extend(                      \
-                                [[[[1, 1], 0, " "]] * newCanvasSize[0]])
+                                [[[1, 1, 0, " "]] * newCanvasSize[0]])
                     for numNewCol in range(newCanvasSize[0]):
                         self.canvasBackend.drawPatch(           \
-                            eventDc, [[numNewCol, numNewRow],   \
+                            eventDc, [numNewCol, numNewRow,     \
                             *self.canvasMap[-1][-1]])
 
             self.canvasSize = newCanvasSize
