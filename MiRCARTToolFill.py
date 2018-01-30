@@ -32,17 +32,17 @@ class MiRCARTToolFill(MiRCARTTool):
     # onMouseEvent(self, event, atPoint, brushColours, brushSize, isDragging, isLeftDown, isRightDown, dispatchFn, eventDc): XXX
     def onMouseEvent(self, event, atPoint, brushColours, brushSize, isDragging, isLeftDown, isRightDown, dispatchFn, eventDc):
         pointStack = [list(atPoint)]; pointsDone = [];
-        testColour = self.parentCanvas.canvasMap[atPoint[1]][atPoint[0]][0][1]
+        testColour = self.parentCanvas.canvasMap[atPoint[1]][atPoint[0]][0:2]
         if isLeftDown or isRightDown:
             if isRightDown:
                 brushColours = [brushColours[1], brushColours[0]]
             while len(pointStack) > 0:
                 point = pointStack.pop()
                 pointCell = self.parentCanvas.canvasMap[point[1]][point[0]]
-                if pointCell[0][1] == testColour:
+                if pointCell[0:2] == testColour:
                     if not point in pointsDone:
-                        dispatchFn(eventDc, False, [point.copy(),   \
-                            [brushColours[0], brushColours[0]], 0, " "])
+                        dispatchFn(eventDc, False, [*point, \
+                            brushColours[0], brushColours[0], 0, " "])
                         if point[0] > 0:
                             pointStack.append([point[0] - 1, point[1]])
                         if point[0] < (self.parentCanvas.canvasSize[0] - 1):

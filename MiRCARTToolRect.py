@@ -43,7 +43,7 @@ class MiRCARTToolRect(MiRCARTTool):
             brushSize[0] *= 2
         for brushRow in range(brushSize[1]):
             for brushCol in range(brushSize[0]):
-                patch = [[atPoint[0] + brushCol, atPoint[1] + brushRow],brushColours, 0, " "]
+                patch = [atPoint[0] + brushCol, atPoint[1] + brushRow, *brushColours, 0, " "]
                 if isLeftDown or isRightDown:
                     dispatchFn(eventDc, False, patch); dispatchFn(eventDc, True, patch);
                 else: 

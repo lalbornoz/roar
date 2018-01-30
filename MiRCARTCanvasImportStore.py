@@ -105,7 +105,7 @@ class MiRCARTCanvasImportStore():
                             inCellState, self._CellState.CS_UNDERLINE)
                     else:
                         inRowCols += 1
-                        outMap[inCurRow].append((inCurColours, inCellState, inChar))
+                        outMap[inCurRow].append([*inCurColours, inCellState, inChar])
                 elif inParseState == self._ParseState.PS_COLOUR_DIGIT0      \
                 or   inParseState == self._ParseState.PS_COLOUR_DIGIT1:
                     if  inChar == ","                                       \
@@ -146,8 +146,8 @@ class MiRCARTCanvasImportStore():
     # }}}
     # {{{ importNew(self, newCanvasSize=None): XXX
     def importNew(self, newCanvasSize=None):
-        newMap = [[[[1, 1], 0, " "]                  \
-                for x in range(newCanvasSize[0])]    \
+        newMap = [[[1, 1, 0, " "]                   \
+                for x in range(newCanvasSize[0])]   \
                     for y in range(newCanvasSize[1])]
         self.parentCanvas.onStoreUpdate(newCanvasSize, newMap)
     # }}}

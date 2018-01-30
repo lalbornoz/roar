@@ -55,10 +55,10 @@ class MiRCARTToolLine(MiRCARTTool):
         lineD = 2 * pointDelta[1] - pointDelta[0]; lineY = 0;
         for lineX in range(pointDelta[0] + 1):
             for brushStep in range(brushSize[0]):
-                patch = [[                                                          \
+                patch = [                                                           \
                         originPoint[0] + lineX*lineXX + lineY*lineYX + brushStep,   \
-                        originPoint[1] + lineX*lineXY + lineY*lineYY],              \
-                        brushColours, 0, " "]
+                        originPoint[1] + lineX*lineXY + lineY*lineYY,               \
+                        *brushColours, 0, " "]
                 if isCursor:
                     dispatchFn(eventDc, False, patch); dispatchFn(eventDc, True, patch);
                 else:
@@ -83,7 +83,7 @@ class MiRCARTToolLine(MiRCARTTool):
                 self.toolColours = brushColours
                 self.toolOriginPoint = list(atPoint)
                 self.toolState = self.TS_ORIGIN
-            dispatchFn(eventDc, True, [atPoint, brushColours, 0, " "])
+            dispatchFn(eventDc, True, [*atPoint, *brushColours, 0, " "])
         elif self.toolState == self.TS_ORIGIN:
             targetPoint = list(atPoint)
             originPoint = self.toolOriginPoint
