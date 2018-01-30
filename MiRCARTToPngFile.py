@@ -89,35 +89,35 @@ class MiRCARTToPngFile:
             for inCurCol in range(len(self.inCanvasMap[inCurRow])):
                 inCurCell = self.inCanvasMap[inCurRow][inCurCol]
                 outColours = [0, 0]
-                if inCurCell[1] & MiRCARTCanvasImportStore.MiRCARTCanvasImportStore._CellState.CS_BOLD:
-                    if inCurCell[2] != " ":
-                        if inCurCell[2] == "█":
-                            outColours[1] = self._ColourMapNormal[inCurCell[0][0]]
+                if inCurCell[2] & MiRCARTCanvasImportStore.MiRCARTCanvasImportStore._CellState.CS_BOLD:
+                    if inCurCell[3] != " ":
+                        if inCurCell[3] == "█":
+                            outColours[1] = self._ColourMapNormal[inCurCell[0]]
                         else:
-                            outColours[0] = self._ColourMapBold[inCurCell[0][0]]
-                            outColours[1] = self._ColourMapNormal[inCurCell[0][1]]
+                            outColours[0] = self._ColourMapBold[inCurCell[0]]
+                            outColours[1] = self._ColourMapNormal[inCurCell[1]]
                     else:
-                        outColours[1] = self._ColourMapNormal[inCurCell[0][1]]
+                        outColours[1] = self._ColourMapNormal[inCurCell[1]]
                 else:
-                    if inCurCell[2] != " ":
-                        if inCurCell[2] == "█":
-                            outColours[1] = self._ColourMapNormal[inCurCell[0][0]]
+                    if inCurCell[3] != " ":
+                        if inCurCell[3] == "█":
+                            outColours[1] = self._ColourMapNormal[inCurCell[0]]
                         else:
-                            outColours[0] = self._ColourMapNormal[inCurCell[0][0]]
-                            outColours[1] = self._ColourMapNormal[inCurCell[0][1]]
+                            outColours[0] = self._ColourMapNormal[inCurCell[0]]
+                            outColours[1] = self._ColourMapNormal[inCurCell[1]]
                     else:
-                        outColours[1] = self._ColourMapNormal[inCurCell[0][1]]
+                        outColours[1] = self._ColourMapNormal[inCurCell[1]]
                 outImgDraw.rectangle((*outCurPos,           \
                     outCurPos[0] + self.outImgFontSize[0],  \
                     outCurPos[1] + self.outImgFontSize[1]), \
                     fill=(*outColours[1], 255))
-                if  not inCurCell[2] in " █"                \
+                if  not inCurCell[3] in " █"                \
                 and outColours[0] != outColours[1]:
                     # XXX implement italic
                     outImgDraw.text(outCurPos,              \
-                        inCurCell[2], (*outColours[0], 255), self.outImgFont)
-                if inCurCell[1] & MiRCARTCanvasImportStore.MiRCARTCanvasImportStore._CellState.CS_UNDERLINE:
-                    outColours[0] = self._ColourMapNormal[inCurCell[0][0]]
+                        inCurCell[3], (*outColours[0], 255), self.outImgFont)
+                if inCurCell[2] & MiRCARTCanvasImportStore.MiRCARTCanvasImportStore._CellState.CS_UNDERLINE:
+                    outColours[0] = self._ColourMapNormal[inCurCell[0]]
                     self._drawUnderLine(outCurPos,          \
                         self.outImgFontSize,                \
                         outImgDraw, (*outColours[0], 255))
