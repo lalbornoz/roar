@@ -148,11 +148,11 @@ class IrcMiRCARTBot(IrcClient.IrcClient):
             for numRow in range(len(canvasStore.outMap)):
                 if len(canvasStore.outMap[numRow]) != numRowCols:
                     for numColOff in range(numRowCols - len(canvasStore.outMap[numRow])):
-                        canvasStore.outMap[numRow].append([[1, 1], 0, " "])
-                canvasStore.outMap[numRow].insert(0, [[1, 1], 0, " "])
-                canvasStore.outMap[numRow].append([[1, 1], 0, " "])
-            canvasStore.outMap.insert(0, [[[1, 1], 0, " "]] * len(canvasStore.outMap[0]))
-            canvasStore.outMap.append([[[1, 1], 0, " "]] * len(canvasStore.outMap[0]))
+                        canvasStore.outMap[numRow].append([1, 1, 0, " "])
+                canvasStore.outMap[numRow].insert(0, [1, 1, 0, " "])
+                canvasStore.outMap[numRow].append([1, 1, 0, " "])
+            canvasStore.outMap.insert(0, [[1, 1, 0, " "]] * len(canvasStore.outMap[0]))
+            canvasStore.outMap.append([[1, 1, 0, " "]] * len(canvasStore.outMap[0]))
             MiRCARTToPngFile(canvasStore.outMap, "DejaVuSansMono.ttf", 11).export(imgTmpFilePath)
             imgurResponse = self._uploadToImgur(imgTmpFilePath, "MiRCART image", "MiRCART image", "c9a6efb3d7932fd")
             if imgurResponse[0] == 200:
