@@ -53,7 +53,7 @@ class MiRCARTToolSelectClone(MiRCARTToolSelect):
                 cellOld = self.toolSelectMap[numRow][numCol]
                 rectY = selectRect[0][1] + numRow
                 rectX = selectRect[0][0] + numCol
-                dispatchFn(eventDc, isCursor, [[rectX+disp[0], rectY+disp[1]], *cellOld])
+                dispatchFn(eventDc, isCursor, [rectX+disp[0], rectY+disp[1], *cellOld])
         self._drawSelectRect(newToolRect, dispatchFn, eventDc)
         self.toolRect = newToolRect
 
