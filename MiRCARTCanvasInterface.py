@@ -34,6 +34,7 @@ import os, wx
 
 class MiRCARTCanvasInterface():
     """XXX"""
+    imgurApiKey = None
     parentCanvas = parentFrame = canvasPathName = canvasTool = None
 
     # {{{ _dialogSaveChanges(self)
@@ -136,8 +137,8 @@ class MiRCARTCanvasInterface():
     # {{{ canvasExportImgur(self, event): XXX
     def canvasExportImgur(self, event):
         self.parentCanvas.SetCursor(wx.Cursor(wx.CURSOR_WAIT))
-        imgurResult = self.parentCanvas.canvasExportStore.exportBitmapToImgur(   \
-            "c9a6efb3d7932fd", self.parentCanvas.canvasBackend.canvasBitmap,    \
+        imgurResult = self.parentCanvas.canvasExportStore.exportBitmapToImgur(  \
+            self.imgurApiKey, self.parentCanvas.canvasBackend.canvasBitmap,     \
             "", "", wx.BITMAP_TYPE_PNG)
         self.parentCanvas.SetCursor(wx.Cursor(wx.NullCursor))
         if imgurResult[0] == 200:

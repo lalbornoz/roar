@@ -28,12 +28,14 @@ import json
 import IrcClient
 import requests, urllib.request
 from MiRCARTCanvasImportStore import MiRCARTCanvasImportStore
+from MiRCARTImgurApiKey import MiRCARTImgurApiKey
 from MiRCARTToPngFile import MiRCARTToPngFile
 
 class IrcMiRCARTBot(IrcClient.IrcClient):
     """IRC<->MiRC2png bot"""
     clientChannelLastMessage = clientChannelOps = clientChannel = None
     clientChannelRejoin = None
+    imgurApiKey = MiRCARTImgurApiKey.imgurApiKey
 
     # {{{ ContentTooLargeException(Exception): Raised by _urlretrieveReportHook() given download size > 1 MB
     class ContentTooLargeException(Exception):
@@ -154,7 +156,7 @@ class IrcMiRCARTBot(IrcClient.IrcClient):
             canvasStore.outMap.insert(0, [[1, 1, 0, " "]] * len(canvasStore.outMap[0]))
             canvasStore.outMap.append([[1, 1, 0, " "]] * len(canvasStore.outMap[0]))
             MiRCARTToPngFile(canvasStore.outMap, "DejaVuSansMono.ttf", 11).export(imgTmpFilePath)
-            imgurResponse = self._uploadToImgur(imgTmpFilePath, "MiRCART image", "MiRCART image", "c9a6efb3d7932fd")
+            imgurResponse = self._uploadToImgur(imgTmpFilePath, "MiRCART image", "MiRCART image", self.imgurApiKey)
             if imgurResponse[0] == 200:
                     self._log("Uploaded as: {}".format(imgurResponse[1]))
                     self.queue("PRIVMSG", message[2], "8/!\\ Uploaded as: {}".format(imgurResponse[1]))
