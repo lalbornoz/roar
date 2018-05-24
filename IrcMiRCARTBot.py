@@ -110,7 +110,7 @@ class IrcMiRCARTBot(IrcClient.IrcClient):
     def _dispatchPrivmsg(self, message):
         if  message[2].lower() == self.clientChannel.lower()           \
         and message[3].startswith("!pngbot "):
-            if (int(time.time()) - self.clientLastMessage) < 30:
+            if (int(time.time()) - self.clientLastMessage) < 5:
                 self._log("Ignoring request on {} from {} due to rate limit: {}".format(message[2].lower(), message[0], message[3]))
                 return
             elif message[0].split("!")[0].lower() not in self.clientChannelOps:
