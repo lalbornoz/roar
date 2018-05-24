@@ -27,6 +27,7 @@ from MiRCARTCanvasJournal import MiRCARTCanvasJournal
 from MiRCARTCanvasExportStore import MiRCARTCanvasExportStore, haveMiRCARTToPngFile, haveUrllib
 from MiRCARTCanvasImportStore import MiRCARTCanvasImportStore
 from MiRCARTCanvasInterface import MiRCARTCanvasInterface
+from MiRCARTImgurApiKey import MiRCARTImgurApiKey
 import wx
 
 class MiRCARTCanvas(wx.Panel):
@@ -38,6 +39,7 @@ class MiRCARTCanvas(wx.Panel):
     canvasBackend = canvasJournal = None
     canvasExportStore = canvasImportStore = None
     canvasInterface = None
+    imgurApiKey = MiRCARTImgurApiKey.imgurApiKey
 
     # {{{ _commitPatch(self, patch): XXX
     def _commitPatch(self, patch):
