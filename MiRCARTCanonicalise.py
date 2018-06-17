@@ -29,9 +29,9 @@ def canonicalise(inPathName):
     canvasStore = MiRCARTCanvasImportStore(inPathName)
     inMap = canvasStore.outMap.copy(); del canvasStore;
     with open(inPathName, "w+") as outFile:
-        lastAttribs = MiRCARTCanvasImportStore._CellState.CS_NONE
-        lastColours = None
         for inCurRow in range(len(inMap)):
+            lastAttribs = MiRCARTCanvasImportStore._CellState.CS_NONE
+            lastColours = None
             for inCurCol in range(len(inMap[inCurRow])):
                 inCurCell = inMap[inCurRow][inCurCol]
                 if lastAttribs != inCurCell[2]:
