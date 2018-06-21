@@ -163,7 +163,9 @@ class IrcMiRCARTBot(IrcClient.IrcClient):
                     self.clientLastMessage = int(time.time())
             else:
                     self._log("Upload failed with HTTP status code {}".format(imgurResponse[0]))
+                    self._log("Message from website: {}".format(imgurResponse[1]))
                     self.queue("PRIVMSG", message[2], "4/!\\ Upload failed with HTTP status code {}!".format(imgurResponse[0]))
+                    self.queue("PRIVMSG", message[2], "4/!\\ Message from website: {}".format(imgurResponse[1]))
             if os.path.isfile(asciiTmpFilePath):
                 os.remove(asciiTmpFilePath)
             if os.path.isfile(imgTmpFilePath):
@@ -197,7 +199,7 @@ class IrcMiRCARTBot(IrcClient.IrcClient):
         if responseHttp.status_code == 200:
                 return [200, responseDict.get("data").get("link")]
         else:
-                return [responseHttp.status_code]
+                return [responseHttp.status_code, responseHttp.text]
     # }}}
     # {{{ _urlretrieveReportHook(count, blockSize, totalSize): Limit downloads to 1 MB
     def _urlretrieveReportHook(count, blockSize, totalSize):
