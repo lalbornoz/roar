@@ -70,7 +70,7 @@ class MiRCARTCanvasImportStore():
     # }}}
     # {{{ importTextFile(self, pathName): XXX
     def importTextFile(self, pathName):
-        self.inFile = open(pathName, "r")
+        self.inFile = open(pathName, "r", encoding="utf-8")
         self.inSize = self.outMap = None;
         inCurColourSpec = ""; inCurRow = -1;
         inLine = self.inFile.readline()
