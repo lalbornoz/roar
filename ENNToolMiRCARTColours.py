@@ -5,7 +5,32 @@
 # This project is licensed under the terms of the MIT license.
 #
 
+#
+# MiRCARTColours: mIRC colour number to RGBA map given none of ^[BFV_] (bold, italic, reverse, underline],
+#
 ENNToolMiRCARTColours = [
+    [255, 255, 255],    # White
+    [0,   0,   0],      # Black
+    [0,   0,   187],    # Blue
+    [0,   187, 0],      # Green
+    [255, 85,  85],     # Light Red
+    [187, 0,   0],      # Red
+    [187, 0,   187],    # Purple
+    [187, 187, 0],      # Yellow
+    [255, 255, 85],     # Light Yellow
+    [85,  255, 85],     # Light Green
+    [0,   187, 187],    # Cyan
+    [85,  255, 255],    # Light Cyan
+    [85,  85,  255],    # Light Blue
+    [255, 85,  255],    # Pink
+    [85,  85,  85],     # Grey
+    [187, 187, 187],    # Light Grey
+]
+
+#
+# MiRCARTColours: mIRC colour number to RGBA float map given none of ^[BFV_] (bold, italic, reverse, underline],
+#
+ENNToolMiRCARTColoursFloat = [
     [1.00, 1.00, 1.00], # White
     [0.00, 0.00, 0.00], # Black
     [0.00, 0.00, 0.73], # Blue
