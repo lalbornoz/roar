@@ -43,7 +43,7 @@ class ENNToolApp(object):
             print("       -R WxH....: set MiRCART cube resolution; defaults to 0.1x0.2", file=sys.stderr)
             print("       -s pname..: input script pathname", file=sys.stderr)
             print("       -S........: select scrolling mode", file=sys.stderr)
-            print("       -t pname..: set MiRCART texture pathname; defaults to texture.png", file=sys.stderr)
+            print("       -t pname..: set MiRCART texture pathname; defaults to {}".format(os.path.join("assets", "texture.png")), file=sys.stderr)
             print("       -v........: be verbose", file=sys.stderr)
         try:
             optlist, argv = getopt(argv[1:], "Af:ho:pr:R:s:St:v")
@@ -63,7 +63,7 @@ class ENNToolApp(object):
             if not "-R" in optdict:
                 optdict["-R"] = "0.1x0.2"
             if not "-t" in optdict:
-                optdict["-t"] = "texture.png"
+                optdict["-t"] = os.path.join("assets", "texture.png")
 
             if "-r" in optdict:
                 optdict["-r"] = [int(r) for r in optdict["-r"].split("x")][0:2]
