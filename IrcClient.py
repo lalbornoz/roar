@@ -38,12 +38,14 @@ class IrcClient:
             self.clientSocket.close()
         self.clientSocket = self.clientSocketFile = None;
     # }}}
-    # {{{ connect(self, timeout=None): Connect to server and register w/ optional timeout
-    def connect(self, timeout=None):
-        self.clientSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    # {{{ connect(self, preferFamily=socket.AF_INET, timeout=None): Connect to server and register w/ optional timeout
+    def connect(self, preferFamily=socket.AF_INET, timeout=None):
+        gaiInfo = socket.getaddrinfo(self.serverHname, self.serverPort,
+                                     preferFamily, socket.SOCK_STREAM, socket.IPPROTO_TCP)
+        self.clientSocket = socket.socket(*gaiInfo[0][:3])
         self.clientSocket.setblocking(0)
         try:
-            self.clientSocket.connect((self.serverHname, int(self.serverPort)))
+            self.clientSocket.connect(gaiInfo[0][4])
         except BlockingIOError:
             pass
         if timeout:

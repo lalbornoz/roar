@@ -22,8 +22,9 @@
 # SOFTWARE.
 #
 
+from getopt import getopt, GetoptError
 import base64
-import os, sys, time
+import os, socket, sys, time
 import json
 import IrcClient
 import requests, urllib.request
@@ -206,10 +207,10 @@ class IrcMiRCARTBot(IrcClient.IrcClient):
         if (totalSize > pow(2,20)):
             raise IrcMiRCARTBot.ContentTooLargeException
     # }}}
-    # {{{ connect(self, timeout=None): Connect to server and (re)initialise w/ optional timeout
-    def connect(self, timeout=None):
+    # {{{ connect(self, preferFamily=0, timeout=None): Connect to server and (re)initialise w/ optional timeout
+    def connect(self, preferFamily=0, timeout=None):
         self._log("Connecting to {}:{}...".format(self.serverHname, self.serverPort))
-        if super().connect(timeout):
+        if super().connect(preferFamily=preferFamily, timeout=timeout):
                 self._log("Connected to {}:{}.".format(self.serverHname, self.serverPort))
                 self._log("Registering on {}:{} as {}, {}, {}...".format(self.serverHname, self.serverPort, self.clientNick, self.clientIdent, self.clientGecos))
                 self.clientLastMessage = 0; self.clientChannelOps = [];
@@ -255,18 +256,25 @@ class IrcMiRCARTBot(IrcClient.IrcClient):
 
 #
 # Entry point
-def main(*argv):
-    _IrcMiRCARTBot = IrcMiRCARTBot(*argv[1:])
+def main(optdict, *argv):
+    _IrcMiRCARTBot = IrcMiRCARTBot(*argv)
     while True:
-        if _IrcMiRCARTBot.connect(15):
+        if "-4" in optdict:
+            preferFamily = socket.AF_INET
+        elif "-6" in optdict:
+            preferFamily = socket.AF_INET6
+        else:
+            preferFamily = 0
+        if _IrcMiRCARTBot.connect(preferFamily=preferFamily, timeout=15):
             _IrcMiRCARTBot.dispatch()
             _IrcMiRCARTBot.close()
         time.sleep(15)
 
 if __name__ == "__main__":
-    if ((len(sys.argv) - 1) < 1)\
-    or ((len(sys.argv) - 1) > 4):
-        print("usage: {} "                                                  \
+    optlist, argv = getopt(sys.argv[1:], "46")
+    optdict = dict(optlist)
+    if len(argv) < 1 or len(argv) > 4:
+        print("usage: {} [-4|-6] "                                          \
             "<IRC server hostname> "                                        \
             "[<IRC server port; defaults to 6667>] "                        \
             "[<IRC bot nick name; defaults to pngbot>] "                    \
@@ -274,6 +282,6 @@ if __name__ == "__main__":
             "[<IRC bot real name; defaults to pngbot>] "                    \
             "[<IRC bot channel name; defaults to #MiRCART>] ".format(sys.argv[0]), file=sys.stderr)
     else:
-        main(*sys.argv)
+        main(optdict, *argv)
 
 # vim:expandtab foldmethod=marker sw=4 ts=4 tw=120
