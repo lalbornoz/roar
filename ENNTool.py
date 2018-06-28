@@ -10,7 +10,7 @@
 # 3) -s: effects: rotate, smash into bricks, swirl, wave, ...
 # 4) XXX autodetect video width from widest mircart
 # 5) XXX convert TTF to texture PNG & coords TXT, render accordingly
-# 6) XXX dont stall GPU w/ glReadPixels(), switch to asynchronous model w/ PBOs
+# 6) XXX dont stall GPU w/ glReadPixels(), switch to asynchronous model w/ FBO or PBO (http://www.songho.ca/opengl/gl_fbo.html, http://www.songho.ca/opengl/gl_pbo.html)
 # 7) XXX render mircart as 3D blocks vs flat surface
 #
 
@@ -91,8 +91,8 @@ class ENNToolApp(object):
                 MiRCART += ENNToolMiRCARTImporter(inFile).outMap
 
         curY, rotateX, rotateY, translateY = 0, 0, 0, scrollRate
-        artTextureId = panelGLCanvas.initTexture(texturePathName)
-        artVbo, artVboLen, lastY, numVertices = panelGLCanvas.renderMiRCART(MiRCART, cubeSize=optdict["-R"])
+        artTextureId, artInfo = panelGLCanvas.initTexture(texturePathName)
+        artVbo, artVboLen, lastY, numVertices = panelGLCanvas.renderMiRCART(artInfo, MiRCART, cubeSize=optdict["-R"])
         if "-v" in optdict:
             print("{} vertices".format(numVertices))
         w, h = panelGLCanvas.GetClientSize(); w, h = max(w, 1.0), max(h, 1.0);
@@ -121,7 +121,9 @@ class ENNToolApp(object):
 
         videoFps, videoPath = int(optdict["-f"]), optdict["-o"]
         panelGLCanvas = ENNToolGLCanvasPanel(appPanelSkin, size=appFrameSize, videoPath=videoPath)
-        panelGLCanvas.initOpenGL(); panelGLCanvas.initVideoWriter(fps=videoFps)
+        panelGLCanvas.initOpenGL()
+        panelGLCanvas.initShaders()
+        panelGLCanvas.initVideoWriter(fps=videoFps)
 
         if "-v" in optdict:
             time0 = time.time()
