@@ -8,10 +8,12 @@
 # 1) -A: render frame #1, render frame #2, ...
 # 2) -o: support at least {GIF,MP4,WEBM}
 # 3) -s: effects: rotate, smash into bricks, swirl, wave, ...
-# 4) XXX autodetect video width from widest mircart
-# 5) XXX convert TTF to texture PNG & coords TXT, render accordingly
-# 6) XXX dont stall GPU w/ glReadPixels(), switch to asynchronous model w/ FBO or PBO (http://www.songho.ca/opengl/gl_fbo.html, http://www.songho.ca/opengl/gl_pbo.html)
-# 7) XXX render mircart as 3D blocks vs flat surface
+# 4) Feature: include ETA @ progress bar
+# 5) Feature: autodetect video width from widest mircart
+# 6) Feature: render mircart as 3D blocks vs flat surface
+# 7) Optimisation: dont stall GPU w/ glReadPixels(), switch to asynchronous model w/ FBO or PBO (http://www.songho.ca/opengl/gl_fbo.html, http://www.songho.ca/opengl/gl_pbo.html)
+# 8) OpenGL: use VAOs + glVertexAttribFormat + glVertexAttribBinding
+# 9) OpenGL: use glEnable(GL_BLEND) + glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA) & multiply texel * bgcolour (https://learnopengl.com/Advanced-OpenGL/Blending)
 #
 
 from getopt import getopt, GetoptError
@@ -21,6 +23,7 @@ import os, sys, time
 import wx
 
 from ENNToolGLCanvasPanel import ENNToolGLCanvasPanel
+from ENNToolGLTTFTexture import ENNToolGLTTFTexture
 from ENNToolMiRCARTImporter import ENNToolMiRCARTImporter
 
 class ENNToolApp(object):
@@ -91,7 +94,7 @@ class ENNToolApp(object):
                 MiRCART += ENNToolMiRCARTImporter(inFile).outMap
 
         curY, rotateX, rotateY, translateY = 0, 0, 0, scrollRate
-        artTextureId, artInfo = panelGLCanvas.initTexture(texturePathName)
+        artTextureId, artInfo = ENNToolGLTTFTexture(MiRCART, optdict["-R"], optdict["-r"]).getParams()
         artVbo, artVboLen, lastY, numVertices = panelGLCanvas.renderMiRCART(artInfo, MiRCART, cubeSize=optdict["-R"])
         if "-v" in optdict:
             print("{} vertices".format(numVertices))
