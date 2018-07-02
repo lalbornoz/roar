@@ -10,18 +10,14 @@
 # Wed, 27 Jun 2018 16:02:12 +0200 [3] <https://www.khronos.org/opengl/wiki/How_lighting_works#Good_Settings.>
 # Wed, 27 Jun 2018 16:02:13 +0200 [4] <https://www.khronos.org/opengl/wiki/Common_Mistakes>
 # Wed, 27 Jun 2018 16:02:14 +0200 [5] <https://www.khronos.org/opengl/wiki/Pixel_Transfer#Pixel_layout>
-# Thu, 28 Jun 2018 17:03:16 +0200 [6] <https://stackoverflow.com/questions/384759/how-to-convert-a-pil-image-into-a-numpy-array>
-# Thu, 28 Jun 2018 17:04:59 +0200 [7] <https://www.khronos.org/opengl/wiki/Common_Mistakes#y-axis>
-# Thu, 28 Jun 2018 18:32:50 +0200 [8] <https://stackoverflow.com/questions/18935203/shader-position-vec4-or-vec3>
+# Thu, 28 Jun 2018 18:32:50 +0200 [6] <https://stackoverflow.com/questions/18935203/shader-position-vec4-or-vec3>
 #
 
 from OpenGL.GL import *
 from OpenGL.GL import shaders
-from PIL import Image
 import cv2, numpy
 import ctypes, os, sys, time
 import wx, wx.glcanvas
-import yaml
 
 from ENNToolMiRCARTColours import ENNToolMiRCARTColoursFloat
 
@@ -53,11 +49,7 @@ class ENNToolGLCanvasPanel(wx.glcanvas.GLCanvas, wx.Panel):
 
             void main() {
                 vec4 texel = texture2D(texture, fgTexCoord);
-                if (texel.a > 0.0) {
-                    gl_FragColor = vec4(texel.r, texel.g, texel.b, 1.0);
-                } else {
-                    gl_FragColor = bgColour;
-                }
+                gl_FragColor = vec4(texel.r, texel.g, texel.b, 1.0);
             }
             """, GL_FRAGMENT_SHADER)
         vs = shaders.compileShader("""
@@ -82,37 +74,12 @@ class ENNToolGLCanvasPanel(wx.glcanvas.GLCanvas, wx.Panel):
             """, GL_VERTEX_SHADER)
         self.shader = shaders.compileProgram(vs, fs)
     # }}}
-    # {{{ initTexture(self, pathName, infoPathName=os.path.join("assets", "textures.yaml")): XXX
-    def initTexture(self, pathName, infoPathName=os.path.join("assets", "textures.yaml")):
-        with open(infoPathName, "r") as fileObject:
-            artInfo = yaml.load(fileObject)
-
-        # [6], [7]
-        artTextureId = glGenTextures(1)
-        artTextureImage = Image.open(pathName).transpose(Image.FLIP_TOP_BOTTOM)
-        artTextureImageData = numpy.array(artTextureImage)
-
-        glBindTexture(GL_TEXTURE_2D, artTextureId)
-        glPixelStorei(GL_UNPACK_ALIGNMENT, 1)
-        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP)
-        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP)
-
-        # [2]
-        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
-        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST)
-
-        # [4][5]
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA,
-                     artTextureImage.size[0], artTextureImage.size[1],
-                     0, GL_RGBA, GL_UNSIGNED_BYTE, artTextureImageData)
-        glBindTexture(GL_TEXTURE_2D, artTextureId)
-        return artTextureId, artInfo
-    # }}}
     # {{{ initVideoWriter(self): XXX
     def initVideoWriter(self, fourcc="XVID", fps=25):
         fourcc = cv2.VideoWriter_fourcc(*list(fourcc))
         self.videoWriter = cv2.VideoWriter(self.videoPath, fourcc, fps, (self.width, self.height), True)
     # }}}
+
     # {{{ renderFrame(self, artTextureId, artVbo, artVboLen): XXX
     def renderFrame(self, artTextureId, artVbo, artVboLen):
         glEnableClientState(GL_VERTEX_ARRAY)
@@ -136,7 +103,7 @@ class ENNToolGLCanvasPanel(wx.glcanvas.GLCanvas, wx.Panel):
         glUniformMatrix4fv(glGetUniformLocation(self.shader, "projection"), 1, GL_FALSE, projection)
         glUniform1i(glGetUniformLocation(self.shader, "texture"), 0)
 
-        # [8]
+        # [6]
         glEnableVertexAttribArray(0)
         glVertexAttribPointer(0, 3, GL_FLOAT, False, 48, ctypes.c_void_p(0))
         glEnableVertexAttribArray(1)
@@ -168,43 +135,39 @@ class ENNToolGLCanvasPanel(wx.glcanvas.GLCanvas, wx.Panel):
             if centre and (len(artMap[numRow]) < canvasCols):
                 curPos[0] += (((canvasCols - len(artMap[numRow])) * cubeSize[0]) / 2)
             for numCol in range(len(artMap[numRow])):
-                cubeColour = [*ENNToolMiRCARTColoursFloat[artMap[numRow][numCol][1]], 1.0]
-                if artMap[numRow][numCol][0] != artMap[numRow][numCol][1]:
-                    colColour = artMap[numRow][numCol][0]
-                    cubeChar = artMap[numRow][numCol][3]
-                    if ord(cubeChar) >= 128:
-                        print("dont have {}".format(cubeChar))
-                        cubeChar = " "
-                else:
-                    colColour = artMap[numRow][numCol][1]
-                    cubeChar = " "
+                cubeFg = artMap[numRow][numCol][0]
+                cubeBg = artMap[numRow][numCol][1]
+                cubeBgFloat = [*ENNToolMiRCARTColoursFloat[cubeBg], 1.0]
+                cubeAttrs = artMap[numRow][numCol][2]
+                cubeChar = artMap[numRow][numCol][3]
+                artCell = artInfo[cubeFg][cubeBg][cubeAttrs][cubeChar]
 
                 # Top Right
                 vertices += curPos
                 vertices += [0.0, 0.0, 1.0]
-                vertices += cubeColour
-                vertices += [float(((ord(cubeChar) + 1) * artInfo["rowWidth"]) / artInfo["texWidth"]), ((colColour + 1) * artInfo["rowHeight"]) / float(artInfo["texHeight"])]
+                vertices += cubeBgFloat
+                vertices += artCell[0:2]
                 numVertices += 1
 
                 # Top Left
                 vertices += [curPos[0]-cubeSize[0], curPos[1], curPos[2]]
                 vertices += [0.0, 0.0, 1.0]
-                vertices += cubeColour
-                vertices += [float(((ord(cubeChar) + 0) * artInfo["rowWidth"]) / artInfo["texWidth"]), ((colColour + 1) * artInfo["rowHeight"]) / float(artInfo["texHeight"])]
+                vertices += cubeBgFloat
+                vertices += artCell[2:4]
                 numVertices += 1
 
                 # Bottom Left
                 vertices += [curPos[0]-cubeSize[0], curPos[1]-cubeSize[1], curPos[2]]
                 vertices += [0.0, 0.0, 1.0]
-                vertices += cubeColour
-                vertices += [float(((ord(cubeChar) + 0) * artInfo["rowWidth"]) / artInfo["texWidth"]), ((colColour) * artInfo["rowHeight"]) / float(artInfo["texHeight"])]
+                vertices += cubeBgFloat
+                vertices += artCell[4:6]
                 numVertices += 1
 
                 # Bottom Right
                 vertices += [curPos[0], curPos[1]-cubeSize[1], curPos[2]]
                 vertices += [0.0, 0.0, 1.0]
-                vertices += cubeColour
-                vertices += [float(((ord(cubeChar) + 1) * artInfo["rowWidth"]) / artInfo["texWidth"]), ((colColour) * artInfo["rowHeight"]) / float(artInfo["texHeight"])]
+                vertices += cubeBgFloat
+                vertices += artCell[6:8]
                 numVertices += 1
 
                 curPos[0] += cubeSize[0]
@@ -226,6 +189,7 @@ class ENNToolGLCanvasPanel(wx.glcanvas.GLCanvas, wx.Panel):
         screenshot = numpy.flipud(numpy.frombuffer(screenshot, numpy.uint8).reshape((self.height, self.width, 3)))
         self.videoWriter.write(screenshot)
     # }}}
+
     # {{{ __init__(self, parent, size, defaultPos=(24,24), videoPath=None): initialisation method
     def __init__(self, parent, size, defaultPos=(24,24), videoPath=None):
         super().__init__(parent, pos=defaultPos, size=size)
