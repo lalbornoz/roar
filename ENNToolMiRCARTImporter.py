@@ -26,7 +26,6 @@ class ENNToolMiRCARTImporter(object):
         PS_COLOUR_DIGIT0    = 2
         PS_COLOUR_DIGIT1    = 3
     # }}}
-
     # {{{ _flipCellStateBit(self, cellState, bit): XXX
     def _flipCellStateBit(self, cellState, bit):
         if cellState & bit:

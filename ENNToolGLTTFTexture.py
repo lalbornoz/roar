@@ -17,7 +17,6 @@ from OpenGL.GL import *
 from PIL import Image, ImageDraw, ImageFont
 import numpy
 import os, string, sys
-
 from ENNToolMiRCARTColours import ENNToolMiRCARTColours
 from ENNToolMiRCARTImporter import ENNToolMiRCARTImporter
 
@@ -34,7 +33,6 @@ class ENNToolGLTTFTexture(object):
     def _nestedDict():
         return defaultdict(ENNToolGLTTFTexture._nestedDict)
     # }}}
-
     # {{{ _drawCharList(self, artInfo, charList, pilFontBold, pilFontNormal, pilFontSize, pilImageDraw, pilImageSize): XXX
     def _drawCharList(self, artInfo, charList, pilFontBold, pilFontNormal, pilFontSize, pilImageDraw, pilImageSize):
         curPos = [0, 0]
@@ -119,9 +117,9 @@ class ENNToolGLTTFTexture(object):
                      0, GL_RGBA, GL_UNSIGNED_BYTE, artTextureImageData)
         glGenerateMipmap(GL_TEXTURE_2D)
 
+        glBindTexture(GL_TEXTURE_2D, 0)
         return artTextureId
     # }}}
-
     # {{{ getParams(self): XXX
     def getParams(self):
         return self.artTextureId, self.artInfo
