@@ -11,15 +11,12 @@
 # Wed, 27 Jun 2018 16:02:13 +0200 [4] <https://www.khronos.org/opengl/wiki/Common_Mistakes>
 # Wed, 27 Jun 2018 16:02:14 +0200 [5] <https://www.khronos.org/opengl/wiki/Pixel_Transfer#Pixel_layout>
 # Thu, 28 Jun 2018 18:32:50 +0200 [6] <https://stackoverflow.com/questions/18935203/shader-position-vec4-or-vec3>
+# Tue, 03 Jul 2018 14:34:57 +0200 [7] <https://gamedev.stackexchange.com/questions/107793/binding-and-unbinding-what-would-you-do>
 #
 
 from OpenGL.GL import *
 from OpenGL.GL import shaders
-import cv2, numpy
-import ctypes, os, sys, time
-import wx, wx.glcanvas
-
-from ENNToolMiRCARTColours import ENNToolMiRCARTColoursFloat
+import ctypes, wx, wx.glcanvas
 
 class ENNToolGLCanvasPanel(wx.glcanvas.GLCanvas, wx.Panel):
     """XXX"""
@@ -40,10 +37,10 @@ class ENNToolGLCanvasPanel(wx.glcanvas.GLCanvas, wx.Panel):
     # }}}
     # {{{ initShaders(self): XXX
     def initShaders(self):
+        # Fragment shader
         fs = shaders.compileShader("""
             #version 330 core
 
-            in vec4 bgColour;
             in vec2 fgTexCoord;
             uniform sampler2D texture;
 
@@ -52,125 +49,83 @@ class ENNToolGLCanvasPanel(wx.glcanvas.GLCanvas, wx.Panel):
                 gl_FragColor = vec4(texel.r, texel.g, texel.b, 1.0);
             }
             """, GL_FRAGMENT_SHADER)
+
+        # Vertex shader
         vs = shaders.compileShader("""
             #version 330 core
 
             layout(location = 0) in vec4 vertex;
-            layout(location = 1) in vec3 normal;
-            layout(location = 2) in vec4 colour;
-            layout(location = 3) in vec2 texcoord;
+            layout(location = 1) in vec2 texcoord;
 
-            out vec4 bgColour;
             out vec2 fgTexCoord;
 
-            uniform mat4 model;
+            uniform mat4 modelview;
             uniform mat4 projection;
 
             void main() {
-                gl_Position = projection * model * vertex;
-                bgColour = colour;
+                gl_Position = projection * modelview * vertex;
                 fgTexCoord = texcoord;
             }
             """, GL_VERTEX_SHADER)
         self.shader = shaders.compileProgram(vs, fs)
     # }}}
-    # {{{ initVideoWriter(self): XXX
-    def initVideoWriter(self, fourcc="XVID", fps=25):
-        fourcc = cv2.VideoWriter_fourcc(*list(fourcc))
-        self.videoWriter = cv2.VideoWriter(self.videoPath, fourcc, fps, (self.width, self.height), True)
-    # }}}
-
     # {{{ renderFrame(self, artTextureId, artVbo, artVboLen): XXX
     def renderFrame(self, artTextureId, artVbo, artVboLen):
-        glEnableClientState(GL_VERTEX_ARRAY)
-        glEnableClientState(GL_NORMAL_ARRAY)
-        glEnableClientState(GL_COLOR_ARRAY)
-        glEnableClientState(GL_TEXTURE_COORD_ARRAY)
-        glEnable(GL_TEXTURE_2D)
-
-        glEnable(GL_BLEND)
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
-
-        glBindTexture(GL_TEXTURE_2D, artTextureId)
+        # Bind VBO and named texture & install shader program object
         glBindBuffer(GL_ARRAY_BUFFER, artVbo)
-
+        glBindTexture(GL_TEXTURE_2D, artTextureId)
         glUseProgram(self.shader)
-        model = (GLfloat * 16)()
-        glGetFloatv(GL_MODELVIEW_MATRIX, model)
-        projection = (GLfloat * 16)()
+
+        # Specify modelview and projection matrix & texture unit uniforms for shader programs
+        modelview, projection = (GLfloat * 16)(), (GLfloat * 16)()
+        glGetFloatv(GL_MODELVIEW_MATRIX, modelview)
         glGetFloatv(GL_PROJECTION_MATRIX, projection)
-        glUniformMatrix4fv(glGetUniformLocation(self.shader, "model"), 1, GL_FALSE, model)
+        glUniformMatrix4fv(glGetUniformLocation(self.shader, "modelview"), 1, GL_FALSE, modelview)
         glUniformMatrix4fv(glGetUniformLocation(self.shader, "projection"), 1, GL_FALSE, projection)
         glUniform1i(glGetUniformLocation(self.shader, "texture"), 0)
 
-        # [6]
+        # VBO vertices location
         glEnableVertexAttribArray(0)
-        glVertexAttribPointer(0, 3, GL_FLOAT, False, 48, ctypes.c_void_p(0))
+        glVertexAttribPointer(0, 3, GL_FLOAT, False, 20, ctypes.c_void_p(0))
+        glVertexPointer(3, GL_FLOAT, 20, ctypes.c_void_p(0))
+
+        # VBO texture coordinates
         glEnableVertexAttribArray(1)
-        glVertexAttribPointer(1, 3, GL_FLOAT, False, 48, ctypes.c_void_p(12))
-        glEnableVertexAttribArray(2)
-        glVertexAttribPointer(2, 4, GL_FLOAT, False, 48, ctypes.c_void_p(24))
-        glEnableVertexAttribArray(3)
-        glVertexAttribPointer(3, 2, GL_FLOAT, False, 48, ctypes.c_void_p(40))
+        glVertexAttribPointer(1, 2, GL_FLOAT, False, 20, ctypes.c_void_p(12))
+        glTexCoordPointer(2, GL_FLOAT, 20, ctypes.c_void_p(12))
 
-        glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT)
-        glVertexPointer(3, GL_FLOAT, 48, ctypes.c_void_p(0))
-        glNormalPointer(GL_FLOAT, 48, ctypes.c_void_p(12))
-        glColorPointer(4, GL_FLOAT, 48, ctypes.c_void_p(24))
-        glTexCoordPointer(2, GL_FLOAT, 48, ctypes.c_void_p(40))
+        # Clear colour and depth buffer, draw quads from VBO & clear state
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
         glDrawArrays(GL_QUADS, 0, artVboLen)
-
         glDisableVertexAttribArray(0)
-        glDisable(GL_BLEND)
-        glDisable(GL_TEXTURE_2D)
-        glDisableClientState(GL_TEXTURE_COORD_ARRAY)
-        glDisableClientState(GL_COLOR_ARRAY)
-        glDisableClientState(GL_NORMAL_ARRAY)
-        glDisableClientState(GL_VERTEX_ARRAY)
+        glBindTexture(GL_TEXTURE_2D, 0)
     # }}}
     # {{{ renderMiRCART(self, artInfo, artMap, centre=True, canvasCols=100, cubeSize=(0.1, 0.2)): XXX
     def renderMiRCART(self, artInfo, artMap, centre=True, canvasCols=100, cubeSize=(0.1, 0.2)):
-        curPos = [0, 0, 0]; vertices = []; numVertices = 0;
+        curPos, vertices, numVertices = [0, 0, 0], [], 0
         for numRow in range(len(artMap)):
             if centre and (len(artMap[numRow]) < canvasCols):
                 curPos[0] += (((canvasCols - len(artMap[numRow])) * cubeSize[0]) / 2)
             for numCol in range(len(artMap[numRow])):
                 cubeFg = artMap[numRow][numCol][0]
                 cubeBg = artMap[numRow][numCol][1]
-                cubeBgFloat = [*ENNToolMiRCARTColoursFloat[cubeBg], 1.0]
                 cubeAttrs = artMap[numRow][numCol][2]
                 cubeChar = artMap[numRow][numCol][3]
                 artCell = artInfo[cubeFg][cubeBg][cubeAttrs][cubeChar]
 
-                # Top Right
+                # Top Right, Top Left
                 vertices += curPos
-                vertices += [0.0, 0.0, 1.0]
-                vertices += cubeBgFloat
                 vertices += artCell[0:2]
-                numVertices += 1
-
-                # Top Left
-                vertices += [curPos[0]-cubeSize[0], curPos[1], curPos[2]]
-                vertices += [0.0, 0.0, 1.0]
-                vertices += cubeBgFloat
+                vertices += [curPos[0] - cubeSize[0], curPos[1], curPos[2]]
                 vertices += artCell[2:4]
-                numVertices += 1
 
-                # Bottom Left
-                vertices += [curPos[0]-cubeSize[0], curPos[1]-cubeSize[1], curPos[2]]
-                vertices += [0.0, 0.0, 1.0]
-                vertices += cubeBgFloat
+                # Bottom Left, Bottom Right
+                vertices += [curPos[0] - cubeSize[0], curPos[1] - cubeSize[1], curPos[2]]
                 vertices += artCell[4:6]
-                numVertices += 1
-
-                # Bottom Right
-                vertices += [curPos[0], curPos[1]-cubeSize[1], curPos[2]]
-                vertices += [0.0, 0.0, 1.0]
-                vertices += cubeBgFloat
+                vertices += [curPos[0], curPos[1] - cubeSize[1], curPos[2]]
                 vertices += artCell[6:8]
-                numVertices += 1
 
-                curPos[0] += cubeSize[0]
+                curPos[0], numVertices = curPos[0] + cubeSize[0], numVertices + 4
             curPos[0], curPos[1] = 0, curPos[1] - cubeSize[1]
 
         artVbo = glGenBuffers(1)
@@ -180,22 +135,10 @@ class ENNToolGLCanvasPanel(wx.glcanvas.GLCanvas, wx.Panel):
                      GL_STATIC_DRAW)
         return artVbo, len(vertices), -curPos[1], numVertices
     # }}}
-    # {{{ saveFrame(self): XXX
-    def saveFrame(self):
-        if sys.byteorder == "little":
-            screenshot = glReadPixels(0, 0, self.width, self.height, GL_BGR, GL_UNSIGNED_BYTE)
-        else:
-            screenshot = glReadPixels(0, 0, self.width, self.height, GL_RGB, GL_UNSIGNED_BYTE)
-        screenshot = numpy.flipud(numpy.frombuffer(screenshot, numpy.uint8).reshape((self.height, self.width, 3)))
-        self.videoWriter.write(screenshot)
-    # }}}
-
-    # {{{ __init__(self, parent, size, defaultPos=(24,24), videoPath=None): initialisation method
-    def __init__(self, parent, size, defaultPos=(24,24), videoPath=None):
+    # {{{ __init__(self, parent, size, defaultPos=(24,24)): initialisation method
+    def __init__(self, parent, size, defaultPos=(24,24)):
         super().__init__(parent, pos=defaultPos, size=size)
         self.curPos = list(defaultPos); self.curSize = list(size);
-        self.width, self.height = self.GetClientSize()
-        self.videoPath = videoPath
     # }}}
 
 # vim:expandtab foldmethod=marker sw=4 ts=4 tw=120
