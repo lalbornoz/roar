@@ -10,8 +10,8 @@
 # 3) Feature: include ETA @ progress bar
 # 4) Feature: autodetect video width from widest mircart
 # 5) Feature: render mircart as 3D blocks vs flat surface
-# 6) Optimisation: dont stall GPU w/ glReadPixels(), switch to asynchronous model w/ FBO or PBO (http://www.songho.ca/opengl/gl_fbo.html, http://www.songho.ca/opengl/gl_pbo.html)
-# 7) OpenGL: use VAOs + glVertexAttribFormat + glVertexAttribBinding
+# 6) OpenGL: use VAOs + glVertexAttribFormat + glVertexAttribBinding
+# 7) use names @ optdict[] + set from optdefaults
 #
 
 from getopt import getopt, GetoptError
@@ -36,7 +36,7 @@ class ENNToolApp(object):
             print("       [-p] [-r WxH] [-R WxH] [-s fname]", file=sys.stderr)
             print("       [-S] [-v] [--] fname..", file=sys.stderr)
             print("", file=sys.stderr)
-            print("       -a........: select animation mode", file=sys.stderr)
+            print("       -a........: select animation mode (UNIMPLEMENTED)", file=sys.stderr)
             print("       -f fps....: set video FPS; defaults to 25", file=sys.stderr)
             print("       -h........: show this screen", file=sys.stderr)
             print("       -o fname..: output video filename; extension determines video type", file=sys.stderr)
@@ -85,12 +85,20 @@ class ENNToolApp(object):
     # {{{ modeScroll(self, argv, optdict, GLVideoWriter, panelGLCanvas, fps=25, scrollRate=0.25): XXX
     def modeScroll(self, argv, optdict, GLVideoWriter, panelGLCanvas, fps=25, scrollRate=0.25):
         MiRCART = []
+        if "-v" in optdict:
+            time0 = time.time()
         for inFileArg in argv:
             for inFile in sorted(glob(inFileArg)):
                 MiRCART += ENNToolMiRCARTImporter(inFile).outMap
+        if "-v" in optdict:
+            print("mIRC art import delta {:.3f}ms".format((time.time() - time0) * 1000))
 
         curY, rotateX, rotateY, translateY = 0, 0, 0, scrollRate
+        if "-v" in optdict:
+            time0 = time.time()
         artTextureId, artInfo = ENNToolGLTTFTexture(MiRCART, optdict["-R"], optdict["-r"]).getParams()
+        if "-v" in optdict:
+            print("TTF texture generation delta {:.3f}ms".format((time.time() - time0) * 1000))
         artVbo, artVboLen, lastY, numVertices = panelGLCanvas.renderMiRCART(artInfo, MiRCART, cubeSize=optdict["-R"])
         if "-v" in optdict:
             print("{} vertices".format(numVertices))
