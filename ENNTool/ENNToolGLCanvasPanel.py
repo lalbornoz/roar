@@ -14,13 +14,12 @@
 # Tue, 03 Jul 2018 14:34:57 +0200 [7] <https://gamedev.stackexchange.com/questions/107793/binding-and-unbinding-what-would-you-do>
 #
 
+from ENNToolMiRCARTColours import ENNToolMiRCARTColoursFloat
 from OpenGL.GL import *
 from OpenGL.GL import shaders
 import ctypes, wx, wx.glcanvas
 
-class ENNToolGLCanvasPanel(wx.glcanvas.GLCanvas, wx.Panel):
-    """XXX"""
-
+class ENNToolGLCanvas(wx.glcanvas.GLCanvas):
     # {{{ initOpenGL(self): XXX
     def initOpenGL(self):
         self.glContext = wx.glcanvas.GLContext(self)
@@ -32,7 +31,6 @@ class ENNToolGLCanvasPanel(wx.glcanvas.GLCanvas, wx.Panel):
         glLoadIdentity(); glFrustum(-1, 1, -1, 1, 1, 100);
         glMatrixMode(GL_MODELVIEW)
         glEnable(GL_DEPTH_TEST)
-        glClearColor(0, 0, 0, 1); glClearDepth(1);
         glTranslatef(-5.0, 3.0, -5)
     # }}}
     # {{{ initShaders(self): XXX
@@ -41,12 +39,20 @@ class ENNToolGLCanvasPanel(wx.glcanvas.GLCanvas, wx.Panel):
         fs = shaders.compileShader("""
             #version 330 core
 
-            in vec2 fgTexCoord;
+            in vec2 frgTexCoord;
+            in vec3 frgFgColour;
+            in vec3 frgBgColour;
             uniform sampler2D texture;
 
+            layout(location = 0) out vec4 fragColour;
+
             void main() {
-                vec4 texel = texture2D(texture, fgTexCoord);
-                gl_FragColor = vec4(texel.r, texel.g, texel.b, 1.0);
+                vec4 texel = texture2D(texture, frgTexCoord);
+                if (texel.r == 0.0 && texel.g == 0.0 && texel.b == 0.0 && texel.a == 0.0) {
+                    fragColour = vec4(frgBgColour.r, frgBgColour.g, frgBgColour.b, 1.0);
+                } else {
+                    fragColour = vec4(frgFgColour.r, frgFgColour.g, frgFgColour.b, 1.0);
+                }
             }
             """, GL_FRAGMENT_SHADER)
 
@@ -56,15 +62,21 @@ class ENNToolGLCanvasPanel(wx.glcanvas.GLCanvas, wx.Panel):
 
             layout(location = 0) in vec4 vertex;
             layout(location = 1) in vec2 texcoord;
+            layout(location = 2) in vec3 vexFgColour;
+            layout(location = 3) in vec3 vexBgColour;
 
-            out vec2 fgTexCoord;
+            out vec2 frgTexCoord;
+            out vec3 frgFgColour;
+            out vec3 frgBgColour;
 
             uniform mat4 modelview;
             uniform mat4 projection;
 
             void main() {
                 gl_Position = projection * modelview * vertex;
-                fgTexCoord = texcoord;
+                frgTexCoord = texcoord;
+                frgFgColour = vexFgColour;
+                frgBgColour = vexBgColour;
             }
             """, GL_VERTEX_SHADER)
         self.shader = shaders.compileProgram(vs, fs)
@@ -86,13 +98,23 @@ class ENNToolGLCanvasPanel(wx.glcanvas.GLCanvas, wx.Panel):
 
         # VBO vertices location
         glEnableVertexAttribArray(0)
-        glVertexAttribPointer(0, 3, GL_FLOAT, False, 20, ctypes.c_void_p(0))
-        glVertexPointer(3, GL_FLOAT, 20, ctypes.c_void_p(0))
+        glVertexAttribPointer(0, 3, GL_FLOAT, False, 44, ctypes.c_void_p(0))
+        glVertexPointer(3, GL_FLOAT, 44, ctypes.c_void_p(0))
 
         # VBO texture coordinates
         glEnableVertexAttribArray(1)
-        glVertexAttribPointer(1, 2, GL_FLOAT, False, 20, ctypes.c_void_p(12))
-        glTexCoordPointer(2, GL_FLOAT, 20, ctypes.c_void_p(12))
+        glVertexAttribPointer(1, 2, GL_FLOAT, False, 44, ctypes.c_void_p(12))
+        glTexCoordPointer(2, GL_FLOAT, 44, ctypes.c_void_p(12))
+
+        # VBO foreground colours
+        glEnableVertexAttribArray(2)
+        glVertexAttribPointer(2, 3, GL_FLOAT, False, 44, ctypes.c_void_p(20))
+        glTexCoordPointer(3, GL_FLOAT, 44, ctypes.c_void_p(20))
+
+        # VBO background colours
+        glEnableVertexAttribArray(3)
+        glVertexAttribPointer(3, 3, GL_FLOAT, False, 44, ctypes.c_void_p(32))
+        glTexCoordPointer(3, GL_FLOAT, 44, ctypes.c_void_p(32))
 
         # Clear colour and depth buffer, draw quads from VBO & clear state
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
@@ -111,19 +133,27 @@ class ENNToolGLCanvasPanel(wx.glcanvas.GLCanvas, wx.Panel):
                 cubeBg = artMap[numRow][numCol][1]
                 cubeAttrs = artMap[numRow][numCol][2]
                 cubeChar = artMap[numRow][numCol][3]
-                artCell = artInfo[cubeFg][cubeBg][cubeAttrs][cubeChar]
+                artCell = artInfo[cubeAttrs][cubeChar]
 
                 # Top Right, Top Left
                 vertices += curPos
                 vertices += artCell[0:2]
+                vertices += [*ENNToolMiRCARTColoursFloat[cubeFg]]
+                vertices += [*ENNToolMiRCARTColoursFloat[cubeBg]]
                 vertices += [curPos[0] - cubeSize[0], curPos[1], curPos[2]]
                 vertices += artCell[2:4]
+                vertices += ENNToolMiRCARTColoursFloat[cubeFg]
+                vertices += ENNToolMiRCARTColoursFloat[cubeBg]
 
                 # Bottom Left, Bottom Right
                 vertices += [curPos[0] - cubeSize[0], curPos[1] - cubeSize[1], curPos[2]]
                 vertices += artCell[4:6]
+                vertices += [*ENNToolMiRCARTColoursFloat[cubeFg]]
+                vertices += [*ENNToolMiRCARTColoursFloat[cubeBg]]
                 vertices += [curPos[0], curPos[1] - cubeSize[1], curPos[2]]
                 vertices += artCell[6:8]
+                vertices += ENNToolMiRCARTColoursFloat[cubeFg]
+                vertices += ENNToolMiRCARTColoursFloat[cubeBg]
 
                 curPos[0], numVertices = curPos[0] + cubeSize[0], numVertices + 4
             curPos[0], curPos[1] = 0, curPos[1] - cubeSize[1]
@@ -135,10 +165,40 @@ class ENNToolGLCanvasPanel(wx.glcanvas.GLCanvas, wx.Panel):
                      GL_STATIC_DRAW)
         return artVbo, len(vertices), -curPos[1], numVertices
     # }}}
-    # {{{ __init__(self, parent, size, defaultPos=(24,24)): initialisation method
-    def __init__(self, parent, size, defaultPos=(24,24)):
+    # {{{ __init__(self, parentCanvas, size): initialisation method
+    def __init__(self, parentCanvas, size):
+        super().__init__(parentCanvas, size=size)
+        self.curSize = list(size)
+        self.parentCanvas = parentCanvas
+    # }}}
+
+class ENNToolGLPanel(wx.Panel):
+    """XXX"""
+
+    # {{{ onPaint(self, event): XXX
+    def onPaint(self, event):
+        eventDc = wx.PaintDC(self)
+        eventUpdates = wx.RegionIterator(self.GetUpdateRegion())
+        paintFlag = True if eventUpdates.HaveRects() else False
+        if self.frameFun != None:
+            self.frameFun()
+    # }}}
+    # {{{ onTimer(self, event): XXX
+    def onTimer(self, event):
+        if self.frameFun != None:
+            if not self.frameFun():
+                event.GetTimer().Stop()
+                event.GetTimer().Destroy()
+    # }}}
+    # {{{ __init__(self, parent, size, defaultPos=(24,24), parentFrame=None): initialisation method
+    def __init__(self, parent, size, defaultPos=(24,24), parentFrame=None):
         super().__init__(parent, pos=defaultPos, size=size)
         self.curPos = list(defaultPos); self.curSize = list(size);
+        self.Bind(wx.EVT_PAINT, self.onPaint)
+        self.frameFun = None
+        self.timerTimer = wx.Timer(self, 1)
+        self.timerTimer.Start(40)
+        self.Bind(wx.EVT_TIMER, self.onTimer, self.timerTimer)
     # }}}
 
 # vim:expandtab foldmethod=marker sw=4 ts=4 tw=120
