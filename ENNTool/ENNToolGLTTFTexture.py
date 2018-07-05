@@ -10,6 +10,7 @@
 # Wed, 27 Jun 2018 16:02:12 +0200 [3] <https://www.khronos.org/opengl/wiki/How_lighting_works#Good_Settings.>
 # Wed, 27 Jun 2018 16:02:13 +0200 [4] <https://www.khronos.org/opengl/wiki/Common_Mistakes>
 # Wed, 27 Jun 2018 16:02:14 +0200 [5] <https://www.khronos.org/opengl/wiki/Pixel_Transfer#Pixel_layout>
+# Wed, 04 Jul 2018 10:57:09 +0200 [6] <https://stackoverflow.com/questions/466204/rounding-up-to-next-power-of-2>
 #
 
 from collections import defaultdict
@@ -33,33 +34,38 @@ class ENNToolGLTTFTexture(object):
     def _nestedDict():
         return defaultdict(ENNToolGLTTFTexture._nestedDict)
     # }}}
-    # {{{ _drawCharList(self, artInfo, charList, pilFontBold, pilFontNormal, pilFontSize, pilImageDraw, pilImageSize): XXX
-    def _drawCharList(self, artInfo, charList, pilFontBold, pilFontNormal, pilFontSize, pilImageDraw, pilImageSize):
+    # {{{ _drawCharList(self, artInfo, charList, pilFontBold, pilFontNormal, pilImageDraw, pilImageSize): XXX
+    def _drawCharList(self, artInfo, charList, pilFontBold, pilFontNormal, pilImageDraw, pilImageSize):
         curPos = [0, 0]
         for newChar in charList:
-            pilFont, underLine = pilFontNormal, False
             if newChar[2] & ENNToolMiRCARTImporter._CellState.CS_BOLD:
-                pilFont = pilFontBold
+                pilFont, pilFontSize = pilFontBold, [pilFontBold.getsize(newChar[3])[0], pilFontBold.getsize(newChar[3])[1]]
+            else:
+                pilFont, pilFontSize = pilFontNormal, [pilFontNormal.getsize(newChar[3])[0], pilFontNormal.getsize(newChar[3])[1]]
             if newChar[2] & ENNToolMiRCARTImporter._CellState.CS_UNDERLINE:
                 underLine = True
-            pilImageDraw.rectangle((*curPos, curPos[0] + pilFontSize[0], curPos[1] + pilFontSize[1] - 1),
-                                   fill=(*ENNToolMiRCARTColours[newChar[1]], 255))
-            pilImageDraw.text(curPos, newChar[3], (*ENNToolMiRCARTColours[newChar[0]], 255), pilFont)
-            if underLine:
+            else:
+                underLine = False
+            if newChar[3] != " ":
+                pilImageDraw.text(curPos, newChar[3], (255, 255, 255, 255), pilFont)
+            elif newChar[0] == newChar[1]:
+                pilImageDraw.rectangle((*curPos, curPos[0] + pilFontSize[0], curPos[1] + pilFontSize[1] - 1),
+                                       fill=(255, 255, 255, 255))
+            if underLine and False:
                 pilImageDraw.line(
                     xy=(curPos[0], curPos[1] + (pilFontSize[1] - 2),
                         curPos[0] + pilFontSize[0], curPos[1] + pilFontSize[1]),
                     fill=(*ENNToolMiRCARTColours[newChar[0]], 255))
 
-            artInfo[newChar[0]][newChar[1]][newChar[2]][newChar[3]] = []
+            artInfo[newChar[2]][newChar[3]] = []
             # Top Right
-            artInfo[newChar[0]][newChar[1]][newChar[2]][newChar[3]] += [float(curPos[0] + pilFontSize[0]) / pilImageSize[0], 0.0]
+            artInfo[newChar[2]][newChar[3]] += [float(curPos[0] + pilFontSize[0]) / pilImageSize[0], 0.0]
             # Top Left
-            artInfo[newChar[0]][newChar[1]][newChar[2]][newChar[3]] += [float(curPos[0]) / pilImageSize[0], 0.0]
+            artInfo[newChar[2]][newChar[3]] += [float(curPos[0]) / pilImageSize[0], 0.0]
             # Bottom Left
-            artInfo[newChar[0]][newChar[1]][newChar[2]][newChar[3]] += [float(curPos[0]) / pilImageSize[0], float(pilFontSize[1]) / pilImageSize[1]]
+            artInfo[newChar[2]][newChar[3]] += [float(curPos[0]) / pilImageSize[0], float(pilFontSize[1]) / pilImageSize[1]]
             # Bottom Right
-            artInfo[newChar[0]][newChar[1]][newChar[2]][newChar[3]] += [float(curPos[0] + pilFontSize[0]) / pilImageSize[0], float(pilFontSize[1]) / pilImageSize[1]]
+            artInfo[newChar[2]][newChar[3]] += [float(curPos[0] + pilFontSize[0]) / pilImageSize[0], float(pilFontSize[1]) / pilImageSize[1]]
 
             curPos[0] += pilFontSize[0]
         return artInfo
@@ -73,24 +79,33 @@ class ENNToolGLTTFTexture(object):
                 artBg = artMap[numRow][numCol][1]
                 artAttrs = artMap[numRow][numCol][2]
                 artChar = artMap[numRow][numCol][3]
-                if artInfo[artFg][artBg][artAttrs][artChar] == {}:
-                    artInfo[artFg][artBg][artAttrs][artChar] = None
+                if artInfo[artAttrs][artChar] == {}:
+                    artInfo[artAttrs][artChar] = None
                     charList += [[artFg, artBg, artAttrs, artChar]]
         return artInfo, charList
     # }}}
-    # {{{ _initFonts(self): XXX
-    def _initFonts(self):
+    # {{{ _initFonts(self, charMap): XXX
+    def _initFonts(self, charMap):
         fontBoldPathName = os.path.join("assets", "DejaVuSansMono-Bold.ttf")
         fontNormalPathName = os.path.join("assets", "DejaVuSansMono.ttf")
         fontSize = int("26")
         pilFontBold = ImageFont.truetype(fontBoldPathName, fontSize)
+        pilFontMaxSize = [16, 32] # TODO
         pilFontNormal = ImageFont.truetype(fontNormalPathName, fontSize)
-        pilFontSize = list(pilFontNormal.getsize("_"))  # XXX
-        return pilFontBold, pilFontNormal, pilFontSize
+        return pilFontBold, pilFontMaxSize, pilFontNormal
     # }}}
-    # {{{ _initImage(self, charList, pilFontSize): XXX
-    def _initImage(self, charList, pilFontSize):
-        pilImageSize = (pilFontSize[0] * len(charList), pilFontSize[1])
+    # {{{ _initImage(self, charList, pilFontMaxSize): XXX
+    def _initImage(self, charList, pilFontMaxSize):
+        pilImageSize = [pilFontMaxSize[0] * len(charList), pilFontMaxSize[1]]
+        for numDim in range(len(pilImageSize)):
+            if (pilImageSize[numDim] & (pilImageSize[numDim] - 1)) != 0:
+                pilImageSize[numDim] -= 1
+                pilImageSize[numDim] |= pilImageSize[numDim] >> 1
+                pilImageSize[numDim] |= pilImageSize[numDim] >> 2
+                pilImageSize[numDim] |= pilImageSize[numDim] >> 4
+                pilImageSize[numDim] |= pilImageSize[numDim] >> 8
+                pilImageSize[numDim] |= pilImageSize[numDim] >> 16
+                pilImageSize[numDim] += 1
         pilImage = Image.new("RGBA", pilImageSize, (0, 0, 0, 0))
         pilImageDraw = ImageDraw.Draw(pilImage)
         return pilImage, pilImageDraw, pilImageSize
@@ -115,7 +130,6 @@ class ENNToolGLTTFTexture(object):
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA,
                      artTextureImage.size[0], artTextureImage.size[1],
                      0, GL_RGBA, GL_UNSIGNED_BYTE, artTextureImageData)
-        glGenerateMipmap(GL_TEXTURE_2D)
 
         glBindTexture(GL_TEXTURE_2D, 0)
         return artTextureId
@@ -127,11 +141,9 @@ class ENNToolGLTTFTexture(object):
     # {{{ __init__(self): initialisation method
     def __init__(self, artMap, cubeSize, videoSize):
         artInfo, charList = self._initArtInfoCharList(artMap)
-        pilFontBold, pilFontNormal, pilFontSize = self._initFonts()
-        pilImage, pilImageDraw, pilImageSize = self._initImage(charList, pilFontSize)
-        artInfo = self._drawCharList(artInfo, charList,
-                                     pilFontBold, pilFontNormal, pilFontSize,
-                                     pilImageDraw, pilImageSize)
+        pilFontBold, pilFontMaxSize, pilFontNormal = self._initFonts(charList)
+        pilImage, pilImageDraw, pilImageSize = self._initImage(charList, pilFontMaxSize)
+        artInfo = self._drawCharList(artInfo, charList, pilFontBold, pilFontNormal, pilImageDraw, pilImageSize)
         artTextureId = self._initTexture(pilImage)
         self.artTextureId = artTextureId
         self.artInfo = artInfo

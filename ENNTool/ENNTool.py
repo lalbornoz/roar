@@ -5,13 +5,20 @@
 # This project is licensed under the terms of the MIT license.
 #
 # TODO:
-# 1) -A: render frame #1, render frame #2, ...
-# 2) -s: effects: rotate, smash into bricks, swirl, wave, ...
-# 3) Feature: include ETA @ progress bar
-# 4) Feature: autodetect video width from widest mircart
-# 5) Feature: render mircart as 3D blocks vs flat surface
-# 6) OpenGL: use VAOs + glVertexAttribFormat + glVertexAttribBinding
-# 7) use names @ optdict[] + set from optdefaults
+# 1) -A, -S: replace w/ -s, implement animation script: render frame #1, render frame #2, ...; scrolling script; effects: rotate, smash into bricks, swirl, wave, ...
+# 2) Feature: include ETA(s) @ progress bar(s)
+# 3) Feature: autodetect video width from widest mircart
+# 4) Feature: render mircart as 3D blocks vs flat surface
+
+#
+# 1) Optimisation: speed up ENNToolMiRCARTImporter
+# 2) Cleanup: use names @ optdict + set from optdefaults
+# 3) Feature: scrolling speed as <how many Y units>x<count of frame(s)>
+# 4) Cleanup: use VAOs + glVertexAttribFormat + glVertexAttribBinding
+# 5) Optimisation: split mIRC art into separate VBOs & implement rudimentary culling
+# 6) Optimisation: only call glReadPixels() when changes were made relative to the last call
+# 7) Split video output into separate module, switch to GUI
+# 8) FBOs http://www.songho.ca/opengl/gl_fbo.html
 #
 
 from getopt import getopt, GetoptError
@@ -20,7 +27,7 @@ from OpenGL.GL import *
 import os, sys, time
 import wx
 
-from ENNToolGLCanvasPanel import ENNToolGLCanvasPanel
+from ENNToolGLCanvasPanel import ENNToolGLCanvas, ENNToolGLPanel
 from ENNToolGLTTFTexture import ENNToolGLTTFTexture
 from ENNToolGLVideoWriter import ENNToolGLVideoWriter
 from ENNToolMiRCARTImporter import ENNToolMiRCARTImporter
@@ -52,8 +59,6 @@ class ENNToolApp(object):
 
             if "-h" in optdict:
                 usage(sys.argv[0]); exit(0);
-            elif not "-o" in optdict:
-                raise GetoptError("-o fname must be specified")
             elif not len(argv):
                 raise GetoptError("at least one MiRCART input fname must be specified")
 
@@ -82,8 +87,8 @@ class ENNToolApp(object):
         print("\r[{:<50}] {}%".format(
             ("=" * int(progressDiv * 50)), int(progressDiv * 100)), end=endChar)
     # }}}
-    # {{{ modeScroll(self, argv, optdict, GLVideoWriter, panelGLCanvas, fps=25, scrollRate=0.25): XXX
-    def modeScroll(self, argv, optdict, GLVideoWriter, panelGLCanvas, fps=25, scrollRate=0.25):
+    # {{{ modeScroll(self, argv, optdict, GLVideoWriter, GLpanel, GLpanel, fps=25, scrollRate=0.1): XXX
+    def modeScroll(self, argv, optdict, GLVideoWriter, GLcanvas, GLpanel, fps=25, scrollRate=0.1):
         MiRCART = []
         if "-v" in optdict:
             time0 = time.time()
@@ -93,53 +98,74 @@ class ENNToolApp(object):
         if "-v" in optdict:
             print("mIRC art import delta {:.3f}ms".format((time.time() - time0) * 1000))
 
-        curY, rotateX, rotateY, translateY = 0, 0, 0, scrollRate
         if "-v" in optdict:
             time0 = time.time()
         artTextureId, artInfo = ENNToolGLTTFTexture(MiRCART, optdict["-R"], optdict["-r"]).getParams()
         if "-v" in optdict:
             print("TTF texture generation delta {:.3f}ms".format((time.time() - time0) * 1000))
-        artVbo, artVboLen, lastY, numVertices = panelGLCanvas.renderMiRCART(artInfo, MiRCART, cubeSize=optdict["-R"])
+        artVbo, artVboLen, lastY, numVertices = GLcanvas.renderMiRCART(artInfo, MiRCART, cubeSize=optdict["-R"])
         if "-v" in optdict:
             print("{} vertices".format(numVertices))
-        w, h = panelGLCanvas.GetClientSize(); w, h = max(w, 1.0), max(h, 1.0);
-
-        while True:
-            self.printProgress(curY, lastY)
-            for numFrame in range(fps):
-                panelGLCanvas.renderFrame(artTextureId, artVbo, artVboLen)
+        def scrollFrameFun():
+            curY, rotateX, rotateY, translateY = 0, 0, 0, scrollRate
+            w, h = GLcanvas.GetClientSize(); w, h = max(w, 1.0), max(h, 1.0);
+            def scrollFrame():
+                nonlocal curY
+                self.printProgress(curY, lastY)
+                GLcanvas.renderFrame(artTextureId, artVbo, artVboLen)
                 if translateY:
                     glTranslatef(0, translateY, 0); curY += translateY
                 if rotateX:
                     glRotatef(rotateX * (180.0/w), 0.0, 1.0, 0.0)
                 if rotateY:
                     glRotatef(rotateY * (180.0/h), 1.0, 0.0, 0.0)
-                GLVideoWriter.saveFrame()
-            if curY >= lastY:
-                self.printProgress(curY, lastY); break;
-
-        GLVideoWriter.saveVideo()
+                if "-o" in optdict:
+                    GLVideoWriter.saveFrame()
+                else:
+                    GLcanvas.SwapBuffers()
+                if curY >= lastY:
+                    self.printProgress(curY, lastY)
+                    if "-o" in optdict:
+                        GLVideoWriter.saveVideo()
+                    return False
+                return True
+            return scrollFrame
+        if "-o" in optdict:
+            frameFun = scrollFrameFun()
+            while True:
+                if not frameFun():
+                    break
+        else:
+            GLpanel.frameFun = scrollFrameFun()
+            self.wxApp.MainLoop()
     # }}}
     # {{{ __init__(self, argv): XXX
     def __init__(self, argv):
         argv, optdict = self.parseArgv(argv)
-        wxApp = wx.App(False)
-        appFrameSize = optdict["-r"]
-        appFrame = wx.Frame(None, size=appFrameSize); appFrame.Hide();
-        appPanelSkin = wx.Panel(appFrame, wx.ID_ANY)
+        self.wxApp = wx.App(False)
+        appFrameSize = [c + 128 for c in optdict["-r"]]
+        self.appFrame = wx.Frame(None, size=appFrameSize)
+        appPanelSkin = wx.Panel(self.appFrame, wx.ID_ANY)
 
-        videoFps, videoPath = int(optdict["-f"]), optdict["-o"]
-        panelGLCanvas = ENNToolGLCanvasPanel(appPanelSkin, size=appFrameSize)
-        panelGLCanvas.initOpenGL()
-        panelGLCanvas.initShaders()
-        GLVideoWriter = ENNToolGLVideoWriter(videoPath, panelGLCanvas.GetClientSize(), videoFps=videoFps)
+        videoFps, videoPath = int(optdict["-f"]), optdict["-o"] if "-o" in optdict else None
+        GLpanel = ENNToolGLPanel(appPanelSkin, size=optdict["-r"], parentFrame=self.appFrame)
+        GLcanvas = ENNToolGLCanvas(GLpanel, optdict["-r"])
+        GLcanvas.initOpenGL()
+        GLcanvas.initShaders()
+        GLVideoWriter = ENNToolGLVideoWriter(videoPath, GLpanel.GetClientSize(), videoFps=videoFps)
+
+        if "-o" in optdict:
+            self.appFrame.Hide()
+        else:
+            self.appFrame.Show(); self.appFrame.SetFocus();
 
         if "-v" in optdict:
             time0 = time.time()
-        self.modeScroll(argv, optdict, GLVideoWriter, panelGLCanvas, fps=videoFps)
+        self.modeScroll(argv, optdict, GLVideoWriter, GLcanvas, GLpanel, fps=videoFps)
         if "-v" in optdict:
             print("delta {}s".format(time.time() - time0))
-        if "-p" in optdict:
+        if  "-o" in optdict \
+        and "-p" in optdict:
             os.startfile(videoPath)
     # }}}
 
