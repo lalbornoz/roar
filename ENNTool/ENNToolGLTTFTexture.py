@@ -48,9 +48,6 @@ class ENNToolGLTTFTexture(object):
                 underLine = False
             if newChar[3] != " ":
                 pilImageDraw.text(curPos, newChar[3], (255, 255, 255, 255), pilFont)
-            elif newChar[0] == newChar[1]:
-                pilImageDraw.rectangle((*curPos, curPos[0] + pilFontSize[0], curPos[1] + pilFontSize[1] - 1),
-                                       fill=(255, 255, 255, 255))
             if underLine and False:
                 pilImageDraw.line(
                     xy=(curPos[0], curPos[1] + (pilFontSize[1] - 2),

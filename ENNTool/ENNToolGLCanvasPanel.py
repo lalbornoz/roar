@@ -20,8 +20,8 @@ from OpenGL.GL import shaders
 import ctypes, wx, wx.glcanvas
 
 class ENNToolGLCanvas(wx.glcanvas.GLCanvas):
-    # {{{ initOpenGL(self): XXX
-    def initOpenGL(self):
+    # {{{ initOpenGL(self, cameraPos=(-5.0, 3.0, -5)): XXX
+    def initOpenGL(self, cameraPos=(-5.0, 3.0, -5)):
         self.glContext = wx.glcanvas.GLContext(self)
         self.SetCurrent(self.glContext)
 
@@ -31,7 +31,7 @@ class ENNToolGLCanvas(wx.glcanvas.GLCanvas):
         glLoadIdentity(); glFrustum(-1, 1, -1, 1, 1, 100);
         glMatrixMode(GL_MODELVIEW)
         glEnable(GL_DEPTH_TEST)
-        glTranslatef(-5.0, 3.0, -5)
+        glTranslatef(*cameraPos)
     # }}}
     # {{{ initShaders(self): XXX
     def initShaders(self):

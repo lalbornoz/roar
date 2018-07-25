@@ -39,11 +39,12 @@ class ENNToolApp(object):
     def parseArgv(self, argv):
         def usage(argv0):
             print("usage: {}".format(os.path.basename(argv0)), file=sys.stderr)
-            print("       [-A] [-f fps] [-h] [-o fname]".format(os.path.basename(argv0)), file=sys.stderr)
+            print("       [-a] [-c x,y,z] [-f fps] [-h] [-o fname]".format(os.path.basename(argv0)), file=sys.stderr)
             print("       [-p] [-r WxH] [-R WxH] [-s fname]", file=sys.stderr)
-            print("       [-S] [-v] [--] fname..", file=sys.stderr)
+            print("       [-S] [-t float] [-v] [--] fname..", file=sys.stderr)
             print("", file=sys.stderr)
             print("       -a........: select animation mode (UNIMPLEMENTED)", file=sys.stderr)
+            print("       -c x,y,z..: specify camera position", file=sys.stderr)
             print("       -f fps....: set video FPS; defaults to 25", file=sys.stderr)
             print("       -h........: show this screen", file=sys.stderr)
             print("       -o fname..: output video filename; extension determines video type", file=sys.stderr)
@@ -52,9 +53,10 @@ class ENNToolApp(object):
             print("       -R WxH....: set MiRCART cube resolution; defaults to 0.1x0.2", file=sys.stderr)
             print("       -s fname..: input script filename", file=sys.stderr)
             print("       -S........: select scrolling mode", file=sys.stderr)
+            print("       -t float..: scrolling rate in Y coordinates per frame", file=sys.stderr)
             print("       -v........: be verbose", file=sys.stderr)
         try:
-            optlist, argv = getopt(argv[1:], "Af:ho:pr:R:s:Sv")
+            optlist, argv = getopt(argv[1:], "Ac:f:ho:pr:R:s:St:v")
             optdict = dict(optlist)
 
             if "-h" in optdict:
@@ -69,6 +71,8 @@ class ENNToolApp(object):
             if not "-R" in optdict:
                 optdict["-R"] = "0.1x0.2"
 
+            if "-c" in optdict:
+                optdict["-c"] = [float(r) for r in optdict["-c"].split(",")][0:3]
             if "-r" in optdict:
                 optdict["-r"] = [int(r) for r in optdict["-r"].split("x")][0:2]
             if "-R" in optdict:
@@ -87,9 +91,13 @@ class ENNToolApp(object):
         print("\r[{:<50}] {}%".format(
             ("=" * int(progressDiv * 50)), int(progressDiv * 100)), end=endChar)
     # }}}
-    # {{{ modeScroll(self, argv, optdict, GLVideoWriter, GLpanel, GLpanel, fps=25, scrollRate=0.1): XXX
-    def modeScroll(self, argv, optdict, GLVideoWriter, GLcanvas, GLpanel, fps=25, scrollRate=0.1):
+    # {{{ modeScroll(self, argv, optdict, GLVideoWriter, GLpanel, GLpanel, fps=25): XXX
+    def modeScroll(self, argv, optdict, GLVideoWriter, GLcanvas, GLpanel, fps=25):
         MiRCART = []
+        if "-t" in optdict:
+            scrollRate = float(optdict["-t"])
+        else:
+            scrollRate = 0.1
         if "-v" in optdict:
             time0 = time.time()
         for inFileArg in argv:
@@ -150,7 +158,10 @@ class ENNToolApp(object):
         videoFps, videoPath = int(optdict["-f"]), optdict["-o"] if "-o" in optdict else None
         GLpanel = ENNToolGLPanel(appPanelSkin, size=optdict["-r"], parentFrame=self.appFrame)
         GLcanvas = ENNToolGLCanvas(GLpanel, optdict["-r"])
-        GLcanvas.initOpenGL()
+        if "-c" in optdict:
+            GLcanvas.initOpenGL(cameraPos=optdict["-c"])
+        else:
+            GLcanvas.initOpenGL()
         GLcanvas.initShaders()
         GLVideoWriter = ENNToolGLVideoWriter(videoPath, GLpanel.GetClientSize(), videoFps=videoFps)
 
