@@ -47,22 +47,21 @@ Lex.prototype.sanitize = function(){
     default:  return this.char
   }
 }
-var lastBg = -1, lastFg = -1
-Lex.prototype.mirc = function(){
+Lex.prototype.mirc = function(bg_, fg_){
   var char = this.char || " "
   var charIsNaN = isNaN(parseInt(char))
-  if        ((lastBg == this.fg) && (lastFg == this.bg)) {
-    lastBg = this.bg; lastFg = this.fg
-    return "\x16" + char
-  } else if ((lastBg != this.bg) && (lastFg == this.fg)) {
-    lastBg = this.bg
-    return "\x03," + ((this.bg&15) < 10 && !charIsNaN ? "0" : "") + (this.bg&15) + char
-  } else if ((lastBg == this.bg) && (lastFg != this.fg)) {
-    lastFg = this.fg
-    return "\x03" + ((this.fg&15) < 10 && !charIsNaN ? "0" : "") + (this.fg&15) + char
+  if        ((bg_ == this.fg) && (fg_ == this.bg)) {
+    bg_ = this.bg; fg_ = this.fg
+    return [bg_, fg_, "\x16" + char]
+  } else if ((bg_ != this.bg) && (fg_ == this.fg)) {
+    bg_ = this.bg
+    return [bg_, fg_, "\x03," + ((this.bg&15) < 10 && !charIsNaN ? "0" : "") + (this.bg&15) + char]
+  } else if ((bg_ == this.bg) && (fg_ != this.fg)) {
+    fg_ = this.fg
+    return [bg_, fg_, "\x03" + ((this.fg&15) < 10 && !charIsNaN ? "0" : "") + (this.fg&15) + char]
   } else {
-    lastBg = this.bg; lastFg = this.fg
-    return "\x03" + (this.fg&15) + "," + ((this.bg&15) < 10 && !charIsNaN ? "0" : "") + (this.bg&15) + char
+    bg_ = this.bg; fg_ = this.fg
+    return [bg_, fg_, "\x03" + (this.fg&15) + "," + ((this.bg&15) < 10 && !charIsNaN ? "0" : "") + (this.bg&15) + char]
   }
 }
 Lex.prototype.ansi = function(){
