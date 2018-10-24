@@ -150,7 +150,7 @@ var clipboard = (function () {
               case "\x1f":  // ^_ (unimplemented)
                 break
               default:
-                cells.push({bg: bg, fg: bg, value: line[x]})
+                cells.push({bg: bg, fg: fg, value: line[x]})
               }
             }
             if (cells.length > 0) {
