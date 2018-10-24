@@ -1,0 +1,16 @@
+asdf.us/ascii tips
+==================
+
+These keyboard commands work in brush mode (square, circle, cross):
+
+[                          brush smaller
+]                          brush bigger
+ctrl~click on brush        erase cell
+ctrl~click on canvas       draw with bg color
+shift~click on canvas      draw line from last position
+alt~click on canvas        fill brush with sampled color
+alt~shift~click on canvas  copy canvas to brush
+rightclick on palette      set bg color (when drawing with a letter)
+
+h/t timb for guide
+

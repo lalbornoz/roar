@@ -1,0 +1,166 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>asciiblaster</title>
+<meta name="viewport" content="width=device-width, maximum-scale=1.0, user-scalable=yes" />
+<link rel="stylesheet" href="css/sally.css" type="text/css" charset="utf-8" />
+<link rel="stylesheet" href="css/ak.css" type="text/css" charset="utf-8" />
+</head>
+
+<body class="loading panke">
+
+  <div id="goodies_rapper">
+  </div>
+
+  <div id="workspace_rapper">
+    <div id="canvas_rapper" class="rapper"></div>
+  </div>
+
+  <div id="ui_rapper">
+    <div class="block" id="tools_block">
+      <div id="palette_rapper"></div>
+      <div id="secret_rapper">
+        <span id="experimental_palette_toggle">.</span>
+        <!-- <span id="nopaint_toggle">N</span> -->
+      </div>
+      <div id="letters_rapper"></div>
+      <div id="custom_rapper"></div>
+    </div>
+    <div id="brush_container" class="block">
+      <div id="brush_rapper">
+      </div>
+      <br>
+      <span id="fg_checkbox" class="tool">x fg</span><br>
+      <span id="bg_checkbox" class="tool">x bg</span><br>
+      <span id="char_checkbox" class="tool">x char</span><br>
+      <br>
+      <span id="add_custom_el" class="tool">+ add</span>
+      <span id="mirror_x_checkbox" class="tool">_ mirror x</span><br>
+      <span id="mirror_y_checkbox" class="tool">_ mirror y</span><br>
+      <br>
+      <span id="undo_el" class="tool hidden">undo</span><br>
+      <span id="redo_el" class="tool hidden">redo</span><br>
+    </div>
+    <div id="tools_rapper" class="block">
+      <span id="square_el" class="tool">square</span><br>
+      <span id="circle_el" class="tool">circle</span><br>
+      <span id="cross_el" class="tool">cross</span><br>
+      <span id="text_el" class="tool">text</span><br>
+      <span id="fill_el" class="tool">fill</span><br>
+      <span id="select_el" class="tool">select</span><br>
+      <br>
+      <span id="rotate_el" class="tool">rotate</span><br>
+      <span id="scale_el" class="tool">scale</span><br>
+      <span id="translate_el" class="tool">translate</span><br>
+      <span id="slice_el" class="tool">slice</span><br>
+
+      <span id="grid_el" class="tool">_ grid</span>
+      <!-- <span id="rotate_checkbox" class="tool">_ rotate</span><br> -->
+      <span id="vertical_checkbox" class="tool">x vertical</span>
+      <!-- <span id="pixels_checkbox" class="tool">_ pixels</span><br> -->
+    </div>
+    
+    <div id="textarea_mode" style="float: left">
+      <div>
+        <span id="clear_el" class="tool">new</span>
+        <span id="save_el" class="tool">save</span>
+        <span id="load_el" class="tool">load</span>
+        <br>
+        <span id="shader_el" class="tool">shader</span>
+        <span id="webcam_el" class="tool">webcam</span>
+        <a id="doc_el" href="/asciiblaster/doc/" target="_blank">doc</a>
+        <a id="gallery_el" href="//asdf.us/im/gallery/?tag=ascii&limit=80" target="_blank">gallery</a>
+        <br>
+        <span id="advanced_checkbox" class="tool">_ advanced</span>
+        <br>
+        <span id="send_to_irc_el" class="tool">&gt; send to IRC</span>
+        <br>
+        <div id="nopaint_rapper">
+          <br>
+          <span id="nopaint_no_el" class="tool">no</span><br>
+          <span id="nopaint_paint_el" class="tool">paint</span><br>
+          <span id="nopaint_pause_el" class="tool hidden">pause</span><br>
+        </div>
+        <br>
+        brush: <span id="brush_w_el" class="ed">5</span> x <span id="brush_h_el" class="ed">5</span><br>
+        canvas: <span id="canvas_w_el" class="ed">100</span> x <span id="canvas_h_el" class="ed">30</span><br>
+      </div>
+            
+      <div id="import_rapper">
+        <span id="format_el">ascii *irssi mirc ansi</span>
+        <span id="import_buttons">
+          <button id="import_button">import</button>
+        </span>
+        <div id="gallery_rapper">
+          <input id="username_input" type="text" placeholder="username">
+          <input id="upload_input" type="text" placeholder="uploaded url">
+          <button id="export_button">export</button>
+          <button id="save_button">save</button>
+          <button id="upload_button">upload</button>
+        </div><br>
+        <div id="cutoff_warning_el">colorcode is too wide for irc and is cutoff</div>
+        <textarea id="import_textarea"></textarea>
+      </div>
+
+      <div id="shader_rapper">
+        <span id="animate_checkbox" class="tool">_ animate</span>
+        to <span id="shader_target_el">*canvas brush selection</span>
+        <span id="shader_fps_el" class="hidden faded"></span><br>
+        <textarea id="shader_textarea"></textarea>
+      </div>
+    </div>
+  </div>
+  <div id="webcam_rapper" class="transparent">
+    <span class="close" id="webcam_close">x</span>
+    <iframe id="webcam_iframe"></iframe>
+  </div>
+
+  <input type="text" id="cursor_input">
+
+</body>
+<script type="text/javascript-shader" id="demo_shader">
+// lex.bg = hue((x+y*y+t/10)/20)
+// lex.fg = colors.white
+// lex.char = " "
+// lex.opacity = 1
+
+</script>
+<script src="js/vendor/colorcode.js"></script>
+<script src="js/vendor/text-encoder-lite.js"></script>
+<script src="js/vendor/dataUriToBlob.js"></script>
+<script src="js/vendor/FileSaver.js"></script>
+<script src="js/vendor/oktween.js"></script>
+
+<script src="js/util.js"></script>
+<script src="js/png.js"></script>
+<script src="js/unicode.js"></script>
+<script src="js/color.js"></script>
+<script src="js/dither.js"></script>
+<script src="js/undo.js"></script>
+<script src="js/clipboard.js"></script>
+<script src="js/upload.js"></script>
+<script src="js/user.js"></script>
+
+<script src="js/lex.js"></script>
+<script src="js/matrix.js"></script>
+<script src="js/blit.js"></script>
+<script src="js/tool.js"></script>
+<script src="js/shader.js"></script>
+<script src="js/draw.js"></script>
+
+<script src="js/ui/brush.js"></script>
+<script src="js/ui/canvas.js"></script>
+<script src="js/ui/custom.js"></script>
+<script src="js/ui/goodies.js"></script>
+<script src="js/ui/keys.js"></script>
+<script src="js/ui/controls.js"></script>
+<script src="js/ui/palette.js"></script>
+<script src="js/ui/letters.js"></script>
+<script src="js/ui/selection.js"></script>
+<script src="js/ui/transform.js"></script>
+<script src="js/ui/nopaint.js"></script>
+
+<script src="js/app.js"></script>
+</html>
+
