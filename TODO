@@ -2,4 +2,4 @@
 2) document: Shift + LMB to delete brush, Shift + LMB to switch character sets
 3) feature: allow to {dis,en}able cutoff
 4) feature: {bold,italic,underline} attributes
-5) reimplement: {save,upload} as PNG
+5) reimplement: {save,upload} as PNG & gallery

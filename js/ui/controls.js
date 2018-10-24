@@ -160,16 +160,8 @@ var controls = (function(){
   })
   controls.save = new ClipboardTool (save_el)
   controls.save.use = function(){
-    changed && clipboard.upload_png()
     clipboard.show()
     clipboard.export_mode()
-  }
-  controls.send_to_irc = new ClipboardTool (send_to_irc_el)
-  controls.send_to_irc.use = function(){
-    changed && clipboard.upload_png()
-    clipboard.show()
-    clipboard.export_mode()
-    alert('your ascii art is now on display on the IRC channel inside the panke.gallery!')
   }
   controls.load = new ClipboardTool (load_el)
   controls.load.use = function(){
