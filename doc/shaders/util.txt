@@ -1,0 +1,38 @@
+SHADER UTILITIES
+================
+
+These are little snippets which may be useful in writing your own shaders.
+
+
+
+>> basic way to slow the frame rate of a shader.
+
+window.zz=window.zz||0
+if(!(x+y)) zz++
+if (lex.bg != 1 && !(zz % 4)) {
+  ...
+}
+
+
+>> handy for brushes - use color to mask brush shape
+
+lex.opacity = lex.bg == colors.black ? 0 : 1
+
+
+Tip: Set to "animate brush", then use option+shift (alt+shift) to
+copy color from the canvas. Brush will have the "shape" of the
+copied color only.  Can be a cool effect when used with fg/bg only.
+
+
+
+>> copy color from canvas at x/y
+
+lex.assign( canvas.get(x,y) )
+
+
+
+>> animate canvas up and to the left..
+
+lex.assign( canvas.get(x+1,y+1) )
+
+
