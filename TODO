@@ -1,5 +1,5 @@
-1) attributes: bold, italic, underline
-2) document UI: Shift + LMB to delete brush, Shift + LMB to switch character sets
-3) document: constraints for video reverse
-4) feature: allow to {dis,en}able cutoff
+1) document: constraints for video reverse
+2) document: Shift + LMB to delete brush, Shift + LMB to switch character sets
+3) feature: allow to {dis,en}able cutoff
+4) feature: {bold,italic,underline} attributes
 5) reimplement: {save,upload} as PNG
