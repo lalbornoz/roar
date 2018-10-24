@@ -272,12 +272,13 @@ Matrix.prototype.mirc = function (opts) {
   var lines = this.aa.map(function(row, y){
     var last, line = ""
     row.forEach(function(lex, x) {
+      var bg_ = -1, fg_ = 15
       if (lex.eqColor(last)) {
         line += lex.sanitize()
       } 
       else {
-        line += lex.mirc()
-        last = lex
+        [bg_, fg_, line_] = lex.mirc(bg_, fg_)
+        line += line_; last = lex;
       }
     })
     if (opts && opts.cutoff && line.length > opts.cutoff) {
