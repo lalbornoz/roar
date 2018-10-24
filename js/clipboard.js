@@ -100,7 +100,70 @@ var clipboard = (function () {
       if (!data.match(/\x03/))
         return exports.import_text();
 
-      var json = colorcode.to_json(data, {fg:0, bg:1})
+      var to_json = function(string, opts){
+        var lines_in = string.split(/\r?\n/)
+        var lines_out = []
+        var w = 0, h = 0
+        for (var y = 0; y < lines_in.length; y++) {
+          var bg = 1, fg = 15
+          var cells = [], line = lines_in[y]
+          if (line.length === 0) {
+            continue
+          } else {
+            for (var x = 0; x < line.length; x++) {
+              switch (line[x]) {
+              case "\x02":  // ^B (unimplemented)
+                break
+              case "\x03":  // ^C
+                var parseColour = function(line, x) {
+                  if (/1[0-5]/.test(line.substr(x, 2))) {
+                    colour = parseInt(line.substr(x, 2))
+                    return [colour, x + 2]
+                  } else if (/0[0-9]/.test(line.substr(x, 2))) {
+                    colour = parseInt(line.substr(x, 2))
+                    return [colour, x + 2]
+                  } else if (/[0-9]/.test(line.substr(x, 1))) {
+                    colour = parseInt(line.substr(x, 1))
+                    return [colour, x + 1]
+                  } else {
+                    return [undefined, x]
+                  }
+                }
+                var bg_ = undefined, fg_ = undefined, x_ = x + 1;
+                [fg_, x_] = parseColour(line, x_)
+                if (line[x_] === ",") {
+                  [bg_, x_] = parseColour(line, x_ + 1)
+                }
+                if ((bg_ == undefined) && (fg_ == undefined)) {
+                  [bg, fg] = [1, 15]
+                } else {
+                  bg = (bg_ != undefined) ? bg_ : bg;
+                  fg = (fg_ != undefined) ? fg_ : fg;
+                };
+                if (x_ != x) {x = x_ - 1}; break;
+              case "\x06":  // ^F (unimplemented)
+                break
+              case "\x0f":  // ^O
+                [bg, fg] = [1, 15]; break;
+              case "\x16":  // ^V
+                [bg, fg] = [fg, bg]; break;
+              case "\x1f":  // ^_ (unimplemented)
+                break
+              default:
+                cells.push({bg: bg, fg: bg, value: line[x]})
+              }
+            }
+            if (cells.length > 0) {
+              if (w < cells.length) {
+                w = cells.length
+              }
+              lines_out.push(cells); h++;
+            }
+          }
+        }
+        return {h: h, lines: lines_out, w: w}
+      }
+      var json = to_json(data, {fg:0, bg:1})
 
       if (!no_undo) undo.new()
       if (!no_undo) undo.save_rect(0,0, canvas.w, canvas.h)
@@ -114,7 +177,7 @@ var clipboard = (function () {
         var row = canvas.aa[y]
         for (var x = 0, char; char = line[x]; x++){
           var lex = row[x]
-          lex.char = String.fromCharCode(char.value)
+          lex.char = char.value
           lex.fg = char.fg
           lex.bg = char.bg
           lex.opacity = 1
@@ -211,9 +274,11 @@ var clipboard = (function () {
         var c = canvas.rotated ? clipboard.rotate_canvas() : clipboard.canvas
         if (done_fn) done_fn(c)
       }
+      var to_canvas = function(fn, opts){
+      }
 
       var start = Date.now();
-      colorcode.to_canvas(canvas.mirc(), opts)
+      to_canvas(canvas.mirc(), opts)
       var total = Date.now() - start;
       console.log("took " + total)
     },
