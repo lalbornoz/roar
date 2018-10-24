@@ -1,0 +1,156 @@
+ASCII SHADER TUTORIAL
+=====================
+
+In the asdf.us/ascii shaders, you write a little math function that executes on every
+pixel on the selected area.  The shaders can affect either the brush, the selected region,
+or the whole canvas.
+
+Shaders can also be animated, so they update live.  With a shader applied to the brush,
+the brush changes continuously as you draw.
+
+
+THE LEX OBJECT
+==============
+
+Essentially you are writing a Javascript function that modifies this "lex" object, which
+has four properties
+
+1) lex.bg = this is the background color
+2) lex.fg = this is the foreground color (text color)
+3) lex.char = this is the letter that you see in the space
+4) lex.opacity = this is whether the pixel actually draws or not
+      - so like a circular brush is opacity 1 in the middle and opacity 0 on the corners
+
+
+THE COLOR CODE NUMBERS
+======================
+
+With lex.bg and lex.fg, the goal is to have a number between 0 and 15, corresponding to
+the color code values from mIRC.
+
+If you shift-click on the color palette, you can cycle it around to the one which shows
+the actual order of the mIRC colors.
+
+The mIRC colors are the ones that go white, black, dark blue, green, red, dark red ...
+and these correspond to the numbers 0, 1, 2, 3, 4 ...
+
+
+COLOR CYCLING
+=============
+
+Additionally there are some color functions that might help -
+These functions make it easier to cycle through colors in a way that makes sense logically
+(since the mIRC colors are in a weird order)
+
+- hue(...) = this creates a cycle of colors in terms of their hue or color name,
+             so you get a rainbow that goes from dark red through yellow, green, blue,
+             purple, and back
+- gray(...) = cycles through grayscale
+- red(...) yellow(...) green(...) blue(...) purple(...) = use smaller palettes
+- inv_hue(...) fire(...) dark_gray(...) = these are oddities i made for fun
+
+
+VARIABLES
+=========
+
+Variables you have at your disposal are similar to the asdf.us/shader tool -
+
+- x, y = the coordinates of the pixel
+- mouse.x, mouse.y = the coordinate of the mouse as it hovers over the canvas
+- t = the current time, in milliseconds
+
+TIP: The time will increase very quickly - it's good to add t /= 1000 at the top of
+your shader so it goes slowly (and won't cause a seizure).
+
+
+FUNCTIONS
+=========
+
+Remember, this is Javascript.  You have the basic operators:
+
++ - / *
+
+And the bitwise operators:
+
+& | ^ ~
+
+You can do if statements with the standard comparison operators:
+
+< > == <= >=
+
+You also have access to all the functions on the Math object:
+
+floor, ceil, round
+abs, sign, mod(n,m), xor
+pow, exp, sqrt
+cos, sin, tan
+acos, asin, atan, atan2
+random() rand(n) randint(n) randrange(a,b)
+E, PI, PHI
+
+And some utility functions which might help:
+
+clamp(n,min,max)
+mix(n,a,b) (lerp)
+step(a,b)
+smoothstep(min,max,n)
+avg(m,n,a)
+cosp, sinp (mapped to [0,1])
+pixel(x,y) == 4*(y*w+h)
+dist(x,y,a,b)
+angle(x,y,a,b)
+choice(array)
+deg(radians), rad(degrees)
+
+
+BEYOND BASIC COLORS
+===================
+
+Other weird effects are possible if you combine these color functions.
+
+For instance, if you do hue(x+y) you'll get a rainbow.  But remember, this is just
+outputting a number between 0 and 15.  So you can do hue(x+y) + 1 and get a different
+cycle which does not really have anything to do with the rainbow, but looks cool.
+
+
+HOW DRAWING WORKS IN THE ASCII TOOL
+===================================
+
+When you click and drag to draw a line, your mouse produces a series of points which
+describe the line you tried to draw.  But these points do not necessarily make a
+continuous line - more like a series of dots, which it then draw lines between to make
+a "line" or "brush stroke".
+
+A line between two points is made by stamping the brush at regular intervals between the
+points which, with these brushes, ends up filling the space in between so it looks like
+you drew a continuous line.
+
+This is why when you draw a line with a big brush, it smears the outer edges.. The stamps
+happen right next to each other, so you wind up seeing mostly brush edges.
+
+You can visualize this effect with the following shader:
+
+lex.bg = mouse.x + mouse.y
+
+Drawing strokes quickly, or slowly.
+Make sure to make it animate to brush.
+Results could look like this:
+
+http://i.asdf.us/im/f9/1458658781640-ascii-bamboo.png
+
+
+SAMPLE SHADERS
+==============
+
+You can see a list of example shaders here:
+
+http://asdf.us/ascii/doc/shaderz.txt
+
+If you make a cool shader and want to see it on the list, please get in touch!
+You can find me on irc.jollo.org:9999 (ssl) in #sally, making color codes with my friends.
+
+Thanks and have fun!
+
+~ Bamboo, 22 Marzo 2016
+
+
