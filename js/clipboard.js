@@ -12,9 +12,6 @@ var clipboard = (function () {
 //      import_irssi.addEventListener("change", exports.setFormat("irssi"))
 //      import_mirc.addEventListener("change", exports.setFormat("mirc"))
       import_button.addEventListener("click", exports.import_colorcode)
-      export_button.addEventListener("click", exports.export_data)
-      save_button.addEventListener("click", exports.save_png)
-      upload_button.addEventListener("click", exports.upload_png)
       import_textarea.addEventListener("focus", exports.focus)
       import_textarea.addEventListener("blur", exports.blur)
       import_textarea.addEventListener('paste', exports.paste)
@@ -45,15 +42,6 @@ var clipboard = (function () {
       cutoff_warning_el.style.display = 'none'
       import_buttons.style.display = "inline"
       import_textarea.value = ""
-    },
-    export_mode: function () {
-      focus()
-      clipboard.importing = false
-      import_buttons.style.display = "none"
-      format_el.style.display = 'inline'
-      cutoff_warning_el.style.display = 'none'
-      gallery_rapper.style.display = 'inline'
-      clipboard.export_data()
     },
 
     paste: function (e) {
@@ -261,130 +249,6 @@ var clipboard = (function () {
       ctx.drawImage(c, 0, 0)
       return cr
     },
-
-    export_canvas: function (done_fn) {
-      var opts = {
-        palette: 'mirc',
-        font: canvas.pixels ? 'fixedsys_8x8' : 'fixedsys_8x15',
-        fg: 0,
-        bg: 1,
-        canvas: clipboard.canvas
-      }
-      opts.done = function(){
-        var c = canvas.rotated ? clipboard.rotate_canvas() : clipboard.canvas
-        if (done_fn) done_fn(c)
-      }
-      var to_canvas = function(fn, opts){
-      }
-
-      var start = Date.now();
-      to_canvas(canvas.mirc(), opts)
-      var total = Date.now() - start;
-      console.log("took " + total)
-    },
-    
-    filename: function () {
-      return [ +new Date, "ascii", user.username ].join("-")
-    },
-
-    save_png: function () {
-      var save_fn = function(canvas_out){
-        var filename = clipboard.filename() + ".png"
-        var blob = PNG.canvas_to_blob_with_colorcode(canvas_out, canvas.mirc())
-        saveAs(blob, filename);
-      }
-      clipboard.export_canvas(save_fn)
-    },
-    
-    upload_png: function () {
-      var upload_fn = function(canvas_out){
-        var blob = PNG.canvas_to_blob_with_colorcode(canvas_out, canvas.mirc())
-        var filename = clipboard.filename()
-        var tag = 'ascii'
-        upload(blob, filename, tag, canvas.mirc())
-      }
-      clipboard.export_canvas(upload_fn)
-    }
-
-  }
- 
-  // http...?a=1&b=2&b=3 -> {a: '1', b: ['2', '3']}
-  function parse_url_search_params(url){
-    var params = {}
-    url = url.split('?')
-    if (url.length < 2) return params
-
-    var search = url[1].split('&')
-    for (var i = 0, pair; pair = search[i]; i++){
-      pair = pair.split('=')
-      if (pair.length < 2) continue
-      var key = pair[0]
-      var val = pair[1]
-      if (key in params){
-        if (typeof params[key] === 'string'){
-          params[key] = [params[key], val]
-        }
-        else params[key].push(val)
-      }
-      else params[key] = val
-    }
-    return params
-  }
-
-  function get_filetype(txt){
-    txt = txt.split('.')
-    return txt[txt.length - 1].toLowerCase() 
-  }
-
-  function fetch_url(url, f, type){
-    type = type || 'arraybuffer'
-    url = "/cgi-bin/proxy?" + url
-    //url = "http://198.199.72.134/cors/" + url
-    var xhr = new XMLHttpRequest()
-    xhr.open('GET', url, true)
-    xhr.responseType = type
-    xhr.addEventListener('load', function(){ f(xhr.response) })
-    xhr.send()
-  }
-
-  function load_text(txt){
-    clipboard.import_colorcode(txt, true)
-  }
-
-  function load_png(buf){
-    var chunks = PNG.decode(buf)
-    if (!chunks) return
-    var itxt_chunks = []
-    for (var i=0, c; c=chunks[i]; i++){
-      if (c.type !== 'iTXt') continue
-      var itxt = PNG.decode_itxt_chunk(c)
-      if (!itxt.keyword || itxt.keyword !== 'colorcode') continue
-      clipboard.import_colorcode(itxt.data, true)
-    }
-  }
-  
-  function sally_url_convert(url){
-    var png_regex = /^https?:\/\/jollo\.org\/den\/sallies\/([0-9]+)\/([^.]+)\.png$/
-    var matches = url.match(png_regex)
-    if (!matches) return url
-    return 'http://jollo.org/den/sallies/' + matches[1] + '/raw-' + matches[2] + '?.txt'
-    // txt suffix to force asdf proxy
-  }
-
-  exports.load_from_location = function(){
-    var params = parse_url_search_params(window.location + '')
-    if (!params.url) return
-    var url = params.url
-    url = sally_url_convert(url)
-    var type = get_filetype(url)
-    switch (type){
-      case 'txt':
-        fetch_url(url, load_text, 'text')
-        break
-      case 'png':
-        fetch_url(url, load_png)
-        break
-    } 
 
   }
   
