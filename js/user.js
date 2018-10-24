@@ -57,7 +57,7 @@ var user = (function(){
     if (!user.username.match(/^00/)) {
       console.log("setting to " + username)
     }
-    document.cookie = "imname="+username+";path=/;domain=.asdf.us;max-age=1086400"
+    document.cookie = "imname="+username+";path=/;domain=.lucioillanes.de;max-age=1086400"
     localStorage.setItem("im.name", username);
   }
   
