@@ -9,9 +9,14 @@ var custom = (function(){
     new_brush.append(rapper)
     custom_rapper.appendChild(rapper)
     // store in localstorage?
-    rapper.addEventListener("click", function(){
-      // load this brush
-      exports.load(new_brush)
+    rapper.addEventListener("click", function(e){
+      if (e.shiftKey) {
+        rapper.parentNode.removeChild(rapper)
+        delete new_brush
+      } else {
+        // load this brush
+        exports.load(new_brush)
+      }
     })
   }
   
