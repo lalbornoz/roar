@@ -8,6 +8,16 @@ var palette = (function(){
   var palette_index = localStorage.getItem("ascii.palette") || 1
   var palette_list = [all_hue, all_inv_hue, mirc_color, mirc_color_reverse]
   var palette_fn = palette_list[palette_index]
+  var dither = {
+    aa: '▓▒░ ',
+    a: '▓',
+    b: '▒',
+    c: '░',
+    d: ' ',
+    p: function(n){
+      return dither.aa[Math.floor(Math.abs(n) % 4)]
+    }
+  }
   palette.chars = "  " + dither.a + dither.b + dither.c
 
   palette.repaint = function(){
