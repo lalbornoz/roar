@@ -34,8 +34,6 @@ from MiRCARTToPngFile import MiRCARTToPngFile
 
 class IrcMiRCARTBot(IrcClient.IrcClient):
     """IRC<->MiRC2png bot"""
-    clientChannelLastMessage = clientChannelOps = clientChannel = None
-    clientChannelRejoin = None
     imgurApiKey = MiRCARTImgurApiKey.imgurApiKey
 
     # {{{ ContentTooLargeException(Exception): Raised by _urlretrieveReportHook() given download size > 1 MB
@@ -111,7 +109,7 @@ class IrcMiRCARTBot(IrcClient.IrcClient):
     def _dispatchPrivmsg(self, message):
         if  message[2].lower() == self.clientChannel.lower()           \
         and message[3].startswith("!pngbot "):
-            if (int(time.time()) - self.clientLastMessage) < 5:
+            if (int(time.time()) - self.clientChannelLastMessage) < 5:
                 self._log("Ignoring request on {} from {} due to rate limit: {}".format(message[2].lower(), message[0], message[3]))
                 return
             elif message[0].split("!")[0].lower() not in self.clientChannelOps:
@@ -161,7 +159,7 @@ class IrcMiRCARTBot(IrcClient.IrcClient):
             if imgurResponse[0] == 200:
                     self._log("Uploaded as: {}".format(imgurResponse[1]))
                     self.queue("PRIVMSG", message[2], "8/!\\ Uploaded as: {}".format(imgurResponse[1]))
-                    self.clientLastMessage = int(time.time())
+                    self.clientChannelLastMessage = int(time.time())
             else:
                     self._log("Upload failed with HTTP status code {}".format(imgurResponse[0]))
                     self._log("Message from website: {}".format(imgurResponse[1]))
@@ -207,14 +205,15 @@ class IrcMiRCARTBot(IrcClient.IrcClient):
         if (totalSize > pow(2,20)):
             raise IrcMiRCARTBot.ContentTooLargeException
     # }}}
-    # {{{ connect(self, preferFamily=0, timeout=None): Connect to server and (re)initialise w/ optional timeout
-    def connect(self, preferFamily=0, timeout=None):
+    # {{{ connect(self, localAddr=None, preferFamily=0, timeout=None): Connect to server and (re)initialise w/ optional timeout
+    def connect(self, localAddr=None, preferFamily=0, timeout=None):
         self._log("Connecting to {}:{}...".format(self.serverHname, self.serverPort))
-        if super().connect(preferFamily=preferFamily, timeout=timeout):
+        if super().connect(localAddr=localAddr, preferFamily=preferFamily, timeout=timeout):
                 self._log("Connected to {}:{}.".format(self.serverHname, self.serverPort))
                 self._log("Registering on {}:{} as {}, {}, {}...".format(self.serverHname, self.serverPort, self.clientNick, self.clientIdent, self.clientGecos))
-                self.clientLastMessage = 0; self.clientChannelOps = [];
+                self.clientChannelLastMessage = 0; self.clientChannelOps = [];
                 self.clientChannelRejoin = False
+                self.clientHasPing = False
                 return True
         else:
                 return False
@@ -226,13 +225,21 @@ class IrcMiRCARTBot(IrcClient.IrcClient):
                 timeNow = time.time()
                 if self.clientNextTimeout <= timeNow:
                     self._dispatchTimer()
-            self.unqueue()
-            serverMessage = self.readline()
-            if serverMessage == None:
+            if self.unqueue() == False:
                 self._dispatchNone(); break;
-            elif serverMessage == "":
-                continue
-            elif serverMessage[1] == "001":
+            else:
+                serverMessage = self.readline()
+                if serverMessage == None:
+                    self._dispatchNone(); break;
+                elif serverMessage == "":
+                    if self.clientHasPing:
+                        self._dispatchNone(); break;
+                    else:
+                        self.clientHasPing = True
+                        self.queue("PING", str(time.time()))
+                        self._log("Ping...")
+                        continue
+            if serverMessage[1] == "001":
                 self._dispatch001(serverMessage)
             elif serverMessage[1] == "353":
                 self._dispatch353(serverMessage)
@@ -244,6 +251,9 @@ class IrcMiRCARTBot(IrcClient.IrcClient):
                 self._dispatchMode(serverMessage)
             elif serverMessage[1] == "PING":
                 self._dispatchPing(serverMessage)
+            elif serverMessage[1] == "PONG":
+                self._log("Pong.")
+                self.clientHasPing = False
             elif serverMessage[1] == "PRIVMSG":
                 self._dispatchPrivmsg(serverMessage)
     # }}}
@@ -259,22 +269,26 @@ class IrcMiRCARTBot(IrcClient.IrcClient):
 def main(optdict, *argv):
     _IrcMiRCARTBot = IrcMiRCARTBot(*argv)
     while True:
+        if "-l" in optdict:
+            localAddr = optdict["-l"]
+        else:
+            localAddr = None
         if "-4" in optdict:
             preferFamily = socket.AF_INET
         elif "-6" in optdict:
             preferFamily = socket.AF_INET6
         else:
             preferFamily = 0
-        if _IrcMiRCARTBot.connect(preferFamily=preferFamily, timeout=15):
+        if _IrcMiRCARTBot.connect(localAddr=localAddr, preferFamily=preferFamily, timeout=15):
             _IrcMiRCARTBot.dispatch()
             _IrcMiRCARTBot.close()
         time.sleep(15)
 
 if __name__ == "__main__":
-    optlist, argv = getopt(sys.argv[1:], "46")
+    optlist, argv = getopt(sys.argv[1:], "46l:")
     optdict = dict(optlist)
     if len(argv) < 1 or len(argv) > 4:
-        print("usage: {} [-4|-6] "                                          \
+        print("usage: {} [-4|-6] [-l <local hostname>]"                     \
             "<IRC server hostname> "                                        \
             "[<IRC server port; defaults to 6667>] "                        \
             "[<IRC bot nick name; defaults to pngbot>] "                    \
