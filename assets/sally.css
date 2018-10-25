@@ -173,8 +173,6 @@ textarea { font-size:12pt; width: 37vw; height: 300px; background: #333; color: 
   user-select: none;
 }
 .close { position: absolute; top: 20px; right: 20px; z-index: 2; padding: 10px; background: black; cursor: pointer; }
-#webcam_rapper { display: none; position: absolute; top: 0px; left: 0px; width:100%;height:100%; box-sizing:border-box; border: 40px solid rgba(0,0,0,0.5); background-color: rgba(0,0,0,0.5);  }
-#webcam_iframe { position: absolute; top: 0px; left: 0px; width:100%;height:100%; background-color: rgba(0,0,0,0.5); border: 0; }
 #experimental_palette_toggle.focused { box-shadow: none; }
 #cursor_input { position: fixed; top: 0; right: 0; width:30px; opacity: 0; font-size: 16px; }
 .selector_el {
