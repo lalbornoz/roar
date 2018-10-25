@@ -38,12 +38,15 @@ class IrcClient:
             self.clientSocket.close()
         self.clientSocket = self.clientSocketFile = None;
     # }}}
-    # {{{ connect(self, preferFamily=socket.AF_INET, timeout=None): Connect to server and register w/ optional timeout
-    def connect(self, preferFamily=socket.AF_INET, timeout=None):
+    # {{{ connect(self, localAddr=None, preferFamily=socket.AF_INET, timeout=None): Connect to server and register w/ optional timeout
+    def connect(self, localAddr=None, preferFamily=socket.AF_INET, timeout=None):
         gaiInfo = socket.getaddrinfo(self.serverHname, self.serverPort,
                                      preferFamily, socket.SOCK_STREAM, socket.IPPROTO_TCP)
         self.clientSocket = socket.socket(*gaiInfo[0][:3])
         self.clientSocket.setblocking(0)
+        if localAddr != None:
+            gaiInfo_ = socket.getaddrinfo(localAddr, None, preferFamily, socket.SOCK_STREAM, socket.IPPROTO_TCP)
+            self.clientSocket.bind(gaiInfo_[0][4])
         try:
             self.clientSocket.connect(gaiInfo[0][4])
         except BlockingIOError:
@@ -60,16 +63,21 @@ class IrcClient:
         self.queue("USER", self.clientIdent, "0", "0", self.clientGecos)
         return True
     # }}}
-    # {{{ readline(self): Read and parse single line from server into canonicalised list, honouring timers
-    def readline(self):
+    # {{{ readline(self, timeout=30): Read and parse single line from server into canonicalised list, honouring timers
+    def readline(self, timeout=30):
         if self.clientNextTimeout:
             timeNow = time.time()
             if self.clientNextTimeout <= timeNow:
                 return ""
             else:
                 readySet = select.select([self.clientSocket.fileno()], [], [], self.clientNextTimeout - timeNow)
+                if  len(readySet[0]) == 0   \
+                and (time.time() - timeNow) >= timeout:
+                    return ""
         else:
-            readySet = select.select([self.clientSocket.fileno()], [], [])
+            readySet = select.select([self.clientSocket.fileno()], [], [], timeout)
+            if len(readySet[0]) == 0:
+                return ""
         msg = self.clientSocketFile.readline()
         if len(msg):
             msg = msg.rstrip("\r\n")
@@ -99,24 +107,31 @@ class IrcClient:
                 msg += args[argNum] + " "
         self.clientQueue.append((msg + "\r\n").encode())
     # }}}
-    # {{{ unqueue(self): Send all queued lines to server, honouring timers
-    def unqueue(self):
+    # {{{ unqueue(self, timeout=15): Send all queued lines to server, honouring timers
+    def unqueue(self, timeout=15):
         while self.clientQueue:
             msg = self.clientQueue[0]; msgLen = len(msg); msgBytesSent = 0;
             while msgBytesSent < msgLen:
                 if self.clientNextTimeout:
                     timeNow = time.time()
                     if self.clientNextTimeout <= timeNow:
-                        self.clientQueue[0] = msg; return;
+                        self.clientQueue[0] = msg; return True;
                     else:
-                        readySet = select.select([], [self.clientSocket.fileno()], [], self.clientNextTimeout - timeNow)
+                        readySet = select.select([], [self.clientSocket.fileno()], [], min(self.clientNextTimeout - timeNow, timeout))
                         if len(readySet[1]) == 0:
-                            self.clientQueue[0] = msg; return;
+                            timeNow_ = time.time()
+                            if (timeNow_ - timeNow) >= timeout:
+                                return False
+                            else:
+                                self.clientQueue[0] = msg; return True;
                 else:
-                    readySet = select.select([], [self.clientSocket.fileno()], [])
+                    readySet = select.select([], [self.clientSocket.fileno()], [], timeout)
+                    if len(readySet[1]) == 0:
+                        return False
                 msgBytesSent = self.clientSocket.send(msg)
                 msg = msg[msgBytesSent:]; msgLen -= msgBytesSent;
             del self.clientQueue[0]
+        return True
     # }}}
 
     #
