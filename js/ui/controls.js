@@ -116,30 +116,6 @@ var controls = (function(){
     current_filetool && current_filetool.blur()
   }
 
-  controls.webcam = new FileTool (webcam_el)
-  controls.webcam.load = function(){
-    this.loaded = true
-    webcam_close.addEventListener("click", function(){ controls.webcam.blur() })
-    window.addEventListener("message", function(e){
-      if (e.origin !== window.location.origin) return
-      controls.webcam.blur()
-      controls.circle.focus()
-      import_textarea.value = e.data
-      clipboard.import_colorcode()
-    })
-  }
-  controls.webcam.use = function(){
-    if (! this.loaded) {
-      this.load()
-    }
-    webcam_iframe.src = "webcam.html"
-    webcam_rapper.style.display = "block"
-  }
-  controls.webcam.done = function(){
-    webcam_iframe.src = ""
-    webcam_rapper.style.display = "none"
-  }
-  
   controls.grid = new BlurredCheckbox (grid_el)
   controls.grid.memorable = true
   controls.grid.use = function(state){
