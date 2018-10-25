@@ -33,7 +33,6 @@ var clipboard = (function () {
     import_mode: function () {
       focus()
       clipboard.importing = true
-      gallery_rapper.style.display = 'none'
       format_el.style.display = 'none'
       cutoff_warning_el.style.display = 'none'
       import_buttons.style.display = "inline"
@@ -46,7 +45,6 @@ var clipboard = (function () {
       import_buttons.style.display = "none"
       format_el.style.display = 'inline'
       cutoff_warning_el.style.display = 'none'
-      gallery_rapper.style.display = 'inline'
       clipboard.export_data()
     },
 
