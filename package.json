@@ -1,0 +1,31 @@
+{
+  "author": "Lucio Andrés Illanes Albornoz <lucio@lucioillanes.de>, based on work by JOLLO NET NA",
+  "bugs": {
+    "url": "https://github.com/lalbornoz/asciiblaster/issues"
+  },
+  "description": "asciiblaster (standalone NW app)",
+  "directories": {
+    "doc": "doc"
+  },
+  "homepage": "https://github.com/lalbornoz/asciiblaster#readme",
+  "license": "Jollo LNT license <https://raw.githubusercontent.com/lalbornoz/asciiblaster/master/LICENCE>",
+  "main": "index.html",
+  "name": "asciiblaster",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lalbornoz/asciiblaster.git"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "version": "1.0.0",
+  "window": {
+    "title": "asciiblaster (standalone NW app)",
+    "toolbar": true,
+    "position": "center",
+    "width": 1024,
+    "height": 768,
+    "min_width": 1024,
+    "min_height": 768
+  }
+}
