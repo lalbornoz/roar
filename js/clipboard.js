@@ -184,10 +184,10 @@ var clipboard = (function () {
           output = canvas.ascii()
           break
         case 'mirc':
-          output = canvas.mirc({cutoff: 400})
+          output = canvas.mirc({cutoff: 425})
           break
         case 'irssi':
-          output = canvas.irssi({cutoff: 400})
+          output = canvas.irssi({cutoff: 425})
           break
         case 'ansi':
           output = canvas.ansi()
