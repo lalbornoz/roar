@@ -3,6 +3,7 @@
 
 PACKAGE_NAME="asciiblaster";
 RELEASE_DEPS="cpio find gunzip rm sed tar unzip wget zip";
+NWJS_MANIFEST_FNAME="assets/nwjs.manifest";
 NWJS_PLATFORMS="linux-ia32 linux-x64 win-ia32 win-x64";
 NWJS_VERSION="0.34.5";
 NWJS_SUBDIR="nwjs-v${NWJS_VERSION}-%NWJS_PLATFORM%";
@@ -50,6 +51,9 @@ release() {
 		wget -cqO "${_nwjs_fname}" "${_nwjs_url}";
 	else
 		wget -cO "${_nwjs_fname}" "${_nwjs_url}";
+	fi;
+	if ! sha256sum --ignore-missing -c --status "${NWJS_MANIFEST_FNAME}"; then
+		echo "error: SHA256 sum mismatch for \`${_nwjs_fname}'" >&2; return 1;
 	fi;
 	rm -rf "${_release_dname}"; mkdir -p "${_release_dname}"; extract "${_nwjs_fname}" "${_release_dname}";
 
