@@ -2,7 +2,7 @@
 #
 
 PACKAGE_NAME="asciiblaster";
-PACKAGE_VERSION="1.0.0";
+PACKAGE_VERSION="1.0.1";
 RELEASE_DEPS="cpio find gunzip rm tar unzip wget zip";
 NWJS_PLATFORMS="linux-ia32 linux-x64 win-ia32 win-x64";
 NWJS_VERSION="0.34.5";
