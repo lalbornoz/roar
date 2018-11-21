@@ -2,8 +2,7 @@
 #
 
 PACKAGE_NAME="asciiblaster";
-PACKAGE_VERSION="1.0.1";
-RELEASE_DEPS="cpio find gunzip rm tar unzip wget zip";
+RELEASE_DEPS="cpio find gunzip rm sed tar unzip wget zip";
 NWJS_PLATFORMS="linux-ia32 linux-x64 win-ia32 win-x64";
 NWJS_VERSION="0.34.5";
 NWJS_SUBDIR="nwjs-v${NWJS_VERSION}-%NWJS_PLATFORM%";
@@ -36,13 +35,15 @@ subst() {
 };
 
 release() {
-	local _platform="${1}" _vflag="${2}" _nwjs_fname="" _nwjs_subdir="" _nwjs_url="" _release_fname="" _release_dname="";
+	local _platform="${1}" _vflag="${2}" _nwjs_fname="" _nwjs_subdir="" _nwjs_url=""	\
+		_release_fname="" _release_dname="" _release_version="";
 
 	_nwjs_subdir="$(subst "${NWJS_SUBDIR}" "%NWJS_PLATFORM%" "${_platform}")";
 	_nwjs_url="$(subst "$(eval echo \"\${NWJS_URL_${_platform%%-*}}\")" "%NWJS_PLATFORM%" "${_platform}")";
 	_nwjs_fname="${RELEASES_DNAME}/${_nwjs_url##*/}";
 	_release_dname="${RELEASES_DNAME}/${PACKAGE_NAME}-${PACKAGE_VERSION}-release-${_platform}";
 	_release_fname="${_release_dname}.zip";
+	_release_version="$(sed -n '/^\s\*"version":/s/^.*:\s*"\([0-9.]\+\)",\?\s*$/\1/p' package.json)";
 
 	trap "rm -fr ${_nwjs_fname} ${_release_dname}" EXIT HUP INT QUIT PIPE TERM USR1 USR2;
 	if [ "${_vflag:-0}" -eq 0 ]; then
