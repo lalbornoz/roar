@@ -283,7 +283,6 @@ Matrix.prototype.mirc = function (opts) {
     })
     if (opts && opts.cutoff && line.length > opts.cutoff) {
       cutoff = true
-      return line.substr(0, opts.cutoff)
     }
     return line
   })
