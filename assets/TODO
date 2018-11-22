@@ -5,4 +5,5 @@
 5) feature: keyboard instead of [LR]MB
 6) feature: {line,measuring} tool
 7) feature: status bar w/ position, etc.
-8) reimplement: {save,upload} as PNG & gallery
+8) feature: zoom {in,out}
+9) reimplement: {save,upload} as PNG & gallery
