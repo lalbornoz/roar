@@ -2,7 +2,7 @@
 #
 
 PACKAGE_NAME="asciiblaster-www";
-RELEASE_DEPS="cpio find gzip rm sed tar";
+RELEASE_DEPS="cpio find rm sed zip";
 RELEASES_DNAME="releases";
 
 msgf() {
@@ -15,7 +15,7 @@ deploy() {
 
 	_release_version="$(sed -n '/^\s*<title>/s/^\s*<title>asciiblaster v\([0-9.]\+\)<\/title>\s*$/\1/p' index.html)";
 	_release_dname="${RELEASES_DNAME}/${PACKAGE_NAME}-${_release_version}";
-	_release_fname="${_release_dname}.tgz";
+	_release_fname="${_release_dname}.zip";
 
 	find -L .					\
 		-mindepth 1				\
@@ -24,10 +24,13 @@ deploy() {
 		-not -name '*.sw*'			\
 		-not -name "${0##*/}"			|\
 			cpio --quiet -dLmp "${_release_dname}";
-	tar -C "${RELEASES_DNAME}" -cpf -		\
-		"${_release_dname##${RELEASES_DNAME}/}"	|\
-			gzip -c - > "${_release_fname}";
-	rm -fr "${_release_dname}";
+	cd "${RELEASES_DNAME}";
+	if [ "${_vflag:-0}" -eq 0 ]; then
+		zip -9 -r "${_release_fname##${RELEASES_DNAME}/}" "${_release_dname##${RELEASES_DNAME}/}" >/dev/null;
+	else
+		zip -9 -r "${_release_fname##${RELEASES_DNAME}/}" "${_release_dname##${RELEASES_DNAME}/}";
+	fi;
+	cd "${OLDPWD}"; rm -fr "${_release_dname}";
 };
 
 usage() {
