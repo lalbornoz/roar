@@ -26,7 +26,7 @@ var Tool = Model({
     current_tool = this
     this.el.classList.add('focused')
     this.use()
-    if (this.name != 'shader' && is_desktop) { cursor_input.focus() }
+    if (is_desktop) { cursor_input.focus() }
   },
   blur: function(){
     current_tool = null
@@ -45,7 +45,7 @@ var FileTool = Tool.extend({
     current_filetool = this
     this.el.classList.add('focused')
     this.use()
-    if (this.name != 'shader' && is_desktop) { cursor_input.focus() }
+    if (is_desktop) { cursor_input.focus() }
   },
   blur: function(){
     current_filetool = null
