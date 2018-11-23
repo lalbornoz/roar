@@ -104,7 +104,6 @@ var canvas = current_canvas = (function(){
         point = [x,y]
         lex = canvas.aa[y][x]
         if (! dragging) return
-        shader_el.innerHTML = point.join(",")
         if (drawing) {
           draw.move(e, lex, point)
         }
