@@ -7,4 +7,4 @@
 7)  feature: status bar w/ position, etc.
 8)  feature: zoom {in,out}
 9)  reimplement: {save,upload} as PNG & gallery
-10) releases: merge w/ MiRCARTools (into asciiblaster,) provide signed release APK
+10) releases: merge w/ MiRCARTools (into asciiblaster,) provide signed release APK, set is_{iphone,ipad,android,mobile,desktop}
