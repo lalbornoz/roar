@@ -15,7 +15,7 @@ usage() {
 };
 
 main() {
-	local _opt="" _version_new="" _version_old="";
+	local _opt="" _version_new="" _version_new_code="" _version_old="";
 	while getopts hv _opt; do
 	case "${_opt}" in
 	h) usage; exit 0; ;;
@@ -28,6 +28,7 @@ main() {
 		echo "error: empty or missing new version number argument" >&2; usage; exit 1;
 	else
 		_version_old="${1}"; _version_new="${2}";
+		_version_new_code="$(echo "${_version_new}" | sed -e 's,\.,,g' -e 's/^[0-9]/&00/')";
 	fi;
 	for _cmd in ${RELEASE_DEPS_CMD}; do
 		if ! which "${_cmd}" >/dev/null; then
@@ -35,17 +36,24 @@ main() {
 			exit 1;
 		fi;
 	done;
-	rc sed -i"" '/"version":/s/\("version":\s*\)"'"${_version_old}"'"/\1"'"${_version_new}"'"/'		\
-		asciiblaster-cordoba/package.json								\
-		asciiblaster-cordoba/package-lock.json								\
-		asciiblaster-nw/package.json									\
-		asciiblaster-nw/package-lock.json;
-	rc sed -i"" '/version="/s/\(version=\)"'"${_version_old}"'"/\1"'"${_version_new}"'"/'			\
+	rc sed -i"" '/version="/s/\(version=\)"'"${_version_old}"'"/\1"'"${_version_new}"'"/'				\
 		asciiblaster-cordoba/config.xml;
-	rc sed -i"" '/<title>[^<]\+ v/s/\(<title>[^<]\+ v\)'"${_version_old}"'\(<\)/\1'"${_version_new}"'\2/'	\
+	rc sed -i"" '/"version":/s/\("version":\s*\)"'"${_version_old}"'"/\1"'"${_version_new}"'"/'			\
+		asciiblaster-cordoba/package.json									\
+		asciiblaster-cordoba/package-lock.json;
+	rc sed -i"" '/android:versionCode="/s/\(android:versionCode=\)"[0-9]\+"/\1"'"${_version_new_code}"'"/'		\
+		asciiblaster-cordoba/platforms/android/app/src/main/AndroidManifest.xml;
+	rc sed -i"" '/android:versionName="/s/\(android:versionName=\)"'"${_version_old}"'"/\1"'"${_version_new}"'"/'	\
+		asciiblaster-cordoba/platforms/android/app/src/main/AndroidManifest.xml;
+	rc sed -i"" '/version="/s/\(version=\)"'"${_version_old}"'"/\1"'"${_version_new}"'"/'				\
+		asciiblaster-cordoba/platforms/android/app/src/main/res/xml/config.xml;
+	rc sed -i"" '/"version":/s/\("version":\s*\)"'"${_version_old}"'"/\1"'"${_version_new}"'"/'			\
+		asciiblaster-nw/package.json										\
+		asciiblaster-nw/package-lock.json;
+	rc sed -i"" '/<title>[^<]\+ v/s/\(<title>[^<]\+ v\)'"${_version_old}"'\(<\)/\1'"${_version_new}"'\2/'		\
 		index.html;
-	rc rsync -aiLPv --delete										\
-		asciiblaster-cordoba/www/									\
+	rc rsync -aiLPv --delete											\
+		asciiblaster-cordoba/www/										\
 		asciiblaster-cordoba/platforms/android/app/src/main/assets/www/;
 	rc git add asciiblaster-cordoba/platforms/android/app/src/main/assets/www;
 	rc git commit -avm "Bump to v${_version_new}.";
