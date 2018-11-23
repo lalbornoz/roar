@@ -12,7 +12,7 @@
     </description>
     <name>asciiblaster-cordoba</name>
     <access origin="*" />
-    <content src="www/index.html" />
+    <content src="index.html" />
     <allow-intent href="http://*/*" />
     <allow-intent href="https://*/*" />
     <allow-intent href="mailto:*" />
