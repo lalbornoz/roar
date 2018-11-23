@@ -1,0 +1,237 @@
+CANVAS SHADERS
+==============
+
+These shaders were written to work on areas of canvas.
+Make sure "canvas" is selected and "animate" is checked.
+
+
+>> original shader..
+
+lex.bg = hue((x+y*y+t/10)/20)
+lex.fg = (x+y)%16
+lex.char = (y%2) ? ":" : "%" 
+
+
+
+>> energy ball ascii shader
+
+d = dist(x/2+w/4, y, w/2, h/2)
+an = angle(x/2+w/4, y, w/2,h/2)+t/4200
+r=10.2
+
+if (d < r) lex.bg = randint(r)
+
+ll=abs(an|0)+""
+lex.char=ll[ll.length-1]
+
+if (d > r) {
+  lex.bg = randint(d)
+  lex.fg = randint(d)
+  lex.char = ll[ll.length-2]
+}
+
+
+
+>> drifting fire
+
+t += sin(x/1000)*100000
+pos = y/h*6 + sin(x*3) - cos(y*t/10000-10)
+pos = clamp(pos, 0, 6)
+lex.bg = hue(pos)
+
+
+
+>> the "bJoel56" shader
+
+yy=y
+x-=w/2
+y-=h/2
+
+lex.bg = blue(yy/h+random())
+lex.fg = green(yy/h*4 + sin(x/100+random()/2)) // hue(t/1000)|0;
+
+var abcd=".'~:;!>+=icjtJYSGSXDQKHNWM";
+function chara (aa,n) { return aa[clamp(n*aa.length, 0, aa.length)|0] }
+lex.char = chara(abcd, y/h*(5/3 + tan(x/100)+random()/1))
+
+
+
+>> frog shader v2
+
+t/=-100
+d = sinp( (dist(x/2+w/4, y, w/2, h/2) + t)/2 ) * 10
+
+lex.char=',./>"ASE$#'[(floor(d))]
+lex.fg = [1,3,9][floor(d*3)%3]
+lex.bg=1
+
+
+
+>> frog shader v3
+
+// set period to like 0.2 for a normal circle
+period = y/10
+
+t/=-100
+d = sinp( (dist(x/2+w/4, y, w/2, h/2) + t) * period )
+dd = d * 10.5
+d3 = dd < 8 ? 0 : 1
+
+lex.char=' .,"+/>OXEN'[(floor(dd))]
+lex.fg = [3,9][floor(d3)]
+lex.bg=1
+
+
+
+>> spaceships
+
+many cool shaders are possible with this technique.. changing the char
+gradient (lex.char=...) etc. i love how the dots move on v4.
+
+this is a variation that looks like a bunch of ships flying across the screen.
+has a really cool 3d look to it cuz the rows move at different speeds.
+
+period = sin(y)
+
+t/=-100
+d = sinp( (dist(x/2+w/4, y, w/2, h/2) + t) * period )
+dd = d * 10.5
+d3 = dd < 8 ? 0 : 1
+
+lex.char=' .,"+/>\^+'[(floor(dd))]
+lex.fg = [3,9][floor(d3)]
+lex.bg=1
+
+
+
+>> concentric circles with a wavy "sunburst" pattern going around them
+
+x -= w/2
+y -= h/2
+
+x /= h
+y /= h/2 + 2
+
+r = dist(x,y,0,0)
+ang = angle(x,y,0,0)
+
+if (r < 0.6) {
+  if (abs(mod(sin((r*t)/100000000000) + ang*18,TWO_PI)) < 2)
+    lex.bg = 12
+  else
+    lex.bg = 5
+}
+else if (r < 0.65)
+  lex.bg = 4
+else if (abs(mod(sin((r*t)/100000000000) + ang*18,TWO_PI)) < 2)
+  lex.bg = 7
+else
+  lex.bg = 8
+
+
+
+>> slash-based interference patterns
+
+if (x > h*2) x=h-x
+y-=h/2
+t/=2000
+
+if (sin(x-y*t) > 0) {
+  lex.bg=1
+  lex.fg=4
+  lex.char= Math.floor(x-y*10001+t)%2 ? '\/' : '\\' 
+}
+else {
+  lex.bg=1
+  lex.fg=9
+  lex.char= Math.floor(3*x+y+t)%2 ? '\\' : ' ' 
+}
+
+
+
+>> sparkling stars
+
+if (lex.char != " ") {
+  lex.fg =floor( Math.random()*10 )
+  var az="Xx+*"
+  lex.char=az[floor(az.indexOf(lex.char)+ t/10000000 +Math.random())%az.length]
+}
+
+
+
+>> coogi x/y doodle
+
+xx=x
+t/=1000
+x/=w/2
+y/=h/2
+y-=1
+x-=1
+x*=x-sin(y/t)
+y*=1
+
+lex.bg = 1 // gray( sin(x/(y/3-1)+t) + sin(y/4+t) )
+lex.fg = hue( sin((y/5)+t) - cos(x*t) *5 )
+lex.char = " _.,:;\"~|  "[Math.round(xx*(y+1+(x+t/102)/4)*13)%13]
+
+
+
+>> glitch shader - produces odd combinations of fg/bg
+
+lex.char=String.fromCharCode(lex.char.charCodeAt(0)+1)
+lex.bg+=7
+lex.fg+=5
+
+
+
+>> dots / lines shader
+
+xx = ((t/10*x)*y/10)%8
+lex.bg = colors.black
+lex.fg = green(x*3+y*5)
+lex.char = ((xx%1) !== 0) ? " " : " .,;=+!@"[xx]
+
+
+
+>> munching squares horizon
+
+t/=100
+y+=10
+x-=w/2
+x/=y/10
+lex.bg=hue((x^y)+t)
+
+
+
+>> grayscale vertical interlacing
+
+First, make a canvas that's totally white.
+
+Run this shader:
+
+if (lex.bg == 0) {
+  lex.bg = ((x)%2) ? 15 : 14
+}
+
+Then set your brush to a white square.
+
+Run this shader w/ animate:
+
+if (lex.bg == 0) {
+  lex.bg = ((x)%2) ? 0 : 1
+}
+
+
+
+>> nice purple/orange texture
+
+lex.bg=colors.purple
+lex.fg=colors.orange
+x/=3
+x=floor(x+y/2.1)   // <- this is cool number to change
+if (x+10*sin(x)+10*cos(y/(t%100)) < y/3) {
+  lex.char="abcdefghijklmnopqrstuvwxyz"[x%26]
+} else {
+  lex.char="abcdefghijklmnopqrstuvwxyz".toUpperCase()[x%26]
+}
+
