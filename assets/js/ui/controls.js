@@ -209,16 +209,6 @@ var controls = (function(){
     this.update(state)
   }
 
-/*
-  controls.nopaint = new HiddenCheckbox (nopaint_toggle)
-  controls.nopaint.memorable = true
-  controls.nopaint.on = "N"
-  controls.nopaint.use = function(state){
-    var state = nopaint.toggle(state)
-    this.update(state)
-  }
-*/
-
   //
   
   controls.fg = new BlurredCheckbox (fg_checkbox)
