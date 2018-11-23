@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='utf-8'?>
-<widget id="com.lalbornoz.asciiblaster" version="1.0.4" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+<widget id="com.lalbornoz.asciiblaster" version="1.0.5" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
     <author email="lucio@lucioillanes.de" href="https://github.com/lalbornoz/asciiblaster#readme">
         Lucio Andrés Illanes Albornoz &lt;lucio@lucioillanes.de&gt;, based on work by JOLLO NET NA
     </author>
