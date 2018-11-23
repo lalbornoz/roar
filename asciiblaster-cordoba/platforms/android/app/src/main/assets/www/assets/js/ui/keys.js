@@ -98,10 +98,6 @@ var keys = (function(){
         e.preventDefault()
       }
   */
-      if (current_tool.name == "shader") {
-        cursor_input.value = ""
-        return
-      }
       var char = cursor_input.value
       cursor_input.value = ""
 

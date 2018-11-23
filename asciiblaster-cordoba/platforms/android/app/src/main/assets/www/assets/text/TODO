@@ -1,9 +1,10 @@
-1) document: constraints for video reverse
-2) document: Shift + LMB to delete brush, Shift + LMB to switch character sets
-3) feature: allow to adjust cutoff warning threshold, {dis,en}able cutoff & print line numbers affected
-4) feature: {bold,italic,underline} attributes
-5) feature: keyboard instead of [LR]MB
-6) feature: {line,measuring} tool
-7) feature: status bar w/ position, etc.
-8) feature: zoom {in,out}
-9) reimplement: {save,upload} as PNG & gallery
+1)  document: constraints for video reverse
+2)  document: Shift + LMB to delete brush, Shift + LMB to switch character sets
+3)  feature: allow to adjust cutoff warning threshold, {dis,en}able cutoff & print line numbers affected
+4)  feature: {bold,italic,underline} attributes
+5)  feature: keyboard instead of [LR]MB
+6)  feature: {line,measuring} tool
+7)  feature: status bar w/ position, etc.
+8)  feature: zoom {in,out}
+9)  reimplement: {save,upload} as PNG & gallery, shaders (possibly)
+10) releases: merge w/ MiRCARTools (into asciiblaster,) provide signed release APK, set is_{iphone,ipad,android,mobile,desktop}
