@@ -1,0 +1,58 @@
+
+                            ""         88  
+ 9,88m, ,8888, 9,88m, ,888, mm 9,88m, 8888 
+ 88  88 86  98 88  88 ,mm88 88 88  88  88  
+ 88  88 '8888' 88888' "nn89 88 88  88  "8m 
+               88      a brief tutorial :)
+
+Last month or so I encountered Jeffrey Scudder's tool 'No Paint' -
+
+https://www.nopaint.org/
+
+- an automatic drawing tool with a minimal interface: you control it using
+just two buttons.  The No Paint tool provided much entertainment on #sally,
+so during some downtime I added similar functionality to the asdf.us/ascii
+tool.  Under the brush, you should see two buttons - to kick it off, click
+'paint' and it will begin drawing.
+
+If you don't like what it's doing, click 'no' -
+- this will remove the current line and start drawing a new line.
+
+If you like what it's doing, click 'paint' -
+- the line will be applied to the canvas, and it will start drawing anew.
+
+While it's going, you can also click 'pause' and it will stop, so you can
+save it or draw on it yourself.
+
+
+Keyboard shortcuts -
+
+left arrow  - 'no'
+right arrow - 'paint'
+down arrow  - 'pause'
+
+
+Right-click toggles -
+
+If you RIGHT-CLICK on "Paint" it will switch tools automatically.
+
+If you RIGHT-CLICK on "No" it will engage TURBO MODE.
+
+
+Some tools currently implemented -
+
+- solid brush
+- erase brush
+- color-changing brush
+- hue brush
+- letter brush
+- clone tool
+- smear tool
+- fill tool
+- stars brush
+- canvas slide
+- canvas scale
+- canvas rotate
+- canvas colorcycle
+
+
