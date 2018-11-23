@@ -35,7 +35,7 @@ subst() {
 	echo "${_string_}";
 };
 
-release() {
+deploy() {
 	local _platform="${1}" _vflag="${2}" _nwjs_fname="" _nwjs_subdir="" _nwjs_url=""	\
 		_release_fname="" _release_dname="" _release_version="";
 
@@ -107,9 +107,9 @@ main() {
 	for _platform in ${_platforms:-${NWJS_PLATFORMS}}; do
 		msgf "Building ${_platform} release...";
 		if [ "${_vflag:-0}" -eq 0 ]; then
-			release "${_platform}" "${_vflag}" >/dev/null;
+			deploy "${_platform}" "${_vflag}" >/dev/null;
 		else
-			release "${_platform}" "${_vflag}";
+			deploy "${_platform}" "${_vflag}";
 		fi;
 		msgf "Built ${_platform} release.";
 	done;
