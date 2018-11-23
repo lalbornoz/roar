@@ -1,9 +1,9 @@
 #!/bin/sh
 #
 
-PACKAGE_NAME="asciiblaster";
+PACKAGE_NAME="asciiblaster-nw";
 RELEASE_DEPS="cpio find gunzip rm sed tar unzip wget zip";
-NWJS_MANIFEST_FNAME="assets/nwjs.manifest";
+NWJS_MANIFEST_FNAME="nwjs.manifest";
 NWJS_PLATFORMS="linux-ia32 linux-x64 win-ia32 win-x64";
 NWJS_VERSION="0.34.5";
 NWJS_SUBDIR="nwjs-v${NWJS_VERSION}-%NWJS_PLATFORM%";
@@ -63,15 +63,14 @@ release() {
 			cpio --quiet -dmp ..;
 	cd "${OLDPWD}";
 	rm -fr "${_release_dname}/${_nwjs_subdir}";
-	find .						\
+	find -L .					\
 		-mindepth 1				\
-		-not -path './.git/*'			\
-		-not -path "./.git"			\
 		-not -path "./${RELEASES_DNAME}/*"	\
 		-not -path "./${RELEASES_DNAME}"	\
-		-not -name '.git*'			\
-		-not -name '*.sw*'			|\
-			cpio --quiet -dmp "${_release_dname}";
+		-not -name '*.sw*'			\
+		-not -name "${0##*/}"			\
+		-not -name "${NWJS_MANIFEST_FNAME}"	|\
+			cpio --quiet -dLmp "${_release_dname}";
 	cd "${RELEASES_DNAME}";
 	if [ "${_vflag:-0}" -eq 0 ]; then
 		zip -9 -r "${_release_fname##${RELEASES_DNAME}/}" "${_release_dname##${RELEASES_DNAME}/}" >/dev/null;

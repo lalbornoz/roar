@@ -12,12 +12,12 @@ body {
 }
 @font-face {
     font-family: 'FixedsysExcelsior301Regular';
-    src: url('../assets/fsex300-webfont.eot');
-    src: url('../assets/fsex300-webfont.eot?#iefix') format('embedded-opentype'),
-         url('../assets/fsex300-webfont.woff') format('woff'),
-         url('../assets/fsex300-webfont.ttf') format('truetype'),
-         url('../assets/fsex300-webfont.svg#FixedsysExcelsior301Regular') format('svg');
-    font-weight: normal;
+    src: url('../fonts/fsex300-webfont.eot');
+    src: url('../fonts/fsex300-webfont.eot?#iefix') format('embedded-opentype'),
+         url('../fonts/fsex300-webfont.woff') format('woff'),
+         url('../fonts/fsex300-webfont.ttf') format('truetype'),
+         url('../fonts/fsex300-webfont.svg#FixedsysExcelsior301Regular') format('svg');
+    font-weighmal;
     font-style: normal;
 }
 
@@ -66,7 +66,7 @@ a:hover { text-decoration: underline }
 }
 .transparent {
   background-color: transparent;
-  background-image: url(../assets/gray-dither.gif);
+  background-image: url(../images/gray-dither.gif);
   background-size: 8px 8px;
 }
 
@@ -152,10 +152,10 @@ textarea { font-size:12pt; width: 37vw; height: 300px; background: #333; color: 
   cursor: crosshair;
 }
 .dropper #canvas_rapper {
-  cursor: url(../assets/dropper.gif) 0 15, auto;
+  cursor: url(../images/dropper.gif) 0 15, auto;
 }
 .bucket #canvas_rapper {
-  cursor: url(../assets/bucket.png) 3 15, auto;
+  cursor: url(../images/bucket.png) 3 15, auto;
 }
 #brush_rapper {
   border: 1px solid;
