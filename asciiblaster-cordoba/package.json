@@ -21,7 +21,7 @@
   },
   "homepage": "https://github.com/lalbornoz/asciiblaster#readme",
   "license": "Jollo LNT license <https://raw.githubusercontent.com/lalbornoz/asciiblaster/master/LICENCE>",
-  "main": "www/index.html",
+  "main": "index.html",
   "name": "asciiblaster-cordoba",
   "repository": {
     "type": "git",
