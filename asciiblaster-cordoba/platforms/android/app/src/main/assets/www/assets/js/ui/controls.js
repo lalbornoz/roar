@@ -155,41 +155,6 @@ var controls = (function(){
   }
   //
 
-  var ShaderTool = FileTool.extend({
-    active: false,
-    use: function(state){
-      this.active = typeof state == "boolean" ? state : ! this.active
-      if (this.active) {
-        shader_rapper.style.display = "block"
-        shader_textarea.focus()
-      } else {
-        shader_rapper.style.display = "none"
-      }
-    },
-    done: function(){
-      this.use(false)
-    }
-  })
-  controls.shader = new ShaderTool (shader_el)
-  shader_textarea.value = shader_textarea.value || demo_shader.innerHTML
-  shader_textarea.addEventListener("input", function(){
-    var fn = shader.build(shader_textarea.value)
-    fn && shader.run(canvas)
-  })
-  controls.animate = new BlurredCheckbox (animate_checkbox)
-  controls.animate.use = function(state){
-    var state = shader.toggle()
-    this.update(state)
-    // controls.shader.focus()
-    controls.shader.use(true)
-  }
-
-  controls.shader_target = new RadioGroup(shader_target_el)
-  var cs = controls.shader_target.controls
-  cs.canvas.use = function(){ shader.canvas = canvas }
-  cs.brush.use = function(){ shader.canvas = brush }
-  cs.selection.use = function(){ shader.canvas = selection.canvas }
-
   controls.experimental_palette = new HiddenCheckbox (experimental_palette_toggle)
   controls.experimental_palette.memorable = true
   controls.experimental_palette.use = function(state){
@@ -208,16 +173,6 @@ var controls = (function(){
       document.body.classList.remove('panke')
     this.update(state)
   }
-
-/*
-  controls.nopaint = new HiddenCheckbox (nopaint_toggle)
-  controls.nopaint.memorable = true
-  controls.nopaint.on = "N"
-  controls.nopaint.use = function(state){
-    var state = nopaint.toggle(state)
-    this.update(state)
-  }
-*/
 
   //
   

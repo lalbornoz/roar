@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>asciiblaster</title>
+<title>asciiblaster v1.0.4</title>
 <meta name="viewport" content="width=device-width, maximum-scale=1.0, user-scalable=yes" />
 <link rel="stylesheet" href="assets/css/sally.css" type="text/css" charset="utf-8" />
 <link rel="stylesheet" href="assets/css/ak.css" type="text/css" charset="utf-8" />
@@ -19,7 +19,6 @@
       <div id="palette_rapper"></div>
       <div id="secret_rapper">
         <span id="experimental_palette_toggle">.</span>
-        <!-- <span id="nopaint_toggle">N</span> -->
       </div>
       <div id="letters_rapper"></div>
       <div id="custom_rapper"></div>
@@ -64,18 +63,10 @@
         <span id="save_el" class="tool">save</span>
         <span id="load_el" class="tool">load</span>
         <br>
-        <span id="shader_el" class="tool">shader</span>
         <a id="doc_el" href="assets/doc/index.html" target="_blank">doc</a>
         <br>
         <span id="advanced_checkbox" class="tool">_ advanced</span>
         <br>
-        <br>
-        <div id="nopaint_rapper">
-          <br>
-          <span id="nopaint_no_el" class="tool">no</span><br>
-          <span id="nopaint_paint_el" class="tool">paint</span><br>
-          <span id="nopaint_pause_el" class="tool hidden">pause</span><br>
-        </div>
         <br>
         brush: <span id="brush_w_el" class="ed">5</span> x <span id="brush_h_el" class="ed">5</span><br>
         canvas: <span id="canvas_w_el" class="ed">100</span> x <span id="canvas_h_el" class="ed">30</span><br>
@@ -90,33 +81,16 @@
         <div id="cutoff_warning_el">character limit of 425 exceeded</div>
         <textarea id="import_textarea"></textarea>
       </div>
-
-      <div id="shader_rapper">
-        <span id="animate_checkbox" class="tool">_ animate</span>
-        to <span id="shader_target_el">*canvas brush selection</span>
-        <span id="shader_fps_el" class="hidden faded"></span><br>
-        <textarea id="shader_textarea"></textarea>
-      </div>
     </div>
   </div>
 
   <input type="text" id="cursor_input">
 
 </body>
-<script type="text/javascript-shader" id="demo_shader">
-// lex.bg = hue((x+y*y+t/10)/20)
-// lex.fg = colors.white
-// lex.char = " "
-// lex.opacity = 1
-
-</script>
-<script src="assets/js/ext/oktween.js"></script>
-
-<script src="assets/js/ext/util.js"></script>
-<script src="assets/js/ext/unicode.js"></script>
-<script src="assets/js/ext/color.js"></script>
+<script src="assets/js/util.js"></script>
+<script src="assets/js/unicode.js"></script>
+<script src="assets/js/color.js"></script>
 <script src="assets/js/clipboard.js"></script>
-
 <script src="assets/js/lex.js"></script>
 <script src="assets/js/matrix.js"></script>
 <script src="assets/js/gfx.js"></script>
@@ -132,7 +106,6 @@
 <script src="assets/js/ui/letters.js"></script>
 <script src="assets/js/ui/selection.js"></script>
 <script src="assets/js/ui/transform.js"></script>
-<script src="assets/js/ext/nopaint.js"></script>
 
 <script src="assets/js/app.js"></script>
 </html>
