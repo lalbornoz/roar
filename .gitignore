@@ -3,4 +3,5 @@ asciiblaster-cordoba/node_modules
 asciiblaster-cordoba/platforms/android/.gradle
 asciiblaster-cordoba/platforms/android/app/build
 asciiblaster-cordoba/platforms/android/CordovaLib/build
+asciiblaster-cordoba/releases/*
 asciiblaster-nw/releases/*
