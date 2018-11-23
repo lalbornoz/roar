@@ -21,7 +21,7 @@ subst() {
 	echo "${_string_}";
 };
 
-release() {
+deploy() {
 	local _platform="${1}" _vflag="${2}" _release_dname_src="" _release_type="" _release_version="";
 
 	_release_dname_src="$(subst "${RELEASES_DNAME_SRC}" "%CORDOBA_PLATFORM%" "${_platform}")";
@@ -65,9 +65,9 @@ main() {
 	for _platform in ${_platforms:-${CORDOBA_PLATFORMS}}; do
 		msgf "Building ${_platform} release...";
 		if [ "${_vflag:-0}" -eq 0 ]; then
-			release "${_platform}" "${_vflag}" >/dev/null;
+			deploy "${_platform}" "${_vflag}" >/dev/null;
 		else
-			release "${_platform}" "${_vflag}";
+			deploy "${_platform}" "${_vflag}";
 		fi;
 		msgf "Built ${_platform} release.";
 	done;
