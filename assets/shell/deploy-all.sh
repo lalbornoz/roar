@@ -21,7 +21,7 @@ main() {
 	*) usage; exit 1; ;;
 	esac; done;
 	shift $((${OPTIND}-1));
-	for _build in cordoba nwjs www; do
+	for _build in cordoba nw www; do
 		msgf "Deploying ${_build}...";
 		cd "asciiblaster-${_build}";
 		if [ "${_vflag:-0}" -eq 0 ]; then
