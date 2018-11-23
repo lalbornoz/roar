@@ -19,10 +19,6 @@ function init () {
   bind()
 }
 function build () {
-  shader.init()
-//  shader.run(canvas)
-  shader.animate()
-
   canvas.append(canvas_rapper)
   brush.append(brush_rapper)
   palette.append(palette_rapper)
@@ -30,7 +26,6 @@ function build () {
   letters.repaint("Basic Latin")
   
   controls.circle.focus()
-//  controls.shader.focus()
 
   brush.bg = colors.red
   brush.generate()
@@ -50,13 +45,10 @@ function bind () {
   
   window.addEventListener('mouseup', function(e){
     dragging = erasing = false
-    // if (current_filetool.name != 'shader' && current_filetool.name != 'load' && current_filetool.name != 'save' && is_desktop) {
-      // cursor_input.focus()
-    // }
     
     var ae = document.activeElement
 
-    if (ae !== shader_textarea && ae !== import_textarea) {
+    if (ae !== import_textarea) {
       if (is_desktop) cursor_input.focus()
     }
 
@@ -75,9 +67,9 @@ function bind () {
   })
   
   window.addEventListener('mousedown', function(e){
-    // if (current_filetool.name != 'shader' && is_desktop) { cursor_input.focus() }
+    // if (is_desktop) { cursor_input.focus() }
   })
-
+ 
   document.addEventListener('DOMContentLoaded', function(){
     if (is_desktop) { cursor_input.focus() }
     document.body.classList.remove('loading')
