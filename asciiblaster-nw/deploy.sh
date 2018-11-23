@@ -1,1 +1,1 @@
-../assets/shell/deploy-nwjs.sh
+../assets/shell/deploy-nw.sh
