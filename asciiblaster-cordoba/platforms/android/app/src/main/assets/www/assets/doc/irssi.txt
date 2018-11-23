@@ -1,0 +1,153 @@
+          __________________________________________________________________________
+          ____              ____  _____ ____        ___        ___              ____
+             /_____   _____/   /  ___  \    /  ____/   /  ____/  /_____   _____/    
+                  /  /        /  /   \  \  /  /       /  /            /  /          
+                 /  /        /  /____/  /  \  \__     \  \__         /  /           
+                /  /        /  ___   __/    \__  \     \__  \       /  /            
+               /  /        /  /   \  \         \  \       \  \     /  /             
+         _____/  /_____   /  /     \  \    ____/  /   ____/  /____/  /_____         
+     ___/             /__/  /_______\  \__/      /___/      //            /____     
+    __________________________________________________________________________      
+
+
+OPTIMIZE YOUR TERMINAL FOR COLOR CODES ON OSX
+=============================================
+
+You can use terminal, some nerds seem to prefer iterm2, but it's up to you
+... http://iterm2.com/
+
+To see color codes correctly, make sure your term type is xterm-256color --
+
+If you use iterm:    https://s3.amazonaws.com/luckyplop/a1b0f0e3d6eae746c82194876f2ccd8b200bc3bb.png
+If you use terminal: https://s3.amazonaws.com/luckyplop/6a2270b58ea1cfac587607215e1b829f41d47355.png
+
+Restart iterm after changing this setting.
+
+The default iterm colors are kind of ugly for color codes, so you may want to change them
+to something like this..
+
+https://s3.amazonaws.com/luckyplop/c5f3a1f2b8e2f8a745fa2638c21af7d26117b91b.png
+
+You can download this iTerm color preset here:
+
+http://asdf.us/ascii/doc/bamboo.itermcolors
+
+
+INSTALLING IRSSI ON OSX
+=======================
+
+For me the easiest thing is to install homebrew >> http://brew.sh/
+
+Follow les instructions and then..
+
+brew install irssi
+
+Then you run irssi from a terminal by typing the magic word..
+
+irssi
+
+
+SETTING UP IRSSI FOR COLOR CODES
+================================
+
+Use these commands for proper unicode support --
+
+/set term_charset utf-8
+/set recode_autodetect_utf8 ON
+/set recode_fallback ISO-8859-15
+/set recode ON
+
+Use these commands to dump color codes quickly and efficiently --
+
+/set cmd_queue_speed 0msec
+/set cmds_max_at_once 1
+/set flood_max_msgs 0
+/set flood_timecheck 0
+
+To make your log go back very far --
+
+/set scrollback_lines 20000
+/set scrollback_time 10day
+
+Remember to type /save after doing a /set to save your changes!
+
+/save
+
+Your irssi configuration will be stored in your home directory in..
+
+.irssi/config
+
+
+NORMAL IRSSI OPERATION
+======================
+
+If you do not want to do the autojoin thing these are the commands you'd normally use to connect:
+
+/server -ssl irc.asdf.us 7777
+/join #ascii
+
+
+SETTING UP IRSSI TO AUTOJOIN #ASCII
+===================================
+
+First run irssi, then paste in these commands.
+Please change YOUR_NICK_HERE to your preferred username!
+
+/network add -nick YOUR_NICK_HERE -user YOUR_NICK_HERE -realname "YOUR NAME HERE" asdf
+/server add -network asdf -auto -ssl irc.asdf.us 7777
+/channel add -auto #ascii asdf
+/save
+/quit
+
+Now run irssi again.. it should autoconnect to the channels and stuff.
+If you want it to move you into #ascii by default, you can do ctrl-N and then
+
+/layout save
+/save
+
+
+IRC TIPS
+========
+
+/join #ascii       -- join a channel :)
+/part #ascii       -- leave a channel ;(
+/quit blabla       -- quit irc (with the quit message 'blabla')
+/list              -- list channels
+/nick booboo       -- change your nick to booboo
+/who #ascii        -- show complete list of people on #ascii
+/names             -- show quick list of names
+/msg nick blabla   -- send someone a private message ;)
+
+
+IRSSI TIPS
+==========
+
+Ctrl-N          -- move to next window
+Ctrl-P          -- move to previous window
+/window close   -- close a window
+Fn-up arrow     -- page up (if you don't have a pageup key)
+Fn-down arrow   -- page down (if you don't have a pagedown key)
+
+
+IRSSI SCRIPTING
+===============
+
+This is its own can of worms.  May we suggest:
+
+http://scripts.irssi.org/scripts/noticelogic.pl
+http://scripts.irssi.org/scripts/nickcolor.pl
+
+To make it run on startup, copy it into ~/.irssi/scripts/autorun/  (and restart irssi)
+
+Another fun IRC thing is running an XDCC server for sharing files..
+-- for more info see http://asdf.us/xdcc/
+
+
+AND REMEMBER...
+===============
+
+Have fun and be safe online!
+
+
+
+
