@@ -23,11 +23,13 @@ main() {
 	shift $((${OPTIND}-1));
 	for _build in cordoba nwjs www; do
 		msgf "Deploying ${_build}...";
+		cd "asciiblaster-${_build}";
 		if [ "${_vflag:-0}" -eq 0 ]; then
-			./assets/shell/deploy-${_build}.sh "${@}";
+			./deploy.sh "${@}";
 		else
-			./assets/shell/deploy-${_build}.sh -v "${@}";
+			./deploy.sh -v "${@}";
 		fi;
+		cd "${OLDPWD}";
 		msgf "Deployed ${_build}.";
 	done;
 };
