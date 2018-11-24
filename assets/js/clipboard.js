@@ -64,7 +64,7 @@ var clipboard = (function () {
         }
       })
     },
-    
+
     import_colorcode: function (data, no_undo) {
     	if (data && data.preventDefault) {
 				data = import_textarea.value
@@ -72,7 +72,7 @@ var clipboard = (function () {
     	else {
 				data = data || import_textarea.value
     	}
-      
+
       var irssi_style_regex = /^\s*\/exec -out printf ("%b" )?"/;
 
       // turn irssi style into mirc style
@@ -173,9 +173,9 @@ var clipboard = (function () {
         }
       }
 
-      current_filetool && current_filetool.blur()     
+      current_filetool && current_filetool.blur()
     },
-    
+
     export_data: function () {
       var output
       // switch (clipboard.format) {
@@ -204,9 +204,9 @@ var clipboard = (function () {
     },
 
   }
-  
+
   return exports
-  
+
 })()
 
 

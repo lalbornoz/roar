@@ -1,5 +1,5 @@
 var brush = (function(){
-  
+
   var brush = new Matrix (5, 5, function(x,y){
     var lex = new Lex (x,y)
     lex.build()
@@ -7,9 +7,9 @@ var brush = (function(){
   })
 
   brush.modified = false
-  
+
   brush.mask = blit.circle
-  
+
   brush.generate = function(){
     brush.fill(brush)
     brush.mask(brush)
@@ -25,7 +25,7 @@ var brush = (function(){
 
       if (lex.bound) return
       lex.bound = true
-      
+
       var point = [x,y]
       lex.span.addEventListener('contextmenu', function(e){
         e.preventDefault()
@@ -83,7 +83,7 @@ var brush = (function(){
   brush.contract = function(i){
     brush.size_add(-i, -i)
   }
-  
+
   brush.load = function(lex){
     brush.char = lex.char
     brush.fg = lex.fg
@@ -98,11 +98,11 @@ var brush = (function(){
   brush.fg = 0
   brush.bg = 1
   brush.opacity = 1
-  
+
   brush.draw_fg = true
   brush.draw_bg = true
   brush.draw_char = true
-  
+
   return brush
 
 })()
@@ -110,7 +110,7 @@ var brush = (function(){
 var custom = (function(){
 
   var exports = {}
-  
+
   exports.clone = function (){
     var new_brush = brush.clone()
     var rapper = document.createElement("div")
@@ -128,11 +128,11 @@ var custom = (function(){
       }
     })
   }
-  
+
   exports.load = function(new_brush){
     brush.assign( new_brush )
   }
-  
+
   return exports
 
 })()

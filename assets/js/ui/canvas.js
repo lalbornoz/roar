@@ -85,7 +85,7 @@ var canvas = current_canvas = (function(){
     if (!no_undo){
       undo.new()
       undo.save_resize(w, h, old_w, old_h)
-     } 
+     }
 
     canvas.__proto__.resize.call(canvas, w, h)
     controls.canvas_w.char = "" + w

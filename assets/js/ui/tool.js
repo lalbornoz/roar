@@ -104,7 +104,7 @@ var RadioGroup = Tool.extend({
     control.use()
     if (this.memorable){
       localStorage.setItem("ascii.tools." + this.name, this.value)
-    } 
+    }
   },
   bind: function(){
     var tool = this
