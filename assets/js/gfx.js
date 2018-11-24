@@ -100,7 +100,7 @@ var blit = (function(){
     })
   }
   blit.square = function(A, lex){
-  	// i.e. no transparency
+    // i.e. no transparency
   }
   return blit
 })()

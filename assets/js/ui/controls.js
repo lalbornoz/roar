@@ -119,12 +119,12 @@ var controls = (function(){
   controls.grid = new BlurredCheckbox (grid_el)
   controls.grid.memorable = true
   controls.grid.use = function(state){
-  	state = typeof state == "boolean" ? state : ! document.body.classList.contains("grid")
+    state = typeof state == "boolean" ? state : ! document.body.classList.contains("grid")
     document.body.classList[ state ? "add" : "remove" ]('grid')
-  	letters.grid = palette.grid = canvas.grid = state
-  	canvas.resize_rapper()
-  	palette.resize_rapper()
-  	letters.resize_rapper()
+    letters.grid = palette.grid = canvas.grid = state
+    canvas.resize_rapper()
+    palette.resize_rapper()
+    letters.resize_rapper()
     if (! selection.hidden) selection.reposition()
     this.update( state )
   }
