@@ -190,10 +190,3 @@ function setSelectionRange(input, selectionStart, selectionEnd) {
 function setCaretToPos(input, pos) {
   setSelectionRange(input, pos, pos);
 }
-
-// Naive useragent detection pattern
-var is_iphone = (navigator.userAgent.match(/iPhone/i)) || (navigator.userAgent.match(/iPod/i))
-var is_ipad = (navigator.userAgent.match(/iPad/i))
-var is_android = (navigator.userAgent.match(/Android/i))
-var is_mobile = is_iphone || is_ipad || is_android
-var is_desktop = ! is_mobile;
