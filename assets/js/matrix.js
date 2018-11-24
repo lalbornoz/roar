@@ -239,23 +239,6 @@ Matrix.prototype.ascii = function () {
   var txt = lines.join("\n")
   return txt
 }
-Matrix.prototype.ansi = function (opts) {
-  var lines = this.aa.map(function(row, y){
-    var last, line = ""
-    row.forEach(function(lex, x) {
-      if (lex.eqColor(last)) {
-        line += lex.sanitize()
-      }
-      else {
-        line += lex.ansi()
-        last = lex
-      }
-    })
-    return line
-  })
-  var txt = lines.filter(function(line){ return line.length > 0 }).join('\\e[0m\\n') + "\\e[0m"
-  return 'echo -e "' + txt + '"'
-}
 Matrix.prototype.mirc = function (opts) {
   var cutoff = false
   var lines = this.aa.map(function(row, y){
@@ -279,30 +262,6 @@ Matrix.prototype.mirc = function (opts) {
   var txt = lines.filter(function(line){ return line.length > 0 }).join('\n')
 
   if (cutoff) {
-    txt = new String(txt)
-    txt.cutoff = true
-  }
-  return txt
-}
-Matrix.prototype.irssi = function(opts){
-  var mirc = this.mirc(opts)
-  var txt = mirc
-                // .replace(/\%/g, '%%')
-                .replace(/\\/g, '\\x5C')
-                .replace(/\"/g, '\\\"')
-                // .replace(/\'/g, '\\\'')
-                .replace(/\`/g, '\\\`')
-                .replace(/\$/g, '\\$')
-                // .replace(/\n\s+/g, '\n')
-                // .replace(/\s+$/g, '\n')
-                // .replace(/^\n+/, '')
-                .replace(/\n/g, '\\n')
-                .replace(/\x02/g, '\\x02')
-                .replace(/\x03/g, '\\x03')
-
-  txt = unicode.escapeToEscapedBytes(txt)
-  txt = '/exec -out printf "%b" "' + txt + '"\n'
-  if (mirc.cutoff){
     txt = new String(txt)
     txt.cutoff = true
   }
