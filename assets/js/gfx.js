@@ -66,7 +66,7 @@ var blit = (function(){
   blit.circle = function(A, lex){
     var hw = brush.w/2, hh = brush.h/2
     var ratio, distance
-    
+
     if (brush.w === brush.h){
       distance = distance_square
       ratio = hw / hh * (brush.w === 3 || brush.w === 5 ? 1.2 : 1.05)
@@ -108,7 +108,7 @@ var blit = (function(){
 var draw = (function(){
 
   var last_point = [0,0]
-  
+
   function down (e, lex, point) {
     var w = canvas.w, h = canvas.h
     erasing = (e.which == "3" || e.ctrlKey)
@@ -140,12 +140,12 @@ var draw = (function(){
     last_point[0] = point[0]
     last_point[1] = point[1]
   }
-  
+
   function set_last_point (e, point) {
     last_point[0] = point[0]
     last_point[1] = point[1]
   }
-  
+
   function move (e, lex, point) {
     var w = canvas.w, h = canvas.h
     line(lex, last_point, point, erasing)
@@ -162,7 +162,7 @@ var draw = (function(){
     last_point[0] = point[0]
     last_point[1] = point[1]
   }
-  
+
   function move_toroidal (e, lex, point) {
     var w = canvas.w, h = canvas.h
     var src_x_quantile = quantile( last_point[0], w )
@@ -234,7 +234,7 @@ var draw = (function(){
     last_point[1] = point[1]
     // y = point.y
   }
-  
+
   function point (lex, x, y, erasing) {
     stamp (canvas, brush, x, y, erasing)
   }
@@ -268,7 +268,7 @@ var draw = (function(){
       }
     })
   }
-  
+
   function fill (lex, x, y) {
     var q = [ [x,y] ]
     var aa = canvas.aa

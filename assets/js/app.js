@@ -10,7 +10,7 @@ var mirror_x = false
 var mirror_y = false
 var focused
 
-var canvas, tools, palette, controls, brush, mode 
+var canvas, tools, palette, controls, brush, mode
 var current_tool, current_filetool, current_canvas
 var mouse = { x: 0, y: 0 }
 
@@ -24,7 +24,7 @@ function build () {
   palette.append(palette_rapper)
   letters.append(letters_rapper)
   letters.repaint("Basic Latin")
-  
+
   controls.circle.focus()
 
   brush.bg = colors.red
@@ -42,10 +42,10 @@ function bind () {
   controls.bind()
   keys.bind()
   clipboard.bind()
-  
+
   window.addEventListener('mouseup', function(e){
     dragging = erasing = false
-    
+
     var ae = document.activeElement
 
     if (ae !== import_textarea) {
@@ -65,16 +65,16 @@ function bind () {
     }
     dragging = false
   })
-  
+
   window.addEventListener('mousedown', function(e){
     // cursor_input.focus()
   })
- 
+
   document.addEventListener('DOMContentLoaded', function(){
     cursor_input.focus()
     document.body.classList.remove('loading')
   })
-  
+
   window.onbeforeunload = function() {
     // if (changed && !in_iframe()) return "You have edited this drawing."
   }

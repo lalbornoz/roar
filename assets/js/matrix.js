@@ -87,7 +87,7 @@ Matrix.prototype.focus = function(x, y){
   y = mod(y, this.h)
   this.focus_x = x
   this.focus_y = y
-   
+
   //focused_input = this
   this.aa[y][x].focus()
 }
@@ -188,7 +188,7 @@ Matrix.prototype.resize = function(w,h){
       }
     }
   }
-  
+
   if (w < old_w) {
     this.aa.forEach(function(row, y){
       while (row.length > w) {
@@ -206,7 +206,7 @@ Matrix.prototype.resize = function(w,h){
       }
     })
   }
-  
+
   this.w = w
   this.h = h
   this.bind && this.bind()
@@ -233,7 +233,7 @@ Matrix.prototype.resize_rapper = function(){
   else {
     this.rapper.parentNode.classList.remove("rotated")
     this.rapper.parentNode.style.height = ""
-    this.rapper.style.width = 
+    this.rapper.style.width =
       this.rapper.parentNode.style.width = (width) + "px"
     this.rapper.style.top = ""
     // canvas_rapper.style.left = "auto"
@@ -256,7 +256,7 @@ Matrix.prototype.ansi = function (opts) {
     row.forEach(function(lex, x) {
       if (lex.eqColor(last)) {
         line += lex.sanitize()
-      } 
+      }
       else {
         line += lex.ansi()
         last = lex
@@ -275,7 +275,7 @@ Matrix.prototype.mirc = function (opts) {
       var bg_ = -1, fg_ = 15
       if (lex.eqColor(last)) {
         line += lex.sanitize()
-      } 
+      }
       else {
         [bg_, fg_, line_] = lex.mirc(bg_, fg_)
         line += line_; last = lex;
@@ -286,9 +286,9 @@ Matrix.prototype.mirc = function (opts) {
     }
     return line
   })
-  
+
   var txt = lines.filter(function(line){ return line.length > 0 }).join('\n')
-  
+
   if (cutoff) {
     txt = new String(txt)
     txt.cutoff = true
@@ -297,7 +297,7 @@ Matrix.prototype.mirc = function (opts) {
 }
 Matrix.prototype.irssi = function(opts){
   var mirc = this.mirc(opts)
-  var txt = mirc  
+  var txt = mirc
                 // .replace(/\%/g, '%%')
                 .replace(/\\/g, '\\x5C')
                 .replace(/\"/g, '\\\"')
@@ -310,7 +310,7 @@ Matrix.prototype.irssi = function(opts){
                 .replace(/\n/g, '\\n')
                 .replace(/\x02/g, '\\x02')
                 .replace(/\x03/g, '\\x03')
- 
+
   txt = unicode.escapeToEscapedBytes(txt)
   txt = '/exec -out printf "%b" "' + txt + '"\n'
   if (mirc.cutoff){
@@ -388,8 +388,8 @@ var save_size = function(w, h, state){
 }
 // the reason for stringifying the x y coords is so that each
 // coordinate is saved only once in an undo state.
-// otherwise there would be problems with, eg, a brush stroke 
-// that passed over the same grid cell twice. 
+// otherwise there would be problems with, eg, a brush stroke
+// that passed over the same grid cell twice.
 var save_lex = function(x, y, lex, state){
   // var start = Date.now()
   state = state || current_undo
@@ -509,7 +509,7 @@ var undo = function(){
   if (!state) return;
 
   restore_state(state)
-  
+
   // now take the applied undo state and store it on the redo state
   // and push the redo state to the redo stack
   state.redo.undo = state
@@ -522,7 +522,7 @@ var undo = function(){
 var redo = function(){
   var state = stack.redo.pop();
   if (!state) return;
-  
+
   restore_state(state)
 
   state.undo.redo = state

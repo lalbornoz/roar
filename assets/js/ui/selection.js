@@ -1,13 +1,13 @@
 var selection = (function(){
 
   var creating = false, moving = false, copying = false
-  
+
   var selection_canvas = new Matrix (1, 1, function(x,y){
     var lex = new Lex (x,y)
     lex.build()
     return lex
   })
-  
+
   var selector_el = document.createElement("div")
   selector_el.className = "selector_el"
   selection_canvas.append(selector_el)
@@ -21,12 +21,12 @@ var selection = (function(){
   // - on mouseup, the selection is locked. then..
   // - drag the selection to move it -- this "cuts" it and leaves a blank space on the canvas.
   // - shift-drag the selection to copy it
-  
+
   var a = [0, 0]
   var b = [0, 0]
   var c = [0, 0]
   var d = [0, 0]
-  
+
   function reset () {
     a[0] = a[1] = b[0] = b[1] = 0
   }
@@ -42,7 +42,7 @@ var selection = (function(){
     var l = left(a,b), m = top(a,b), n = right(a,b), o = bottom(a,b)
     a[0] = l ; a[1] = m ; b[0] = n ; b[1] = o
   }
-  
+
   function contains (a,b,point) {
     var contains_x = a[0] <= point[0] && point[0] <= b[0]
     var contains_y = a[1] <= point[1] && point[1] <= b[1]
@@ -130,7 +130,7 @@ var selection = (function(){
     creating = moving = copying = false
     selector_el.classList.remove("dragging")
   }
-  
+
   function show () {
     selecting = true
   }
@@ -144,7 +144,7 @@ var selection = (function(){
     selection.hidden = true
     selecting = false
   }
-  
+
   var selection = {}
   selection.reposition = reposition
   selection.down = down

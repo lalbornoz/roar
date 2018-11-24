@@ -70,7 +70,7 @@ a:hover { text-decoration: underline }
   background-size: 8px 8px;
 }
 
-@media (-webkit-min-device-pixel-ratio: 2) { 
+@media (-webkit-min-device-pixel-ratio: 2) {
   .transparent {
     background-size: 4px 4px;
   }
@@ -99,7 +99,7 @@ body.grid .tool { border: 1px solid #444; }
 .tool.focused, .ed.focused { color: white; text-decoration: underline; }
 .focused { box-shadow: inset 1px 0 2px white, inset -1px 0 2px white, inset 0 1px 2px white, inset 0 -1px 2px white; }
 .faba.focused, .fbba.focused, .fcba.focused, .fdba.focused, .feba.focused, .ffba.focused, .fgba.focused, .fhba.focused,
-.fiba.focused, .fjba.focused, .fkba.focused, .flba.focused, .fmba.focused, .fnba.focused, .foba.focused, .fpba.focused 
+.fiba.focused, .fjba.focused, .fkba.focused, .flba.focused, .fmba.focused, .fnba.focused, .foba.focused, .fpba.focused
   { box-shadow: inset 1px 0 2px #888, inset -1px 0 2px #888, inset 0 1px 2px #888, inset 0 -1px 2px #888; }
 body.loading { opacity: 0; }
 body { transition: 0.1s linear; }
