@@ -49,7 +49,7 @@ function bind () {
     var ae = document.activeElement
 
     if (ae !== import_textarea) {
-      if (is_desktop) cursor_input.focus()
+      cursor_input.focus()
     }
 
     if (selecting) {
@@ -61,17 +61,17 @@ function bind () {
   })
   window.addEventListener("touchend", function(){
     if (current_tool.name === "text") {
-      if (is_desktop) cursor_input.focus()
+      cursor_input.focus()
     }
     dragging = false
   })
   
   window.addEventListener('mousedown', function(e){
-    // if (is_desktop) { cursor_input.focus() }
+    // cursor_input.focus()
   })
  
   document.addEventListener('DOMContentLoaded', function(){
-    if (is_desktop) { cursor_input.focus() }
+    cursor_input.focus()
     document.body.classList.remove('loading')
   })
   
