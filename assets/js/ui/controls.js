@@ -269,7 +269,6 @@ var controls = (function(){
     ].forEach(function(lex){
       lex.span.addEventListener('mousedown', function(e){
         lex.focus()
-        if (is_mobile) cursor_input.focus()
       })
     });
 
