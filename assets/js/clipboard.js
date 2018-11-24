@@ -66,12 +66,11 @@ var clipboard = (function () {
     },
 
     import_colorcode: function (data, no_undo) {
-    	if (data && data.preventDefault) {
-				data = import_textarea.value
-    	}
-    	else {
-				data = data || import_textarea.value
-    	}
+      if (data && data.preventDefault) {
+        data = import_textarea.value
+      } else {
+        data = data || import_textarea.value
+      }
 
       var irssi_style_regex = /^\s*\/exec -out printf ("%b" )?"/;
 

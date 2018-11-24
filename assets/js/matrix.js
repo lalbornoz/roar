@@ -216,13 +216,13 @@ Matrix.prototype.resize = function(w,h){
   }
 }
 Matrix.prototype.resize_rapper = function(){
-	var cell = canvas.aa[0][0].span
-	var cw = cell.offsetWidth
-	var ch = cell.offsetHeight
-// 	if (canvas.grid) { ch++ }
-	var width = cw * this.aa[0].length
-	var height = ch * this.aa.length
-	if (canvas.grid) { width++; height++ }
+  var cell = canvas.aa[0][0].span
+  var cw = cell.offsetWidth
+  var ch = cell.offsetHeight
+//  if (canvas.grid) { ch++ }
+  var width = cw * this.aa[0].length
+  var height = ch * this.aa.length
+  if (canvas.grid) { width++; height++ }
   if (this.rotated) {
     this.rapper.parentNode.classList.add("rotated")
     this.rapper.parentNode.style.height = (width) + "px"
