@@ -115,27 +115,9 @@ var draw = (function(){
     changed = true
     if (e.shiftKey) {
       line (lex, last_point, point, erasing)
-      if (mirror_x) {
-        line(lex, [w-last_point[0], last_point[1]], [w-point[0], point[1]], erasing)
-      }
-      if (mirror_y) {
-        line(lex, [last_point[0], h-last_point[1]], [point[0], h-point[1]], erasing)
-      }
-      if (mirror_x && mirror_y) {
-        line(lex, [w-last_point[0], h-last_point[1]], [w-point[0], h-point[1]], erasing)
-      }
     }
     else {
       stamp (canvas, brush, point[0], point[1], erasing)
-      if (mirror_x) {
-        stamp (canvas, brush, w-point[0], point[1], erasing)
-      }
-      if (mirror_y) {
-        stamp (canvas, brush, point[0], h-point[1], erasing)
-      }
-      if (mirror_x && mirror_y) {
-        stamp (canvas, brush, w-point[0], h-point[1], erasing)
-      }
     }
     last_point[0] = point[0]
     last_point[1] = point[1]
@@ -149,16 +131,6 @@ var draw = (function(){
   function move (e, lex, point) {
     var w = canvas.w, h = canvas.h
     line(lex, last_point, point, erasing)
-    if (mirror_x) {
-      line(lex, [w-last_point[0], last_point[1]], [w-point[0], point[1]], erasing)
-    }
-    if (mirror_y) {
-      line(lex, [last_point[0], h-last_point[1]], [point[0], h-point[1]], erasing)
-    }
-    if (mirror_x && mirror_y) {
-      line(lex, [w-last_point[0], h-last_point[1]], [w-point[0], h-point[1]], erasing)
-    }
-
     last_point[0] = point[0]
     last_point[1] = point[1]
   }
@@ -223,12 +195,6 @@ var draw = (function(){
       var y_b = mod( point[1], h )
       var last_point_mod = [x_b, y_b], point_mod = [x_a, y_a]
       line(lex, last_point_mod, point_mod, erasing)
-      // if (mirror_x) {
-      //   line(lex, [w-last_point_mod[0], last_point_mod[1]], [w-point_mod[0], point_mod[1]], erasing)
-      // }
-      // if (mirror_y) {
-      //   line(lex, [last_point_mod[0], h-last_point_mod[1]], [point_mod[0], h-point_mod[1]], erasing)
-      // }
     }
     last_point[0] = point[0]
     last_point[1] = point[1]

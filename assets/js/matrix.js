@@ -223,21 +223,10 @@ Matrix.prototype.resize_rapper = function(){
   var width = cw * this.aa[0].length
   var height = ch * this.aa.length
   if (canvas.grid) { width++; height++ }
-  if (this.rotated) {
-    this.rapper.parentNode.classList.add("rotated")
-    this.rapper.parentNode.style.height = (width) + "px"
-    this.rapper.parentNode.style.width = (height) + "px"
-    this.rapper.style.top = (width/2) + "px"
-    // this.rapper.style.left = ((canvas_rapper.offsetHeight+20)/2) + "px"
-  }
-  else {
-    this.rapper.parentNode.classList.remove("rotated")
-    this.rapper.parentNode.style.height = ""
-    this.rapper.style.width =
-      this.rapper.parentNode.style.width = (width) + "px"
-    this.rapper.style.top = ""
-    // canvas_rapper.style.left = "auto"
-  }
+  this.rapper.parentNode.style.height = ""
+  this.rapper.style.width =
+  this.rapper.parentNode.style.width = (width) + "px"
+  this.rapper.style.top = ""
 }
 Matrix.prototype.ascii = function () {
   var lines = this.aa.map(function(row, y){

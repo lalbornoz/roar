@@ -6,8 +6,6 @@ var selecting = false
 var filling = false
 var changed = false
 var transforming = false
-var mirror_x = false
-var mirror_y = false
 var focused
 
 var canvas, tools, palette, controls, brush, mode

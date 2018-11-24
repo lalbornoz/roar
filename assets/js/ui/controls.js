@@ -182,37 +182,6 @@ var controls = (function(){
     this.update(brush.draw_char)
   }
 
-  //
-
-//   controls.turn = new BlurredCheckbox (turn_checkbox)
-//   controls.turn.memorable = true
-//   controls.turn.use = function(state){
-//     canvas.rotated = typeof state == "boolean" ? state : ! canvas.rotated
-//     canvas.resize_rapper()
-//     this.update(canvas.rotated)
-//   }
-
-  // controls.pixels = new BlurredCheckbox (pixels_checkbox)
-  // controls.pixels.memorable = true
-  // controls.pixels.use = function(state){
-  //   canvas.pixels = typeof state == "boolean" ? state : ! canvas.pixels
-  //   document.body.classList.toggle("pixels", canvas.pixels)
-  //   this.update(canvas.pixels)
-  // }
-
-  controls.mirror_x = new BlurredCheckbox (mirror_x_checkbox)
-  controls.mirror_x.use = function(state){
-    window.mirror_x = typeof state == "boolean" ? state : ! window.mirror_x
-    this.update(window.mirror_x)
-  }
-  controls.mirror_y = new BlurredCheckbox (mirror_y_checkbox)
-  controls.mirror_y.use = function(state){
-    window.mirror_y = typeof state == "boolean" ? state : ! window.mirror_y
-    this.update(window.mirror_y)
-  }
-
-  //
-
   controls.vertical = new BlurredCheckbox (vertical_checkbox)
   controls.vertical.memorable = true
   controls.vertical.use = function(state){
