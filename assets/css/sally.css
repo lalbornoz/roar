@@ -76,13 +76,6 @@ a:hover { text-decoration: underline }
   }
 }
 span,a { min-width: 8px; line-height: 15px; display: inline-block; }
-body.pixels {
-  line-height: 8px;
-}
-.pixels #brush_rapper span,
-.pixels #brush_rapper a,
-.pixels #canvas_rapper span,
-.pixels #canvas_rapper a { line-height: 8px; overflow: hidden; }
 .rapper { cursor: crosshair; }
 body.grid span { border-right: 1px solid #444; border-bottom: 1px solid #444; }
 body.grid div { border-left: 1px solid #444; }
@@ -131,13 +124,6 @@ textarea { font-size:12pt; width: 37vw; height: 300px; background: #333; color: 
 #secret_rapper span { float: left; }
 .vertical #secret_rapper { margin-right: 10px; }
 .vertical #secret_rapper span { float: left; clear: both; }
-
-.rotated #canvas_rapper {
-  transform: translateX(-50%) translateY(-50%) translateZ(0) rotate(-90deg);
-  transform-origin: 50% 50%;
-  position: absolute;
-  left: 50%;
-}
 
 #tools_block > * {
   cursor: crosshair;
