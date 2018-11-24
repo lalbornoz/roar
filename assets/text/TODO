@@ -7,5 +7,5 @@
 7)  feature: {line,measuring} tool
 8)  feature: status bar w/ position, etc.
 9)  feature: zoom {in,out}
-10) reimplement: {save,upload} as PNG & gallery, shaders (possibly)
+10) reimplement: ANSI, {save,upload} as PNG & gallery, shaders (possibly)
 11) releases: merge w/ MiRCARTools (into asciiblaster,) provide signed release APK
