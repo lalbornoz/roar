@@ -162,18 +162,6 @@ var controls = (function(){
     this.update(state)
   }
 
-  controls.advanced = new BlurredCheckbox (advanced_checkbox)
-  controls.advanced.memorable = true
-  controls.advanced.use = function(state){
-    console.log(state)
-    state = typeof state == "boolean" ? state : ! document.body.classList.contains('panke')
-    if (state)
-      document.body.classList.add('panke')
-    else
-      document.body.classList.remove('panke')
-    this.update(state)
-  }
-
   //
 
   controls.fg = new BlurredCheckbox (fg_checkbox)
