@@ -77,7 +77,7 @@ function rgbpixel(d,x,y){
 function fit(d,x,y){ rgbpixel(d,x*actual_w/w,y*actual_h/h) }
 
 function step(a, b){
-  return (b >= a) + 0 
+  return (b >= a) + 0
                // ^^ bool -> int
 }
 

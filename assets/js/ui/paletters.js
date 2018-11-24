@@ -8,12 +8,12 @@ var letters = (function(){
     'Box Drawing',
     'Block Elements',
   ]
-  
+
   var letters = new Matrix (1, 1, function(x,y){
     var lex = new Lex (x,y)
     return lex
   })
-  
+
   letters.charset = ""
 
   letters.repaint = function(charset){
@@ -46,7 +46,7 @@ var letters = (function(){
       lex.build()
     })
   }
-  
+
   letters.bind = function(){
     letters.forEach(function(lex,x,y){
       if (lex.bound) return
@@ -84,7 +84,7 @@ var letters = (function(){
       })
     })
   }
-  
+
   return letters
 })()
 
