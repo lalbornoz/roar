@@ -167,11 +167,11 @@ d=this.apply(a,arguments))===e?a:d}.bind(d):d;a.init&&a.init.apply(a,arguments)
 =Model);                                                              // c-{{{-<
 
 function defaults (dest, src) {
-	dest = dest || {}
-	for (var i in src) {
-		dest[i] = typeof dest[i] == 'undefined' ? src[i] : dest[i]
-	}
-	return dest
+  dest = dest || {}
+  for (var i in src) {
+    dest[i] = typeof dest[i] == 'undefined' ? src[i] : dest[i]
+  }
+  return dest
 }
 
 function setSelectionRange(input, selectionStart, selectionEnd) {
