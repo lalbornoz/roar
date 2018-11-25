@@ -122,9 +122,9 @@ var controls = (function(){
     state = typeof state == "boolean" ? state : ! document.body.classList.contains("grid")
     document.body.classList[ state ? "add" : "remove" ]('grid')
     letters.grid = palette.grid = canvas.grid = state
-    canvas.resize_rapper()
-    palette.resize_rapper()
-    letters.resize_rapper()
+    canvas.resize_wrapper()
+    palette.resize_wrapper()
+    letters.resize_wrapper()
     if (! selection.hidden) selection.reposition()
     this.update( state )
   }

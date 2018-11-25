@@ -19,8 +19,8 @@ var clipboard = (function () {
         if (! clipboard.importing) { clipboard.export_data() }
       }
     },
-    show: function () { import_rapper.style.display = "block"; clipboard.visible = true; changed = false },
-    hide: function () { import_rapper.style.display = "none"; clipboard.visible = false },
+    show: function () { import_wrapper.style.display = "block"; clipboard.visible = true; changed = false },
+    hide: function () { import_wrapper.style.display = "none"; clipboard.visible = false },
     focus: function () {
       if (! clipboard.importing) {
         import_textarea.focus()
