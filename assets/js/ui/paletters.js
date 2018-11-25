@@ -192,14 +192,14 @@ var palette = (function(){
         brush.char = lex.char
         brush.opacity = lex.opacity
         brush.generate()
-        brush_rapper.style.borderColor = css_reverse_lookup[fillColor]
+        brush_wrapper.style.borderColor = css_reverse_lookup[fillColor]
         return
       })
 
     })
   }
 
-  brush_rapper.style.borderColor = css_reverse_lookup[fillColor]
+  brush_wrapper.style.borderColor = css_reverse_lookup[fillColor]
 
   return palette
 
