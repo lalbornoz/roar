@@ -1,4 +1,4 @@
-1)  bug: fix select & move
+1)  bug: fix {move,select}, save box colour(s), UI {margins,padding}, vertical mode
 2)  feature: {bold,italic,underline} attributes
 3)  feature: draw w/ keyboard instead of [LR]MB
 4)  feature: {line,measuring} tool
