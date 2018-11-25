@@ -1,0 +1,48 @@
+body {
+  background:         #000000;
+  background-image:   url('../images/tile.jpg');
+  color:              rgb(255,255,0);
+  font-family:        times new roman;
+  font-family:        'FixedsysExcelsior301Regular';
+  font-size:          16pt;
+}
+
+/* {{{ DIV id styles */
+div#box {
+  background:         rgba(0,0,100,0.5);
+  border:             3px solid #0000ff;
+  border-spacing:     0px;
+  color:              #00ffff!important;
+  display:            inline-block;
+  font-size:          20px;
+  font-size:          12pt!important;
+  margin:             10px 0;
+  padding:            10px;
+}
+div#box_wrapper {
+  margin:             0 auto;
+  width:              50%;
+}
+/* }}} */
+/* {{{ Element styles */
+h1 {
+  color:              #ff00ff!important;
+  font-size:          42px;
+  margin-bottom:      15px;
+}
+h2 {
+  color:              #00ffff!important;
+  margin-bottom:      15px;
+  margin-top:         15px;
+}
+p {
+  color:              white;
+}
+pre {
+  color:              white;
+}
+/* }}} */
+
+/*
+ * vim:ts=2 sw=2 expandtab fenc=utf-8 foldmethod=marker nowrap tw=0
+ */

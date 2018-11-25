@@ -20,7 +20,6 @@ var canvas = current_canvas = (function(){
         e.preventDefault()
       })
       lex.span.addEventListener('mousedown', function(e){
-        if (is_mobile) return
         e.preventDefault()
         dragging = true
         current_canvas = canvas
@@ -57,7 +56,6 @@ var canvas = current_canvas = (function(){
       lex.span.addEventListener("mousemove", function(e){
         mouse.x = x
         mouse.y = y
-        if (is_mobile) return
         if (! dragging) return
         if (drawing) {
           draw.move(e, lex, point)
@@ -72,45 +70,6 @@ var canvas = current_canvas = (function(){
       })
 
     })
-
-    if (is_mobile) {
-      canvas.rapper.addEventListener('touchstart', function(e){
-        e.preventDefault()
-        var x, y, point, lex
-        x = (e.touches[0].pageX - canvas.rapper.offsetTop) / canvas.aa[0][0].span.offsetWidth
-        y = (e.touches[0].pageY - canvas.rapper.offsetTop) / canvas.aa[0][0].span.offsetHeight
-        x = ~~clamp(x, 0, canvas.aa[0].length-1)
-        y = ~~clamp(y, 0, canvas.aa.length-1)
-        point = [x,y]
-        lex = canvas.aa[y][x]
-        dragging = true
-        if (drawing) {
-          undo.new()
-          draw.down(e, lex, point)
-        }
-        else if (filling) {
-          undo.new()
-          draw.fill(brush, x, y)
-        }
-        canvas.focus(x, y)
-      })
-      canvas.rapper.addEventListener("touchmove", function(e){
-        e.preventDefault()
-        var x, y, point, lex
-        x = (e.touches[0].pageX - canvas.rapper.offsetTop) / canvas.aa[0][0].span.offsetWidth
-        y = (e.touches[0].pageY - canvas.rapper.offsetTop) / canvas.aa[0][0].span.offsetHeight
-        x = ~~clamp(x, 0, canvas.aa[0].length-1)
-        y = ~~clamp(y, 0, canvas.aa.length-1)
-        point = [x,y]
-        lex = canvas.aa[y][x]
-        if (! dragging) return
-        if (drawing) {
-          draw.move(e, lex, point)
-        }
-        canvas.focus(x, y)
-      })
-    }
-
   }
 
   canvas.min = 1
@@ -126,7 +85,7 @@ var canvas = current_canvas = (function(){
     if (!no_undo){
       undo.new()
       undo.save_resize(w, h, old_w, old_h)
-     } 
+     }
 
     canvas.__proto__.resize.call(canvas, w, h)
     controls.canvas_w.char = "" + w

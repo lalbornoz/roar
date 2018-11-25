@@ -1,0 +1,13 @@
+@font-face {
+  font-family:              'FixedsysExcelsior301Regular';
+  font-style:               normal;
+  src:                      url('../fonts/fsex300-webfont.eot');
+  src:                      url('../fonts/fsex300-webfont.eot?#iefix') format('embedded-opentype'),
+                            url('../fonts/fsex300-webfont.woff') format('woff'),
+                            url('../fonts/fsex300-webfont.ttf') format('truetype'),
+                            url('../fonts/fsex300-webfont.svg#FixedsysExcelsior301Regular') format('svg');
+}
+
+/*
+ * vim:ts=2 sw=2 expandtab fenc=utf-8 foldmethod=marker nowrap tw=0
+ */

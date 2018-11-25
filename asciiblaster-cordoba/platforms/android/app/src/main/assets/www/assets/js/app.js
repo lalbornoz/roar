@@ -6,11 +6,9 @@ var selecting = false
 var filling = false
 var changed = false
 var transforming = false
-var mirror_x = false
-var mirror_y = false
 var focused
 
-var canvas, tools, palette, controls, brush, mode 
+var canvas, tools, palette, controls, brush, mode
 var current_tool, current_filetool, current_canvas
 var mouse = { x: 0, y: 0 }
 
@@ -19,12 +17,12 @@ function init () {
   bind()
 }
 function build () {
-  canvas.append(canvas_rapper)
-  brush.append(brush_rapper)
-  palette.append(palette_rapper)
-  letters.append(letters_rapper)
+  canvas.append(canvas_wrapper)
+  brush.append(brush_wrapper)
+  palette.append(palette_wrapper)
+  letters.append(letters_wrapper)
   letters.repaint("Basic Latin")
-  
+
   controls.circle.focus()
 
   brush.bg = colors.red
@@ -32,7 +30,7 @@ function build () {
   brush.build()
 
   // controls.grid.use()
-  canvas.resize_rapper()
+  canvas.resize_wrapper()
 }
 function bind () {
   canvas.bind()
@@ -42,14 +40,14 @@ function bind () {
   controls.bind()
   keys.bind()
   clipboard.bind()
-  
+
   window.addEventListener('mouseup', function(e){
     dragging = erasing = false
-    
+
     var ae = document.activeElement
 
     if (ae !== import_textarea) {
-      if (is_desktop) cursor_input.focus()
+      cursor_input.focus()
     }
 
     if (selecting) {
@@ -61,20 +59,20 @@ function bind () {
   })
   window.addEventListener("touchend", function(){
     if (current_tool.name === "text") {
-      if (is_desktop) cursor_input.focus()
+      cursor_input.focus()
     }
     dragging = false
   })
-  
+
   window.addEventListener('mousedown', function(e){
-    // if (is_desktop) { cursor_input.focus() }
+    // cursor_input.focus()
   })
- 
+
   document.addEventListener('DOMContentLoaded', function(){
-    if (is_desktop) { cursor_input.focus() }
+    cursor_input.focus()
     document.body.classList.remove('loading')
   })
-  
+
   window.onbeforeunload = function() {
     // if (changed && !in_iframe()) return "You have edited this drawing."
   }
