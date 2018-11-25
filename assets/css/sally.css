@@ -17,7 +17,6 @@ body {
          url('../fonts/fsex300-webfont.woff') format('woff'),
          url('../fonts/fsex300-webfont.ttf') format('truetype'),
          url('../fonts/fsex300-webfont.svg#FixedsysExcelsior301Regular') format('svg');
-    font-weighmal;
     font-style: normal;
 }
 
@@ -158,7 +157,6 @@ textarea { font-size:12pt; width: 37vw; height: 300px; background: #333; color: 
   position:absolute;
   margin-top: -1px;
   top:-999px;left:-999px;
-  pointer-events: none;
 }
 .selector_el.dragging {
   color: #0f0;
