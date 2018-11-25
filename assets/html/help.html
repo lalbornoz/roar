@@ -1,46 +1,52 @@
-<!-- https://raw.githubusercontent.com/lalbornoz/asciiblaster/master/LICENCE -->
-<meta charset="UTF-8">
-<link rel="stylesheet" href="../css/sally.css" type="text/css" charset="utf-8" />
-<link rel="stylesheet" href="../css/ak.css" type="text/css" charset="utf-8" />
-<link rel="stylesheet" href="../css/nitelite.css" type="text/css" charset="utf-8" />
-<style>
-body { font-family: 'FixedsysExcelsior301Regular'; }
-a:nth-of-type(2n+1), a { color: #0f0; }
-a:nth-of-type(2n+2), a { color: #ff0; }
-</style>
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+  <!-- {{{ HEAD -->
+  <head>
+    <link charset="utf-8" href="../css/help.css" rel="stylesheet" type="text/css" />
+    <meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+    <title>asciiblaster v1.0.6 documentation</title>
+  </head>
+  <!-- }}} -->
+  <!-- {{{ BODY -->
+  <body>
+    <div id="box_wrapper">
+      <div id="box">
+        <h1>asciiblaster documentation</h1>
+        <p>
+          These are some handy documents which address some of the more obscure features of asciiblaster:
+        </p>
 
-<br><br>
-<center>
+        <h2>Tips on using the keyboard</h2>
+        <pre>
+          [                                   Decrease brush size
+          ]                                   Increase brush size
+          &lt;Alt&gt; + &lt;LMB&gt; on canvas             Fill brush with sampled color
+          &lt;Alt&gt; + &lt;Shift&gt; + &lt;LMB&gt; on canvas   Copy canvas to brush
+          &lt;Ctrl&gt; + &lt;LMB&gt; on brush             Erase cell
+          &lt;Ctrl&gt; + &lt;LMB&gt; on canvas            Draw with background color
+          &lt;Shift&gt; + &lt;LMB&gt; on canvas           Draw line from last position
+          &lt;Shift&gt; + &lt;LMB&gt; on character box    Switch to next character set
+          &lt;Shift&gt; + &lt;LMB&gt; on stored brush     Delete stored brush
+          &lt;RMB&gt; on palette                    Set background color (when drawing with a letter)
+        </pre>
 
-<table border=35 cellpadding=10>
-<tr><td style="background: rgba(0,0,100,0.5)">
-<h1>asciiblaster documentation</h1>
-
-<span style="white-space: pre; color: white;">
-These are some handy documents which address some of the more obscure features of asciiblaster:
-
-<h2>Tips on using the keyboard</h2>
-<pre>
-[                                   Decrease brush size
-]                                   Increase brush size
-&lt;Alt&gt; + &lt;LMB&gt; on canvas             Fill brush with sampled color
-&lt;Alt&gt; + &lt;Shift&gt; + &lt;LMB&gt; on canvas   Copy canvas to brush
-&lt;Ctrl&gt; + &lt;LMB&gt; on brush             Erase cell
-&lt;Ctrl&gt; + &lt;LMB&gt; on canvas            Draw with background color
-&lt;Shift&gt; + &lt;LMB&gt; on canvas           Draw line from last position
-&lt;Shift&gt; + &lt;LMB&gt; on character box    Switch to next character set
-&lt;Shift&gt; + &lt;LMB&gt; on stored brush     Delete stored brush
-&lt;RMB&gt; on palette                    Set background color (when drawing with a letter)
-</pre>
-
-<h2>Notate bene</h2>
-Characters not forming part of the initial set in the character box beneath the colour palette
-encode to, assuming UTF-8, 2-3 bytes in total vs. one (1) byte for those part of the initial
-set (e.g. 0-9, A-Z, a-z, etc.)
-
-Repeating patterns of alternating back- and foreground colours, and vice versa, are encoded
-using a single (1) byte in mIRC format (video reverse) and as such save space, especially
-with large numbers of repetitions or alternations.
+        <h2>Notate bene</h2>
+        <p>
+          Characters not forming part of the initial set in the character box beneath the colour palette
+          encode to, assuming UTF-8, 2-3 bytes in total vs. one (1) byte for those part of the initial
+          set (e.g. 0-9, A-Z, a-z, etc.)<br />
+          <br />
+          Repeating patterns of alternating back- and foreground colours, and vice versa, are encoded
+          using a single (1) byte in mIRC format (video reverse) and as such save space, especially
+          with large numbers of repetitions or alternations.
+        </p>
+      </div>
+    </div>
+  </body>
+  <!-- }}} -->
+</html>
 
 <!--
   vim:ts=2 sw=2 expandtab fenc=utf-8 foldmethod=marker nowrap tw=0
