@@ -1,11 +1,8 @@
 1)  bug: fix HTML & CSS
-2)  document: constraints for video reverse
-3)  document: Shift + LMB to delete brush, Shift + LMB to switch character sets
-4)  feature: allow to adjust cutoff warning threshold, {dis,en}able cutoff & print line numbers affected
-5)  feature: {bold,italic,underline} attributes
-6)  feature: keyboard instead of [LR]MB
-7)  feature: {line,measuring} tool
-8)  feature: status bar w/ position, etc.
-9)  feature: zoom {in,out}
-10) reimplement: ANSI, {save,upload} as PNG & gallery, shaders (possibly)
-11) releases: merge w/ MiRCARTools (into asciiblaster,) provide signed release APK
+2)  feature: {bold,italic,underline} attributes
+3)  feature: draw w/ keyboard instead of [LR]MB
+4)  feature: {line,measuring} tool
+5)  feature: status bar w/ position, etc.
+6)  feature: zoom {in,out} (esp. on Android)
+7)  reimplement: ANSI (maybe,) {save,upload} as PNG & gallery, cutoff (print line #(s) affected, tunably,) shaders (maybe)
+8)  releases: merge w/ MiRCARTools (into asciiblaster,) provide signed release APK
