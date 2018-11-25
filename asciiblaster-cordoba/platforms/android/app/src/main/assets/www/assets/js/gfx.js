@@ -66,7 +66,7 @@ var blit = (function(){
   blit.circle = function(A, lex){
     var hw = brush.w/2, hh = brush.h/2
     var ratio, distance
-    
+
     if (brush.w === brush.h){
       distance = distance_square
       ratio = hw / hh * (brush.w === 3 || brush.w === 5 ? 1.2 : 1.05)
@@ -100,7 +100,7 @@ var blit = (function(){
     })
   }
   blit.square = function(A, lex){
-  	// i.e. no transparency
+    // i.e. no transparency
   }
   return blit
 })()
@@ -108,61 +108,33 @@ var blit = (function(){
 var draw = (function(){
 
   var last_point = [0,0]
-  
+
   function down (e, lex, point) {
     var w = canvas.w, h = canvas.h
     erasing = (e.which == "3" || e.ctrlKey)
     changed = true
     if (e.shiftKey) {
       line (lex, last_point, point, erasing)
-      if (mirror_x) {
-        line(lex, [w-last_point[0], last_point[1]], [w-point[0], point[1]], erasing)
-      }
-      if (mirror_y) {
-        line(lex, [last_point[0], h-last_point[1]], [point[0], h-point[1]], erasing)
-      }
-      if (mirror_x && mirror_y) {
-        line(lex, [w-last_point[0], h-last_point[1]], [w-point[0], h-point[1]], erasing)
-      }
     }
     else {
       stamp (canvas, brush, point[0], point[1], erasing)
-      if (mirror_x) {
-        stamp (canvas, brush, w-point[0], point[1], erasing)
-      }
-      if (mirror_y) {
-        stamp (canvas, brush, point[0], h-point[1], erasing)
-      }
-      if (mirror_x && mirror_y) {
-        stamp (canvas, brush, w-point[0], h-point[1], erasing)
-      }
     }
     last_point[0] = point[0]
     last_point[1] = point[1]
   }
-  
+
   function set_last_point (e, point) {
     last_point[0] = point[0]
     last_point[1] = point[1]
   }
-  
+
   function move (e, lex, point) {
     var w = canvas.w, h = canvas.h
     line(lex, last_point, point, erasing)
-    if (mirror_x) {
-      line(lex, [w-last_point[0], last_point[1]], [w-point[0], point[1]], erasing)
-    }
-    if (mirror_y) {
-      line(lex, [last_point[0], h-last_point[1]], [point[0], h-point[1]], erasing)
-    }
-    if (mirror_x && mirror_y) {
-      line(lex, [w-last_point[0], h-last_point[1]], [w-point[0], h-point[1]], erasing)
-    }
-
     last_point[0] = point[0]
     last_point[1] = point[1]
   }
-  
+
   function move_toroidal (e, lex, point) {
     var w = canvas.w, h = canvas.h
     var src_x_quantile = quantile( last_point[0], w )
@@ -223,18 +195,12 @@ var draw = (function(){
       var y_b = mod( point[1], h )
       var last_point_mod = [x_b, y_b], point_mod = [x_a, y_a]
       line(lex, last_point_mod, point_mod, erasing)
-      // if (mirror_x) {
-      //   line(lex, [w-last_point_mod[0], last_point_mod[1]], [w-point_mod[0], point_mod[1]], erasing)
-      // }
-      // if (mirror_y) {
-      //   line(lex, [last_point_mod[0], h-last_point_mod[1]], [point_mod[0], h-point_mod[1]], erasing)
-      // }
     }
     last_point[0] = point[0]
     last_point[1] = point[1]
     // y = point.y
   }
-  
+
   function point (lex, x, y, erasing) {
     stamp (canvas, brush, x, y, erasing)
   }
@@ -268,7 +234,7 @@ var draw = (function(){
       }
     })
   }
-  
+
   function fill (lex, x, y) {
     var q = [ [x,y] ]
     var aa = canvas.aa

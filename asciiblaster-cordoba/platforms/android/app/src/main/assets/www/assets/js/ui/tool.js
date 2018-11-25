@@ -26,7 +26,7 @@ var Tool = Model({
     current_tool = this
     this.el.classList.add('focused')
     this.use()
-    if (is_desktop) { cursor_input.focus() }
+    cursor_input.focus()
   },
   blur: function(){
     current_tool = null
@@ -45,7 +45,7 @@ var FileTool = Tool.extend({
     current_filetool = this
     this.el.classList.add('focused')
     this.use()
-    if (is_desktop) { cursor_input.focus() }
+    cursor_input.focus()
   },
   blur: function(){
     current_filetool = null
@@ -104,7 +104,7 @@ var RadioGroup = Tool.extend({
     control.use()
     if (this.memorable){
       localStorage.setItem("ascii.tools." + this.name, this.value)
-    } 
+    }
   },
   bind: function(){
     var tool = this

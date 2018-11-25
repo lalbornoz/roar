@@ -33,7 +33,7 @@ var transform = (function(){
   }
   function up (e){
   }
-  
+
   var modes = {
 
     rotate: {
@@ -59,7 +59,7 @@ var transform = (function(){
         return true
       },
     },
-    
+
     scale: {
       init: function(e){
         mode.independent = e.shiftKey || e.altKey || e.metaKey
@@ -86,7 +86,7 @@ var transform = (function(){
         return true
       },
     },
-    
+
     translate: {
       init: function(e){
         mode.dx = mode.dy = 0
@@ -113,7 +113,7 @@ var transform = (function(){
       before: function(dx, dy, pdx, pdy, point){
         var new_position = mode.is_y ? point[1] : point[0]
         var dd = mode.is_y ? pdx : pdy
-        
+
         if (mode.position !== new_position) {
           mode.position = new_position
           mode.direction = 0
@@ -151,19 +151,19 @@ var transform = (function(){
     },
 */
   }
-  
+
   function set_mode(m){
     if (m in modes) {
       mode = modes[m]
       transforming = true
     }
   }
-  
+
   function done(){
     transforming = false
     copy && copy.demolish()
   }
-  
+
   return {
     down: down,
     move: move,
