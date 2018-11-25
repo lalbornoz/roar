@@ -51,7 +51,7 @@ main() {
 		asciiblaster-nw/package.json										\
 		asciiblaster-nw/package-lock.json;
 	rc sed -i"" '/<title>[^<]\+ v/s/\(<title>[^<]\+ v\)'"${_version_old}"'\(<\)/\1'"${_version_new}"'\2/'		\
-		index.html;
+		index.html assets/html/help.html;
 	rc rsync -aiLPv --delete											\
 		asciiblaster-cordoba/www/										\
 		asciiblaster-cordoba/platforms/android/app/src/main/assets/www/;
