@@ -85,7 +85,7 @@ var keys = (function(){
           if (e.shiftKey)
             undo.redo();
           else
-            undo.undo(); 
+            undo.undo();
           break
   //      default:
   //        if (focused) { focused.key(undefined, e.keyCode) }
@@ -102,7 +102,7 @@ var keys = (function(){
       cursor_input.value = ""
 
       // console.log("input:", char)
-      
+
       if (current_tool.name != "text" && ! brush.modified) {
         brush.char = char
         if (char == " ") {
@@ -126,14 +126,14 @@ var keys = (function(){
         current_canvas.focus_add(1, 0)
       }
     })
-    
+
     cursor_input.addEventListener("keyup", function(e){
       if (! e.altKey) {
         document.body.classList.remove("dropper")
       }
     })
   }
-  
+
   keys.int_key = function (f) {
     return function (key, keyCode) {
       var n = parseInt(key)

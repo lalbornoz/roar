@@ -1,7 +1,7 @@
 var clipboard = (function () {
 
   var exports = {
-    format: "irssi",
+    format: "mirc",
     importing: false,
     visible: false,
     canvas: document.createElement("canvas"),
@@ -19,8 +19,8 @@ var clipboard = (function () {
         if (! clipboard.importing) { clipboard.export_data() }
       }
     },
-    show: function () { import_rapper.style.display = "block"; clipboard.visible = true; changed = false },
-    hide: function () { import_rapper.style.display = "none"; clipboard.visible = false },
+    show: function () { import_wrapper.style.display = "block"; clipboard.visible = true; changed = false },
+    hide: function () { import_wrapper.style.display = "none"; clipboard.visible = false },
     focus: function () {
       if (! clipboard.importing) {
         import_textarea.focus()
@@ -64,28 +64,12 @@ var clipboard = (function () {
         }
       })
     },
-    
-    import_colorcode: function (data, no_undo) {
-    	if (data && data.preventDefault) {
-				data = import_textarea.value
-    	}
-    	else {
-				data = data || import_textarea.value
-    	}
-      
-      var irssi_style_regex = /^\s*\/exec -out printf ("%b" )?"/;
 
-      // turn irssi style into mirc style
-      if (data.match(irssi_style_regex)){
-        data = data.replace(/\\x03/gm, '\x03')
-                   .replace(/(\\x..)+/gm, unicode.unescapeFromEscapedBytes)
-                   .replace(/\\x5C/g, '\\')
-                   .replace(/\\n/gm, '\n')
-                   .replace(/\\`/gm, '`')
-                   .replace(/\\"/gm, '"')
-                   .replace(/\\\$/gm, '$')
-                   .replace(irssi_style_regex, '')
-                   .replace(/"\s*$/, '')
+    import_colorcode: function (data, no_undo) {
+      if (data && data.preventDefault) {
+        data = import_textarea.value
+      } else {
+        data = data || import_textarea.value
       }
 
       var to_json = function(string, opts){
@@ -173,9 +157,9 @@ var clipboard = (function () {
         }
       }
 
-      current_filetool && current_filetool.blur()     
+      current_filetool && current_filetool.blur()
     },
-    
+
     export_data: function () {
       var output
       // switch (clipboard.format) {
@@ -185,12 +169,6 @@ var clipboard = (function () {
           break
         case 'mirc':
           output = canvas.mirc({cutoff: 425})
-          break
-        case 'irssi':
-          output = canvas.irssi({cutoff: 425})
-          break
-        case 'ansi':
-          output = canvas.ansi()
           break
       }
       if (output.cutoff){
@@ -204,9 +182,9 @@ var clipboard = (function () {
     },
 
   }
-  
+
   return exports
-  
+
 })()
 
 

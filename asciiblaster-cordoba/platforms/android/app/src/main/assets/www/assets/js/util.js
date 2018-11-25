@@ -77,7 +77,7 @@ function rgbpixel(d,x,y){
 function fit(d,x,y){ rgbpixel(d,x*actual_w/w,y*actual_h/h) }
 
 function step(a, b){
-  return (b >= a) + 0 
+  return (b >= a) + 0
                // ^^ bool -> int
 }
 
@@ -167,11 +167,11 @@ d=this.apply(a,arguments))===e?a:d}.bind(d):d;a.init&&a.init.apply(a,arguments)
 =Model);                                                              // c-{{{-<
 
 function defaults (dest, src) {
-	dest = dest || {}
-	for (var i in src) {
-		dest[i] = typeof dest[i] == 'undefined' ? src[i] : dest[i]
-	}
-	return dest
+  dest = dest || {}
+  for (var i in src) {
+    dest[i] = typeof dest[i] == 'undefined' ? src[i] : dest[i]
+  }
+  return dest
 }
 
 function setSelectionRange(input, selectionStart, selectionEnd) {
@@ -190,10 +190,3 @@ function setSelectionRange(input, selectionStart, selectionEnd) {
 function setCaretToPos(input, pos) {
   setSelectionRange(input, pos, pos);
 }
-
-// Naive useragent detection pattern
-var is_iphone = (navigator.userAgent.match(/iPhone/i)) || (navigator.userAgent.match(/iPod/i))
-var is_ipad = (navigator.userAgent.match(/iPad/i))
-var is_android = (navigator.userAgent.match(/Android/i))
-var is_mobile = is_iphone || is_ipad || is_android
-var is_desktop = ! is_mobile;
