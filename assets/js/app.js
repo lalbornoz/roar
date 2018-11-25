@@ -17,10 +17,10 @@ function init () {
   bind()
 }
 function build () {
-  canvas.append(canvas_rapper)
-  brush.append(brush_rapper)
-  palette.append(palette_rapper)
-  letters.append(letters_rapper)
+  canvas.append(canvas_wrapper)
+  brush.append(brush_wrapper)
+  palette.append(palette_wrapper)
+  letters.append(letters_wrapper)
   letters.repaint("Basic Latin")
 
   controls.circle.focus()
@@ -30,7 +30,7 @@ function build () {
   brush.build()
 
   // controls.grid.use()
-  canvas.resize_rapper()
+  canvas.resize_wrapper()
 }
 function bind () {
   canvas.bind()

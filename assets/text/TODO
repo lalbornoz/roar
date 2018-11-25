@@ -1,8 +1,7 @@
-1)  bug: fix @ IE8?
-2)  feature: {bold,italic,underline} attributes
-3)  feature: draw w/ keyboard instead of [LR]MB
-4)  feature: {line,measuring} tool
-5)  feature: status bar w/ position, etc.
-6)  feature: zoom {in,out} (esp. on Android)
-7)  reimplement: ANSI (maybe,) {save,upload} as PNG & gallery, cutoff (print line #(s) affected, tunably,) shaders (maybe)
-8)  releases: merge w/ MiRCARTools (into asciiblaster,) provide signed release APK
+1)  feature: {bold,italic,underline} attributes
+2)  feature: draw w/ keyboard instead of [LR]MB
+3)  feature: {line,measuring} tool
+4)  feature: status bar w/ position, etc.
+5)  feature: zoom {in,out} (esp. on Android)
+6)  reimplement: ANSI (maybe,) {save,upload} as PNG & gallery, cutoff (print line #(s) affected, tunably,) shaders (maybe)
+7)  releases: merge w/ MiRCARTools (into asciiblaster,) provide signed release APK

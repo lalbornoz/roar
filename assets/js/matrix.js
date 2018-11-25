@@ -58,8 +58,8 @@ Matrix.prototype.demolish = function (){
   this.forEach(function(lex){
     lex.demolish()
   })
-  while (this.rapper && this.rapper.firstChild) {
-    this.rapper.removeChild(this.rapper.firstChild);
+  while (this.wrapper && this.wrapper.firstChild) {
+    this.wrapper.removeChild(this.wrapper.firstChild);
   }
   this.aa.forEach(function(row){
     row.length = 0
@@ -122,15 +122,15 @@ Matrix.prototype.build = function(){
     lex.build()
   })
 }
-Matrix.prototype.append = function(rapper){
-  rapper = this.rapper = rapper || this.rapper
-  if (! this.rapper) return
+Matrix.prototype.append = function(wrapper){
+  wrapper = this.wrapper = wrapper || this.wrapper
+  if (! this.wrapper) return
   this.aa.forEach(function(row, y){
     var div = document.createElement("div")
     row.forEach(function(lex, x) {
       div.appendChild(lex.span)
     })
-    rapper.appendChild( div )
+    wrapper.appendChild( div )
   })
 }
 Matrix.prototype.region = function(w,h,x,y) {
@@ -164,7 +164,7 @@ Matrix.prototype.resize = function(w,h){
   h = h || canvas.h
   var div, row, lex
   var f = this.f, old_h = this.aa.length, old_w = this.aa[0].length
-  var rapper = this.rapper
+  var wrapper = this.wrapper
   w = max(w, 1)
   h = max(h, 1)
   if (h < old_h) {
@@ -180,7 +180,7 @@ Matrix.prototype.resize = function(w,h){
   else if (h > old_h) {
     for (var y = old_h; y < h; y++) {
       div = document.createElement("div")
-      rapper.appendChild( div )
+      wrapper.appendChild( div )
       this.aa[y] = new Array (w)
       for (var x = 0; x < w; x++) {
         lex = this.aa[y][x] = f(x,y)
@@ -211,11 +211,11 @@ Matrix.prototype.resize = function(w,h){
   this.h = h
   this.bind && this.bind()
   this.focus_clamp()
-  if (this.rapper && this.rapper.parentNode != document.body) {
-    this.resize_rapper()
+  if (this.wrapper && this.wrapper.parentNode != document.body) {
+    this.resize_wrapper()
   }
 }
-Matrix.prototype.resize_rapper = function(){
+Matrix.prototype.resize_wrapper = function(){
   var cell = canvas.aa[0][0].span
   var cw = cell.offsetWidth
   var ch = cell.offsetHeight
@@ -223,10 +223,10 @@ Matrix.prototype.resize_rapper = function(){
   var width = cw * this.aa[0].length
   var height = ch * this.aa.length
   if (canvas.grid) { width++; height++ }
-  this.rapper.parentNode.style.height = ""
-  this.rapper.style.width =
-  this.rapper.parentNode.style.width = (width) + "px"
-  this.rapper.style.top = ""
+  this.wrapper.parentNode.style.height = ""
+  this.wrapper.style.width =
+  this.wrapper.parentNode.style.width = (width) + "px"
+  this.wrapper.style.top = ""
 }
 Matrix.prototype.ascii = function () {
   var lines = this.aa.map(function(row, y){

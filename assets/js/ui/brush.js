@@ -113,14 +113,14 @@ var custom = (function(){
 
   exports.clone = function (){
     var new_brush = brush.clone()
-    var rapper = document.createElement("div")
-    rapper.className = "custom"
-    new_brush.append(rapper)
-    custom_rapper.appendChild(rapper)
+    var wrapper = document.createElement("div")
+    wrapper.className = "custom"
+    new_brush.append(wrapper)
+    custom_wrapper.appendChild(wrapper)
     // store in localstorage?
-    rapper.addEventListener("click", function(e){
+    wrapper.addEventListener("click", function(e){
       if (e.shiftKey) {
-        rapper.parentNode.removeChild(rapper)
+        wrapper.parentNode.removeChild(wrapper)
         delete new_brush
       } else {
         // load this brush
