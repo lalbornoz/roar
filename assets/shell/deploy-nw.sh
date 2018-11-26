@@ -1,7 +1,7 @@
 #!/bin/sh
 #
 
-PACKAGE_NAME="asciiblaster-nw";
+PACKAGE_NAME="MiRCART-nw";
 RELEASE_DEPS="cpio find gunzip rm sed tar unzip wget zip";
 NWJS_MANIFEST_FNAME="nwjs.manifest";
 NWJS_PLATFORMS="linux-ia32 linux-x64 win-ia32 win-x64";

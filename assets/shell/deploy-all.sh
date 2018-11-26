@@ -23,7 +23,7 @@ main() {
 	shift $((${OPTIND}-1));
 	for _build in cordoba nw www; do
 		msgf "Deploying ${_build}...";
-		cd "asciiblaster-${_build}";
+		cd "MiRCART-${_build}";
 		if [ "${_vflag:-0}" -eq 0 ]; then
 			./deploy.sh "${@}";
 		else

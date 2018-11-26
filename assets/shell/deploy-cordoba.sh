@@ -2,7 +2,7 @@
 #
 
 CORDOBA_PLATFORMS="android";
-PACKAGE_NAME="asciiblaster-cordoba";
+PACKAGE_NAME="MiRCART-cordoba";
 RELEASE_DEPS_CMD="cordova cp";
 RELEASE_DEPS_ENV="ANDROID_HOME JAVA_HOME";
 RELEASES_DNAME_DEST="releases";

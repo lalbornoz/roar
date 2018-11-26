@@ -6,7 +6,7 @@
 6)  feature: status bar w/ position, etc.
 7)  feature: zoom {in,out} (esp. on Android)
 8)  reimplement: ANSI (maybe,) {save,upload} as PNG & gallery, cutoff (print line #(s) affected, tunably,) shaders (maybe)
-9)  releases: change name & merge w/ MiRCARTools (into asciiblaster,) provide signed release APK
+9)  releases: provide signed release APK
 
 In progress:
 1)  each newly created & modified(!) ascii is assigned an ascii UUID, if not present already

@@ -1,8 +1,8 @@
 *.sw[op]
-asciiblaster-cordoba/node_modules
-asciiblaster-cordoba/platforms/android/.gradle
-asciiblaster-cordoba/platforms/android/app/build
-asciiblaster-cordoba/platforms/android/CordovaLib/build
-asciiblaster-cordoba/releases/*
-asciiblaster-nw/releases/*
-asciiblaster-www/releases/*
+MiRCART-cordoba/node_modules
+MiRCART-cordoba/platforms/android/.gradle
+MiRCART-cordoba/platforms/android/app/build
+MiRCART-cordoba/platforms/android/CordovaLib/build
+MiRCART-cordoba/releases/*
+MiRCART-nw/releases/*
+MiRCART-www/releases/*

@@ -1,7 +1,7 @@
 #!/bin/sh
 #
 
-PACKAGE_NAME="asciiblaster-www";
+PACKAGE_NAME="MiRCART-www";
 RELEASE_DEPS="cpio find rm sed zip";
 RELEASES_DNAME="releases";
 
@@ -13,7 +13,7 @@ msgf() {
 deploy() {
 	local _vflag="${1}" _release_fname="" _release_dname="" _release_version="";
 
-	_release_version="$(sed -n '/^\s*<title>/s/^\s*<title>asciiblaster v\([0-9.]\+\)<\/title>\s*$/\1/p' index.html)";
+	_release_version="$(sed -n '/^\s*<title>/s/^\s*<title>MiRCART v\([0-9.]\+\)<\/title>\s*$/\1/p' index.html)";
 	_release_dname="${RELEASES_DNAME}/${PACKAGE_NAME}-${_release_version}";
 	_release_fname="${_release_dname}.zip";
 

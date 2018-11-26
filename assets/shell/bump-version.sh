@@ -37,25 +37,25 @@ main() {
 		fi;
 	done;
 	rc sed -i"" '/version="/s/\(version=\)"'"${_version_old}"'"/\1"'"${_version_new}"'"/'				\
-		asciiblaster-cordoba/config.xml;
+		MiRCART-cordoba/config.xml;
 	rc sed -i"" '/"version":/s/\("version":\s*\)"'"${_version_old}"'"/\1"'"${_version_new}"'"/'			\
-		asciiblaster-cordoba/package.json									\
-		asciiblaster-cordoba/package-lock.json;
+		MiRCART-cordoba/package.json										\
+		MiRCART-cordoba/package-lock.json;
 	rc sed -i"" '/android:versionCode="/s/\(android:versionCode=\)"[0-9]\+"/\1"'"${_version_new_code}"'"/'		\
-		asciiblaster-cordoba/platforms/android/app/src/main/AndroidManifest.xml;
+		MiRCART-cordoba/platforms/android/app/src/main/AndroidManifest.xml;
 	rc sed -i"" '/android:versionName="/s/\(android:versionName=\)"'"${_version_old}"'"/\1"'"${_version_new}"'"/'	\
-		asciiblaster-cordoba/platforms/android/app/src/main/AndroidManifest.xml;
+		MiRCART-cordoba/platforms/android/app/src/main/AndroidManifest.xml;
 	rc sed -i"" '/version="/s/\(version=\)"'"${_version_old}"'"/\1"'"${_version_new}"'"/'				\
-		asciiblaster-cordoba/platforms/android/app/src/main/res/xml/config.xml;
+		MiRCART-cordoba/platforms/android/app/src/main/res/xml/config.xml;
 	rc sed -i"" '/"version":/s/\("version":\s*\)"'"${_version_old}"'"/\1"'"${_version_new}"'"/'			\
-		asciiblaster-nw/package.json										\
-		asciiblaster-nw/package-lock.json;
+		MiRCART-nw/package.json											\
+		MiRCART-nw/package-lock.json;
 	rc sed -i"" '/<title>[^<]\+ v/s/\(<title>[^<]\+ v\)'"${_version_old}"'\(<\)/\1'"${_version_new}"'\2/'		\
 		index.html assets/html/help.html;
 	rc rsync -aiLPv --delete											\
-		asciiblaster-cordoba/www/										\
-		asciiblaster-cordoba/platforms/android/app/src/main/assets/www/;
-	rc git add asciiblaster-cordoba/platforms/android/app/src/main/assets/www;
+		MiRCART-cordoba/www/											\
+		MiRCART-cordoba/platforms/android/app/src/main/assets/www/;
+	rc git add MiRCART-cordoba/platforms/android/app/src/main/assets/www;
 	rc git commit -avm "Bump to v${_version_new}.";
 };
 
