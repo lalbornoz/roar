@@ -43,7 +43,7 @@ deploy() {
 	_nwjs_url="$(subst "$(eval echo \"\${NWJS_URL_${_platform%%-*}}\")" "%NWJS_PLATFORM%" "${_platform}")";
 	_nwjs_fname="${RELEASES_DNAME}/${_nwjs_url##*/}";
 	_release_version="$(sed -n '/^\s*"version":/s/^.*:\s*"\([0-9.]\+\)",\?\s*$/\1/p' package.json)";
-	_release_dname="${RELEASES_DNAME}/${PACKAGE_NAME}-${_release_version}-release-${_platform}";
+	_release_dname="${RELEASES_DNAME}/${PACKAGE_NAME}-release-${_platform}-${_release_version}";
 	_release_fname="${_release_dname}.zip";
 
 	trap "rm -fr ${_release_dname}" EXIT HUP INT QUIT PIPE TERM USR1 USR2;
