@@ -1,0 +1,31 @@
+{
+  "author": "Lucio Andrés Illanes Albornoz <lucio@lucioillanes.de>, based on work by JOLLO NET NA",
+  "bugs": {
+    "url": "https://github.com/lalbornoz/MiRCART/issues"
+  },
+  "description": "MiRCART (standalone NW app)",
+  "directories": {
+    "assets": "assets"
+  },
+  "homepage": "https://github.com/lalbornoz/MiRCART#readme",
+  "license": "Jollo LNT license <https://raw.githubusercontent.com/lalbornoz/MiRCART/master/LICENCE>",
+  "main": "index.html",
+  "name": "MiRCART-nw",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lalbornoz/MiRCART.git"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "version": "1.0.7",
+  "window": {
+    "title": "MiRCART (standalone NW app)",
+    "toolbar": true,
+    "position": "center",
+    "width": 1024,
+    "height": 768,
+    "min_width": 1024,
+    "min_height": 768
+  }
+}
