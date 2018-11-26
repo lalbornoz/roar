@@ -1,31 +1,30 @@
 #!/usr/bin/env python3
 #
-# ENNTool -- mIRC art animation tool (for EFnet #MiRCART) (WIP)
+# MiRCARTCanvasImportStore.py -- XXX
 # Copyright (c) 2018 Lucía Andrea Illanes Albornoz <lucia@luciaillanes.de>
-# This project is licensed under the terms of the MIT license.
-#
-# TODO:
-# 1) un-Quick'n'Dirty-ify
+# This project is licensed under the terms of the MIT licence.
 #
 
-import chardet
-
-class ENNToolMiRCARTImporter(object):
+class MiRCARTCanvasImportStore():
     """XXX"""
+    inFile = inSize = outMap = None
+    parentCanvas = None
 
-    # {{{ _CellState(): Cell state
+    #
+    # _CellState(): Cell state
     class _CellState():
         CS_NONE             = 0x00
         CS_BOLD             = 0x01
         CS_ITALIC           = 0x02
         CS_UNDERLINE        = 0x04
-    # }}}
-    # {{{ _ParseState(): Parsing loop state
+
+    #
+    # _ParseState(): Parsing loop state
     class _ParseState():
         PS_CHAR             = 1
         PS_COLOUR_DIGIT0    = 2
         PS_COLOUR_DIGIT1    = 3
-    # }}}
+
     # {{{ _flipCellStateBit(self, cellState, bit): XXX
     def _flipCellStateBit(self, cellState, bit):
         if cellState & bit:
@@ -39,19 +38,22 @@ class ENNToolMiRCARTImporter(object):
             colourSpec = colourSpec.split(",")
             if  len(colourSpec) == 2                             \
             and len(colourSpec[1]) > 0:
-                return [int(colourSpec[0] or curColours[0]),    \
-                    int(colourSpec[1])]
+                return (int(colourSpec[0] or curColours[0]),    \
+                    int(colourSpec[1]))
             elif len(colourSpec) == 1                           \
             or   len(colourSpec[1]) == 0:
-                return [int(colourSpec[0]), curColours[1]]
+                return (int(colourSpec[0]), curColours[1])
         else:
-            return [15, 1]
+            return (15, 1)
     # }}}
-    # {{{ fromTextFile(self, pathName): XXX
-    def fromTextFile(self, pathName):
-        with open(pathName, "rb") as fileObject:
-            inFileEncoding = chardet.detect(fileObject.read())["encoding"]
-        self.inFile = open(pathName, "r", encoding=inFileEncoding)
+
+    # {{{ importIntoPanel(self): XXX
+    def importIntoPanel(self):
+        self.parentCanvas.onStoreUpdate(self.inSize, self.outMap)
+    # }}}
+    # {{{ importTextFile(self, pathName): XXX
+    def importTextFile(self, pathName):
+        self.inFile = open(pathName, "r", encoding="utf-8")
         self.inSize = self.outMap = None;
         inCurColourSpec = ""; inCurRow = -1;
         inLine = self.inFile.readline()
@@ -60,7 +62,7 @@ class ENNToolMiRCARTImporter(object):
             inCellState = self._CellState.CS_NONE
             inParseState = self._ParseState.PS_CHAR
             inCurCol = 0; inMaxCol = len(inLine);
-            inCurColourDigits = 0; inCurColours = [15, 1]; inCurColourSpec = "";
+            inCurColourDigits = 0; inCurColours = (15, 1); inCurColourSpec = "";
             inCurRow += 1; outMap.append([]); inRowCols = 0; inSize[1] += 1;
             while inCurCol < inMaxCol:
                 inChar = inLine[inCurCol]
@@ -78,9 +80,9 @@ class ENNToolMiRCARTImporter(object):
                             inCellState, self._CellState.CS_ITALIC)
                     elif inChar == "":
                         inCellState |= self._CellState.CS_NONE
-                        inCurColours = [15, 1]
+                        inCurColours = (15, 1)
                     elif inChar == "":
-                        inCurColours = [inCurColours[1], inCurColours[0]]
+                        inCurColours = (inCurColours[1], inCurColours[0])
                     elif inChar == "":
                         inCellState = self._flipCellStateBit(               \
                             inCellState, self._CellState.CS_UNDERLINE)
@@ -125,10 +127,20 @@ class ENNToolMiRCARTImporter(object):
         inSize[0] = inMaxCols; self.inSize = inSize; self.outMap = outMap;
         self.inFile.close()
     # }}}
-    # {{{ __init__(self, inFile): initialisation method
-    def __init__(self, inFile):
-        self.inFile = inFile; self.inSize = self.outMap = None;
-        self.fromTextFile(inFile)
+    # {{{ importNew(self, newCanvasSize=None): XXX
+    def importNew(self, newCanvasSize=None):
+        newMap = [[[1, 1, 0, " "]                   \
+                for x in range(newCanvasSize[0])]   \
+                    for y in range(newCanvasSize[1])]
+        self.parentCanvas.onStoreUpdate(newCanvasSize, newMap)
     # }}}
+
+    #
+    # __init__(self, inFile=None, parentCanvas=None): initialisation method
+    def __init__(self, inFile=None, parentCanvas=None):
+        self.inFile = inFile; self.inSize = self.outMap = None;
+        self.parentCanvas = parentCanvas
+        if inFile != None:
+            self.importTextFile(inFile)
 
 # vim:expandtab foldmethod=marker sw=4 ts=4 tw=120
