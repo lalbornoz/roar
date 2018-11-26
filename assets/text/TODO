@@ -18,4 +18,3 @@ In progress:
 7)  always prompt on close window/exit/...
 8)  always prompt on new
 9)  save to text file @ standalone app
-10) bump version to 1.0.8, deploy-all.sh, upblog releases to github

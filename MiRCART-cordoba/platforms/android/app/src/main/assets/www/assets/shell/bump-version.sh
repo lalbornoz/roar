@@ -50,7 +50,7 @@ main() {
 	rc sed -i"" '/"version":/s/\("version":\s*\)"'"${_version_old}"'"/\1"'"${_version_new}"'"/'			\
 		MiRCART-nw/package.json											\
 		MiRCART-nw/package-lock.json;
-	rc sed -i"" '/<title>[^<]\+ v/s/\(<title>[^<]\+ v\)'"${_version_old}"'\(<\)/\1'"${_version_new}"'\2/'		\
+	rc sed -i"" '/<title>[^<]\+ v/s/\(<title>[^<]\+ v\)'"${_version_old}"'\(.*<\)/\1'"${_version_new}"'\2/'		\
 		index.html assets/html/help.html;
 	rc rsync -aiLPv --delete											\
 		MiRCART-cordoba/www/											\
