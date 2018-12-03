@@ -139,7 +139,10 @@ class IrcMiRCARTBot(IrcClient.IrcClient):
             canvasStore.outMap.append([[1, 1, 0, " "]] * len(canvasStore.outMap[0]))
             MiRCARTToPngFile(canvasStore.outMap, "DejaVuSansMono.ttf", 11).export(imgTmpFilePath)
             imgurResponse = self._uploadToImgur(imgTmpFilePath, "MiRCART image", "MiRCART image", self.imgurApiKey)
-            if imgurResponse[0] == 200:
+            if imgurResponse[0] == None:
+                    self._log("Upload failed with exception `{}'".format(imgurResponse[1]))
+                    self.queue("PRIVMSG", message[2], "4/!\\ Upload failed with exception `{}'!".format(imgurResponse[1]))
+            elif imgurResponse[0] == 200:
                     self._log("Uploaded as: {}".format(imgurResponse[1]))
                     self.queue("PRIVMSG", message[2], "8/!\\ Uploaded as: {}".format(imgurResponse[1]))
                     self.clientChannelLastMessage = int(time.time())
@@ -177,7 +180,10 @@ class IrcMiRCARTBot(IrcClient.IrcClient):
         requestHeaders = {                                  \
             "Authorization": "Client-ID " + apiKey}
         responseHttp = requests.post("https://api.imgur.com/3/upload.json", data=requestData, headers=requestHeaders)
-        responseDict = json.loads(responseHttp.text)
+        try:
+                responseDict = json.loads(responseHttp.text)
+        except json.decoder.JSONDecodeError as err:
+                return [None, err]
         if responseHttp.status_code == 200:
                 return [200, responseDict.get("data").get("link")]
         else:
