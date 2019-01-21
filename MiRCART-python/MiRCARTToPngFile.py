@@ -16,40 +16,40 @@ class MiRCARTToPngFile:
 
     # {{{ _ColourMapBold: mIRC colour number to RGBA map given ^B (bold)
     _ColourMapBold = [
-        [255, 255, 255],    # White
-        [85,  85,  85],     # Grey
+        [255, 255, 255],    # Bright White
+        [85,  85,  85],     # Black
         [85,  85,  255],    # Light Blue
-        [85,  255, 85],     # Light Green
-        [255, 85,  85],     # Light Red
+        [85,  255, 85],     # Green
+        [255, 85,  85],     # Red
         [255, 85,  85],     # Light Red
         [255, 85,  255],    # Pink
-        [255, 255, 85],     # Light Yellow
+        [255, 255, 85],     # Yellow
         [255, 255, 85],     # Light Yellow
         [85,  255, 85],     # Light Green
+        [85,  255, 255],    # Cyan
         [85,  255, 255],    # Light Cyan
-        [85,  255, 255],    # Light Cyan
-        [85,  85,  255],    # Light Blue
-        [255, 85,  255],    # Pink
+        [85,  85,  255],    # Blue
+        [255, 85,  255],    # Light Pink
         [85,  85,  85],     # Grey
-        [255, 255, 255],    # White
+        [255, 255, 255],    # Light Grey
     ]
     # }}}
     # {{{ _ColourMapNormal: mIRC colour number to RGBA map given none of ^[BFV_] (bold, italic, reverse, underline)
     _ColourMapNormal = [
-        [255, 255, 255],    # White
+        [255, 255, 255],    # Bright White
         [0,   0,   0],      # Black
-        [0,   0,   187],    # Blue
+        [0,   0,   187],    # Light Blue
         [0,   187, 0],      # Green
-        [255, 85,  85],     # Light Red
-        [187, 0,   0],      # Red
-        [187, 0,   187],    # Purple
+        [255, 85,  85],     # Red
+        [187, 0,   0],      # Light Red
+        [187, 0,   187],    # Pink
         [187, 187, 0],      # Yellow
         [255, 255, 85],     # Light Yellow
         [85,  255, 85],     # Light Green
         [0,   187, 187],    # Cyan
         [85,  255, 255],    # Light Cyan
-        [85,  85,  255],    # Light Blue
-        [255, 85,  255],    # Pink
+        [85,  85,  255],    # Blue
+        [255, 85,  255],    # Light Pink
         [85,  85,  85],     # Grey
         [187, 187, 187],    # Light Grey
     ]
