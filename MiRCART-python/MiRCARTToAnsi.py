@@ -13,8 +13,8 @@ MiRCARTToAnsiColours = [
     30,    # Black        
     94,    # Light Blue   
     32,    # Green        
-    31,    # Red          
-    91,    # Light Red    
+    91,    # Red          
+    31,    # Light Red    
     35,    # Pink         
     33,    # Yellow       
     93,    # Light Yellow 
