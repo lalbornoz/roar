@@ -276,8 +276,8 @@ def main(optdict, *argv):
 if __name__ == "__main__":
     optlist, argv = getopt(sys.argv[1:], "46l:")
     optdict = dict(optlist)
-    if len(argv) < 1 or len(argv) > 4:
-        print("usage: {} [-4|-6] [-l <local hostname>]"                     \
+    if len(argv) < 1 or len(argv) > 6:
+        print("usage: {} [-4|-6] [-l <local hostname>] "                    \
             "<IRC server hostname> "                                        \
             "[<IRC server port; defaults to 6667>] "                        \
             "[<IRC bot nick name; defaults to pngbot>] "                    \
