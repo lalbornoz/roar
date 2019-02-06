@@ -1,12 +1,13 @@
 1)  feature: animation; Blender mIRCart Python importer plugin
 2)  feature: {bold,italic,underline} attributes
-3)  feature: draw w/ keyboard instead of [LR]MB
-4)  feature: {line,measuring} tool
-5)  feature: multiplayer realtime editing
-6)  feature: status bar w/ position, etc.
-7)  feature: zoom {in,out} (esp. on Android)
-8)  reimplement: ANSI (maybe,) {save,upload} as PNG & gallery, cutoff (print line #(s) affected, tunably,) shaders (maybe)
-9)  releases: provide signed release APK
+3)  feature: comic editor/generator *
+4)  feature: draw w/ keyboard instead of [LR]MB
+5)  feature: {line,measuring} tool
+6)  feature: multiplayer realtime editing
+7)  feature: status bar w/ position, etc.
+8)  feature: zoom {in,out} (esp. on Android)
+9)  reimplement: ANSI (maybe,) {save,upload} as PNG & gallery, cutoff (print line #(s) affected, tunably,) shaders (maybe)
+10) releases: provide signed release APK
 
 In progress:
 1)  each newly created & modified(!) ascii is assigned an ascii UUID, if not present already
