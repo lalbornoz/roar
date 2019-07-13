@@ -244,7 +244,7 @@ Matrix.prototype.mirc = function (opts) {
   var lines = this.aa.map(function(row, y){
     var last, line = ""
     row.forEach(function(lex, x) {
-      var bg_ = -1, fg_ = 15
+      var bg_ = -1, fg_ = -1
       if (lex.eqColor(last)) {
         line += lex.sanitize()
       }
