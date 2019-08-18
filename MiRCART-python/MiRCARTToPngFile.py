@@ -68,6 +68,7 @@ class MiRCARTToPngFile:
         outCurPos = [0, 0]
         outImg = Image.new("RGBA", outSize, (*self._ColourMapNormal[1], 255))
         outImgDraw = ImageDraw.Draw(outImg)
+        outImgDraw.fontmode = "1"
         for inCurRow in range(len(self.inCanvasMap)):
             for inCurCol in range(len(self.inCanvasMap[inCurRow])):
                 inCurCell = self.inCanvasMap[inCurRow][inCurCol]
