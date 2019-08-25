@@ -47,15 +47,29 @@ Lex.prototype.sanitize = function(){
     default:  return this.char
   }
 }
+Lex.prototype.ansi = function(bg_, fg_){
+  var char = this.char || " "
+  var charIsNaN = isNaN(parseInt(char))
+  if ((bg_ == this.fg) && (fg_ == this.bg)) {
+    bg_ = this.bg; fg_ = this.fg
+    return [bg_, fg_, "\x1b[7m" + char]
+  } else if ((bg_ != this.bg) && (fg_ != this.fg)) {
+    bg_ = this.bg; fg_ = this.fg;
+    return [bg_, fg_, "\x1b[" + ansi_bg[bg_] + ";" + ansi_fg[fg_] + "m" + char]
+  } else if (bg_ != this.bg) {
+    bg_ = this.bg
+    return [bg_, fg_, "\x1b[" + ansi_bg[bg_] + "m" + char]
+  } else if (fg_ != this.fg) {
+    fg_ = this.fg
+    return [bg_, fg_, "\x1b[" + ansi_fg[fg_] + "m" + char]
+  }
+}
 Lex.prototype.mirc = function(bg_, fg_){
   var char = this.char || " "
   var charIsNaN = isNaN(parseInt(char))
-  if        ((bg_ == this.fg) && (fg_ == this.bg)) {
+  if ((bg_ == this.fg) && (fg_ == this.bg)) {
     bg_ = this.bg; fg_ = this.fg
     return [bg_, fg_, "\x16" + char]
-  } else if ((bg_ != this.bg) && (fg_ == this.fg)) {
-    bg_ = this.bg
-    return [bg_, fg_, "\x03," + ((this.bg&15) < 10 && !charIsNaN ? "0" : "") + (this.bg&15) + char]
   } else if ((bg_ == this.bg) && (fg_ != this.fg)) {
     fg_ = this.fg
     return [bg_, fg_, "\x03" + ((this.fg&15) < 10 && !charIsNaN ? "0" : "") + (this.fg&15) + char]

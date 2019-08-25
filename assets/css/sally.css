@@ -20,10 +20,12 @@ body.grid #palette_wrapper > div:first-child {
 /* {{{ .initial styles */
 .initial #add_custom_el,
 .initial #doc_el,
-.initial #export_button,
-.initial #format_el,
-.initial #grid_el,
+.initial #export_format_el,
+.initial #export_textarea,
+.initial #import_button,
+.initial #import_format_el,
 .initial #import_textarea,
+.initial #grid_el,
 .initial #load_el,
 .initial #save_el,
 .initial #vertical_checkbox {
@@ -109,6 +111,7 @@ body.grid #palette_wrapper > div:first-child {
 .hidden { visibility: hidden; }
 .loading .vertical #ui_wrapper { clear: none }
 #experimental_palette_toggle.focused { box-shadow: none; }
+#export_wrapper { display: none; }
 #import_wrapper { display: none; }
 #tools_block > * { cursor: crosshair; }
 #workspace_wrapper { width: 100%; }
@@ -246,6 +249,16 @@ textarea, input[type=text], body {
   right:                    0;
   top:                      0;
   width:                    30px;
+}
+#export_textarea {
+  background:               #001100;
+  border:                   1px solid #333333;
+  color:                    #00FF00;
+  font-family:              'FixedsysExcelsior301Regular';
+  font-size:                12pt;
+  height:                   300px;
+  outline:                  0;
+  width:                    37vw;
 }
 #import_textarea {
   background:               #001100;

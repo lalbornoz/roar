@@ -68,39 +68,77 @@ Object.keys(css_lookup).forEach(function(color){
 })
 
 var ansi_fg = [
-  97, // white
-  30, // black
-  34, // dark blue
-  32, // green
-  91, // light red
-  31, // dark red
-  35, // purple
-  33, // "dark yellow" (orange?)
-  93, // "light yellow"
-  92, // light green
-  36, // cyan (teal?)
-  96, // light cyan
-  94, // light blue
-  95, // light magenta
-  90, // dark gray
-  37, // light gray
+  97,  // Bright White
+  30,  // Black
+  94,  // Light Blue
+  32,  // Green
+  91,  // Red
+  31,  // Light Red
+  35,  // Pink
+  33,  // Yellow
+  93,  // Light Yellow
+  92,  // Light Green
+  36,  // Cyan
+  96,  // Light Cyan
+  34,  // Blue
+  95,  // Light Pink
+  90,  // Grey
+  37,  // Light Grey
 ]
 
+var ansi_fg_import = {
+  97: 0,  // Bright White
+  30: 1,  // Black
+  94: 2,  // Light Blue
+  32: 3,  // Green
+  91: 4,  // Red
+  31: 5,  // Light Red
+  35: 6,  // Pink
+  33: 7,  // Yellow
+  93: 8,  // Light Yellow
+  92: 9,  // Light Green
+  36: 10, // Cyan
+  96: 11, // Light Cyan
+  34: 12, // Blue
+  95: 13,  // Light Pink
+  90: 14, // Grey
+  37: 15, // Light Grey
+}
+
 var ansi_bg = [
-  107, // white
-  40,  // black
-  44,  // dark blue
-  42,  // green
-  101, // light red
-  41,  // dark red
-  45,  // purple
-  43,  // yellow (orange)
-  103, // light yellow
-  102, // light green
-  46,  // cyan (teal?)
-  106, // light cyan
-  104, // light blue
-  105, // light magenta
-  100, // dark gray
-  47,  // light gray
+  107, // Bright White
+  40,  // Black
+  104, // Light Blue
+  42,  // Green
+  101, // Red
+  41,  // Light Red
+  45,  // Pink
+  43,  // Yellow
+  103, // Light Yellow
+  102, // Light Green
+  46,  // Cyan
+  106, // Light Cyan
+  44,  // Blue
+  105, // Light Pink
+  100, // Grey
+  47,  // Light Grey
 ]
+
+var ansi_bg_import = {
+  107: 0,  // Bright White
+  40:  1,  // Black
+  104: 2,  // Light Blue
+  42:  3,  // Green
+  101: 4,  // Red
+  41:  5,  // Light Red
+  45:  6,  // Pink
+  43:  7,  // Yellow
+  103: 8,  // Light Yellow
+  102: 9,  // Light Green
+  46:  10, // Cyan
+  106: 11, // Light Cyan
+  44:  12, // Blue
+  105: 13, // Light Pink
+  100: 14, // Grey
+  47:  15, // Light Grey
+}
