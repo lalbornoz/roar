@@ -131,26 +131,32 @@ var controls = (function(){
   ClipboardTool = FileTool.extend({
     blur: function(){
       this.__blur()
-      clipboard.hide()
+      clipboard.export_hide()
+      clipboard.import_hide()
     }
   })
   controls.save = new ClipboardTool (save_el)
   controls.save.use = function(){
-    clipboard.show()
+    clipboard.export_show()
     clipboard.export_mode()
   }
   controls.load = new ClipboardTool (load_el)
   controls.load.use = function(){
-    // console.log("use")
-    clipboard.show()
+    clipboard.import_show()
     clipboard.import_mode()
   }
 
-  controls.save_format = new RadioGroup(format_el)
+  controls.load_format = new RadioGroup(import_format_el)
+  controls.load_format.name = 'load_format'
+  controls.load_format.memorable = true
+  var cs = controls.load_format.controls
+  //
+
+  controls.save_format = new RadioGroup(export_format_el)
   controls.save_format.name = 'save_format'
   controls.save_format.memorable = true
   var cs = controls.save_format.controls
-  cs.mirc.use = cs.ascii.use = function(){
+  cs.mirc.use = cs.ansi.use = cs.ascii.use = function(){
     clipboard.export_data()
   }
   //

@@ -2,50 +2,55 @@ var clipboard = (function () {
 
   var exports = {
     format: "mirc",
-    importing: false,
+    exporting: false,
     visible: false,
     canvas: document.createElement("canvas"),
     canvas_r: document.createElement("canvas"),
 
     bind: function () {
-      import_button.addEventListener("click", exports.import_colorcode)
-      import_textarea.addEventListener("focus", exports.focus)
-      import_textarea.addEventListener("blur", exports.blur)
-      import_textarea.addEventListener('paste', exports.paste)
+      export_textarea.addEventListener("focus", exports.export_focus)
+      export_textarea.addEventListener("blur", exports.blur)
+      import_button.addEventListener("click", exports.import_click)
+      import_textarea.addEventListener("focus", exports.import_focus)
+      import_textarea.addEventListener("paste", exports.paste)
     },
     setFormat: function (name) {
       return function () {
         clipboard.format = name
-        if (! clipboard.importing) { clipboard.export_data() }
+        if (! clipboard.exporting) { clipboard.export_data() }
       }
     },
-    show: function () { import_wrapper.style.display = "block"; clipboard.visible = true; changed = false },
-    hide: function () { import_wrapper.style.display = "none"; clipboard.visible = false },
-    focus: function () {
-      if (! clipboard.importing) {
-        import_textarea.focus()
-        import_textarea.select()
+    import_hide: function () { import_wrapper.style.display = "none"; clipboard.visible = false },
+    import_show: function () { import_wrapper.style.display = "block"; clipboard.visible = true; },
+    export_hide: function () { export_wrapper.style.display = "none"; clipboard.visible = false },
+    export_show: function () { export_wrapper.style.display = "block"; clipboard.visible = true; changed = false },
+    export_focus: function () {
+      if (! clipboard.exporting) {
+        export_textarea.focus()
+        export_textarea.select()
       }
     },
+    import_focus: function () {
+      import_textarea.focus()
+      import_textarea.select()
+    },
+
     blur: function () {
     },
 
-    import_mode: function () {
-      focus()
-      clipboard.importing = true
-      format_el.style.display = 'none'
-      cutoff_warning_el.style.display = 'none'
-      import_buttons.style.display = "inline"
-      import_textarea.value = ""
+    export_mode: function () {
+      exports.export_focus()
+      clipboard.exporting = true
+      export_cutoff_warning_el.style.display = "none"
+      export_format_el.style.display = "inline"
+      clipboard.export_data()
     },
 
-    export_mode: function () {
-      focus()
-      clipboard.importing = false
-      import_buttons.style.display = "none"
-      format_el.style.display = 'inline'
-      cutoff_warning_el.style.display = 'none'
-      clipboard.export_data()
+    import_mode: function () {
+      import_button.style.display = "inline"
+      import_format_el.style.display = "inline"
+      import_textarea.value = ""
+      exports.import_focus()
     },
 
     paste: function (e) {
@@ -65,7 +70,101 @@ var clipboard = (function () {
       })
     },
 
-    import_colorcode: function (data, no_undo) {
+    import_click: function (data, no_undo) {
+      switch (controls.load_format.value) {
+        case 'ansi':
+          exports.import_ansi(data, no_undo)
+          break
+        case 'mirc':
+          exports.import_mirc(data, no_undo)
+          break
+      }
+    },
+
+    import_ansi: function (data, no_undo) {
+      if (data && data.preventDefault) {
+        data = import_textarea.value
+      } else {
+        data = data || import_textarea.value
+      }
+
+      var to_json = function(string, opts){
+        var lines_in = string.split(/\r?\n/)
+        var lines_out = []
+        var w = 0, h = 0
+        for (var y = 0; y < lines_in.length; y++) {
+          var bg = 1, fg = 15
+          var cells = [], line = lines_in[y]
+          if (line.length === 0) {
+            continue
+          } else {
+            for (var x = 0; x < line.length; x++) {
+              var m = line.substring(x).match(/^\x1b\[(\d{1,3});(\d{1,3})m/);
+              if (m !== null) {
+                if (ansi_bg_import[parseInt(m[1])] !== undefined) {
+                  bg = ansi_bg_import[parseInt(m[1])];
+                }
+                if (ansi_fg_import[parseInt(m[1])] !== undefined) {
+                  fg = ansi_fg_import[parseInt(m[1])];
+                }
+                if (ansi_bg_import[parseInt(m[2])] !== undefined) {
+                  bg = ansi_bg_import[parseInt(m[2])];
+                }
+                if (ansi_fg_import[parseInt(m[2])] !== undefined) {
+                  fg = ansi_fg_import[parseInt(m[2])];
+                }
+                x += (m[0].length - 1)
+              } else {
+                var m = line.substring(x).match(/^\x1b\[(\d{1,3})m/);
+                if (m !== null) {
+                  if (ansi_bg_import[parseInt(m[1])] !== undefined) {
+                    bg = ansi_bg_import[parseInt(m[1])];
+                  }
+                  if (ansi_fg_import[parseInt(m[1])] !== undefined) {
+                    fg = ansi_fg_import[parseInt(m[1])];
+                  }
+                  x += (m[0].length - 1)
+                } else {
+                  cells.push({bg: bg, fg: fg, value: line[x]})
+                }
+              }
+            }
+            if (cells.length > 0) {
+              if (w < cells.length) {
+                w = cells.length
+              }
+              lines_out.push(cells); h++;
+            }
+          }
+        }
+        return {h: h, lines: lines_out, w: w}
+      }
+      var json = to_json(data, {fg:0, bg:1})
+
+      if (!no_undo) undo.new()
+      if (!no_undo) undo.save_rect(0,0, canvas.w, canvas.h)
+      if (json.w !== canvas.w || json.h !== canvas.h){
+        if (!no_undo) undo.save_size(canvas.w, canvas.h)
+        canvas.resize(json.w, json.h, true)
+      }
+      canvas.clear()
+
+      for (var y = 0, line; line = json.lines[y]; y++){
+        var row = canvas.aa[y]
+        for (var x = 0, char; char = line[x]; x++){
+          var lex = row[x]
+          lex.char = char.value
+          lex.fg = char.fg
+          lex.bg = char.bg
+          lex.opacity = 1
+          lex.build()
+        }
+      }
+
+      current_filetool && current_filetool.blur()
+    },
+
+    import_mirc: function (data, no_undo) {
       if (data && data.preventDefault) {
         data = import_textarea.value
       } else {
@@ -167,17 +266,20 @@ var clipboard = (function () {
         case 'ascii':
           output = canvas.ascii()
           break
+        case 'ansi':
+          output = canvas.ansi()
+          break
         case 'mirc':
           output = canvas.mirc({cutoff: 425})
           break
       }
       if (output.cutoff){
-        cutoff_warning_el.style.display = 'block'
+        export_cutoff_warning_el.style.display = 'block'
       } else {
-        cutoff_warning_el.style.display = 'none'
+        export_cutoff_warning_el.style.display = 'none'
       }
-      import_textarea.value = output
-      clipboard.focus()
+      export_textarea.value = output
+      clipboard.export_focus()
       return output
     },
 
