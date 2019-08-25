@@ -239,6 +239,26 @@ Matrix.prototype.ascii = function () {
   var txt = lines.join("\n")
   return txt
 }
+Matrix.prototype.ansi = function (opts) {
+  var lines = this.aa.map(function(row, y){
+    var last, line = ""
+    row.forEach(function(lex, x) {
+      var bg_ = -1, fg_ = -1
+      if (lex.eqColor(last)) {
+        line += lex.sanitize()
+      }
+      else {
+        [bg_, fg_, line_] = lex.ansi(bg_, fg_)
+        line += line_; last = lex;
+      }
+    })
+    return line
+  })
+
+  var txt = lines.filter(function(line){ return line.length > 0 }).join('\n')
+
+  return txt
+}
 Matrix.prototype.mirc = function (opts) {
   var cutoff = false
   var lines = this.aa.map(function(row, y){

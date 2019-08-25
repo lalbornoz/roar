@@ -46,7 +46,7 @@ function bind () {
 
     var ae = document.activeElement
 
-    if (ae !== import_textarea) {
+    if ((ae !== export_textarea) && (ae !== import_textarea)) {
       cursor_input.focus()
     }
 
