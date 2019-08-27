@@ -93,40 +93,35 @@ var clipboard = (function () {
         var lines_out = []
         var w = 0, h = 0
         for (var y = 0; y < lines_in.length; y++) {
-          var bg = 1, fg = 15
+          var bg = 1, bold = false, fg = 15
           var cells = [], line = lines_in[y]
           if (line.length === 0) {
             continue
           } else {
             for (var x = 0; x < line.length; x++) {
-              var m = line.substring(x).match(/^\x1b\[(\d{1,3});(\d{1,3})m/);
+              var m = line.substring(x).match(/^\x1b\[((?:\d{1,3};?)+)m/)
               if (m !== null) {
-                if (ansi_bg_import[parseInt(m[1])] !== undefined) {
-                  bg = ansi_bg_import[parseInt(m[1])];
-                }
-                if (ansi_fg_import[parseInt(m[1])] !== undefined) {
-                  fg = ansi_fg_import[parseInt(m[1])];
-                }
-                if (ansi_bg_import[parseInt(m[2])] !== undefined) {
-                  bg = ansi_bg_import[parseInt(m[2])];
-                }
-                if (ansi_fg_import[parseInt(m[2])] !== undefined) {
-                  fg = ansi_fg_import[parseInt(m[2])];
-                }
-                x += (m[0].length - 1)
+                m[1].split(";").forEach(function(c){
+                  c = parseInt(c);
+                  if (c == 0) {
+                    bg = 1; bold = false; fg = 15;
+                  } else if (c == 1) {
+                    bold = true;
+                  } else if (c == 2) {
+                    bold = false;
+                  } else if (bold && (ansi_bg_bold_import[c] !== undefined)) {
+                    bg = ansi_bg_bold_import[c];
+                  } else if (!bold && (ansi_bg_import[c] !== undefined)) {
+                    bg = ansi_bg_import[c];
+                  } else if (bold && (ansi_fg_bold_import[c] !== undefined)) {
+                    fg = ansi_fg_bold_import[c];
+                  } else if (!bold && (ansi_fg_import[c] !== undefined)) {
+                    fg = ansi_fg_import[c];
+                  }
+                });
+                x += (m[0].length - 1);
               } else {
-                var m = line.substring(x).match(/^\x1b\[(\d{1,3})m/);
-                if (m !== null) {
-                  if (ansi_bg_import[parseInt(m[1])] !== undefined) {
-                    bg = ansi_bg_import[parseInt(m[1])];
-                  }
-                  if (ansi_fg_import[parseInt(m[1])] !== undefined) {
-                    fg = ansi_fg_import[parseInt(m[1])];
-                  }
-                  x += (m[0].length - 1)
-                } else {
-                  cells.push({bg: bg, fg: fg, value: line[x]})
-                }
+                cells.push({bg: bg, fg: fg, value: line[x]})
               }
             }
             if (cells.length > 0) {
