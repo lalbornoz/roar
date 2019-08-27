@@ -241,9 +241,8 @@ Matrix.prototype.ascii = function () {
 }
 Matrix.prototype.ansi = function (opts) {
   var lines = this.aa.map(function(row, y){
-    var last, line = ""
+    var last, line = "", bg_ = -1, fg_ = -1
     row.forEach(function(lex, x) {
-      var bg_ = -1, fg_ = -1
       if (lex.eqColor(last)) {
         line += lex.sanitize()
       }
@@ -262,9 +261,8 @@ Matrix.prototype.ansi = function (opts) {
 Matrix.prototype.mirc = function (opts) {
   var cutoff = false
   var lines = this.aa.map(function(row, y){
-    var last, line = ""
+    var last, line = "", bg_ = -1, fg_ = -1
     row.forEach(function(lex, x) {
-      var bg_ = -1, fg_ = -1
       if (lex.eqColor(last)) {
         line += lex.sanitize()
       }
