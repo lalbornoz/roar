@@ -70,7 +70,7 @@ Object.keys(css_lookup).forEach(function(color){
 var ansi_fg = [
   97,  // Bright White
   30,  // Black
-  94,  // Light Blue
+  94,  // Blue
   32,  // Green
   91,  // Red
   31,  // Light Red
@@ -80,7 +80,7 @@ var ansi_fg = [
   92,  // Light Green
   36,  // Cyan
   96,  // Light Cyan
-  34,  // Blue
+  34,  // Light Blue
   95,  // Light Pink
   90,  // Grey
   37,  // Light Grey
@@ -89,7 +89,7 @@ var ansi_fg = [
 var ansi_fg_import = {
   97: 0,  // Bright White
   30: 1,  // Black
-  94: 2,  // Light Blue
+  94: 2,  // Blue
   32: 3,  // Green
   91: 4,  // Red
   31: 5,  // Light Red
@@ -99,16 +99,35 @@ var ansi_fg_import = {
   92: 9,  // Light Green
   36: 10, // Cyan
   96: 11, // Light Cyan
-  34: 12, // Blue
-  95: 13,  // Light Pink
+  34: 12, // Light Blue
+  95: 13, // Light Pink
   90: 14, // Grey
   37: 15, // Light Grey
+}
+
+var ansi_fg_bold_import = {
+  97: 0,  // Bright White
+  30: 14, // Grey
+  94: 12, // Light Blue
+  32: 9,  // Light Green
+  91: 4,  // Light Red
+  31: 4,  // Light Red
+  35: 13, // Light Pink
+  33: 8,  // Light Yellow
+  93: 8,  // Light Yellow
+  92: 9,  // Light Green
+  36: 11, // Light Cyan
+  96: 11, // Light Cyan
+  34: 12, // Light Blue
+  95: 13, // Light Pink
+  90: 14, // Grey
+  37: 0,  // Bright White
 }
 
 var ansi_bg = [
   107, // Bright White
   40,  // Black
-  104, // Light Blue
+  104, // Blue
   42,  // Green
   101, // Red
   41,  // Light Red
@@ -118,16 +137,35 @@ var ansi_bg = [
   102, // Light Green
   46,  // Cyan
   106, // Light Cyan
-  44,  // Blue
+  44,  // Light Blue
   105, // Light Pink
   100, // Grey
   47,  // Light Grey
 ]
 
+var ansi_bg_bold_import = {
+  107: 0,  // Bright White
+  40:  14, // Black
+  104: 12, // Light Blue
+  42:  9,  // Light Green
+  101: 4,  // Light Red
+  41:  4,  // Light Red
+  45:  13, // Light Pink
+  43:  8,  // Light Yellow
+  103: 8,  // Light Yellow
+  102: 9,  // Light Green
+  46:  11, // Light Cyan
+  106: 11, // Light Cyan
+  44:  12, // Light Blue
+  105: 13, // Light Pink
+  100: 14, // Grey
+  47:  0,  // Bright White
+}
+
 var ansi_bg_import = {
   107: 0,  // Bright White
   40:  1,  // Black
-  104: 2,  // Light Blue
+  104: 2,  // Blue
   42:  3,  // Green
   101: 4,  // Red
   41:  5,  // Light Red
@@ -137,7 +175,7 @@ var ansi_bg_import = {
   102: 9,  // Light Green
   46:  10, // Cyan
   106: 11, // Light Cyan
-  44:  12, // Blue
+  44:  12, // Light Blue
   105: 13, // Light Pink
   100: 14, // Grey
   47:  15, // Light Grey
