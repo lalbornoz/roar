@@ -143,25 +143,6 @@ var ansi_bg = [
   47,  // Light Grey
 ]
 
-var ansi_bg_bold_import = {
-  107: 0,  // Bright White
-  40:  14, // Black
-  104: 12, // Light Blue
-  42:  9,  // Light Green
-  101: 4,  // Light Red
-  41:  4,  // Light Red
-  45:  13, // Light Pink
-  43:  8,  // Light Yellow
-  103: 8,  // Light Yellow
-  102: 9,  // Light Green
-  46:  11, // Light Cyan
-  106: 11, // Light Cyan
-  44:  12, // Light Blue
-  105: 13, // Light Pink
-  100: 14, // Grey
-  47:  0,  // Bright White
-}
-
 var ansi_bg_import = {
   107: 0,  // Bright White
   40:  1,  // Black
