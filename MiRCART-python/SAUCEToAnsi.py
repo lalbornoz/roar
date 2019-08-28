@@ -18,7 +18,6 @@ def SAUCEToAnsi(inPathName, outPathName):
             return 1
         else:
             width, height = struct.unpack("H", inFile.read(2))[0], struct.unpack("H", inFile.read(2))[0]
-            print(width)
             with open(outPathName, "w+") as outFile:
                 inFile.seek(0, 0)
                 inFileData, row, rowChars = inFile.read(inFileStat.st_size - 128).decode("cp437"), "", 0
