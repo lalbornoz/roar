@@ -91,9 +91,9 @@ var clipboard = (function () {
       var to_json = function(string, opts){
         var lines_in = string.split(/\r?\n/)
         var lines_out = []
+        var bg = 1, bg_ansi = 30, bold = false, fg = 15, fg_ansi = 37
         var w = 0, h = 0
         for (var y = 0; y < lines_in.length; y++) {
-          var bg = 1, bold = false, fg = 15
           var cells = [], line = lines_in[y]
           if (line.length === 0) {
             continue
@@ -104,29 +104,39 @@ var clipboard = (function () {
                 m[1].split(";").forEach(function(c){
                   c = parseInt(c);
                   if (c == 0) {
-                    bg = 1; bold = false; fg = 15;
+                    bg = 1; bg_ansi = 30; bold = false; fg = 15; fg_ansi = 37;
                   } else if (c == 1) {
-                    bold = true;
+                    bold = true; fg = ansi_fg_bold_import[fg_ansi];
                   } else if (c == 2) {
-                    bold = false;
-                  } else if (bold && (ansi_bg_bold_import[c] !== undefined)) {
-                    bg = ansi_bg_bold_import[c];
-                  } else if (!bold && (ansi_bg_import[c] !== undefined)) {
-                    bg = ansi_bg_import[c];
+                    bold = false; fg = ansi_fg_import[fg_ansi];
+                  } else if (ansi_bg_import[c] !== undefined) {
+                    bg = ansi_bg_import[c]; bg_ansi = c;
                   } else if (bold && (ansi_fg_bold_import[c] !== undefined)) {
-                    fg = ansi_fg_bold_import[c];
+                    fg = ansi_fg_bold_import[c]; fg_ansi = c;
                   } else if (!bold && (ansi_fg_import[c] !== undefined)) {
-                    fg = ansi_fg_import[c];
+                    fg = ansi_fg_import[c]; fg_ansi = c;
                   }
                 });
                 x += (m[0].length - 1);
               } else {
-                cells.push({bg: bg, fg: fg, value: line[x]})
+                m = line.substring(x).match(/^\x1b\[(\d+)C/)
+                if (m !== null) {
+                  for (var n = 0, nmax = parseInt(m[1]); n < nmax; n++) {
+                    cells.push({bg: bg, fg: fg, value: " "})
+                  }
+                  x += (m[0].length - 1);
+                } else {
+                  cells.push({bg: bg, fg: fg, value: line[x]})
+                }
               }
             }
             if (cells.length > 0) {
               if (w < cells.length) {
                 w = cells.length
+              } else if (w > cells.length) {
+                for (var n = cells.length, nmax = w; n < nmax; n++) {
+                  cells.push({bg: bg, fg: fg, value: " "})
+                }
               }
               lines_out.push(cells); h++;
             }
