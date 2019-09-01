@@ -1,1 +1,0 @@
-../assets/shell/deploy-www.sh
