@@ -1,8 +1,3 @@
 *.sw[op]
-MiRCART-cordoba/node_modules
-MiRCART-cordoba/platforms/android/.gradle
-MiRCART-cordoba/platforms/android/app/build
-MiRCART-cordoba/platforms/android/CordovaLib/build
-MiRCART-cordoba/releases/*
-MiRCART-nw/releases/*
-MiRCART-www/releases/*
+__pycache__/
+MiRCARTImgurApiKey.py
