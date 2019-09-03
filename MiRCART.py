@@ -5,10 +5,8 @@
 #
 
 import os, sys
-sys.path.append(os.path.join(os.getcwd(), "libcanvas"))
-sys.path.append(os.path.join(os.getcwd(), "libgui"))
-sys.path.append(os.path.join(os.getcwd(), "librtl"))
-sys.path.append(os.path.join(os.getcwd(), "libtools"))
+[sys.path.append(os.path.join(os.getcwd(), path)) for path in   \
+    ["libcanvas", "libgui", "librtl", "libtools"]]
 
 from MiRCARTFrame import MiRCARTFrame
 import wx
