@@ -5,9 +5,12 @@
 # This project is licensed under the terms of the MIT licence.
 #
 
-import MiRCARTCanvasImportStore
+import os, sys
+[sys.path.append(os.path.join(os.getcwd(), "..", "..", path)) for path in ["libcanvas", "librtl", "libtools"]]
+
+from CanvasImportStore import CanvasImportStore
+from getopt import getopt, GetoptError
 from PIL import Image, ImageDraw, ImageFont
-import sys
 
 class MiRCARTToPngFile:
     """XXX"""
@@ -73,7 +76,7 @@ class MiRCARTToPngFile:
             for inCurCol in range(len(self.inCanvasMap[inCurRow])):
                 inCurCell = self.inCanvasMap[inCurRow][inCurCol]
                 outColours = [0, 0]
-                if inCurCell[2] & MiRCARTCanvasImportStore.MiRCARTCanvasImportStore._CellState.CS_BOLD:
+                if inCurCell[2] & CanvasImportStore._CellState.CS_BOLD:
                     if inCurCell[3] != " ":
                         if inCurCell[3] == "█":
                             outColours[1] = self._ColourMapNormal[inCurCell[0]]
@@ -100,7 +103,7 @@ class MiRCARTToPngFile:
                     # XXX implement italic
                     outImgDraw.text(outCurPos,              \
                         inCurCell[3], (*outColours[0], 255), self.outImgFont)
-                if inCurCell[2] & MiRCARTCanvasImportStore.MiRCARTCanvasImportStore._CellState.CS_UNDERLINE:
+                if inCurCell[2] & CanvasImportStore._CellState.CS_UNDERLINE:
                     outColours[0] = self._ColourMapNormal[inCurCell[0]]
                     self._drawUnderLine(outCurPos,          \
                         self.outImgFontSize,                \
@@ -112,29 +115,31 @@ class MiRCARTToPngFile:
     # }}}
 
     #
-    # __init__(self, inCanvasMap, fontFilePath="DejaVuSansMono.ttf", fontSize=11): initialisation method
-    def __init__(self, inCanvasMap, fontFilePath="DejaVuSansMono.ttf", fontSize=11):
+    # __init__(self, inCanvasMap, fontFilePath, fontSize): initialisation method
+    def __init__(self, inCanvasMap, fontFilePath, fontSize):
         self.inCanvasMap = inCanvasMap
-        self.outFontFilePath = fontFilePath; self.outFontSize = int(fontSize);
-        self.outImgFont = ImageFont.truetype(           \
-            self.outFontFilePath, self.outFontSize)
+        self.outFontFilePath, self.outFontSize = fontFilePath, fontSize
+        self.outImgFont = ImageFont.truetype(self.outFontFilePath, self.outFontSize)
         self.outImgFontSize = [*self.outImgFont.getsize(" ")]
         self.outImgFontSize[1] += 3
 
 #
 # Entry point
 def main(*argv):
-    canvasStore = MiRCARTCanvasImportStore.MiRCARTCanvasImportStore(inFile=argv[1])
-    MiRCARTToPngFile(canvasStore.outMap, *argv[3:]).export(argv[2])
-if __name__ == "__main__":
-    if ((len(sys.argv) - 1) < 2)\
-    or ((len(sys.argv) - 1) > 4):
-        print("usage: {} "                                              \
-            "<MiRCART input file pathname> "                            \
-            "<PNG image output file pathname> "                         \
-            "[<Font file pathname; defaults to DejaVuSansMono.ttf>] "   \
-            "[<Font size; defaults to 11>]".format(sys.argv[0]), file=sys.stderr)
+    argv0 = argv[0]; optlist, argv = getopt(argv[1:], "f:hs:"); optdict = dict(optlist);
+    if len(argv) < 1:
+        print("""usage: {} [-f fname] [-h] [-s size] fname...
+       -h.........: show this screen
+       -f fname...: font file pathname (defaults to: ../fonts/DejaVuSansMono.ttf)
+       -s size....: font size (defaults to: 11)""".format(argv0), file=sys.stderr)
     else:
-        main(*sys.argv)
+        if not "-f" in optdict:
+            optdict["-f"] = os.path.join("..", "fonts", "DejaVuSansMono.ttf")
+        optdict["-s"] = 11 if not "-s" in optdict else int(optdict["-s"])
+        for inFile in argv:
+            canvasStore, outFile = CanvasImportStore(inFile=inFile), os.path.splitext(inFile)[0] + ".png"
+            MiRCARTToPngFile(canvasStore.outMap, fontFilePath=optdict["-f"], fontSize=optdict["-s"]).export(outFile)
+if __name__ == "__main__":
+    main(*sys.argv)
 
 # vim:expandtab foldmethod=marker sw=4 ts=4 tw=120
