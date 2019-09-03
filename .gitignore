@@ -1,3 +1,4 @@
 *.sw[op]
 __pycache__/
-MiRCARTImgurApiKey.py
+librtl/ImgurApiKey.py
+releases/

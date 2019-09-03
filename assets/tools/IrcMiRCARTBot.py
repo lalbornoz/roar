@@ -5,19 +5,19 @@
 # This project is licensed under the terms of the MIT licence.
 #
 
+import os, sys
+[sys.path.append(os.path.join(os.getcwd(), "..", "..", path)) for path in ["libcanvas", "librtl"]]
+
+import base64, json, requests, socket, time, urllib.request
 from getopt import getopt, GetoptError
-import base64
-import os, socket, sys, time
-import json
-import IrcClient
-import requests, urllib.request
-from MiRCARTCanvasImportStore import MiRCARTCanvasImportStore
-from MiRCARTImgurApiKey import MiRCARTImgurApiKey
+from CanvasImportStore import CanvasImportStore
+from ImgurApiKey import ImgurApiKey
+from IrcClient import IrcClient
 from MiRCARTToPngFile import MiRCARTToPngFile
 
-class IrcMiRCARTBot(IrcClient.IrcClient):
+class IrcMiRCARTBot(IrcClient):
     """IRC<->MiRC2png bot"""
-    imgurApiKey = MiRCARTImgurApiKey.imgurApiKey
+    imgurApiKey = ImgurApiKey.imgurApiKey
 
     # {{{ ContentTooLargeException(Exception): Raised by _urlretrieveReportHook() given download size > 1 MB
     class ContentTooLargeException(Exception):
@@ -125,7 +125,7 @@ class IrcMiRCARTBot(IrcClient.IrcClient):
                 self.queue("PRIVMSG", message[2], "4/!\\ Unknown URL type specified!")
                 return
 
-            canvasStore = MiRCARTCanvasImportStore(inFile=asciiTmpFilePath)
+            canvasStore = CanvasImportStore(inFile=asciiTmpFilePath)
             numRowCols = 0
             for numRow in range(len(canvasStore.outMap)):
                 numRowCols = max(numRowCols, len(canvasStore.outMap[numRow]))
@@ -137,7 +137,7 @@ class IrcMiRCARTBot(IrcClient.IrcClient):
                 canvasStore.outMap[numRow].append([1, 1, 0, " "])
             canvasStore.outMap.insert(0, [[1, 1, 0, " "]] * len(canvasStore.outMap[0]))
             canvasStore.outMap.append([[1, 1, 0, " "]] * len(canvasStore.outMap[0]))
-            MiRCARTToPngFile(canvasStore.outMap, "DejaVuSansMono.ttf", 11).export(imgTmpFilePath)
+            MiRCARTToPngFile(canvasStore.outMap, os.path.join("..", "fonts", "DejaVuSansMono.ttf"), 11).export(imgTmpFilePath)
             imgurResponse = self._uploadToImgur(imgTmpFilePath, "MiRCART image", "MiRCART image", self.imgurApiKey)
             if imgurResponse[0] == None:
                     self._log("Upload failed with exception `{}'".format(imgurResponse[1]))
