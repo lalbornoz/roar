@@ -5,22 +5,24 @@
 # This project is licensed under the terms of the MIT licence.
 #
 
-from MiRCARTCanvasImportStore import MiRCARTCanvasImportStore
+import os, sys
+[sys.path.append(os.path.join(os.getcwd(), "..", "..", path)) for path in ["libcanvas", "librtl"]]
+
+from CanvasImportStore import CanvasImportStore
 import sys
 
 def reduce(inPathName):
-    canvasStore = MiRCARTCanvasImportStore(inPathName)
+    canvasStore = CanvasImportStore(inPathName)
     inMap = canvasStore.outMap.copy(); del canvasStore;
     with open(inPathName, "w+") as outFile:
         for inCurRow in range(len(inMap)):
-            lastAttribs = MiRCARTCanvasImportStore._CellState.CS_NONE
-            lastColours = None
+            lastAttribs, lastColours = CanvasImportStore._CellState.CS_NONE, None
             for inCurCol in range(len(inMap[inCurRow])):
                 inCurCell = inMap[inCurRow][inCurCol]
                 if lastAttribs != inCurCell[2]:
-                    if inCurCell[2] & MiRCARTCanvasImportStore._CellState.CS_BOLD:
+                    if inCurCell[2] & CanvasImportStore._CellState.CS_BOLD:
                         print("\u0002", end="", file=outFile)
-                    if inCurCell[2] & MiRCARTCanvasImportStore._CellState.CS_UNDERLINE:
+                    if inCurCell[2] & CanvasImportStore._CellState.CS_UNDERLINE:
                         print("\u001f", end="", file=outFile)
                     lastAttribs = inCurCell[2]
                 if lastColours == None                  \
