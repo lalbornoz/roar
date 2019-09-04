@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 #
-# mirc2png -- convert ASCII w/ mIRC control codes to monospaced PNG (for EFnet #MiRCART)
-# Copyright (c) 2018 Lucio Andrés Illanes Albornoz <lucio@lucioillanes.de>
+# IrcClient.py -- XXX
+# Copyright (c) 2018, 2019 Lucio Andrés Illanes Albornoz <lucio@lucioillanes.de>
 # This project is licensed under the terms of the MIT licence.
 #
 
@@ -10,10 +10,6 @@ import select, socket, time
 
 class IrcClient:
     """Non-blocking abstraction over the IRC protocol"""
-    serverHname = serverPort = None;
-    clientNick = clientIdent = clientGecos = None;
-    clientSocket = clientSocketFile = None;
-    clientNextTimeout = None; clientQueue = None;
 
     # {{{ close(self): Close connection to server
     def close(self):
@@ -45,6 +41,16 @@ class IrcClient:
         self.queue("NICK", self.clientNick)
         self.queue("USER", self.clientIdent, "0", "0", self.clientGecos)
         return True
+    # }}}
+    # {{{ queue(self, *args): Parse and queue single line to server from list
+    def queue(self, *args):
+        msg = ""; argNumMax = len(args);
+        for argNum in range(argNumMax):
+            if argNum == (argNumMax - 1):
+                msg += ":" + args[argNum]
+            else:
+                msg += args[argNum] + " "
+        self.clientQueue.append((msg + "\r\n").encode())
     # }}}
     # {{{ readline(self, timeout=30): Read and parse single line from server into canonicalised list, honouring timers
     def readline(self, timeout=30):
@@ -80,16 +86,6 @@ class IrcClient:
             msg = [""] + msg[0:]
         return msg
     # }}}
-    # {{{ queue(self, *args): Parse and queue single line to server from list
-    def queue(self, *args):
-        msg = ""; argNumMax = len(args);
-        for argNum in range(argNumMax):
-            if argNum == (argNumMax - 1):
-                msg += ":" + args[argNum]
-            else:
-                msg += args[argNum] + " "
-        self.clientQueue.append((msg + "\r\n").encode())
-    # }}}
     # {{{ unqueue(self, timeout=15): Send all queued lines to server, honouring timers
     def unqueue(self, timeout=15):
         while self.clientQueue:
@@ -120,7 +116,8 @@ class IrcClient:
     #
     # __init__(self, serverHname, serverPort, clientNick, clientIdent, clientGecos): initialisation method
     def __init__(self, serverHname, serverPort, clientNick, clientIdent, clientGecos):
-        self.serverHname = serverHname; self.serverPort = serverPort;
-        self.clientNick = clientNick; self.clientIdent = clientIdent; self.clientGecos = clientGecos;
+        self.clientGecos, self.clientIdent, self.clientNick = clientGecos, clientIdent, clientNick
+        self.clientNextTimeout, self.clientQueue, self.clientSocket, self.clientSocketFile = None, None, None, None
+        self.serverHname, self.serverPort = serverHname, serverPort
 
 # vim:expandtab foldmethod=marker sw=4 ts=4 tw=120
