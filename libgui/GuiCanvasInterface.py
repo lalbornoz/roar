@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 #
-# CanvasInterface.py -- XXX
+# GuiCanvasInterface.py -- XXX
 # Copyright (c) 2018 Lucio Andrés Illanes Albornoz <lucio@lucioillanes.de>
 #
 
@@ -11,55 +11,13 @@ from ToolSelectClone import ToolSelectClone
 from ToolSelectMove import ToolSelectMove
 from ToolRect import ToolRect
 from ToolText import ToolText
-                
+
 from glob import glob
+from GuiCanvasInterfaceAbout import GuiCanvasInterfaceAbout
 import os, random, wx, wx.adv
 
-class CanvasInterfaceAbout(wx.Dialog):
+class GuiCanvasInterface():
     """XXX"""
-
-    # {{{ onButtonRoar(self, event): XXX
-    def onButtonRoar(self, event):
-        self.Destroy()
-    # }}}
-    # {{{ __init__(self, parent, size=(320, 240), title="About roar"): XXX
-    def __init__(self, parent, size=(320, 240), title="About roar"):
-        super(CanvasInterfaceAbout, self).__init__(parent, size=size, title=title)
-        self.panel, self.sizer, self.sizerH1, self.sizerH2 = wx.Panel(self), wx.BoxSizer(wx.VERTICAL), wx.BoxSizer(wx.HORIZONTAL), wx.BoxSizer(wx.HORIZONTAL)
-
-        logoPathNames = glob(os.path.join("assets", "images", "logo*.bmp"))
-        logoPathName = logoPathNames[random.randint(0, len(logoPathNames) - 1)]
-        self.logo = wx.StaticBitmap(self, -1, wx.Bitmap(logoPathName))
-        self.sizerH1.Add(self.logo, 0, wx.CENTER)
-
-        self.title = wx.StaticText(self.panel, label="roar -- mIRC art editor for Windows & Linux (Git revision __ROAR_RELEASE_GIT_SHORT_REV__)\nhttps://www.github.com/lalbornoz/roar/\nCopyright (c) 2018, 2019 Lucio Andrés Illanes Albornoz <lucio@lucioillanes.de>", style=wx.ALIGN_CENTER)
-        self.title.SetFont(wx.Font(8, wx.DEFAULT, wx.NORMAL, wx.NORMAL, underline=False))
-        self.sizer.Add(self.title)
-
-        labelsText = ["roar!", "ROAR!", "roaaaaaaar!", "ROAROARAOR", "_ROAR_"]
-        labelText = labelsText[random.randint(0, len(labelsText) - 1)]
-        self.buttonRoar = wx.Button(self.panel, label=labelText, pos=(75, 10))
-        self.buttonRoar.Bind(wx.EVT_BUTTON, self.onButtonRoar)
-        self.sizerH2.Add(self.buttonRoar, 0, wx.CENTER)
-
-        self.sizer.Add(self.sizerH1, 0, wx.CENTER)
-        self.sizer.Add(self.sizerH2, 0, wx.CENTER)
-        self.SetSizer(self.sizer); self.sizer.Fit(self.panel);
-        self.SetSize(size); self.SetTitle(title); self.Center();
-
-        soundBitePathNames = glob(os.path.join("assets", "audio", "roar*.wav"))
-        soundBitePathName = soundBitePathNames[random.randint(0, len(logoPathNames) - 1)]
-        self.soundBite = wx.adv.Sound(soundBitePathName)
-        if self.soundBite.IsOk():
-            self.soundBite.Play(wx.adv.SOUND_ASYNC)
-
-        self.ShowModal()
-    # }}}
-
-class CanvasInterface():
-    """XXX"""
-    imgurApiKey = None
-    parentCanvas = parentFrame = canvasPathName = canvasTool = None
 
     # {{{ _dialogSaveChanges(self)
     def _dialogSaveChanges(self):
@@ -73,7 +31,7 @@ class CanvasInterface():
 
     # {{{ canvasAbout(self, event): XXX
     def canvasAbout(self, event):
-        CanvasInterfaceAbout(self.parentFrame)
+        GuiCanvasInterfaceAbout(self.parentFrame)
     # }}}
     # {{{ canvasBrushSolid(self, event): XXX
     def canvasBrushSolid(self, event):
@@ -374,8 +332,8 @@ class CanvasInterface():
     #
     # __init__(self, parentCanvas, parentFrame):
     def __init__(self, parentCanvas, parentFrame):
-        self.parentCanvas = parentCanvas; self.parentFrame = parentFrame;
-        self.canvasPathName = None
+        self.canvasPathName, self.imgurApiKey = None, None
+        self.parentCanvas, self.parentFrame = parentCanvas, parentFrame
         self.canvasToolRect(None)
 
 # vim:expandtab foldmethod=marker sw=4 ts=4 tw=120
