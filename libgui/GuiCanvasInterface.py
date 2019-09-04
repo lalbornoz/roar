@@ -117,16 +117,14 @@ class GuiCanvasInterface():
     # }}}
     # {{{ canvasExportAsPng(self, event): XXX
     def canvasExportAsPng(self, event):
-        with wx.FileDialog(self, "Save As...", os.getcwd(), "",                 \
-                "*.png", wx.FD_SAVE|wx.FD_OVERWRITE_PROMPT) as dialog:
+        with wx.FileDialog(self.parentFrame, "Save As...", os.getcwd(), "", "*.png", wx.FD_SAVE|wx.FD_OVERWRITE_PROMPT) as dialog:
             if dialog.ShowModal() == wx.ID_CANCEL:
                 return False
             else:
                 outPathName = dialog.GetPath()
                 self.parentCanvas.SetCursor(wx.Cursor(wx.CURSOR_WAIT))
-                self.parentCanvas.canvasExportStore.exportBitmapToPngFile(      \
-                    self.parentCanvas.canvasBackend.canvasBitmap, outPathName,  \
-                        wx.BITMAP_TYPE_PNG)
+                self.parentCanvas.canvasExportStore.exportBitmapToPngFile(  \
+                    self.parentCanvas.canvasBackend.canvasBitmap, outPathName, wx.BITMAP_TYPE_PNG)
                 self.parentCanvas.SetCursor(wx.Cursor(wx.NullCursor))
                 return True
     # }}}
