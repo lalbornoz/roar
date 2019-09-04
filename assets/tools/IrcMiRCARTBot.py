@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 #
 # IrcMiRCARTBot.py -- IRC<->MiRC2png bot (for EFnet #MiRCART)
-# Copyright (c) 2018 Lucía Andrea Illanes Albornoz <lucia@luciaillanes.de>
+# Copyright (c) 2018, 2019 Lucía Andrea Illanes Albornoz <lucia@luciaillanes.de>
 # This project is licensed under the terms of the MIT licence.
 #
 

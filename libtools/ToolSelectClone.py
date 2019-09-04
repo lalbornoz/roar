@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 #
 # ToolSelectClone.py -- XXX
-# Copyright (c) 2018 Lucía Andrea Illanes Albornoz <lucia@luciaillanes.de>
+# Copyright (c) 2018, 2019 Lucía Andrea Illanes Albornoz <lucia@luciaillanes.de>
 #
 
 from ToolSelect import ToolSelect
