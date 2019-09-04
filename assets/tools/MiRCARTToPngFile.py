@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 #
 # MiRCARTToPngFile.py -- convert ASCII w/ mIRC control codes to monospaced PNG (for EFnet #MiRCART)
-# Copyright (c) 2018 Lucio Andrés Illanes Albornoz <lucio@lucioillanes.de>
+# Copyright (c) 2018, 2019 Lucio Andrés Illanes Albornoz <lucio@lucioillanes.de>
 # This project is licensed under the terms of the MIT licence.
 #
 

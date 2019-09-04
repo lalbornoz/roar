@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 #
-# MiRCARTImgurApiKey.py -- melp?
-# Copyright (c) 2018 Lucio Andrés Illanes Albornoz <lucio@lucioillanes.de>
+# ImgurApiKey.py -- XXX
+# Copyright (c) 2018, 2019 Lucio Andrés Illanes Albornoz <lucio@lucioillanes.de>
 # This project is licensed under the terms of the MIT licence.
 #
 
-class MiRCARTImgurApiKey(object):
+class ImgurApiKey(object):
     imgurApiKey = None
 
 # vim:expandtab foldmethod=marker sw=4 ts=4 tw=120
