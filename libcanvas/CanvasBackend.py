@@ -9,9 +9,6 @@ import wx
 
 class CanvasBackend():
     """XXX"""
-    _font = _brushes = _pens = None
-    _lastBrush = _lastPen = None
-    canvasBitmap = cellSize = None
 
     # {{{ _drawBrushPatch(self, eventDc, patch): XXX
     def _drawBrushPatch(self, eventDc, patch):
@@ -76,6 +73,11 @@ class CanvasBackend():
         return [a * b for a, b in zip(patch[0:2], self.cellSize)]
     # }}}
 
+    # {{{ drawCursorMaskWithJournal(self, canvasJournal, eventDc): XXX
+    def drawCursorMaskWithJournal(self, canvasJournal, eventDc):
+        for patch in canvasJournal.popCursor():
+            self.drawPatch(eventDc, patch)
+    # }}}
     # {{{ drawPatch(self, eventDc, patch): XXX
     def drawPatch(self, eventDc, patch):
         if  patch[0] < self.canvasSize[0]    \
@@ -90,15 +92,9 @@ class CanvasBackend():
         else:
             return False
     # }}}
-    # {{{ drawCursorMaskWithJournal(self, canvasJournal, eventDc): XXX
-    def drawCursorMaskWithJournal(self, canvasJournal, eventDc):
-        for patch in canvasJournal.popCursor():
-            self.drawPatch(eventDc, patch)
-    # }}}
     # {{{ getDeviceContext(self, parentWindow): XXX
     def getDeviceContext(self, parentWindow):
-        eventDc = wx.BufferedDC(    \
-            wx.ClientDC(parentWindow), self.canvasBitmap)
+        eventDc = wx.BufferedDC(wx.ClientDC(parentWindow), self.canvasBitmap)
         self._lastBrushBg = self._lastBrushFg = self._lastPen = None;
         return eventDc
     # }}}
@@ -151,6 +147,8 @@ class CanvasBackend():
     #
     # __init__(self, canvasSize, cellSize): initialisation method
     def __init__(self, canvasSize, cellSize):
+        self._brushes, self._font, self._lastBrush, self._lastPen, self._pens = None, None, None, None, None
+        self.canvasBitmap, self.cellSize = None, None
         self._initBrushesAndPens()
         self.reset(canvasSize, cellSize)
 
