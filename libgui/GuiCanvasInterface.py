@@ -14,7 +14,7 @@ from ToolText import ToolText
 
 from glob import glob
 from GuiCanvasInterfaceAbout import GuiCanvasInterfaceAbout
-import os, random, wx, wx.adv
+import io, os, random, wx, wx.adv
 
 class GuiCanvasInterface():
     """XXX"""
@@ -105,6 +105,16 @@ class GuiCanvasInterface():
                 self.canvasSave(event)
         self.parentFrame.Close(True)
     # }}}
+    # {{{ canvasExportToClipboard(self, event): XXX
+    def canvasExportToClipboard(self, event):
+        self.parentCanvas.SetCursor(wx.Cursor(wx.CURSOR_WAIT))
+        outBuffer = self.parentCanvas.canvasExportStore.exportTextBuffer(self.parentCanvas.canvasMap, self.parentCanvas.canvasSize)
+        if wx.TheClipboard.Open():
+            wx.TheClipboard.SetData(wx.TextDataObject(outBuffer))
+            wx.TheClipboard.Close()
+        self.parentCanvas.SetCursor(wx.Cursor(wx.NullCursor))
+        return True
+    # }}}
     # {{{ canvasExportAsPng(self, event): XXX
     def canvasExportAsPng(self, event):
         with wx.FileDialog(self, "Save As...", os.getcwd(), "",                 \
@@ -157,6 +167,33 @@ class GuiCanvasInterface():
         else:
             wx.MessageBox("Failed to export to Pastebin: " + pasteResult,   \
                 "Export to Pastebin", wx.OK|wx.ICON_EXCLAMATION)
+    # }}}
+    # {{{ canvasImportFromClipboard(self, event): XXX
+    def canvasImportFromClipboard(self, event):
+        rc = False
+        if  wx.TheClipboard.IsSupported(wx.DataFormat(wx.DF_TEXT))  \
+        and wx.TheClipboard.Open():
+            inBuffer = wx.TextDataObject()
+            if wx.TheClipboard.GetData(inBuffer):
+                if self.canvasPathName != None:
+                    saveChanges = self._dialogSaveChanges()
+                    if saveChanges == wx.ID_CANCEL:
+                        return
+                    elif saveChanges == wx.ID_NO:
+                        pass
+                    elif saveChanges == wx.ID_YES:
+                        self.canvasSave(event)
+                self.parentCanvas.SetCursor(wx.Cursor(wx.CURSOR_WAIT))
+                self.parentCanvas.canvasImportStore.importTextFileBuffer(io.StringIO(inBuffer.GetText()))
+                self.parentCanvas.canvasImportStore.importIntoPanel()
+                self.canvasPathName = "(Clipboard)"
+                self.parentCanvas.SetCursor(wx.Cursor(wx.NullCursor))
+                self.parentFrame.onCanvasUpdate(pathName="(Clipboard)", undoLevel=-1)
+                rc = True
+            wx.TheClipboard.Close()
+        if not rc:
+            with wx.MessageDialog(self.parentCanvas, "Clipboard does not contain text data and/or cannot be opened", "", wx.ICON_QUESTION | wx.OK | wx.OK_DEFAULT) as dialog:
+                dialog.ShowModal()
     # }}}
     # {{{ canvasIncrBrushHeight(self, event): XXX
     def canvasIncrBrushHeight(self, event):

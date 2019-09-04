@@ -7,8 +7,6 @@
 
 class CanvasImportStore():
     """XXX"""
-    inFile = inSize = outMap = None
-    parentCanvas = None
 
     #
     # _CellState(): Cell state
@@ -53,11 +51,13 @@ class CanvasImportStore():
     # }}}
     # {{{ importTextFile(self, pathName): XXX
     def importTextFile(self, pathName):
-        self.inFile = open(pathName, "r", encoding="utf-8-sig")
-        self.inSize = self.outMap = None;
-        inCurColourSpec = ""; inCurRow = -1;
-        inLine = self.inFile.readline()
-        inSize = [0, 0]; outMap = []; inMaxCols = 0;
+        return self.importTextFileBuffer(open(pathName, "r", encoding="utf-8-sig"))
+    # }}}
+    # {{{ importTextFileBuffer(self, inFile): XXX
+    def importTextFileBuffer(self, inFile):
+        self.inSize, self.outMap = None, None
+        inCurColourSpec, inCurRow, inMaxCols, inSize, outMap = "", -1, 0, [0, 0], []
+        inLine = inFile.readline()
         while inLine:
             inCellState = self._CellState.CS_NONE
             inParseState = self._ParseState.PS_CHAR
@@ -95,7 +95,7 @@ class CanvasImportStore():
                     and inParseState == self._ParseState.PS_COLOUR_DIGIT0:
                         if  (inCurCol + 1) < inMaxCol                       \
                         and not inLine[inCurCol + 1] in set("0123456789"):
-                            inCurColours = self._parseCharAsColourSpec(      \
+                            inCurColours = self._parseCharAsColourSpec(     \
                                 inCurColourSpec, inCurColours)
                             inCurColourDigits = 0; inCurColourSpec = "";
                             inParseState = self._ParseState.PS_CHAR
@@ -123,9 +123,9 @@ class CanvasImportStore():
                         inCurColourDigits = 0; inCurColourSpec = "";
                         inParseState = self._ParseState.PS_CHAR
             inMaxCols = max(inMaxCols, inRowCols)
-            inLine = self.inFile.readline()
-        inSize[0] = inMaxCols; self.inSize = inSize; self.outMap = outMap;
-        self.inFile.close()
+            inLine = inFile.readline()
+        inSize[0] = inMaxCols; self.inSize, self.outMap = inSize, outMap;
+        inFile.close()
     # }}}
     # {{{ importNew(self, newCanvasSize=None): XXX
     def importNew(self, newCanvasSize=None):
@@ -138,8 +138,7 @@ class CanvasImportStore():
     #
     # __init__(self, inFile=None, parentCanvas=None): initialisation method
     def __init__(self, inFile=None, parentCanvas=None):
-        self.inFile = inFile; self.inSize = self.outMap = None;
-        self.parentCanvas = parentCanvas
+        self.inSize, self.outMap, self.parentCanvas = None, None, parentCanvas
         if inFile != None:
             self.importTextFile(inFile)
 

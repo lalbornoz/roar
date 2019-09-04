@@ -24,9 +24,6 @@ NID_TOOLBAR_VSEP    = (0x202, TID_NOTHING)
 
 class GuiGeneralFrame(wx.Frame):
     """XXX"""
-    accelItemsById = itemsById = menuItemsById = toolBarItemsById = None
-    statusBar = toolBars = None
-    panelSkin = sizerSkin = None
 
     # {{{ _initAccelTable(self, accelsDescr): XXX
     def _initAccelTable(self, accelsDescr):
