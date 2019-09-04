@@ -25,20 +25,16 @@ class CanvasImportStore():
 
     # {{{ _flipCellStateBit(self, cellState, bit): XXX
     def _flipCellStateBit(self, cellState, bit):
-        if cellState & bit:
-            return cellState & ~bit
-        else:
-            return cellState | bit
+        return cellState & ~bit if cellState & bit else cellState | bit
     # }}}
     # {{{ _parseCharAsColourSpec(self, colourSpec, curColours): XXX
     def _parseCharAsColourSpec(self, colourSpec, curColours):
         if len(colourSpec) > 0:
             colourSpec = colourSpec.split(",")
-            if  len(colourSpec) == 2                             \
+            if  len(colourSpec) == 2    \
             and len(colourSpec[1]) > 0:
-                return (int(colourSpec[0] or curColours[0]),    \
-                    int(colourSpec[1]))
-            elif len(colourSpec) == 1                           \
+                return (int(colourSpec[0] or curColours[0]), int(colourSpec[1]))
+            elif len(colourSpec) == 1   \
             or   len(colourSpec[1]) == 0:
                 return (int(colourSpec[0]), curColours[1])
         else:
@@ -48,6 +44,13 @@ class CanvasImportStore():
     # {{{ importIntoPanel(self): XXX
     def importIntoPanel(self):
         self.parentCanvas.onStoreUpdate(self.inSize, self.outMap)
+    # }}}
+    # {{{ importNew(self, newCanvasSize=None): XXX
+    def importNew(self, newCanvasSize=None):
+        newMap = [[[1, 1, 0, " "]                   \
+                for x in range(newCanvasSize[0])]   \
+                    for y in range(newCanvasSize[1])]
+        self.parentCanvas.onStoreUpdate(newCanvasSize, newMap)
     # }}}
     # {{{ importTextFile(self, pathName): XXX
     def importTextFile(self, pathName):
@@ -126,13 +129,6 @@ class CanvasImportStore():
             inLine = inFile.readline()
         inSize[0] = inMaxCols; self.inSize, self.outMap = inSize, outMap;
         inFile.close()
-    # }}}
-    # {{{ importNew(self, newCanvasSize=None): XXX
-    def importNew(self, newCanvasSize=None):
-        newMap = [[[1, 1, 0, " "]                   \
-                for x in range(newCanvasSize[0])]   \
-                    for y in range(newCanvasSize[1])]
-        self.parentCanvas.onStoreUpdate(newCanvasSize, newMap)
     # }}}
 
     #
