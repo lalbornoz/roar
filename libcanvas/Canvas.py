@@ -8,19 +8,11 @@ from CanvasBackend import CanvasBackend
 from CanvasJournal import CanvasJournal
 from CanvasExportStore import CanvasExportStore, haveToPngFile, haveUrllib
 from CanvasImportStore import CanvasImportStore
-from CanvasInterface import CanvasInterface
 from ImgurApiKey import ImgurApiKey
 import wx
 
 class Canvas(wx.Panel):
     """XXX"""
-    parentFrame = None
-    defaultCanvasPos = defaultCanvasSize = defaultCellSize = None
-    canvasMap = canvasPos = canvasSize = None
-    brushColours = brushPos = brushSize = None
-    canvasBackend = canvasJournal = None
-    canvasExportStore = canvasImportStore = None
-    canvasInterface = None
     imgurApiKey = ImgurApiKey.imgurApiKey
 
     # {{{ _commitPatch(self, patch): XXX
@@ -172,31 +164,28 @@ class Canvas(wx.Panel):
     # }}}
 
     #
-    # __init__(self, parent, parentFrame, defaultCanvasPos, defaultCanvasSize, defaultCellSize): initialisation method
-    def __init__(self, parent, parentFrame, defaultCanvasPos, defaultCanvasSize, defaultCellSize):
-        super().__init__(parent, pos=defaultCanvasPos,      \
-            size=[w * h for w, h in zip(defaultCanvasSize, defaultCellSize)])
+    # __init__(self, parent, parentFrame, canvasInterface, defaultCanvasPos, defaultCanvasSize, defaultCellSize): initialisation method
+    def __init__(self, parent, parentFrame, canvasInterface, defaultCanvasPos, defaultCanvasSize, defaultCellSize):
+        super().__init__(parent, pos=defaultCanvasPos, size=[w * h for w, h in zip(defaultCanvasSize, defaultCellSize)])
 
+        self.brushColours, self.brushPos, self.brushSize = [4, 1], [0, 0], [1, 1]
+        self.canvasMap, self.canvasPos, self.canvasSize, = None, defaultCanvasPos, defaultCanvasSize
+        self.defaultCanvasPos, self.defaultCanvasSize, self.defaultCellSize = defaultCanvasPos, defaultCanvasSize, defaultCellSize
         self.parentFrame = parentFrame
-        self.canvasMap = None
-        self.canvasPos = defaultCanvasPos; self.canvasSize = defaultCanvasSize;
-        self.defaultCanvasPos = defaultCanvasPos; self.defaultCanvasSize = defaultCanvasSize;
-        self.brushColours = [4, 1]; self.brushPos = [0, 0]; self.brushSize = [1, 1];
-        self.parentFrame.onCanvasUpdate(                    \
-            brushSize=self.brushSize, colours=self.brushColours)
+        self.parentFrame.onCanvasUpdate(brushSize=self.brushSize, colours=self.brushColours)
+
         self.canvasBackend = CanvasBackend(defaultCanvasSize, defaultCellSize)
         self.canvasJournal = CanvasJournal()
         self.canvasExportStore = CanvasExportStore(parentCanvas=self)
         self.canvasImportStore = CanvasImportStore(parentCanvas=self)
-        self.canvasInterface = CanvasInterface(self, parentFrame)
+        self.canvasInterface = canvasInterface(self, parentFrame)
 
         # Bind event handlers
         self.Bind(wx.EVT_CLOSE, self.onPanelClose)
         self.Bind(wx.EVT_ENTER_WINDOW, self.onPanelEnterWindow)
         self.Bind(wx.EVT_LEAVE_WINDOW, self.onPanelLeaveWindow)
         self.parentFrame.Bind(wx.EVT_CHAR, self.onPanelInput)
-        for eventType in(                                   \
-                wx.EVT_LEFT_DOWN, wx.EVT_MOTION, wx.EVT_RIGHT_DOWN):
+        for eventType in (wx.EVT_LEFT_DOWN, wx.EVT_MOTION, wx.EVT_RIGHT_DOWN):
             self.Bind(eventType, self.onPanelInput)
         self.Bind(wx.EVT_PAINT, self.onPanelPaint)
 

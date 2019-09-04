@@ -5,8 +5,8 @@
 #
 
 from Canvas import Canvas, haveUrllib
-from CanvasInterface import CanvasInterface
 from Colours import Colours
+from GuiCanvasInterface import GuiCanvasInterface
 from GuiGeneralFrame import GuiGeneralFrame,                                            \
     TID_ACCELS, TID_COMMAND, TID_LIST, TID_MENU, TID_NOTHING, TID_SELECT, TID_TOOLBAR,  \
     NID_MENU_SEP, NID_TOOLBAR_HSEP, NID_TOOLBAR_VSEP
@@ -20,75 +20,75 @@ class GuiFrame(GuiGeneralFrame):
 
     # {{{ Commands
     #                      Id     Type Id      Labels                           Icon bitmap                 Accelerator                 [Initial state]
-    CID_NEW             = [0x100, TID_COMMAND, "New", "&New",                   ["", wx.ART_NEW],           [wx.ACCEL_CTRL, ord("N")],  None,           CanvasInterface.canvasNew]
-    CID_OPEN            = [0x101, TID_COMMAND, "Open", "&Open",                 ["", wx.ART_FILE_OPEN],     [wx.ACCEL_CTRL, ord("O")],  None,           CanvasInterface.canvasOpen]
-    CID_SAVE            = [0x102, TID_COMMAND, "Save", "&Save",                 ["", wx.ART_FILE_SAVE],     [wx.ACCEL_CTRL, ord("S")],  None,           CanvasInterface.canvasSave]
-    CID_SAVEAS          = [0x103, TID_COMMAND, "Save As...", "Save &As...",     ["", wx.ART_FILE_SAVE_AS],  None,                       None,           CanvasInterface.canvasSaveAs]
+    CID_NEW             = [0x100, TID_COMMAND, "New", "&New",                   ["", wx.ART_NEW],           [wx.ACCEL_CTRL, ord("N")],  None,           GuiCanvasInterface.canvasNew]
+    CID_OPEN            = [0x101, TID_COMMAND, "Open", "&Open",                 ["", wx.ART_FILE_OPEN],     [wx.ACCEL_CTRL, ord("O")],  None,           GuiCanvasInterface.canvasOpen]
+    CID_SAVE            = [0x102, TID_COMMAND, "Save", "&Save",                 ["", wx.ART_FILE_SAVE],     [wx.ACCEL_CTRL, ord("S")],  None,           GuiCanvasInterface.canvasSave]
+    CID_SAVEAS          = [0x103, TID_COMMAND, "Save As...", "Save &As...",     ["", wx.ART_FILE_SAVE_AS],  None,                       None,           GuiCanvasInterface.canvasSaveAs]
     CID_EXPORT_AS_PNG   = [0x104, TID_COMMAND, "Export as PNG...",              \
-                                               "Export as PN&G...",             None,                       None,                       None,           CanvasInterface.canvasExportAsPng]
+                                               "Export as PN&G...",             None,                       None,                       None,           GuiCanvasInterface.canvasExportAsPng]
     CID_EXPORT_IMGUR    = [0x105, TID_COMMAND, "Export to Imgur...",            \
-                                               "Export to I&mgur...",           None,                       None,                       haveUrllib,     CanvasInterface.canvasExportImgur]
+                                               "Export to I&mgur...",           None,                       None,                       haveUrllib,     GuiCanvasInterface.canvasExportImgur]
     CID_EXPORT_PASTEBIN = [0x106, TID_COMMAND, "Export to Pastebin...",         \
-                                               "Export to Pasteb&in...",        None,                       None,                       haveUrllib,     CanvasInterface.canvasExportPastebin]
-    CID_EXIT            = [0x107, TID_COMMAND, "Exit", "E&xit",                 None,                       [wx.ACCEL_CTRL, ord("X")],  None,           CanvasInterface.canvasExit]
-    CID_UNDO            = [0x108, TID_COMMAND, "Undo", "&Undo",                 ["", wx.ART_UNDO],          [wx.ACCEL_CTRL, ord("Z")],  False,          CanvasInterface.canvasUndo]
-    CID_REDO            = [0x109, TID_COMMAND, "Redo", "&Redo",                 ["", wx.ART_REDO],          [wx.ACCEL_CTRL, ord("Y")],  False,          CanvasInterface.canvasRedo]
-    CID_CUT             = [0x10a, TID_COMMAND, "Cut", "Cu&t",                   ["", wx.ART_CUT],           None,                       False,          CanvasInterface.canvasCut]
-    CID_COPY            = [0x10b, TID_COMMAND, "Copy", "&Copy",                 ["", wx.ART_COPY],          None,                       False,          CanvasInterface.canvasCopy]
-    CID_PASTE           = [0x10c, TID_COMMAND, "Paste", "&Paste",               ["", wx.ART_PASTE],         None,                       False,          CanvasInterface.canvasPaste]
-    CID_DELETE          = [0x10d, TID_COMMAND, "Delete", "De&lete",             ["", wx.ART_DELETE],        None,                       False,          CanvasInterface.canvasDelete]
+                                               "Export to Pasteb&in...",        None,                       None,                       haveUrllib,     GuiCanvasInterface.canvasExportPastebin]
+    CID_EXIT            = [0x107, TID_COMMAND, "Exit", "E&xit",                 None,                       [wx.ACCEL_CTRL, ord("X")],  None,           GuiCanvasInterface.canvasExit]
+    CID_UNDO            = [0x108, TID_COMMAND, "Undo", "&Undo",                 ["", wx.ART_UNDO],          [wx.ACCEL_CTRL, ord("Z")],  False,          GuiCanvasInterface.canvasUndo]
+    CID_REDO            = [0x109, TID_COMMAND, "Redo", "&Redo",                 ["", wx.ART_REDO],          [wx.ACCEL_CTRL, ord("Y")],  False,          GuiCanvasInterface.canvasRedo]
+    CID_CUT             = [0x10a, TID_COMMAND, "Cut", "Cu&t",                   ["", wx.ART_CUT],           None,                       False,          GuiCanvasInterface.canvasCut]
+    CID_COPY            = [0x10b, TID_COMMAND, "Copy", "&Copy",                 ["", wx.ART_COPY],          None,                       False,          GuiCanvasInterface.canvasCopy]
+    CID_PASTE           = [0x10c, TID_COMMAND, "Paste", "&Paste",               ["", wx.ART_PASTE],         None,                       False,          GuiCanvasInterface.canvasPaste]
+    CID_DELETE          = [0x10d, TID_COMMAND, "Delete", "De&lete",             ["", wx.ART_DELETE],        None,                       False,          GuiCanvasInterface.canvasDelete]
     CID_INCRW_CANVAS    = [0x10e, TID_COMMAND, "Increase canvas width",         \
-                                               "Increase canvas width",         ["toolIncrCanvasW.png"],    None,                       None,           CanvasInterface.canvasIncrCanvasWidth]
+                                               "Increase canvas width",         ["toolIncrCanvasW.png"],    None,                       None,           GuiCanvasInterface.canvasIncrCanvasWidth]
     CID_DECRW_CANVAS    = [0x10f, TID_COMMAND, "Decrease canvas width",         \
-                                               "Decrease canvas width",         ["toolDecrCanvasW.png"],    None,                       None,           CanvasInterface.canvasDecrCanvasWidth]
+                                               "Decrease canvas width",         ["toolDecrCanvasW.png"],    None,                       None,           GuiCanvasInterface.canvasDecrCanvasWidth]
     CID_INCRH_CANVAS    = [0x110, TID_COMMAND, "Increase canvas height",        \
-                                               "Increase canvas height",        ["toolIncrCanvasH.png"],    None,                       None,           CanvasInterface.canvasIncrCanvasHeight]
+                                               "Increase canvas height",        ["toolIncrCanvasH.png"],    None,                       None,           GuiCanvasInterface.canvasIncrCanvasHeight]
     CID_DECRH_CANVAS    = [0x111, TID_COMMAND, "Decrease canvas height",        \
-                                               "Decrease canvas height",        ["toolDecrCanvasH.png"],    None,                       None,           CanvasInterface.canvasDecrCanvasHeight]
+                                               "Decrease canvas height",        ["toolDecrCanvasH.png"],    None,                       None,           GuiCanvasInterface.canvasDecrCanvasHeight]
     CID_INCRHW_CANVAS   = [0x112, TID_COMMAND, "Increase canvas size",          \
-                                               "Increase canvas size",          ["toolIncrCanvasHW.png"],   None,                       None,           CanvasInterface.canvasIncrCanvasHeightWidth]
+                                               "Increase canvas size",          ["toolIncrCanvasHW.png"],   None,                       None,           GuiCanvasInterface.canvasIncrCanvasHeightWidth]
     CID_DECRHW_CANVAS   = [0x113, TID_COMMAND, "Decrease canvas size",          \
-                                               "Decrease canvas size",          ["toolDecrCanvasHW.png"],   None,                       None,           CanvasInterface.canvasDecrCanvasHeightWidth]
+                                               "Decrease canvas size",          ["toolDecrCanvasHW.png"],   None,                       None,           GuiCanvasInterface.canvasDecrCanvasHeightWidth]
     CID_INCRW_BRUSH     = [0x114, TID_COMMAND, "Increase brush width",          \
-                                               "Increase brush width",          ["toolIncrBrushW.png"],     None,                       None,           CanvasInterface.canvasIncrBrushWidth]
+                                               "Increase brush width",          ["toolIncrBrushW.png"],     None,                       None,           GuiCanvasInterface.canvasIncrBrushWidth]
     CID_DECRW_BRUSH     = [0x115, TID_COMMAND, "Decrease brush width",          \
-                                               "Decrease brush width",          ["toolDecrBrushW.png"],     None,                       None,           CanvasInterface.canvasDecrBrushWidth]
+                                               "Decrease brush width",          ["toolDecrBrushW.png"],     None,                       None,           GuiCanvasInterface.canvasDecrBrushWidth]
     CID_INCRH_BRUSH     = [0x116, TID_COMMAND, "Increase brush height",         \
-                                               "Increase brush height",         ["toolIncrBrushH.png"],     None,                       None,           CanvasInterface.canvasIncrBrushHeight]
+                                               "Increase brush height",         ["toolIncrBrushH.png"],     None,                       None,           GuiCanvasInterface.canvasIncrBrushHeight]
     CID_DECRH_BRUSH     = [0x117, TID_COMMAND, "Decrease brush height",         \
-                                               "Decrease brush height",         ["toolDecrBrushH.png"],     None,                       None,           CanvasInterface.canvasDecrBrushHeight]
+                                               "Decrease brush height",         ["toolDecrBrushH.png"],     None,                       None,           GuiCanvasInterface.canvasDecrBrushHeight]
     CID_INCRHW_BRUSH    = [0x118, TID_COMMAND, "Increase brush size",           \
-                                               "Increase brush size",           ["toolIncrBrushHW.png"],    None,                       None,           CanvasInterface.canvasIncrBrushHeightWidth]
+                                               "Increase brush size",           ["toolIncrBrushHW.png"],    None,                       None,           GuiCanvasInterface.canvasIncrBrushHeightWidth]
     CID_DECRHW_BRUSH    = [0x119, TID_COMMAND, "Decrease brush size",           \
-                                               "Decrease brush size",           ["toolDecrBrushHW.png"],    None,                       None,           CanvasInterface.canvasDecrBrushHeightWidth]
-    CID_SOLID_BRUSH     = [0x11a, TID_SELECT,  "Solid brush", "Solid brush",    None,                       None,                       True,           CanvasInterface.canvasBrushSolid]
+                                               "Decrease brush size",           ["toolDecrBrushHW.png"],    None,                       None,           GuiCanvasInterface.canvasDecrBrushHeightWidth]
+    CID_SOLID_BRUSH     = [0x11a, TID_SELECT,  "Solid brush", "Solid brush",    None,                       None,                       True,           GuiCanvasInterface.canvasBrushSolid]
 
-    CID_RECT            = [0x150, TID_SELECT,  "Rectangle", "&Rectangle",       ["toolRect.png"],           [wx.ACCEL_CTRL, ord("R")],  True,           CanvasInterface.canvasToolRect]
-    CID_CIRCLE          = [0x151, TID_SELECT,  "Circle", "&Circle",             ["toolCircle.png"],         [wx.ACCEL_CTRL, ord("C")],  False,          CanvasInterface.canvasToolCircle]
-    CID_FILL            = [0x152, TID_SELECT,  "Fill", "&Fill",                 ["toolFill.png"],           [wx.ACCEL_CTRL, ord("F")],  False,          CanvasInterface.canvasToolFill]
-    CID_LINE            = [0x153, TID_SELECT,  "Line", "&Line",                 ["toolLine.png"],           [wx.ACCEL_CTRL, ord("L")],  False,          CanvasInterface.canvasToolLine]
-    CID_TEXT            = [0x154, TID_SELECT,  "Text", "&Text",                 ["toolText.png"],           [wx.ACCEL_CTRL, ord("T")],  False,          CanvasInterface.canvasToolText]
-    CID_CLONE_SELECT    = [0x155, TID_SELECT,  "Clone", "Cl&one",               ["toolClone.png"],          [wx.ACCEL_CTRL, ord("E")],  False,          CanvasInterface.canvasToolSelectClone]
-    CID_MOVE_SELECT     = [0x156, TID_SELECT,  "Move", "&Move",                 ["toolMove.png"],           [wx.ACCEL_CTRL, ord("M")],  False,          CanvasInterface.canvasToolSelectMove]
+    CID_RECT            = [0x150, TID_SELECT,  "Rectangle", "&Rectangle",       ["toolRect.png"],           [wx.ACCEL_CTRL, ord("R")],  True,           GuiCanvasInterface.canvasToolRect]
+    CID_CIRCLE          = [0x151, TID_SELECT,  "Circle", "&Circle",             ["toolCircle.png"],         [wx.ACCEL_CTRL, ord("C")],  False,          GuiCanvasInterface.canvasToolCircle]
+    CID_FILL            = [0x152, TID_SELECT,  "Fill", "&Fill",                 ["toolFill.png"],           [wx.ACCEL_CTRL, ord("F")],  False,          GuiCanvasInterface.canvasToolFill]
+    CID_LINE            = [0x153, TID_SELECT,  "Line", "&Line",                 ["toolLine.png"],           [wx.ACCEL_CTRL, ord("L")],  False,          GuiCanvasInterface.canvasToolLine]
+    CID_TEXT            = [0x154, TID_SELECT,  "Text", "&Text",                 ["toolText.png"],           [wx.ACCEL_CTRL, ord("T")],  False,          GuiCanvasInterface.canvasToolText]
+    CID_CLONE_SELECT    = [0x155, TID_SELECT,  "Clone", "Cl&one",               ["toolClone.png"],          [wx.ACCEL_CTRL, ord("E")],  False,          GuiCanvasInterface.canvasToolSelectClone]
+    CID_MOVE_SELECT     = [0x156, TID_SELECT,  "Move", "&Move",                 ["toolMove.png"],           [wx.ACCEL_CTRL, ord("M")],  False,          GuiCanvasInterface.canvasToolSelectMove]
 
-    CID_COLOUR00        = [0x1a0, TID_SELECT,  "Colour #00", "Colour #00",      None,                       None,                       False,          CanvasInterface.canvasColour]
-    CID_COLOUR01        = [0x1a1, TID_SELECT,  "Colour #01", "Colour #01",      None,                       None,                       False,          CanvasInterface.canvasColour]
-    CID_COLOUR02        = [0x1a2, TID_SELECT,  "Colour #02", "Colour #02",      None,                       None,                       False,          CanvasInterface.canvasColour]
-    CID_COLOUR03        = [0x1a3, TID_SELECT,  "Colour #03", "Colour #03",      None,                       None,                       False,          CanvasInterface.canvasColour]
-    CID_COLOUR04        = [0x1a4, TID_SELECT,  "Colour #04", "Colour #04",      None,                       None,                       True,           CanvasInterface.canvasColour]
-    CID_COLOUR05        = [0x1a5, TID_SELECT,  "Colour #05", "Colour #05",      None,                       None,                       False,          CanvasInterface.canvasColour]
-    CID_COLOUR06        = [0x1a6, TID_SELECT,  "Colour #06", "Colour #06",      None,                       None,                       False,          CanvasInterface.canvasColour]
-    CID_COLOUR07        = [0x1a7, TID_SELECT,  "Colour #07", "Colour #07",      None,                       None,                       False,          CanvasInterface.canvasColour]
-    CID_COLOUR08        = [0x1a8, TID_SELECT,  "Colour #08", "Colour #08",      None,                       None,                       False,          CanvasInterface.canvasColour]
-    CID_COLOUR09        = [0x1a9, TID_SELECT,  "Colour #09", "Colour #09",      None,                       None,                       False,          CanvasInterface.canvasColour]
-    CID_COLOUR10        = [0x1aa, TID_SELECT,  "Colour #10", "Colour #10",      None,                       None,                       False,          CanvasInterface.canvasColour]
-    CID_COLOUR11        = [0x1ab, TID_SELECT,  "Colour #11", "Colour #11",      None,                       None,                       False,          CanvasInterface.canvasColour]
-    CID_COLOUR12        = [0x1ac, TID_SELECT,  "Colour #12", "Colour #12",      None,                       None,                       False,          CanvasInterface.canvasColour]
-    CID_COLOUR13        = [0x1ad, TID_SELECT,  "Colour #13", "Colour #13",      None,                       None,                       False,          CanvasInterface.canvasColour]
-    CID_COLOUR14        = [0x1ae, TID_SELECT,  "Colour #14", "Colour #14",      None,                       None,                       False,          CanvasInterface.canvasColour]
-    CID_COLOUR15        = [0x1af, TID_SELECT,  "Colour #15", "Colour #15",      None,                       None,                       False,          CanvasInterface.canvasColour]
+    CID_COLOUR00        = [0x1a0, TID_SELECT,  "Colour #00", "Colour #00",      None,                       None,                       False,          GuiCanvasInterface.canvasColour]
+    CID_COLOUR01        = [0x1a1, TID_SELECT,  "Colour #01", "Colour #01",      None,                       None,                       False,          GuiCanvasInterface.canvasColour]
+    CID_COLOUR02        = [0x1a2, TID_SELECT,  "Colour #02", "Colour #02",      None,                       None,                       False,          GuiCanvasInterface.canvasColour]
+    CID_COLOUR03        = [0x1a3, TID_SELECT,  "Colour #03", "Colour #03",      None,                       None,                       False,          GuiCanvasInterface.canvasColour]
+    CID_COLOUR04        = [0x1a4, TID_SELECT,  "Colour #04", "Colour #04",      None,                       None,                       True,           GuiCanvasInterface.canvasColour]
+    CID_COLOUR05        = [0x1a5, TID_SELECT,  "Colour #05", "Colour #05",      None,                       None,                       False,          GuiCanvasInterface.canvasColour]
+    CID_COLOUR06        = [0x1a6, TID_SELECT,  "Colour #06", "Colour #06",      None,                       None,                       False,          GuiCanvasInterface.canvasColour]
+    CID_COLOUR07        = [0x1a7, TID_SELECT,  "Colour #07", "Colour #07",      None,                       None,                       False,          GuiCanvasInterface.canvasColour]
+    CID_COLOUR08        = [0x1a8, TID_SELECT,  "Colour #08", "Colour #08",      None,                       None,                       False,          GuiCanvasInterface.canvasColour]
+    CID_COLOUR09        = [0x1a9, TID_SELECT,  "Colour #09", "Colour #09",      None,                       None,                       False,          GuiCanvasInterface.canvasColour]
+    CID_COLOUR10        = [0x1aa, TID_SELECT,  "Colour #10", "Colour #10",      None,                       None,                       False,          GuiCanvasInterface.canvasColour]
+    CID_COLOUR11        = [0x1ab, TID_SELECT,  "Colour #11", "Colour #11",      None,                       None,                       False,          GuiCanvasInterface.canvasColour]
+    CID_COLOUR12        = [0x1ac, TID_SELECT,  "Colour #12", "Colour #12",      None,                       None,                       False,          GuiCanvasInterface.canvasColour]
+    CID_COLOUR13        = [0x1ad, TID_SELECT,  "Colour #13", "Colour #13",      None,                       None,                       False,          GuiCanvasInterface.canvasColour]
+    CID_COLOUR14        = [0x1ae, TID_SELECT,  "Colour #14", "Colour #14",      None,                       None,                       False,          GuiCanvasInterface.canvasColour]
+    CID_COLOUR15        = [0x1af, TID_SELECT,  "Colour #15", "Colour #15",      None,                       None,                       False,          GuiCanvasInterface.canvasColour]
 
-    CID_ABOUT           = [0x1b0, TID_COMMAND, "About", "&About",               None,                       None,                       True,           CanvasInterface.canvasAbout]
+    CID_ABOUT           = [0x1b0, TID_COMMAND, "About", "&About",               None,                       None,                       True,           GuiCanvasInterface.canvasAbout]
     # }}}
     # {{{ Menus
     MID_FILE            = (0x300, TID_MENU, "File", "&File", (                                          \
@@ -225,9 +225,10 @@ class GuiFrame(GuiGeneralFrame):
     def __init__(self, parent, appSize=(840, 630), defaultCanvasPos=(0, 75), defaultCanvasSize=(100, 30), defaultCellSize=(7, 14)):
         self._initPaletteToolBitmaps()
         self.panelSkin = super().__init__(parent, wx.ID_ANY, "", size=appSize)
-        self.panelCanvas = Canvas(self.panelSkin, parentFrame=self,      \
-            defaultCanvasPos=defaultCanvasPos,                                  \
-            defaultCanvasSize=defaultCanvasSize,                                \
+        self.panelCanvas = Canvas(self.panelSkin, parentFrame=self, \
+            canvasInterface=GuiCanvasInterface,                     \
+            defaultCanvasPos=defaultCanvasPos,                      \
+            defaultCanvasSize=defaultCanvasSize,                    \
             defaultCellSize=defaultCellSize)
         self.panelCanvas.canvasInterface.canvasNew(None)
         self.sizerSkin.AddSpacer(5)
