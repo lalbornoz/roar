@@ -7,20 +7,20 @@
 import os, sys, wx
 
 #
-# Types
-TID_ACCELS          = (0x001)
-TID_COMMAND         = (0x002)
-TID_LIST            = (0x003)
-TID_MENU            = (0x004)
-TID_NOTHING         = (0x005)
-TID_SELECT          = (0x006)
-TID_TOOLBAR         = (0x007)
+# Types (0xe000-0xefff)
+TID_ACCELS          = (0xe000)
+TID_COMMAND         = (0xe001)
+TID_LIST            = (0xe002)
+TID_MENU            = (0xe003)
+TID_NOTHING         = (0xe004)
+TID_SELECT          = (0xe005)
+TID_TOOLBAR         = (0xe006)
 
 #
-# Non-items
-NID_MENU_SEP        = (0x200, TID_NOTHING)
-NID_TOOLBAR_HSEP    = (0x201, TID_NOTHING)
-NID_TOOLBAR_VSEP    = (0x202, TID_NOTHING)
+# Non-items (0xf000-0xffff)
+NID_MENU_SEP        = (0xf000, TID_NOTHING)
+NID_TOOLBAR_HSEP    = (0xf001, TID_NOTHING)
+NID_TOOLBAR_VSEP    = (0xf002, TID_NOTHING)
 
 class GuiGeneralFrame(wx.Frame):
     """XXX"""
@@ -74,9 +74,7 @@ class GuiGeneralFrame(wx.Frame):
         self.toolBars = [None]; numToolBar = 0;
         for toolBarItem in toolBarsDescr[2]:
             if self.toolBars[numToolBar] == None:
-                self.toolBars[numToolBar] =                 \
-                    wx.ToolBar(panelSkin, -1,               \
-                        style=wx.HORIZONTAL|wx.TB_FLAT|wx.TB_NODIVIDER)
+                self.toolBars[numToolBar] = wx.ToolBar(panelSkin, -1, style=wx.TB_FLAT | wx.HORIZONTAL | wx.TB_NODIVIDER)
                 self.toolBars[numToolBar].SetToolBitmapSize((16,16))
             if toolBarItem == NID_TOOLBAR_HSEP:
                 self.toolBars[numToolBar].AddSeparator()
@@ -84,50 +82,42 @@ class GuiGeneralFrame(wx.Frame):
                 numToolBar += 1; self.toolBars.append(None);
             elif toolBarItem[1] == TID_SELECT:
                 self.itemsById[toolBarItem[0]] = toolBarItem
-                toolBarItemWindow =                         \
-                    self.toolBars[numToolBar].AddRadioTool( \
-                        toolBarItem[0], toolBarItem[2], toolBarItem[4][2])
+                toolBarItemWindow = self.toolBars[numToolBar].AddRadioTool(toolBarItem[0], toolBarItem[2], toolBarItem[4][2], shortHelp=toolBarItem[2])
                 self.toolBarItemsById[toolBarItem[0]] = toolBarItemWindow
-                if  toolBarItem[6] != None:
+                if toolBarItem[6] != None:
                     toolBarItemWindow.Toggle(toolBarItem[6])
                 self.Bind(wx.EVT_TOOL, self.onInput, toolBarItemWindow)
                 self.Bind(wx.EVT_TOOL_RCLICKED, self.onInput, toolBarItemWindow)
             else:
                 self.itemsById[toolBarItem[0]] = toolBarItem
-                toolBarItemWindow =                         \
-                    self.toolBars[numToolBar].AddTool(      \
-                        toolBarItem[0], toolBarItem[2], toolBarItem[4][2])
+                toolBarItemWindow = self.toolBars[numToolBar].AddTool(toolBarItem[0], toolBarItem[2], toolBarItem[4][2], toolBarItem[2])
                 self.toolBarItemsById[toolBarItem[0]] = toolBarItemWindow
-                if  toolBarItem[6] != None:
+                if toolBarItem[6] != None:
                     toolBarItemWindow.Enable(toolBarItem[6])
                 self.Bind(wx.EVT_TOOL, self.onInput, toolBarItemWindow)
                 self.Bind(wx.EVT_TOOL_RCLICKED, self.onInput, toolBarItemWindow)
         for numToolBar in range(len(self.toolBars)):
-            self.sizerSkin.Add(                             \
-                self.toolBars[numToolBar], 0, wx.ALL|wx.ALIGN_LEFT, 3)
+            self.sizerSkin.Add(self.toolBars[numToolBar], 0, wx.ALL|wx.ALIGN_LEFT, 3)
             self.toolBars[numToolBar].Realize()
             self.toolBars[numToolBar].Fit()
     # }}}
     # {{{ _initToolBitmaps(self, toolBarsDescr): XXX
     def _initToolBitmaps(self, toolBarsDescr):
         for toolBarItem in toolBarsDescr[2]:
-            if toolBarItem == NID_TOOLBAR_HSEP                          \
+            if toolBarItem == NID_TOOLBAR_HSEP  \
             or toolBarItem == NID_TOOLBAR_VSEP:
                 continue
             elif toolBarItem[4] == None:
-                toolBarItem[4] = ["", None, wx.ArtProvider.GetBitmap(   \
-                        wx.ART_HELP, wx.ART_TOOLBAR, (16,16))]
-            elif toolBarItem[4][0] == ""                                \
+                toolBarItem[4] = ["", None, wx.ArtProvider.GetBitmap(wx.ART_HELP, wx.ART_TOOLBAR, (16,16))]
+            elif toolBarItem[4][0] == ""        \
             and  toolBarItem[4][1] != None:
-                toolBarItem[4] = ["", None, wx.ArtProvider.GetBitmap(   \
-                    toolBarItem[4][1], wx.ART_TOOLBAR, (16,16))]
-            elif toolBarItem[4][0] == ""                                \
+                toolBarItem[4] = ["", None, wx.ArtProvider.GetBitmap(toolBarItem[4][1], wx.ART_TOOLBAR, (16,16))]
+            elif toolBarItem[4][0] == ""        \
             and  toolBarItem[4][1] == None:
                 toolBarItem[4] = ["", None, toolBarItem[4][2]]
             elif toolBarItem[4][0] != "":
                 toolBitmapPathName = os.path.dirname(sys.argv[0])
-                toolBitmapPathName = os.path.join(toolBitmapPathName,   \
-                    "assets", "images", toolBarItem[4][0])
+                toolBitmapPathName = os.path.join(toolBitmapPathName, "assets", "images", toolBarItem[4][0])
                 toolBitmap = wx.Bitmap((16,16))
                 toolBitmap.LoadFile(toolBitmapPathName, wx.BITMAP_TYPE_ANY)
                 toolBarItem[4] = ["", None, toolBitmap]
@@ -144,8 +134,7 @@ class GuiGeneralFrame(wx.Frame):
         panelSkin = wx.Panel(self, wx.ID_ANY)
 
         # Initialise accelerators (hotkeys)
-        accelTable = wx.AcceleratorTable(                   \
-            self._initAccelTable(self.LID_ACCELS[2]))
+        accelTable = wx.AcceleratorTable(self._initAccelTable(self.LID_ACCELS[2]))
         self.SetAcceleratorTable(accelTable)
 
         # Initialise menu bar, menus & menu items
