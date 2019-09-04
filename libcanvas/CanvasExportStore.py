@@ -87,13 +87,30 @@ class CanvasExportStore():
         else:
             return False
     # }}}
+    # {{{ exportTextBuffer(self, canvasMap, canvasSize): XXX
+    def exportTextBuffer(self, canvasMap, canvasSize):
+        outBuffer = ""
+        for canvasRow in range(canvasSize[1]):
+            canvasLastColours = []
+            for canvasCol in range(canvasSize[0]):
+                canvasColColours = canvasMap[canvasRow][canvasCol][0:2]
+                canvasColText = canvasMap[canvasRow][canvasCol][3]
+                if canvasColColours != canvasLastColours:
+                    canvasLastColours = canvasColColours
+                    outBuffer += "\x03" +           \
+                        str(canvasColColours[0]) +  \
+                        "," + str(canvasColColours[1])
+                outBuffer += canvasColText
+            outBuffer += "\n"
+        return outBuffer
+    # }}}
     # {{{ exportTextFile(self, canvasMap, canvasSize, outFile): XXX
     def exportTextFile(self, canvasMap, canvasSize, outFile):
         for canvasRow in range(canvasSize[1]):
             canvasLastColours = []
             for canvasCol in range(canvasSize[0]):
-                canvasColColours = canvasMap[canvasRow][canvasCol][0]
-                canvasColText = canvasMap[canvasRow][canvasCol][2]
+                canvasColColours = canvasMap[canvasRow][canvasCol][0:2]
+                canvasColText = canvasMap[canvasRow][canvasCol][3]
                 if canvasColColours != canvasLastColours:
                     canvasLastColours = canvasColColours
                     outFile.write("\x03" +          \
