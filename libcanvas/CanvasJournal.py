@@ -6,7 +6,6 @@
 
 class CanvasJournal():
     """XXX"""
-    patchesCursor = patchesUndo = patchesUndoLevel = None
 
     # {{{ popCursor(self): XXX
     def popCursor(self):
@@ -74,6 +73,7 @@ class CanvasJournal():
     #
     # __init__(self): initialisation method
     def __init__(self):
+        self.patchesCursor, self.patchesUndo, self. patchesUndoLevel = None, None, None
         self.resetCursor(); self.resetUndo();
 
 # vim:expandtab foldmethod=marker sw=4 ts=4 tw=120
