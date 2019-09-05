@@ -8,7 +8,6 @@ from CanvasBackend import CanvasBackend
 from CanvasJournal import CanvasJournal
 from CanvasExportStore import CanvasExportStore, havePIL, haveUrllib
 from CanvasImportStore import CanvasImportStore
-from ImgurApiKey import ImgurApiKey
 import wx
 
 class Canvas(wx.Panel):
@@ -177,7 +176,6 @@ class Canvas(wx.Panel):
         self._canvasDirty, self._canvasDirtyCursor = False, False
         self.canvasMap, self.canvasPos, self.canvasSize, = None, defaultCanvasPos, defaultCanvasSize
         self.defaultCanvasPos, self.defaultCanvasSize, self.defaultCellSize = defaultCanvasPos, defaultCanvasSize, defaultCellSize
-        self.imgurApiKey = ImgurApiKey.imgurApiKey
         self.parentFrame = parentFrame
         self.parentFrame.onCanvasUpdate(brushSize=self.brushSize, colours=self.brushColours)
 
