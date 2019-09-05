@@ -8,59 +8,20 @@
 import os, sys
 [sys.path.append(os.path.join(os.getcwd(), "..", "..", path)) for path in ["libcanvas", "librtl"]]
 
+from CanvasExportStore import CanvasExportStore
 from CanvasImportStore import CanvasImportStore
-
-MiRCARTToAnsiColours = [
-    97,    # Bright White 
-    30,    # Black        
-    94,    # Light Blue   
-    32,    # Green        
-    91,    # Red          
-    31,    # Light Red    
-    35,    # Pink         
-    33,    # Yellow       
-    93,    # Light Yellow 
-    92,    # Light Green  
-    36,    # Cyan         
-    96,    # Light Cyan   
-    34,    # Blue         
-    95,    # Light Pink   
-    90,    # Grey         
-    37,    # Light Grey   
-];
-
-def ToAnsi(inPathName):
-    canvasStore = CanvasImportStore(inPathName)
-    inMap = canvasStore.outMap.copy(); del canvasStore;
-    with open(inPathName, "w+") as outFile:
-        for inCurRow in range(len(inMap)):
-            lastAttribs = CanvasImportStore._CellState.CS_NONE
-            lastColours = None
-            for inCurCol in range(len(inMap[inCurRow])):
-                inCurCell = inMap[inCurRow][inCurCol]
-                if lastAttribs != inCurCell[2]:
-                    if inCurCell[2] & CanvasImportStore._CellState.CS_BOLD:
-                        print("\u001b[1m", end="", file=outFile)
-                    if inCurCell[2] & CanvasImportStore._CellState.CS_UNDERLINE:
-                        print("\u001b[4m", end="", file=outFile)
-                    lastAttribs = inCurCell[2]
-                if lastColours == None or lastColours != inCurCell[:2]:
-                    ansiBg = MiRCARTToAnsiColours[int(inCurCell[1])] + 10
-                    ansiFg = MiRCARTToAnsiColours[int(inCurCell[0])]
-                    print("\u001b[{:02d}m\u001b[{:02d}m{}".format(ansiBg, ansiFg, inCurCell[3]), end="", file=outFile)
-                    lastColours = inCurCell[:2]
-                else:
-                    print(inCurCell[3], end="", file=outFile)
-            print("\u001b[0m\n", end="", file=outFile)
 
 #
 # Entry point
 def main(*argv):
-    ToAnsi(argv[1])
-if __name__ == "__main__":
     if (len(sys.argv) - 1) != 1:
         print("usage: {} <MiRCART input file pathname>".format(sys.argv[0]), file=sys.stderr)
     else:
-        main(*sys.argv)
+        canvasImportStore = CanvasImportStore()
+        canvasImportStore.importAnsiFile(argv[1])
+        canvasExportStore = CanvasExportStore()
+        canvasExportStore.exportAnsiFile(canvasImportStore.outMap, canvasImportStore.inSize, sys.stdout)
+if __name__ == "__main__":
+    main(*sys.argv)
 
 # vim:expandtab foldmethod=marker sw=4 ts=4 tw=120

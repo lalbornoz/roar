@@ -5,23 +5,24 @@
 # This project is licensed under the terms of the MIT licence.
 #
 
+from Colours import AnsiBgToMiRCARTColours, AnsiFgToMiRCARTColours, AnsiFgBoldToMiRCARTColours
+import os, re, struct, sys
+
 class CanvasImportStore():
     """XXX"""
-
-    #
-    # _CellState(): Cell state
+    # {{{ _CellState(): Cell state
     class _CellState():
         CS_NONE             = 0x00
         CS_BOLD             = 0x01
         CS_ITALIC           = 0x02
         CS_UNDERLINE        = 0x04
-
-    #
-    # _ParseState(): Parsing loop state
+    # }}}
+    # {{{ _ParseState(): Parsing loop state
     class _ParseState():
         PS_CHAR             = 1
         PS_COLOUR_DIGIT0    = 2
         PS_COLOUR_DIGIT1    = 3
+    # }}}
 
     # {{{ _flipCellStateBit(self, cellState, bit): XXX
     def _flipCellStateBit(self, cellState, bit):
@@ -41,6 +42,77 @@ class CanvasImportStore():
             return (15, 1)
     # }}}
 
+    # {{{ importAnsiFile(self, inPathName, encoding="cp437"): XXX
+    def importAnsiFile(self, inPathName, encoding="cp437"):
+        return self.importAnsiFileBuffer(open(inPathName, "rb"), encoding)
+    # }}}
+    # {{{ importAnsiFileBuffer(self, inFile, encoding="cp437"): XXX
+    def importAnsiFileBuffer(self, inFile, encoding="cp437"):
+        self.inSize, self.outMap = None, None; inMaxCols, inSize, outMap = 0, [0, 0], [[]];
+        inFileData, row, rowChars = inFile.read().decode(encoding), "", 0
+        inFileChar, inFileCharMax = 0, len(inFileData)
+        curBg, curFg, done, inCurRow = 1, 15, False, 0; curBgAnsi, curBoldAnsi, curFgAnsi = 30, False, 37;
+        while True:
+            if inFileChar >= inFileCharMax:
+                break
+            else:
+                m = re.match('\x1b\[((?:\d{1,3};?)+)m', inFileData[inFileChar:])
+                if m:
+                    newBg, newFg = -1, -1
+                    for ansiCode in m[1].split(";"):
+                        ansiCode = int(ansiCode)
+                        if ansiCode == 0:
+                            curBgAnsi, curBoldAnsi, curFgAnsi = 30, False, 37; newBg, newFg = 1, 15;
+                        elif ansiCode == 1:
+                            curBoldAnsi, newFg = True, AnsiFgBoldToMiRCARTColours[curFgAnsi]
+                        elif ansiCode == 2:
+                            curBoldAnsi, newFg = False, AnsiFgToMiRCARTColours[curFgAnsi]
+                        elif ansiCode == 7:
+                            newBg, newFg = curFg, curBg; curBgAnsi, curFgAnsi = curFgAnsi, curBgAnsi;
+                        elif ansiCode in AnsiBgToMiRCARTColours:
+                            curBgAnsi, newBg = ansiCode, AnsiBgToMiRCARTColours[ansiCode]
+                        elif ansiCode in AnsiFgToMiRCARTColours:
+                            if curBoldAnsi:
+                                newFg = AnsiFgBoldToMiRCARTColours[ansiCode]
+                            else:
+                                newFg = AnsiFgToMiRCARTColours[ansiCode]
+                            curFgAnsi = ansiCode
+                        elif ansiCode in AnsiFgBoldToMiRCARTColours:
+                            curFgAnsi, newFg = ansiCode, AnsiFgBoldToMiRCARTColours[ansiCode]
+                    if  ((newBg != -1) and (newFg != -1))   \
+                    and ((newBg == curFg) and (newFg == curBg)):
+                        curBg, curFg = newBg, newFg
+                    elif ((newBg != -1) and (newFg != -1))  \
+                    and  ((newBg != curBg) and (newFg != curFg)):
+                        curBg, curFg = newBg, newFg
+                    elif (newBg != -1) and (newBg != curBg):
+                        curBg = newBg
+                    elif (newFg != -1) and (newFg != curFg):
+                        curFg = newFg
+                    inFileChar += len(m[0])
+                else:
+                    m = re.match('\x1b\[(\d+)C', inFileData[inFileChar:])
+                    if m:
+                        for numRepeat in range(int(m[1])):
+                            outMap[inCurRow].append([curFg, curBg, self._CellState.CS_NONE, " "])
+                        inFileChar += len(m[0])
+                    elif inFileData[inFileChar:inFileChar+2] == "\r\n":
+                        inFileChar += 2; done = True;
+                    elif inFileData[inFileChar] == "\r" \
+                    or   inFileData[inFileChar] == "\n":
+                        inFileChar += 1; done = True;
+                    else:
+                        outMap[inCurRow].append([curFg, curBg, self._CellState.CS_NONE, inFileData[inFileChar]])
+                        inFileChar += 1; rowChars += 1;
+                if done:
+                    inMaxCols = max(inMaxCols, len(outMap[inCurRow])); inSize[1] += 1;
+                    done = False; rowChars = 0; inCurRow += 1; outMap.append([]);
+        inSize[0] = inMaxCols
+        for numRow in range(inSize[1]):
+            for numCol in range(len(outMap[numRow]), inSize[0]):
+                outMap[numRow].append([curFg, curBg, self._CellState.CS_NONE, " "])
+        self.inSize, self.outMap = inSize, outMap
+    # }}}
     # {{{ importIntoPanel(self): XXX
     def importIntoPanel(self):
         self.parentCanvas.onStoreUpdate(self.inSize, self.outMap)
@@ -51,6 +123,81 @@ class CanvasImportStore():
                 for x in range(newCanvasSize[0])]   \
                     for y in range(newCanvasSize[1])]
         self.parentCanvas.onStoreUpdate(newCanvasSize, newMap)
+    # }}}
+    # {{{ importSauceFile(self, inPathName): XXX
+    def importSauceFile(self, inPathName):
+        with open(inPathName, "rb") as inFile:
+            self.inSize, self.outMap = None, None; inMaxCols, inSize, outMap = 0, [0, 0], [[]];
+            inFileStat = os.stat(inPathName)
+            inFile.seek(inFileStat.st_size - 128, 0)
+            inFile.seek(5 + 2 + 35 + 20 + 20 + 8 + 4, 1)
+            if  (inFile.read(1) == b'\x01') \
+            and (inFile.read(1) == b'\x01'):
+                width, height = struct.unpack("H", inFile.read(2))[0], struct.unpack("H", inFile.read(2))[0]
+                inFile.seek(0, 0)
+                inFileData, row, rowChars = inFile.read(inFileStat.st_size - 128).decode("cp437"), "", 0
+                inFileChar, inFileCharMax = 0, len(inFileData)
+                curBg, curFg, inCurRow = 1, 15, 0; curBgAnsi, curBoldAnsi, curFgAnsi = 30, False, 37;
+                while True:
+                    if inFileChar >= inFileCharMax:
+                        break
+                    else:
+                        m = re.match('\x1b\[((?:\d{1,3};?)+)m', inFileData[inFileChar:])
+                        if m:
+                            newBg, newFg = -1, -1
+                            for ansiCode in m[1].split(";"):
+                                ansiCode = int(ansiCode)
+                                if ansiCode == 0:
+                                    curBgAnsi, curBoldAnsi, curFgAnsi = 30, False, 37; newBg, newFg = 1, 15;
+                                elif ansiCode == 1:
+                                    curBoldAnsi, newFg = True, AnsiFgBoldToMiRCARTColours[curFgAnsi]
+                                elif ansiCode == 2:
+                                    curBoldAnsi, newFg = False, AnsiFgToMiRCARTColours[curFgAnsi]
+                                elif ansiCode == 7:
+                                    newBg, newFg = curFg, curBg; curBgAnsi, curFgAnsi = curFgAnsi, curBgAnsi;
+                                elif ansiCode in AnsiBgToMiRCARTColours:
+                                    curBgAnsi, newBg = ansiCode, AnsiBgToMiRCARTColours[ansiCode]
+                                elif ansiCode in AnsiFgToMiRCARTColours:
+                                    if curBoldAnsi:
+                                        newFg = AnsiFgBoldToMiRCARTColours[ansiCode]
+                                    else:
+                                        newFg = AnsiFgToMiRCARTColours[ansiCode]
+                                    curFgAnsi = ansiCode
+                                elif ansiCode in AnsiFgBoldToMiRCARTColours:
+                                    curFgAnsi, newFg = ansiCode, AnsiFgBoldToMiRCARTColours[ansiCode]
+                            if  ((newBg != -1) and (newFg != -1))   \
+                            and ((newBg == curFg) and (newFg == curBg)):
+                                curBg, curFg = newBg, newFg
+                            elif ((newBg != -1) and (newFg != -1))  \
+                            and  ((newBg != curBg) and (newFg != curFg)):
+                                curBg, curFg = newBg, newFg
+                            elif (newBg != -1) and (newBg != curBg):
+                                curBg = newBg
+                            elif (newFg != -1) and (newFg != curFg):
+                                curFg = newFg
+                            inFileChar += len(m[0])
+                        else:
+                            m = re.match('\x1b\[(\d+)C', inFileData[inFileChar:])
+                            if m:
+                                for numRepeat in range(int(m[1])):
+                                    outMap[inCurRow].append([curFg, curBg, self._CellState.CS_NONE, " "])
+                                inFileChar += len(m[0])
+                            elif inFileData[inFileChar:inFileChar+2] == "\r\n":
+                                inFileChar += 2; rowChars = width;
+                            elif inFileData[inFileChar] == "\r"     \
+                            or   inFileData[inFileChar] == "\n":
+                                inFileChar += 1; rowChars = width;
+                            else:
+                                outMap[inCurRow].append([curFg, curBg, self._CellState.CS_NONE, inFileData[inFileChar]])
+                                inFileChar += 1; rowChars += 1;
+                        if rowChars >= width:
+                            inMaxCols = max(inMaxCols, len(outMap[inCurRow])); inSize[1] += 1;
+                            rowChars = 0; inCurRow += 1; outMap.append([]);
+                inSize[0] = inMaxCols
+                for numRow in range(inSize[1]):
+                    for numCol in range(len(outMap[numRow]), inSize[0]):
+                        outMap[numRow].append([curFg, curBg, self._CellState.CS_NONE, " "])
+                self.inSize, self.outMap = inSize, outMap
     # }}}
     # {{{ importTextFile(self, pathName): XXX
     def importTextFile(self, pathName):
