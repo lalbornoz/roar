@@ -115,9 +115,22 @@ class GuiCanvasInterface():
         self.parentCanvas.SetCursor(wx.Cursor(wx.NullCursor))
         return True
     # }}}
+    # {{{ canvasExportAsAnsi(self, event): XXX
+    def canvasExportAsAnsi(self, event):
+        with wx.FileDialog(self.parentFrame, "Save As...", os.getcwd(), "", "ANSI files (*.ans;*.txt)|*.ans;*.txt|All Files (*.*)|*.*", wx.FD_SAVE|wx.FD_OVERWRITE_PROMPT) as dialog:
+            if dialog.ShowModal() == wx.ID_CANCEL:
+                return False
+            else:
+                outPathName = dialog.GetPath()
+                self.parentCanvas.SetCursor(wx.Cursor(wx.CURSOR_WAIT))
+                with open(outPathName, "w", encoding="utf-8") as outFile:
+                    self.parentCanvas.canvasExportStore.exportAnsiFile(self.parentCanvas.canvasMap, self.parentCanvas.canvasSize, outFile)
+                self.parentCanvas.SetCursor(wx.Cursor(wx.NullCursor))
+                return True
+    # }}}
     # {{{ canvasExportAsPng(self, event): XXX
     def canvasExportAsPng(self, event):
-        with wx.FileDialog(self.parentFrame, "Save As...", os.getcwd(), "", "*.png", wx.FD_SAVE|wx.FD_OVERWRITE_PROMPT) as dialog:
+        with wx.FileDialog(self.parentFrame, "Save As...", os.getcwd(), "", "PNG (*.png)|*.png|All Files (*.*)|*.*", wx.FD_SAVE|wx.FD_OVERWRITE_PROMPT) as dialog:
             if dialog.ShowModal() == wx.ID_CANCEL:
                 return False
             else:
@@ -166,6 +179,29 @@ class GuiCanvasInterface():
             wx.MessageBox("Failed to export to Pastebin: " + pasteResult,   \
                 "Export to Pastebin", wx.OK|wx.ICON_EXCLAMATION)
     # }}}
+    # {{{ canvasImportAnsi(self, event): XXX
+    def canvasImportAnsi(self, event):
+        if self.canvasPathName != None:
+            saveChanges = self._dialogSaveChanges()
+            if saveChanges == wx.ID_CANCEL:
+                return
+            elif saveChanges == wx.ID_NO:
+                pass
+            elif saveChanges == wx.ID_YES:
+                self.canvasSave(event)
+        with wx.FileDialog(self.parentCanvas, "Open", os.getcwd(), "", "ANSI files (*.ans;*.txt)|*.ans;*.txt|All Files (*.*)|*.*", wx.FD_OPEN) as dialog:
+            if dialog.ShowModal() == wx.ID_CANCEL:
+                return False
+            else:
+                self.canvasPathName = dialog.GetPath()
+                self.parentCanvas.SetCursor(wx.Cursor(wx.CURSOR_WAIT))
+                self.parentCanvas.canvasImportStore.importAnsiFile(self.canvasPathName)
+                self.parentCanvas.canvasImportStore.importIntoPanel()
+                self.canvasPathName = "(Imported)"
+                self.parentCanvas.SetCursor(wx.Cursor(wx.NullCursor))
+                self.parentFrame.onCanvasUpdate(pathName="(Imported)", undoLevel=-1)
+                return True
+    # }}}
     # {{{ canvasImportFromClipboard(self, event): XXX
     def canvasImportFromClipboard(self, event):
         rc = False
@@ -192,6 +228,29 @@ class GuiCanvasInterface():
         if not rc:
             with wx.MessageDialog(self.parentCanvas, "Clipboard does not contain text data and/or cannot be opened", "", wx.ICON_QUESTION | wx.OK | wx.OK_DEFAULT) as dialog:
                 dialog.ShowModal()
+    # }}}
+    # {{{ canvasImportSauce(self, event): XXX
+    def canvasImportSauce(self, event):
+        if self.canvasPathName != None:
+            saveChanges = self._dialogSaveChanges()
+            if saveChanges == wx.ID_CANCEL:
+                return
+            elif saveChanges == wx.ID_NO:
+                pass
+            elif saveChanges == wx.ID_YES:
+                self.canvasSave(event)
+        with wx.FileDialog(self.parentCanvas, "Open", os.getcwd(), "", "SAUCE files (*.ans;*.txt)|*.ans;*.txt|All Files (*.*)|*.*", wx.FD_OPEN) as dialog:
+            if dialog.ShowModal() == wx.ID_CANCEL:
+                return False
+            else:
+                self.canvasPathName = dialog.GetPath()
+                self.parentCanvas.SetCursor(wx.Cursor(wx.CURSOR_WAIT))
+                self.parentCanvas.canvasImportStore.importSauceFile(self.canvasPathName)
+                self.parentCanvas.canvasImportStore.importIntoPanel()
+                self.canvasPathName = "(Imported)"
+                self.parentCanvas.SetCursor(wx.Cursor(wx.NullCursor))
+                self.parentFrame.onCanvasUpdate(pathName="(Imported)", undoLevel=-1)
+                return True
     # }}}
     # {{{ canvasIncrBrushHeight(self, event): XXX
     def canvasIncrBrushHeight(self, event):
@@ -253,12 +312,12 @@ class GuiCanvasInterface():
                 pass
             elif saveChanges == wx.ID_YES:
                 self.canvasSave(event)
-        with wx.FileDialog(self.parentCanvas, "Open", os.getcwd(), "",  \
-                "*.txt", wx.FD_OPEN) as dialog:
+        with wx.FileDialog(self.parentCanvas, "Open", os.getcwd(), "", "mIRC art files (*.txt)|*.txt|All Files (*.*)|*.*", wx.FD_OPEN) as dialog:
             if dialog.ShowModal() == wx.ID_CANCEL:
                 return False
             else:
                 self.canvasPathName = dialog.GetPath()
+                print(self.canvasPathName)
                 self.parentCanvas.SetCursor(wx.Cursor(wx.CURSOR_WAIT))
                 self.parentCanvas.canvasImportStore.importTextFile(self.canvasPathName)
                 self.parentCanvas.canvasImportStore.importIntoPanel()
@@ -282,7 +341,7 @@ class GuiCanvasInterface():
             if self.canvasSaveAs(event) == False:
                 return
         try:
-            with open(self.canvasPathName, "w") as outFile:
+            with open(self.canvasPathName, "w", encoding="utf-8") as outFile:
                 self.parentCanvas.SetCursor(wx.Cursor(wx.CURSOR_WAIT))
                 self.parentCanvas.canvasExportStore.exportTextFile(      \
                     self.parentCanvas.canvasMap,                         \
@@ -294,8 +353,7 @@ class GuiCanvasInterface():
     # }}}
     # {{{ canvasSaveAs(self, event): XXX
     def canvasSaveAs(self, event):
-        with wx.FileDialog(self.parentCanvas, "Save As", os.getcwd(), "",   \
-                "*.txt", wx.FD_SAVE|wx.FD_OVERWRITE_PROMPT) as dialog:
+        with wx.FileDialog(self.parentCanvas, "Save As", os.getcwd(), "", "mIRC art files (*.txt)|*.txt|All Files (*.*)|*.*", wx.FD_SAVE|wx.FD_OVERWRITE_PROMPT) as dialog:
             if dialog.ShowModal() == wx.ID_CANCEL:
                 return False
             else:

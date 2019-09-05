@@ -4,13 +4,14 @@
 # Copyright (c) 2018, 2019 Lucio Andrés Illanes Albornoz <lucio@lucioillanes.de>
 #
 
+from Colours import ColourMapBold, ColourMapNormal, MiRCARTToAnsiColours
 import io, os, tempfile
 
 try:
-    from ToPngFile import ToPngFile
-    haveToPngFile = True
+    from PIL import Image, ImageDraw, ImageFont
+    havePIL = True
 except ImportError:
-    haveToPngFile = False
+    havePIL = False
 
 try:
     import base64, json, requests, urllib.request
@@ -20,9 +21,23 @@ except ImportError:
 
 class CanvasExportStore():
     """XXX"""
+    # {{{ _CellState(): Cell state
+    class _CellState():
+        CS_NONE             = 0x00
+        CS_BOLD             = 0x01
+        CS_ITALIC           = 0x02
+        CS_UNDERLINE        = 0x04
+    # }}}
     ImgurUploadUrl = "https://api.imgur.com/3/upload.json"
     PastebinPostUrl = "https://pastebin.com/api/api_post.php"
 
+    # {{{ _drawUnderline(self, curPos, fontSize, imgDraw, fillColour): XXX
+    def _drawUnderLine(self, curPos, fontSize, imgDraw, fillColour):
+        imgDraw.line(                                                       \
+            xy=(curPos[0], curPos[1] + (fontSize[1] - 2),                   \
+                curPos[0] + fontSize[0], curPos[1] + (fontSize[1] - 2)),    \
+                fill=fillColour)
+    # }}}
     # {{{ _exportFileToImgur(self, apiKey, imgName, imgTitle, pathName): upload single PNG file to Imgur
     def _exportFileToImgur(self, apiKey, imgName, imgTitle, pathName):
         with open(pathName, "rb") as requestImage:
@@ -42,6 +57,30 @@ class CanvasExportStore():
                 return [responseHttp.status_code, ""]
     # }}}
 
+    # {{{ exportAnsiFile(self, canvasMap, canvasSize, outFile): XXX
+    def exportAnsiFile(self, canvasMap, canvasSize, outFile):
+        outBuffer = ""
+        for inCurRow in range(len(canvasMap)):
+            lastAttribs = self._CellState.CS_NONE
+            lastColours = None
+            for inCurCol in range(len(canvasMap[inCurRow])):
+                inCurCell = canvasMap[inCurRow][inCurCol]
+                if lastAttribs != inCurCell[2]:
+                    if inCurCell[2] & self._CellState.CS_BOLD:
+                        outBuffer += "\u001b[1m"
+                    if inCurCell[2] & self._CellState.CS_UNDERLINE:
+                        outBuffer += "\u001b[4m"
+                    lastAttribs = inCurCell[2]
+                if lastColours == None or lastColours != inCurCell[:2]:
+                    ansiBg = MiRCARTToAnsiColours[int(inCurCell[1])] + 10
+                    ansiFg = MiRCARTToAnsiColours[int(inCurCell[0])]
+                    outBuffer += "\u001b[{:02d}m\u001b[{:02d}m{}".format(ansiBg, ansiFg, inCurCell[3])
+                    lastColours = inCurCell[:2]
+                else:
+                    outBuffer += inCurCell[3]
+            outBuffer += "\u001b[0m\n"
+        outFile.write(outBuffer)
+    # }}}
     # {{{ exportBitmapToImgur(self, apiKey, canvasBitmap, imgName, imgTitle, imgType): XXX
     def exportBitmapToImgur(self, apiKey, canvasBitmap, imgName, imgTitle, imgType):
         tmpPathName = tempfile.mkstemp()
@@ -77,10 +116,53 @@ class CanvasExportStore():
         else:
             return (False, "missing requests and/or urllib3 module(s)")
     # }}}
-    # {{{ exportPngFile(self, canvasMap, outPathName): XXX
-    def exportPngFile(self, canvasMap, outPathName):
-        if haveToPngFile:
-            ToPngFile(canvasMap).export(outPathName)
+    # {{{ exportPngFile(self, canvasMap, outPathName, fontFilePath, fontSize): XXX
+    def exportPngFile(self, canvasMap, outPathName, fontFilePath, fontSize):
+        if havePIL:
+            outFontFilePath, outFontSize = fontFilePath, fontSize
+            outImgFont = ImageFont.truetype(outFontFilePath, outFontSize)
+            outImgFontSize = [*outImgFont.getsize(" ")]
+            outImgFontSize[1] += 3
+            inSize = (len(canvasMap[0]), len(canvasMap))
+            outSize = [a*b for a,b in zip(inSize, outImgFontSize)]
+            outCurPos = [0, 0]
+            outImg = Image.new("RGBA", outSize, (*ColourMapNormal[1], 255))
+            outImgDraw = ImageDraw.Draw(outImg)
+            outImgDraw.fontmode = "1"
+            for inCurRow in range(len(canvasMap)):
+                for inCurCol in range(len(canvasMap[inCurRow])):
+                    inCurCell = canvasMap[inCurRow][inCurCol]
+                    outColours = [0, 0]
+                    if inCurCell[2] & self._CellState.CS_BOLD:
+                        if inCurCell[3] != " ":
+                            if inCurCell[3] == "█":
+                                outColours[1] = ColourMapNormal[inCurCell[0]]
+                            else:
+                                outColours[0] = ColourMapBold[inCurCell[0]]
+                                outColours[1] = ColourMapNormal[inCurCell[1]]
+                        else:
+                            outColours[1] = ColourMapNormal[inCurCell[1]]
+                    else:
+                        if inCurCell[3] != " ":
+                            if inCurCell[3] == "█":
+                                outColours[1] = ColourMapNormal[inCurCell[0]]
+                            else:
+                                outColours[0] = ColourMapNormal[inCurCell[0]]
+                                outColours[1] = ColourMapNormal[inCurCell[1]]
+                        else:
+                            outColours[1] = ColourMapNormal[inCurCell[1]]
+                    outImgDraw.rectangle((*outCurPos, outCurPos[0] + outImgFontSize[0], outCurPos[1] + outImgFontSize[1]), fill=(*outColours[1], 255))
+                    if  not inCurCell[3] in " █"    \
+                    and outColours[0] != outColours[1]:
+                        # XXX implement italic
+                        outImgDraw.text(outCurPos, inCurCell[3], (*outColours[0], 255), outImgFont)
+                    if inCurCell[2] & self._CellState.CS_UNDERLINE:
+                        outColours[0] = ColourMapNormal[inCurCell[0]]
+                        self._drawUnderLine(outCurPos, outImgFontSize, outImgDraw, (*outColours[0], 255))
+                    outCurPos[0] += outImgFontSize[0];
+                outCurPos[0] = 0
+                outCurPos[1] += outImgFontSize[1]
+            outImg.save(outPathName);
             return True
         else:
             return False
@@ -116,10 +198,5 @@ class CanvasExportStore():
         outBuffer = self.exportTextBuffer(canvasMap, canvasSize)
         outFile.write(outBuffer)
     # }}}
-
-    #
-    # __init__(self, parentCanvas): initialisation method
-    def __init__(self, parentCanvas):
-        self.parentCanvas = parentCanvas
 
 # vim:expandtab foldmethod=marker sw=4 ts=4 tw=120
