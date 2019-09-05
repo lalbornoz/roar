@@ -14,6 +14,7 @@ from ToolText import ToolText
 
 from glob import glob
 from GuiCanvasInterfaceAbout import GuiCanvasInterfaceAbout
+from ImgurApiKey import ImgurApiKey
 import io, os, random, wx, wx.adv
 
 class GuiCanvasInterface():
@@ -425,7 +426,7 @@ class GuiCanvasInterface():
     #
     # __init__(self, parentCanvas, parentFrame):
     def __init__(self, parentCanvas, parentFrame):
-        self.canvasPathName, self.imgurApiKey = None, None
+        self.canvasPathName, self.imgurApiKey = None, ImgurApiKey.imgurApiKey
         self.parentCanvas, self.parentFrame = parentCanvas, parentFrame
         self.canvasToolRect(None)
 

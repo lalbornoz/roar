@@ -49,7 +49,7 @@ class CanvasExportStore():
             "title":    imgTitle,                           \
             "type":     "base64"}
         requestHeaders = {"Authorization": "Client-ID " + apiKey}
-        responseHttp = requests.post(ImgurUploadUrl, data=requestData, headers=requestHeaders)
+        responseHttp = requests.post(self.ImgurUploadUrl, data=requestData, headers=requestHeaders)
         responseDict = json.loads(responseHttp.text)
         if responseHttp.status_code == 200:
                 return [200, responseDict.get("data").get("link")]
@@ -105,7 +105,7 @@ class CanvasExportStore():
                 "api_paste_code":       outFile.getvalue().encode(),    \
                 "api_paste_name":       pasteName,                      \
                 "api_paste_private":    pastePrivate}
-            responseHttp = requests.post(PastebinPostUrl, data=requestData)
+            responseHttp = requests.post(self.PastebinPostUrl, data=requestData)
             if responseHttp.status_code == 200:
                 if responseHttp.text.startswith("http"):
                     return (True, responseHttp.text)
