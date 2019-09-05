@@ -6,7 +6,7 @@
 
 from CanvasBackend import CanvasBackend
 from CanvasJournal import CanvasJournal
-from CanvasExportStore import CanvasExportStore, haveToPngFile, haveUrllib
+from CanvasExportStore import CanvasExportStore, havePIL, haveUrllib
 from CanvasImportStore import CanvasImportStore
 from ImgurApiKey import ImgurApiKey
 import wx
@@ -183,7 +183,7 @@ class Canvas(wx.Panel):
 
         self.canvasBackend = CanvasBackend(defaultCanvasSize, defaultCellSize)
         self.canvasJournal = CanvasJournal()
-        self.canvasExportStore = CanvasExportStore(parentCanvas=self)
+        self.canvasExportStore = CanvasExportStore()
         self.canvasImportStore = CanvasImportStore(parentCanvas=self)
         self.canvasInterface = canvasInterface(self, parentFrame)
 
