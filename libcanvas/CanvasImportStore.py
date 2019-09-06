@@ -5,7 +5,7 @@
 # This project is licensed under the terms of the MIT licence.
 #
 
-from Colours import AnsiBgToMiRCARTColours, AnsiFgToMiRCARTColours, AnsiFgBoldToMiRCARTColours
+from CanvasColours import AnsiBgToMiRCARTColours, AnsiFgToMiRCARTColours, AnsiFgBoldToMiRCARTColours
 import os, re, struct, sys
 
 class CanvasImportStore():
