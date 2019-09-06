@@ -4,7 +4,7 @@
 # Copyright (c) 2018, 2019 Lucía Andrea Illanes Albornoz <lucia@luciaillanes.de>
 #
 
-from Colours import Colours
+from CanvasColours import Colours
 import wx
 
 class CanvasBackend():

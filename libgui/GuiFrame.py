@@ -5,7 +5,7 @@
 #
 
 from Canvas import Canvas, haveUrllib
-from Colours import Colours
+from CanvasColours import Colours
 from GuiCanvasInterface import GuiCanvasInterface
 from GuiGeneralFrame import GuiGeneralFrame,                                            \
     TID_ACCELS, TID_COMMAND, TID_LIST, TID_MENU, TID_NOTHING, TID_SELECT, TID_TOOLBAR,  \

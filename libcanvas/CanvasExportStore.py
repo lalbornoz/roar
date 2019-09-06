@@ -4,7 +4,7 @@
 # Copyright (c) 2018, 2019 Lucía Andrea Illanes Albornoz <lucia@luciaillanes.de>
 #
 
-from Colours import ColourMapBold, ColourMapNormal, MiRCARTToAnsiColours
+from CanvasColours import ColourMapBold, ColourMapNormal, MiRCARTToAnsiColours
 import io, os, tempfile
 
 try:
