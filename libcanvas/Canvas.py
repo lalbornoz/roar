@@ -43,7 +43,7 @@ class Canvas(wx.Panel):
                 if commitUndo:
                     if not self._canvasDirty:
                         self.canvasJournal.pushDeltas([], []); self._canvasDirty = True;
-                    self.canvasJournal.updateCurrentDeltas(patchDelta, patch)
+                    self.canvasJournal.updateCurrentDeltas(patch, patchDelta)
                 self._commitPatch(patch)
     # }}}
 
@@ -90,7 +90,7 @@ class Canvas(wx.Panel):
     # }}}
     # {{{ onPanelPaint(self, event): XXX
     def onPanelPaint(self, event):
-        self.canvasBackend.onPanelPaintEvent(self, event)
+        self.canvasBackend.onPanelPaintEvent(event, self)
     # }}}
     # {{{ onStoreUpdate(self, newCanvasSize, newCanvas=None): XXX
     def onStoreUpdate(self, newCanvasSize, newCanvas=None):
@@ -129,7 +129,7 @@ class Canvas(wx.Panel):
                 undoPatches, redoPatches = ["resize", *oldCanvasSize], ["resize", *newCanvasSize]
                 if not self._canvasDirty:
                     self.canvasJournal.pushDeltas([], []); self._canvasDirty = True;
-                self.canvasJournal.updateCurrentDeltas(undoPatches, redoPatches)
+                self.canvasJournal.updateCurrentDeltas(redoPatches, undoPatches)
 
             if deltaCanvasSize[0] < 0:
                 for numRow in range(oldCanvasSize[1]):
@@ -137,7 +137,7 @@ class Canvas(wx.Panel):
                         for numCol in range((oldCanvasSize[0] + deltaCanvasSize[0]), oldCanvasSize[0]):
                             if not self._canvasDirty:
                                 self.canvasJournal.pushDeltas([], []); self._canvasDirty = True;
-                            self.canvasJournal.updateCurrentDeltas([numCol, numRow, *self.canvasMap[numRow][numCol]], [numCol, numRow, 1, 1, 0, " "])
+                            self.canvasJournal.updateCurrentDeltas([numCol, numRow, 1, 1, 0, " "], [numCol, numRow, *self.canvasMap[numRow][numCol]])
                     del self.canvasMap[numRow][-1:(deltaCanvasSize[0]-1):-1]
             else:
                 for numRow in range(oldCanvasSize[1]):
@@ -150,7 +150,7 @@ class Canvas(wx.Panel):
                         for numCol in range(oldCanvasSize[0] + deltaCanvasSize[0]):
                             if not self._canvasDirty:
                                 self.canvasJournal.pushDeltas([], []); self._canvasDirty = True;
-                            self.canvasJournal.updateCurrentDeltas([numCol, numRow, *self.canvasMap[numRow][numCol]], [numCol, numRow, 1, 1, 0, " "])
+                            self.canvasJournal.updateCurrentDeltas([numCol, numRow, 1, 1, 0, " "], [numCol, numRow, *self.canvasMap[numRow][numCol]])
                 del self.canvasMap[-1:(deltaCanvasSize[1]-1):-1]
             else:
                 for numNewRow in range(oldCanvasSize[1], newCanvasSize[1]):
@@ -182,7 +182,7 @@ class Canvas(wx.Panel):
         self.canvasBackend = CanvasBackend(defaultCanvasSize, defaultCellSize)
         self.canvasJournal = CanvasJournal()
         self.canvasExportStore = CanvasExportStore()
-        self.canvasImportStore = CanvasImportStore(parentCanvas=self)
+        self.canvasImportStore = CanvasImportStore()
         self.canvasInterface = canvasInterface(self, parentFrame)
 
         # Bind event handlers

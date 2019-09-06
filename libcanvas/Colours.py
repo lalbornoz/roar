@@ -126,22 +126,22 @@ Colours = [
 # }}}
 # {{{ MiRCARTToAnsiColours: XXX
 MiRCARTToAnsiColours = [
-    97,  # Bright White 
-    30,  # Black        
-    94,  # Light Blue   
-    32,  # Green        
-    91,  # Red          
-    31,  # Light Red    
-    35,  # Pink         
-    33,  # Yellow       
-    93,  # Light Yellow 
-    92,  # Light Green  
-    36,  # Cyan         
-    96,  # Light Cyan   
-    34,  # Blue         
-    95,  # Light Pink   
-    90,  # Grey         
-    37,  # Light Grey   
+    97,  # Bright White
+    30,  # Black
+    94,  # Light Blue
+    32,  # Green
+    91,  # Red
+    31,  # Light Red
+    35,  # Pink
+    33,  # Yellow
+    93,  # Light Yellow
+    92,  # Light Green
+    36,  # Cyan
+    96,  # Light Cyan
+    34,  # Blue
+    95,  # Light Pink
+    90,  # Grey
+    37,  # Light Grey
 ];
 # }}}
 

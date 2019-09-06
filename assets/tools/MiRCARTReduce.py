@@ -12,8 +12,7 @@ from CanvasImportStore import CanvasImportStore
 import sys
 
 def reduce(inPathName):
-    canvasStore = CanvasImportStore(inPathName)
-    inMap = canvasStore.outMap.copy(); del canvasStore;
+    canvasStore = CanvasImportStore(inPathName); inMap = canvasStore.outMap.copy();
     with open(inPathName, "w+") as outFile:
         for inCurRow in range(len(inMap)):
             lastAttribs, lastColours = CanvasImportStore._CellState.CS_NONE, None
@@ -25,15 +24,21 @@ def reduce(inPathName):
                     if inCurCell[2] & CanvasImportStore._CellState.CS_UNDERLINE:
                         print("\u001f", end="", file=outFile)
                     lastAttribs = inCurCell[2]
-                if lastColours == None                  \
-                or (lastColours[0] != inCurCell[:2][0]  \
-                and lastColours[1] != inCurCell[:2][1]):
-                    print("\u0003{:d},{:d}{}".format(*inCurCell[:2], inCurCell[3]), end="", file=outFile)
+                if  lastColours == None                     \
+                or  (lastColours[0] != inCurCell[:2][0]     \
+                and  lastColours[1] != inCurCell[:2][1]):
+                    if (inCurCell[3] in set("0123456789")) and (inCurCell[1] < 10):
+                        print("\u0003{:d},{:02d}{}".format(*inCurCell[:2], inCurCell[3]), end="", file=outFile)
+                    else:
+                        print("\u0003{:d},{:d}{}".format(*inCurCell[:2], inCurCell[3]), end="", file=outFile)
                     lastColours = inCurCell[:2]
-                elif lastColours[1] == inCurCell[:2][1] \
-                and  lastColours[0] != inCurCell[:2][0]:
-                    print("\u0003{:d}{}".format(inCurCell[:2][0], inCurCell[3]), end="", file=outFile)
-                    lastColours[0] = inCurCell[:2][0]
+                elif (lastColours[1] == inCurCell[:2][1])   \
+                and  (lastColours[0] != inCurCell[:2][0]):
+                    if (inCurCell[3] in set("0123456789")) and (inCurCell[0] < 10):
+                        print("\u0003{:02d}{}".format(inCurCell[0], inCurCell[3]), end="", file=outFile)
+                    else:
+                        print("\u0003{:d}{}".format(inCurCell[0], inCurCell[3]), end="", file=outFile)
+                    lastColours[0] = inCurCell[0]
                 else:
                     print(inCurCell[3], end="", file=outFile)
             print("\n", end="", file=outFile)

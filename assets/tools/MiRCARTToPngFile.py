@@ -27,9 +27,12 @@ def main(*argv):
         optdict["-s"] = 11 if not "-s" in optdict else int(optdict["-s"])
         for inFile in argv:
             canvasImportStore = CanvasImportStore()
-            canvasImportStore.importTextFile(inFile)
-            canvasExportStore = CanvasExportStore()
-            canvasExportStore.exportPngFile(canvasImportStore.outMap, os.path.splitext(inFile)[0] + ".png", optdict["-f"], optdict["-s"])
+            rc, error = canvasImportStore.importTextFile(inFile)
+            if rc:
+                canvasExportStore = CanvasExportStore()
+                canvasExportStore.exportPngFile(canvasImportStore.outMap, optdict["-f"], optdict["-s"], os.path.splitext(inFile)[0] + ".png")
+            else:
+                print("error: {}".format(error), file=sys.stderr)
 if __name__ == "__main__":
     main(*sys.argv)
 

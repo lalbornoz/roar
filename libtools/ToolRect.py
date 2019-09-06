@@ -28,7 +28,7 @@ class ToolRect(Tool):
                 patch = [atPoint[0] + brushCol, atPoint[1] + brushRow, *brushColours, 0, " "]
                 if isLeftDown or isRightDown:
                     dispatchFn(eventDc, False, patch); dispatchFn(eventDc, True, patch);
-                else: 
+                else:
                     dispatchFn(eventDc, True, patch)
 
 # vim:expandtab foldmethod=marker sw=4 ts=4 tw=120

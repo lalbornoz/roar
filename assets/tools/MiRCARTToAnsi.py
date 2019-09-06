@@ -18,9 +18,12 @@ def main(*argv):
         print("usage: {} <MiRCART input file pathname>".format(sys.argv[0]), file=sys.stderr)
     else:
         canvasImportStore = CanvasImportStore()
-        canvasImportStore.importAnsiFile(argv[1])
-        canvasExportStore = CanvasExportStore()
-        canvasExportStore.exportAnsiFile(canvasImportStore.outMap, canvasImportStore.inSize, sys.stdout)
+        rc, error = canvasImportStore.importAnsiFile(argv[1])
+        if rc:
+            canvasExportStore = CanvasExportStore()
+            canvasExportStore.exportAnsiFile(canvasImportStore.outMap, canvasImportStore.inSize, sys.stdout)
+        else
+            print("error: {}".format(error), file=sys.stderr)
 if __name__ == "__main__":
     main(*sys.argv)
 
