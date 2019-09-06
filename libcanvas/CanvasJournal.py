@@ -10,8 +10,7 @@ class CanvasJournal():
     # {{{ popCursor(self): XXX
     def popCursor(self):
         if len(self.patchesCursor):
-            patchesCursor = self.patchesCursor
-            self.patchesCursor = []
+            patchesCursor = self.patchesCursor; self.patchesCursor = [];
             return patchesCursor
         else:
             return []
@@ -19,8 +18,7 @@ class CanvasJournal():
     # {{{ popRedo(self): XXX
     def popRedo(self):
         if self.patchesUndoLevel > 0:
-            self.patchesUndoLevel -= 1
-            patches = self.patchesUndo[self.patchesUndoLevel]
+            self.patchesUndoLevel -= 1; patches = self.patchesUndo[self.patchesUndoLevel];
             return patches[1]
         else:
             return []
@@ -28,8 +26,7 @@ class CanvasJournal():
     # {{{ popUndo(self): XXX
     def popUndo(self):
         if self.patchesUndo[self.patchesUndoLevel] != None:
-            patches = self.patchesUndo[self.patchesUndoLevel]
-            self.patchesUndoLevel += 1
+            patches = self.patchesUndo[self.patchesUndoLevel]; self.patchesUndoLevel += 1;
             return patches[0]
         else:
             return []
@@ -38,13 +35,11 @@ class CanvasJournal():
     def pushCursor(self, patches):
         self.patchesCursor.append(patches)
     # }}}
-    # {{{ pushDeltas(self, undoPatches, redoPatches): XXX
-    def pushDeltas(self, undoPatches, redoPatches):
+    # {{{ pushDeltas(self, redoPatches, undoPatches): XXX
+    def pushDeltas(self, redoPatches, undoPatches):
         if self.patchesUndoLevel > 0:
-            del self.patchesUndo[0:self.patchesUndoLevel]
-            self.patchesUndoLevel = 0
-        deltaItem = [undoPatches, redoPatches]
-        self.patchesUndo.insert(0, deltaItem)
+            del self.patchesUndo[0:self.patchesUndoLevel]; self.patchesUndoLevel = 0;
+        deltaItem = [undoPatches, redoPatches]; self.patchesUndo.insert(0, deltaItem);
         return deltaItem
     # }}}
     # {{{ resetCursor(self): XXX
@@ -59,10 +54,9 @@ class CanvasJournal():
             self.patchesUndo.clear()
         self.patchesUndo = [None]; self.patchesUndoLevel = 0;
     # }}}
-    # {{{ updateCurrentDeltas(self, undoPatches, redoPatches): XXX
-    def updateCurrentDeltas(self, undoPatches, redoPatches):
-        self.patchesUndo[0][0].append(undoPatches)
-        self.patchesUndo[0][1].append(redoPatches)
+    # {{{ updateCurrentDeltas(self, redoPatches, undoPatches): XXX
+    def updateCurrentDeltas(self, redoPatches, undoPatches):
+        self.patchesUndo[0][0].append(undoPatches); self.patchesUndo[0][1].append(redoPatches);
     # }}}
 
     # {{{ __del__(self): destructor method

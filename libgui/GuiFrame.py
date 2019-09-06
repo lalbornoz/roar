@@ -180,7 +180,7 @@ class GuiFrame(GuiGeneralFrame):
             textItems.append("Current tool: {}".format(                 \
                 self.lastPanelState["toolName"]))
         self.statusBar.SetStatusText(" | ".join(textItems))
-        if "undoLevel" in self.lastPanelState: 
+        if "undoLevel" in self.lastPanelState:
             if self.lastPanelState["undoLevel"] >= 0:
                 self.menuItemsById[self.CID_UNDO[0]].Enable(True)
                 toolBar = self.toolBarItemsById[self.CID_UNDO[0]].GetToolBar()

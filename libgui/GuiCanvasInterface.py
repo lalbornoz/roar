@@ -5,7 +5,7 @@
 #
 
 from ToolCircle import ToolCircle
-from ToolFill  import ToolFill
+from ToolFill import ToolFill
 from ToolLine import ToolLine
 from ToolSelectClone import ToolSelectClone
 from ToolSelectMove import ToolSelectMove
@@ -19,13 +19,11 @@ import io, os, random, wx, wx.adv
 
 class GuiCanvasInterface():
     """XXX"""
-
-    # {{{ _dialogSaveChanges(self)
+    # {{{ _dialogSaveChanges(self): XXX
     def _dialogSaveChanges(self):
-        with wx.MessageDialog(self.parentCanvas,                \
-                "Do you want to save changes to {}?".format(    \
-                    self.canvasPathName), "",            \
-                wx.CANCEL|wx.CANCEL_DEFAULT|wx.ICON_QUESTION|wx.YES_NO) as dialog:
+        with wx.MessageDialog(self.parentCanvas,                                    \
+                "Do you want to save changes to {}?".format(self.canvasPathName),   \
+                "", wx.CANCEL|wx.CANCEL_DEFAULT|wx.ICON_QUESTION|wx.YES_NO) as dialog:
             dialogChoice = dialog.ShowModal()
             return dialogChoice
     # }}}
@@ -54,6 +52,105 @@ class GuiCanvasInterface():
     def canvasCut(self, event):
         pass
     # }}}
+    # {{{ canvasDelete(self, event): XXX
+    def canvasDelete(self, event):
+        pass
+    # }}}
+    # {{{ canvasExit(self, event): XXX
+    def canvasExit(self, event):
+        if self.canvasPathName != None:
+            saveChanges = self._dialogSaveChanges()
+            if saveChanges == wx.ID_CANCEL:
+                return
+            elif saveChanges == wx.ID_NO:
+                pass
+            elif saveChanges == wx.ID_YES:
+                self.canvasSave(event)
+        self.parentFrame.Close(True)
+    # }}}
+    # {{{ canvasNew(self, event, newCanvasSize=None): XXX
+    def canvasNew(self, event, newCanvasSize=None):
+        if self.canvasPathName != None:
+            saveChanges = self._dialogSaveChanges()
+            if saveChanges == wx.ID_CANCEL:
+                return
+            elif saveChanges == wx.ID_NO:
+                pass
+            elif saveChanges == wx.ID_YES:
+                self.canvasSave(event)
+        self.parentCanvas.SetCursor(wx.Cursor(wx.CURSOR_WAIT))
+        if newCanvasSize == None:
+            newCanvasSize = list(self.parentCanvas.defaultCanvasSize)
+        newMap = [[[1, 1, 0, " "] for x in range(newCanvasSize[0])] for y in range(newCanvasSize[1])]
+        self.parentCanvas.onStoreUpdate(newCanvasSize, newMap)
+        self.canvasPathName = None
+        self.parentCanvas.SetCursor(wx.Cursor(wx.NullCursor))
+        self.parentFrame.onCanvasUpdate(pathName="", undoLevel=-1)
+    # }}}
+    # {{{ canvasOpen(self, event): XXX
+    def canvasOpen(self, event):
+        if self.canvasPathName != None:
+            saveChanges = self._dialogSaveChanges()
+            if saveChanges == wx.ID_CANCEL:
+                return
+            elif saveChanges == wx.ID_NO:
+                pass
+            elif saveChanges == wx.ID_YES:
+                self.canvasSave(event)
+        with wx.FileDialog(self.parentCanvas, "Open", os.getcwd(), "", "mIRC art files (*.txt)|*.txt|All Files (*.*)|*.*", wx.FD_OPEN) as dialog:
+            if dialog.ShowModal() == wx.ID_CANCEL:
+                return False
+            else:
+                self.canvasPathName = dialog.GetPath()
+                self.parentCanvas.SetCursor(wx.Cursor(wx.CURSOR_WAIT))
+                import pdb; pdb.set_trace()
+                rc, error = self.parentCanvas.canvasImportStore.importTextFile(self.canvasPathName)
+                if rc:
+                    self.parentCanvas.onStoreUpdate(self.parentCanvas.canvasImportStore.inSize, self.parentCanvas.canvasImportStore.outMap)
+                    self.parentCanvas.SetCursor(wx.Cursor(wx.NullCursor))
+                    self.parentFrame.onCanvasUpdate(pathName=self.canvasPathName, undoLevel=-1)
+                    return True
+                else:
+                    print("error: {}".format(error), file=sys.stderr)
+                    return False
+    # }}}
+    # {{{ canvasPaste(self, event): XXX
+    def canvasPaste(self, event):
+        pass
+    # }}}
+    # {{{ canvasRedo(self, event): XXX
+    def canvasRedo(self, event):
+        self.parentCanvas._dispatchDeltaPatches(self.parentCanvas.canvasJournal.popRedo())
+    # }}}
+    # {{{ canvasSave(self, event): XXX
+    def canvasSave(self, event):
+        if self.canvasPathName == None:
+            if self.canvasSaveAs(event) == False:
+                return
+        try:
+            with open(self.canvasPathName, "w", encoding="utf-8") as outFile:
+                self.parentCanvas.SetCursor(wx.Cursor(wx.CURSOR_WAIT))
+                self.parentCanvas.canvasExportStore.exportTextFile(                 \
+                    self.parentCanvas.canvasMap, self.parentCanvas.canvasSize, outFile)
+                self.parentCanvas.SetCursor(wx.Cursor(wx.NullCursor))
+                return True
+        except IOError as error:
+            return False
+    # }}}
+    # {{{ canvasSaveAs(self, event): XXX
+    def canvasSaveAs(self, event):
+        with wx.FileDialog(self.parentCanvas, "Save As", os.getcwd(), "", "mIRC art files (*.txt)|*.txt|All Files (*.*)|*.*", wx.FD_SAVE|wx.FD_OVERWRITE_PROMPT) as dialog:
+            if dialog.ShowModal() == wx.ID_CANCEL:
+                return False
+            else:
+                self.canvasPathName = dialog.GetPath()
+                return self.canvasSave(event)
+    # }}}
+    # {{{ canvasUndo(self, event): XXX
+    def canvasUndo(self, event):
+        self.parentCanvas._dispatchDeltaPatches(self.parentCanvas.canvasJournal.popUndo())
+    # }}}
+
     # {{{ canvasDecrBrushHeight(self, event): XXX
     def canvasDecrBrushHeight(self, event):
         if  self.parentCanvas.brushSize[1] > 1:
@@ -74,9 +171,7 @@ class GuiCanvasInterface():
     # {{{ canvasDecrCanvasHeight(self, event): XXX
     def canvasDecrCanvasHeight(self, event):
         if self.parentCanvas.canvasSize[1] > 1:
-            self.parentCanvas.resize([                  \
-                    self.parentCanvas.canvasSize[0],    \
-                    self.parentCanvas.canvasSize[1]-1])
+            self.parentCanvas.resize([self.parentCanvas.canvasSize[0], self.parentCanvas.canvasSize[1] - 1])
     # }}}
     # {{{ canvasDecrCanvasHeightWidth(self, event): XXX
     def canvasDecrCanvasHeightWidth(self, event):
@@ -86,36 +181,37 @@ class GuiCanvasInterface():
     # {{{ canvasDecrCanvasWidth(self, event): XXX
     def canvasDecrCanvasWidth(self, event):
         if self.parentCanvas.canvasSize[0] > 1:
-            self.parentCanvas.resize([                  \
-                    self.parentCanvas.canvasSize[0]-1,  \
-                    self.parentCanvas.canvasSize[1]])
+            self.parentCanvas.resize([self.parentCanvas.canvasSize[0] - 1, self.parentCanvas.canvasSize[1]])
     # }}}
-    # {{{ canvasDelete(self, event): XXX
-    def canvasDelete(self, event):
-        pass
+    # {{{ canvasIncrBrushHeight(self, event): XXX
+    def canvasIncrBrushHeight(self, event):
+        self.parentCanvas.brushSize[1] += 1
+        self.parentFrame.onCanvasUpdate(brushSize=self.parentCanvas.brushSize)
     # }}}
-    # {{{ canvasExit(self, event): XXX
-    def canvasExit(self, event):
-        if self.canvasPathName != None:
-            saveChanges = self._dialogSaveChanges()
-            if saveChanges == wx.ID_CANCEL:
-                return
-            elif saveChanges == wx.ID_NO:
-                pass
-            elif saveChanges == wx.ID_YES:
-                self.canvasSave(event)
-        self.parentFrame.Close(True)
+    # {{{ canvasIncrBrushHeightWidth(self, event): XXX
+    def canvasIncrBrushHeightWidth(self, event):
+        self.canvasIncrBrushHeight(event)
+        self.canvasIncrBrushWidth(event)
     # }}}
-    # {{{ canvasExportToClipboard(self, event): XXX
-    def canvasExportToClipboard(self, event):
-        self.parentCanvas.SetCursor(wx.Cursor(wx.CURSOR_WAIT))
-        outBuffer = self.parentCanvas.canvasExportStore.exportTextBuffer(self.parentCanvas.canvasMap, self.parentCanvas.canvasSize)
-        if wx.TheClipboard.Open():
-            wx.TheClipboard.SetData(wx.TextDataObject(outBuffer))
-            wx.TheClipboard.Close()
-        self.parentCanvas.SetCursor(wx.Cursor(wx.NullCursor))
-        return True
+    # {{{ canvasIncrBrushWidth(self, event): XXX
+    def canvasIncrBrushWidth(self, event):
+        self.parentCanvas.brushSize[0] += 1
+        self.parentFrame.onCanvasUpdate(brushSize=self.parentCanvas.brushSize)
     # }}}
+    # {{{ canvasIncrCanvasHeight(self, event): XXX
+    def canvasIncrCanvasHeight(self, event):
+        self.parentCanvas.resize([self.parentCanvas.canvasSize[0], self.parentCanvas.canvasSize[1] + 1])
+    # }}}
+    # {{{ canvasIncrCanvasHeightWidth(self, event): XXX
+    def canvasIncrCanvasHeightWidth(self, event):
+        self.canvasIncrCanvasHeight(event)
+        self.canvasIncrCanvasWidth(event)
+    # }}}
+    # {{{ canvasIncrCanvasWidth(self, event): XXX
+    def canvasIncrCanvasWidth(self, event):
+        self.parentCanvas.resize([self.parentCanvas.canvasSize[0] + 1, self.parentCanvas.canvasSize[1]])
+    # }}}
+
     # {{{ canvasExportAsAnsi(self, event): XXX
     def canvasExportAsAnsi(self, event):
         with wx.FileDialog(self.parentFrame, "Save As...", os.getcwd(), "", "ANSI files (*.ans;*.txt)|*.ans;*.txt|All Files (*.*)|*.*", wx.FD_SAVE|wx.FD_OVERWRITE_PROMPT) as dialog:
@@ -137,7 +233,7 @@ class GuiCanvasInterface():
             else:
                 outPathName = dialog.GetPath()
                 self.parentCanvas.SetCursor(wx.Cursor(wx.CURSOR_WAIT))
-                self.parentCanvas.canvasExportStore.exportBitmapToPngFile(  \
+                self.parentCanvas.canvasExportStore.exportBitmapToPngFile(          \
                     self.parentCanvas.canvasBackend.canvasBitmap, outPathName, wx.BITMAP_TYPE_PNG)
                 self.parentCanvas.SetCursor(wx.Cursor(wx.NullCursor))
                 return True
@@ -145,28 +241,23 @@ class GuiCanvasInterface():
     # {{{ canvasExportImgur(self, event): XXX
     def canvasExportImgur(self, event):
         self.parentCanvas.SetCursor(wx.Cursor(wx.CURSOR_WAIT))
-        imgurResult = self.parentCanvas.canvasExportStore.exportBitmapToImgur(  \
-            self.imgurApiKey, self.parentCanvas.canvasBackend.canvasBitmap,     \
-            "", "", wx.BITMAP_TYPE_PNG)
+        rc, status, result = self.parentCanvas.canvasExportStore.exportBitmapToImgur(   \
+                self.imgurApiKey, self.parentCanvas.canvasBackend.canvasBitmap, "", "", wx.BITMAP_TYPE_PNG)
         self.parentCanvas.SetCursor(wx.Cursor(wx.NullCursor))
-        if imgurResult[0] == 200:
+        if rc:
             if not wx.TheClipboard.IsOpened():
-                wx.TheClipboard.Open()
-                wx.TheClipboard.SetData(wx.TextDataObject(imgurResult[1]))
-                wx.TheClipboard.Close()
-            wx.MessageBox("Exported to Imgur: " + imgurResult[1],               \
-                "Export to Imgur", wx.OK|wx.ICON_INFORMATION)
+                wx.TheClipboard.Open(); wx.TheClipboard.SetData(wx.TextDataObject(result)); wx.TheClipboard.Close();
+            wx.MessageBox("Exported to Imgur: {}".format(result), "Export to Imgur", wx.ICON_INFORMATION | wx.OK)
         else:
-            wx.MessageBox("Failed to export to Imgur: " + imgurResult[1],       \
-                "Export to Imgur", wx.OK|wx.ICON_EXCLAMATION)
+            wx.MessageBox("Failed to export to Imgur: {}".format(result), "Export to Imgur", wx.ICON_EXCLAMATION | wx.OK)
     # }}}
     # {{{ canvasExportPastebin(self, event): XXX
     def canvasExportPastebin(self, event):
         self.parentCanvas.SetCursor(wx.Cursor(wx.CURSOR_WAIT))
-        pasteStatus, pasteResult =                                          \
-            self.parentCanvas.canvasExportStore.exportPastebin(             \
-                "",                          \
-                self.parentCanvas.canvasMap,                                \
+        pasteStatus, pasteResult =                                                  \
+            self.parentCanvas.canvasExportStore.exportPastebin(                     \
+                "",                                  \
+                self.parentCanvas.canvasMap,                                        \
                 self.parentCanvas.canvasSize)
         self.parentCanvas.SetCursor(wx.Cursor(wx.NullCursor))
         if pasteStatus:
@@ -174,11 +265,19 @@ class GuiCanvasInterface():
                 wx.TheClipboard.Open()
                 wx.TheClipboard.SetData(wx.TextDataObject(pasteResult))
                 wx.TheClipboard.Close()
-            wx.MessageBox("Exported to Pastebin: " + pasteResult,           \
-                "Export to Pastebin", wx.OK|wx.ICON_INFORMATION)
+            wx.MessageBox("Exported to Pastebin: " + pasteResult, "Export to Pastebin", wx.OK|wx.ICON_INFORMATION)
         else:
-            wx.MessageBox("Failed to export to Pastebin: " + pasteResult,   \
-                "Export to Pastebin", wx.OK|wx.ICON_EXCLAMATION)
+            wx.MessageBox("Failed to export to Pastebin: " + pasteResult, "Export to Pastebin", wx.OK|wx.ICON_EXCLAMATION)
+    # }}}
+    # {{{ canvasExportToClipboard(self, event): XXX
+    def canvasExportToClipboard(self, event):
+        self.parentCanvas.SetCursor(wx.Cursor(wx.CURSOR_WAIT))
+        rc, outBuffer = self.parentCanvas.canvasExportStore.exportTextBuffer(self.parentCanvas.canvasMap, self.parentCanvas.canvasSize)
+        if rc and wx.TheClipboard.Open():
+            wx.TheClipboard.SetData(wx.TextDataObject(outBuffer))
+            wx.TheClipboard.Close()
+        self.parentCanvas.SetCursor(wx.Cursor(wx.NullCursor))
+        return True
     # }}}
     # {{{ canvasImportAnsi(self, event): XXX
     def canvasImportAnsi(self, event):
@@ -196,17 +295,21 @@ class GuiCanvasInterface():
             else:
                 self.canvasPathName = dialog.GetPath()
                 self.parentCanvas.SetCursor(wx.Cursor(wx.CURSOR_WAIT))
-                self.parentCanvas.canvasImportStore.importAnsiFile(self.canvasPathName)
-                self.parentCanvas.canvasImportStore.importIntoPanel()
-                self.canvasPathName = "(Imported)"
-                self.parentCanvas.SetCursor(wx.Cursor(wx.NullCursor))
-                self.parentFrame.onCanvasUpdate(pathName="(Imported)", undoLevel=-1)
-                return True
+                rc, error = self.parentCanvas.canvasImportStore.importAnsiFile(self.canvasPathName)
+                if rc:
+                    self.parentCanvas.onStoreUpdate(self.parentCanvas.canvasImportStore.inSize, self.parentCanvas.canvasImportStore.outMap)
+                    self.canvasPathName = "(Imported)"
+                    self.parentCanvas.SetCursor(wx.Cursor(wx.NullCursor))
+                    self.parentFrame.onCanvasUpdate(pathName="(Imported)", undoLevel=-1)
+                    return True
+                else:
+                    print("error: {}".format(error), file=sys.stderr)
+                    return False
     # }}}
     # {{{ canvasImportFromClipboard(self, event): XXX
     def canvasImportFromClipboard(self, event):
         rc = False
-        if  wx.TheClipboard.IsSupported(wx.DataFormat(wx.DF_TEXT))  \
+        if  wx.TheClipboard.IsSupported(wx.DataFormat(wx.DF_TEXT))                  \
         and wx.TheClipboard.Open():
             inBuffer = wx.TextDataObject()
             if wx.TheClipboard.GetData(inBuffer):
@@ -219,12 +322,14 @@ class GuiCanvasInterface():
                     elif saveChanges == wx.ID_YES:
                         self.canvasSave(event)
                 self.parentCanvas.SetCursor(wx.Cursor(wx.CURSOR_WAIT))
-                self.parentCanvas.canvasImportStore.importTextFileBuffer(io.StringIO(inBuffer.GetText()))
-                self.parentCanvas.canvasImportStore.importIntoPanel()
-                self.canvasPathName = "(Clipboard)"
-                self.parentCanvas.SetCursor(wx.Cursor(wx.NullCursor))
-                self.parentFrame.onCanvasUpdate(pathName="(Clipboard)", undoLevel=-1)
-                rc = True
+                rc, error = self.parentCanvas.canvasImportStore.importTextBuffer(io.StringIO(inBuffer.GetText()))
+                if rc:
+                    self.parentCanvas.onStoreUpdate(self.parentCanvas.canvasImportStore.inSize, self.parentCanvas.canvasImportStore.outMap)
+                    self.canvasPathName = "(Clipboard)"
+                    self.parentCanvas.SetCursor(wx.Cursor(wx.NullCursor))
+                    self.parentFrame.onCanvasUpdate(pathName="(Clipboard)", undoLevel=-1)
+                else:
+                    print("error: {}".format(error), file=sys.stderr)
             wx.TheClipboard.Close()
         if not rc:
             with wx.MessageDialog(self.parentCanvas, "Clipboard does not contain text data and/or cannot be opened", "", wx.ICON_QUESTION | wx.OK | wx.OK_DEFAULT) as dialog:
@@ -246,121 +351,18 @@ class GuiCanvasInterface():
             else:
                 self.canvasPathName = dialog.GetPath()
                 self.parentCanvas.SetCursor(wx.Cursor(wx.CURSOR_WAIT))
-                self.parentCanvas.canvasImportStore.importSauceFile(self.canvasPathName)
-                self.parentCanvas.canvasImportStore.importIntoPanel()
-                self.canvasPathName = "(Imported)"
-                self.parentCanvas.SetCursor(wx.Cursor(wx.NullCursor))
-                self.parentFrame.onCanvasUpdate(pathName="(Imported)", undoLevel=-1)
-                return True
+                rc, error = self.parentCanvas.canvasImportStore.importSauceFile(self.canvasPathName)
+                if rc:
+                    self.parentCanvas.onStoreUpdate(self.parentCanvas.canvasImportStore.inSize, self.parentCanvas.canvasImportStore.outMap)
+                    self.canvasPathName = "(Imported)"
+                    self.parentCanvas.SetCursor(wx.Cursor(wx.NullCursor))
+                    self.parentFrame.onCanvasUpdate(pathName="(Imported)", undoLevel=-1)
+                    return True
+                else:
+                    print("error: {}".format(error), file=sys.stderr)
+                    return False
     # }}}
-    # {{{ canvasIncrBrushHeight(self, event): XXX
-    def canvasIncrBrushHeight(self, event):
-        self.parentCanvas.brushSize[1] += 1
-        self.parentFrame.onCanvasUpdate(brushSize=self.parentCanvas.brushSize)
-    # }}}
-    # {{{ canvasIncrBrushHeightWidth(self, event): XXX
-    def canvasIncrBrushHeightWidth(self, event):
-        self.canvasIncrBrushHeight(event)
-        self.canvasIncrBrushWidth(event)
-    # }}}
-    # {{{ canvasIncrBrushWidth(self, event): XXX
-    def canvasIncrBrushWidth(self, event):
-        self.parentCanvas.brushSize[0] += 1
-        self.parentFrame.onCanvasUpdate(brushSize=self.parentCanvas.brushSize)
-    # }}}
-    # {{{ canvasIncrCanvasHeight(self, event): XXX
-    def canvasIncrCanvasHeight(self, event):
-        self.parentCanvas.resize([              \
-            self.parentCanvas.canvasSize[0],    \
-            self.parentCanvas.canvasSize[1] + 1])
-    # }}}
-    # {{{ canvasIncrCanvasHeightWidth(self, event): XXX
-    def canvasIncrCanvasHeightWidth(self, event):
-        self.canvasIncrCanvasHeight(event)
-        self.canvasIncrCanvasWidth(event)
-    # }}}
-    # {{{ canvasIncrCanvasWidth(self, event): XXX
-    def canvasIncrCanvasWidth(self, event):
-        self.parentCanvas.resize([                  \
-            self.parentCanvas.canvasSize[0] + 1,    \
-            self.parentCanvas.canvasSize[1]])
-    # }}}
-    # {{{ canvasNew(self, event, newCanvasSize=None): XXX
-    def canvasNew(self, event, newCanvasSize=None):
-        if self.canvasPathName != None:
-            saveChanges = self._dialogSaveChanges()
-            if saveChanges == wx.ID_CANCEL:
-                return
-            elif saveChanges == wx.ID_NO:
-                pass
-            elif saveChanges == wx.ID_YES:
-                self.canvasSave(event)
-        self.parentCanvas.SetCursor(wx.Cursor(wx.CURSOR_WAIT))
-        if newCanvasSize == None:
-            newCanvasSize = list(self.parentCanvas.defaultCanvasSize)
-        self.parentCanvas.canvasImportStore.importNew(newCanvasSize)
-        self.canvasPathName = None
-        self.parentCanvas.SetCursor(wx.Cursor(wx.NullCursor))
-        self.parentFrame.onCanvasUpdate(pathName="", undoLevel=-1)
-    # }}}
-    # {{{ canvasOpen(self, event): XXX
-    def canvasOpen(self, event):
-        if self.canvasPathName != None:
-            saveChanges = self._dialogSaveChanges()
-            if saveChanges == wx.ID_CANCEL:
-                return
-            elif saveChanges == wx.ID_NO:
-                pass
-            elif saveChanges == wx.ID_YES:
-                self.canvasSave(event)
-        with wx.FileDialog(self.parentCanvas, "Open", os.getcwd(), "", "mIRC art files (*.txt)|*.txt|All Files (*.*)|*.*", wx.FD_OPEN) as dialog:
-            if dialog.ShowModal() == wx.ID_CANCEL:
-                return False
-            else:
-                self.canvasPathName = dialog.GetPath()
-                print(self.canvasPathName)
-                self.parentCanvas.SetCursor(wx.Cursor(wx.CURSOR_WAIT))
-                self.parentCanvas.canvasImportStore.importTextFile(self.canvasPathName)
-                self.parentCanvas.canvasImportStore.importIntoPanel()
-                self.parentCanvas.SetCursor(wx.Cursor(wx.NullCursor))
-                self.parentFrame.onCanvasUpdate(                        \
-                    pathName=self.canvasPathName, undoLevel=-1)
-                return True
-    # }}}
-    # {{{ canvasPaste(self, event): XXX
-    def canvasPaste(self, event):
-        pass
-    # }}}
-    # {{{ canvasRedo(self, event): XXX
-    def canvasRedo(self, event):
-        self.parentCanvas._dispatchDeltaPatches(    \
-            self.parentCanvas.canvasJournal.popRedo())
-    # }}}
-    # {{{ canvasSave(self, event): XXX
-    def canvasSave(self, event):
-        if self.canvasPathName == None:
-            if self.canvasSaveAs(event) == False:
-                return
-        try:
-            with open(self.canvasPathName, "w", encoding="utf-8") as outFile:
-                self.parentCanvas.SetCursor(wx.Cursor(wx.CURSOR_WAIT))
-                self.parentCanvas.canvasExportStore.exportTextFile(      \
-                    self.parentCanvas.canvasMap,                         \
-                    self.parentCanvas.canvasSize, outFile)
-                self.parentCanvas.SetCursor(wx.Cursor(wx.NullCursor))
-                return True
-        except IOError as error:
-            return False
-    # }}}
-    # {{{ canvasSaveAs(self, event): XXX
-    def canvasSaveAs(self, event):
-        with wx.FileDialog(self.parentCanvas, "Save As", os.getcwd(), "", "mIRC art files (*.txt)|*.txt|All Files (*.*)|*.*", wx.FD_SAVE|wx.FD_OVERWRITE_PROMPT) as dialog:
-            if dialog.ShowModal() == wx.ID_CANCEL:
-                return False
-            else:
-                self.canvasPathName = dialog.GetPath()
-                return self.canvasSave(event)
-    # }}}
+
     # {{{ canvasToolCircle(self, event): XXX
     def canvasToolCircle(self, event):
         self.canvasTool = ToolCircle(self.parentCanvas)
@@ -416,11 +418,6 @@ class GuiCanvasInterface():
         toolBar = self.parentFrame.toolBarItemsById[self.parentFrame.CID_TEXT[0]].GetToolBar()
         toolBar.ToggleTool(self.parentFrame.CID_TEXT[0], True)
         self.parentFrame.onCanvasUpdate(toolName=self.canvasTool.name)
-    # }}}
-    # {{{ canvasUndo(self, event): XXX
-    def canvasUndo(self, event):
-        self.parentCanvas._dispatchDeltaPatches(    \
-            self.parentCanvas.canvasJournal.popUndo())
     # }}}
 
     #
