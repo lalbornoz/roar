@@ -24,9 +24,9 @@ class ToolText(Tool):
             if self.textPos == None:
                 self.textPos = list(atPoint)
         dispatchFn(eventDc, False, [*self.textPos, *self.textColours, 0, keyChar])
-        if self.textPos[0] < (self.parentCanvas.canvasSize[0] - 1):
+        if self.textPos[0] < (self.parentCanvas.canvas.size[0] - 1):
             self.textPos[0] += 1
-        elif self.textPos[1] < (self.parentCanvas.canvasSize[1] - 1):
+        elif self.textPos[1] < (self.parentCanvas.canvas.size[1] - 1):
             self.textPos[0] = 0; self.textPos[1] += 1;
         else:
             self.textPos = [0, 0]

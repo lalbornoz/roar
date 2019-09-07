@@ -6,7 +6,7 @@
 #
 
 from CanvasColours import AnsiBgToMiRCARTColours, AnsiFgToMiRCARTColours, AnsiFgBoldToMiRCARTColours
-import os, re, struct, sys
+import io, os, re, struct, sys
 
 class CanvasImportStore():
     """XXX"""
@@ -23,17 +23,17 @@ class CanvasImportStore():
         return cellState & ~bit if cellState & bit else cellState | bit
     # }}}
 
-    # {{{ importAnsiBuffer(self, inFile, encoding="cp437", width=None): XXX
-    def importAnsiBuffer(self, inFile, encoding="cp437", width=None):
+    # {{{ importAnsiBuffer(self, inBuffer, encoding="cp437", width=None): XXX
+    def importAnsiBuffer(self, inBuffer, encoding="cp437", width=None):
         curBg, curBgAnsi, curBoldAnsi, curFg, curFgAnsi = 1, 30, False, 15, 37
         done, outMap, outMaxCols = False, [[]], 0
-        inFileData = inFile.read().decode(encoding)
-        inFileChar, inFileCharMax = 0, len(inFileData)
+        inBufferData = inBuffer.decode(encoding)
+        inBufferChar, inBufferCharMax = 0, len(inBufferData)
         while True:
-            if inFileChar >= inFileCharMax:
+            if inBufferChar >= inBufferCharMax:
                 break
             else:
-                m = re.match("\x1b\[((?:\d{1,3};?)+m|\d+C)", inFileData[inFileChar:])
+                m = re.match("\x1b\[((?:\d{1,3};?)+m|\d+[ABCDEFG])", inBufferData[inBufferChar:])
                 if m:
                     if m[1][-1] == "C":
                         outMap[-1] += [[curFg, curBg, self._CellState.CS_NONE, " "]] * int(m[1][:-1])
@@ -48,25 +48,26 @@ class CanvasImportStore():
                                 curBoldAnsi, newFg = False, AnsiFgToMiRCARTColours[curFgAnsi]
                             elif ansiCode == 7:
                                 curBgAnsi, curFgAnsi, newBg, newFg = curFgAnsi, curBgAnsi, curFg, curBg
-                            elif ansiCode in AnsiBgToMiRCARTColours:
+                            elif (not curBoldAnsi) and (ansiCode in AnsiBgToMiRCARTColours):
                                 curBgAnsi, newBg = ansiCode, AnsiBgToMiRCARTColours[ansiCode]
-                            elif ansiCode in AnsiFgBoldToMiRCARTColours:
+                            elif curBoldAnsi and (ansiCode in AnsiFgBoldToMiRCARTColours):
                                 curFgAnsi, newFg = ansiCode, AnsiFgBoldToMiRCARTColours[ansiCode]
                             elif ansiCode in AnsiFgToMiRCARTColours:
                                 newFg = AnsiFgBoldToMiRCARTColours[ansiCode] if curBoldAnsi else AnsiFgToMiRCARTColours[ansiCode]
                                 curFgAnsi = ansiCode
                         curBg = newBg if newBg != -1 else curBg; curFg = newFg if newFg != -1 else curFg;
-                    inFileChar += len(m[0])
-                elif inFileData[inFileChar:inFileChar + 2] == "\r\n":
-                    done = True; inFileChar += 2;
-                elif inFileData[inFileChar] in set("\r\n"):
-                    done = True; inFileChar += 1;
+                    inBufferChar += len(m[0])
+                elif inBufferData[inBufferChar:inBufferChar + 2] == "\r\n":
+                    done = True; inBufferChar += 2;
+                elif inBufferData[inBufferChar] in set("\r\n"):
+                    done = True; inBufferChar += 1;
                 else:
-                    outMap[-1].append([curFg, curBg, self._CellState.CS_NONE, inFileData[inFileChar]])
-                    inFileChar += 1
+                    outMap[-1].append([curFg, curBg, self._CellState.CS_NONE, inBufferData[inBufferChar]])
+                    inBufferChar += 1
                 if done or (width == len(outMap[-1])):
                     done, outMaxCols, = False, max(outMaxCols, len(outMap[-1])); outMap.append([]);
-        if len(outMap[0]):
+        if (len(outMap) > 1)    \
+        or ((len(outMap) == 1) and len(outMap[0])):
             for numRow in range(len(outMap)):
                 for numCol in range(len(outMap[numRow]), outMaxCols):
                     outMap[numRow].append([curFg, curBg, self._CellState.CS_NONE, " "])
@@ -77,16 +78,17 @@ class CanvasImportStore():
     # }}}
     # {{{ importAnsiFile(self, inPathName, encoding="cp437"): XXX
     def importAnsiFile(self, inPathName, encoding="cp437"):
-        return self.importAnsiBuffer(open(inPathName, "rb"), encoding)
+        return self.importAnsiBuffer(open(inPathName, "rb").read(), encoding)
     # }}}
-    # {{{ importSauceFile(self, inPathName): XXX
-    def importSauceFile(self, inPathName):
+    # {{{ importSauceFile(self, inPathName, encoding="cp437"): XXX
+    def importSauceFile(self, inPathName, encoding="cp437"):
         with open(inPathName, "rb") as inFile:
-            inFileStat = os.stat(inPathName); inFile.seek(inFileStat.st_size - 128, 0); inFile.seek(94);
+            inFileStat = os.stat(inPathName)
+            inFile.seek(inFileStat.st_size - 128, os.SEEK_SET); inFile.seek(94, os.SEEK_CUR);
             if inFile.read(2) == b'\x01\x01':
                 width = struct.unpack("H", inFile.read(2))[0]
                 inFile.seek(0, 0); inFileData = inFile.read(inFileStat.st_size - 128);
-                return self.importAnsiFileBuffer(io.StringIO(inFileData), width)
+                return self.importAnsiBuffer(inFileData, encoding, width)
             else:
                 return (False, "only character based ANSi SAUCE files are supported")
     # }}}
@@ -124,7 +126,8 @@ class CanvasImportStore():
                 else:
                     outMap[-1].append([*inCurColours, inCellState, inChar]); inCurCol += 1;
             inLine, outMaxCols = inFile.readline(), max(outMaxCols, len(outMap[-1]))
-        if len(outMap[0]):
+        if (len(outMap) > 1)    \
+        or ((len(outMap) == 1) and len(outMap[0])):
             self.inSize, self.outMap = [outMaxCols, len(outMap)], outMap
             return (True, None)
         else:

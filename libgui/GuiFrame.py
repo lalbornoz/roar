@@ -4,9 +4,12 @@
 # Copyright (c) 2018, 2019 Lucio Andrés Illanes Albornoz <lucio@lucioillanes.de>
 #
 
-from Canvas import Canvas, haveUrllib
-from CanvasColours import Colours
+from Canvas import Canvas
+from CanvasExportStore import haveUrllib
+from GuiCanvasColours import Colours
 from GuiCanvasInterface import GuiCanvasInterface
+from GuiCanvasPanel import GuiCanvasPanel
+from GuiCanvasWxBackend import GuiCanvasWxBackend
 from GuiGeneralFrame import GuiGeneralFrame,                                            \
     TID_ACCELS, TID_COMMAND, TID_LIST, TID_MENU, TID_NOTHING, TID_SELECT, TID_TOOLBAR,  \
     NID_MENU_SEP, NID_TOOLBAR_HSEP, NID_TOOLBAR_VSEP
@@ -116,9 +119,7 @@ class GuiFrame(GuiGeneralFrame):
     def _initIcon(self):
         iconPathNames = glob(os.path.join("assets", "images", "logo*.bmp"))
         iconPathName = iconPathNames[random.randint(0, len(iconPathNames) - 1)]
-        icon = wx.Icon()
-        icon.CopyFromBitmap(wx.Bitmap(iconPathName, wx.BITMAP_TYPE_ANY))
-        self.SetIcon(icon)
+        icon = wx.Icon(); icon.CopyFromBitmap(wx.Bitmap(iconPathName, wx.BITMAP_TYPE_ANY)); self.SetIcon(icon);
     # }}}
     # {{{ _initPaletteToolBitmaps(self): XXX
     def _initPaletteToolBitmaps(self):
@@ -131,8 +132,7 @@ class GuiFrame(GuiGeneralFrame):
             toolBitmapColour = Colours[numColour][0:4]
             toolBitmap = wx.Bitmap((16,16))
             toolBitmapDc = wx.MemoryDC(); toolBitmapDc.SelectObject(toolBitmap);
-            toolBitmapBrush = wx.Brush(         \
-                wx.Colour(toolBitmapColour), wx.BRUSHSTYLE_SOLID)
+            toolBitmapBrush = wx.Brush(wx.Colour(toolBitmapColour), wx.BRUSHSTYLE_SOLID)
             toolBitmapDc.SetBrush(toolBitmapBrush)
             toolBitmapDc.SetBackground(toolBitmapBrush)
             toolBitmapDc.SetPen(wx.Pen(wx.Colour(toolBitmapColour), 1))
@@ -140,35 +140,18 @@ class GuiFrame(GuiGeneralFrame):
             paletteDescr[numColour][4] = ["", None, toolBitmap]
     # }}}
 
-    # {{{ onInput(self, event): XXX
-    def onInput(self, event):
-        eventId = event.GetId()
-        if  eventId >= self.CID_COLOUR00[0] \
-        and eventId <= self.CID_COLOUR15[0]:
-            numColour = eventId - self.CID_COLOUR00[0]
-            self.itemsById[eventId][7](self.panelCanvas.canvasInterface, event, numColour)
-        else:
-            self.itemsById[eventId][7](self.panelCanvas.canvasInterface, event)
-    # }}}
-    # {{{ onCanvasUpdate(self, newBrushSize=None, newCellPos=None, newColours=None, newPathName=None, newSize=None, newToolName=None, newUndoLevel=None): XXX
-    def onCanvasUpdate(self, **kwargs):
-        self.lastPanelState.update(kwargs)
-        textItems = []
+    # {{{ update(self, **kwargs): XXX
+    def update(self, **kwargs):
+        self.lastPanelState.update(kwargs); textItems = [];
         if "cellPos" in self.lastPanelState:
-            textItems.append("X: {:03d} Y: {:03d}".format(              \
-                *self.lastPanelState["cellPos"]))
+            textItems.append("X: {:03d} Y: {:03d}".format(*self.lastPanelState["cellPos"]))
         if "size" in self.lastPanelState:
-            textItems.append("W: {:03d} H: {:03d}".format(              \
-                *self.lastPanelState["size"]))
+            textItems.append("W: {:03d} H: {:03d}".format(*self.lastPanelState["size"]))
         if "brushSize" in self.lastPanelState:
-            textItems.append("Brush: {:02d}x{:02d}".format(             \
-                *self.lastPanelState["brushSize"]))
+            textItems.append("Brush: {:02d}x{:02d}".format(*self.lastPanelState["brushSize"]))
         if "colours" in self.lastPanelState:
-            textItems.append("FG: {:02d}, BG: {:02d}".format(           \
-                *self.lastPanelState["colours"]))
-            textItems.append("{} on {}".format(                         \
-                Colours[self.lastPanelState["colours"][0]][4],   \
-                Colours[self.lastPanelState["colours"][1]][4]))
+            textItems.append("FG: {:02d}, BG: {:02d}".format(*self.lastPanelState["colours"]))
+            textItems.append("{} on {}".format(Colours[self.lastPanelState["colours"][0]][4], Colours[self.lastPanelState["colours"][1]][4]))
         if "pathName" in self.lastPanelState:
             if self.lastPanelState["pathName"] != "":
                 basePathName = os.path.basename(self.lastPanelState["pathName"])
@@ -177,8 +160,7 @@ class GuiFrame(GuiGeneralFrame):
             else:
                 self.SetTitle("roar")
         if "toolName" in self.lastPanelState:
-            textItems.append("Current tool: {}".format(                 \
-                self.lastPanelState["toolName"]))
+            textItems.append("Current tool: {}".format(self.lastPanelState["toolName"]))
         self.statusBar.SetStatusText(" | ".join(textItems))
         if "undoLevel" in self.lastPanelState:
             if self.lastPanelState["undoLevel"] >= 0:
@@ -198,11 +180,15 @@ class GuiFrame(GuiGeneralFrame):
                 toolBar = self.toolBarItemsById[self.CID_REDO[0]].GetToolBar()
                 toolBar.EnableTool(self.CID_REDO[0], False)
     # }}}
-
-    # {{{ __del__(self): destructor method
-    def __del__(self):
-        if self.panelCanvas != None:
-            del self.panelCanvas; self.panelCanvas = None;
+    # {{{ onInput(self, event): XXX
+    def onInput(self, event):
+        eventId = event.GetId()
+        if  eventId >= self.CID_COLOUR00[0] \
+        and eventId <= self.CID_COLOUR15[0]:
+            numColour = eventId - self.CID_COLOUR00[0]
+            self.itemsById[eventId][7](self.canvasPanel.interface, event, numColour)
+        else:
+            self.itemsById[eventId][7](self.canvasPanel.interface, event)
     # }}}
 
     #
@@ -210,18 +196,15 @@ class GuiFrame(GuiGeneralFrame):
     def __init__(self, parent, appSize=(840, 630), defaultCanvasPos=(0, 75), defaultCanvasSize=(100, 30), defaultCellSize=(7, 14)):
         self._initPaletteToolBitmaps()
         self.panelSkin = super().__init__(parent, wx.ID_ANY, "", size=appSize)
-        self.lastPanelState, self.panelCanvas = {}, None
+        self.lastPanelState, self.canvasPanel = {}, None
         self._initIcon()
 
-        self.panelCanvas = Canvas(self.panelSkin, parentFrame=self, \
-            canvasInterface=GuiCanvasInterface,                     \
-            defaultCanvasPos=defaultCanvasPos,                      \
-            defaultCanvasSize=defaultCanvasSize,                    \
-            defaultCellSize=defaultCellSize)
-        self.panelCanvas.canvasInterface.canvasNew(None)
+        self.canvas = Canvas(defaultCanvasSize)
+        self.canvasPanel = GuiCanvasPanel(self.panelSkin, self, GuiCanvasWxBackend, self.canvas, defaultCanvasPos, defaultCanvasSize, defaultCellSize, GuiCanvasInterface)
+        self.canvasPanel.interface.canvasNew(None)
 
         self.sizerSkin.AddSpacer(5)
-        self.sizerSkin.Add(self.panelCanvas, 0, wx.ALL|wx.EXPAND, 14)
+        self.sizerSkin.Add(self.canvasPanel, 0, wx.ALL|wx.EXPAND, 14)
         self.panelSkin.SetSizer(self.sizerSkin)
         self.panelSkin.SetAutoLayout(1)
         self.sizerSkin.Fit(self.panelSkin)

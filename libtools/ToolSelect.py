@@ -64,7 +64,7 @@ class ToolSelect(Tool):
                 self.toolSelectMap.append([])
                 for numCol in range((self.targetRect[1][0] - self.targetRect[0][0]) + 1):
                     rectX, rectY = self.targetRect[0][0] + numCol, self.targetRect[0][1] + numRow
-                    self.toolSelectMap[numRow].append(self.parentCanvas.canvasMap[rectY][rectX])
+                    self.toolSelectMap[numRow].append(self.parentCanvas.canvas.map[rectY][rectX])
             self._drawSelectRect(self.targetRect, dispatchFn, eventDc)
         elif isRightDown:
             self.targetRect, self.toolState = None, self.TS_NONE

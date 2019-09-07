@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 #
-# CanvasBackend.py -- XXX
+# GuiCanvasWxBackend.py -- XXX
 # Copyright (c) 2018, 2019 Lucio Andrés Illanes Albornoz <lucio@lucioillanes.de>
 #
 
-from CanvasColours import Colours
+from GuiCanvasColours import Colours
 import wx
 
-class CanvasBackend():
+class GuiCanvasWxBackend():
     """XXX"""
 
     # {{{ _drawBrushPatch(self, eventDc, patch): XXX

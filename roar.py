@@ -18,11 +18,11 @@ def main(*argv):
     appFrame = GuiFrame(None)
     if  len(argv) > 1    \
     and len(argv[1]) > 0:
-        appFrame.panelCanvas.canvasInterface.canvasPathName = argv[1]
-        rc, error = appFrame.panelCanvas.canvasImportStore.importTextFile(argv[1])
+        appFrame.canvasPanel.interface.canvasPathName = argv[1]
+        rc, error = appFrame.canvasPanel.canvas.importStore.importTextFile(argv[1])
         if rc:
-            appFrame.panelCanvas.onStoreUpdate(appFrame.panelCanvas.canvasImportStore.inSize, appFrame.panelCanvas.canvasImportStore.outMap)
-            appFrame.onCanvasUpdate(pathName=argv[1], undoLevel=-1)
+            appFrame.canvasPanel.update(appFrame.canvasPanel.canvas.importStore.inSize, False, appFrame.canvasPanel.canvas.importStore.outMap)
+            appFrame.update(pathName=argv[1], undoLevel=-1)
         else:
             print("error: {}".format(error), file=sys.stderr)
     wxApp.MainLoop()
