@@ -9,6 +9,7 @@ import os, sys
 [sys.path.append(os.path.join(os.getcwd(), "..", "..", path)) for path in ["libcanvas", "librtl"]]
 
 from CanvasImportStore import CanvasImportStore
+from CanvasExportStore import CanvasExportStore
 import sys
 
 def reduce(inPathName):
@@ -25,15 +26,17 @@ def reduce(inPathName):
                         print("\u001f", end="", file=outFile)
                     lastAttribs = inCurCell[2]
                 if  lastColours == None                     \
-                or  (lastColours[0] != inCurCell[:2][0]     \
-                and  lastColours[1] != inCurCell[:2][1]):
+                or  ((lastColours[0] != inCurCell[:2][0])   \
+                and  (lastColours[1] != inCurCell[:2][1]))  \
+                or  ((lastColours[0] == inCurCell[:2][0])   \
+                and  (lastColours[1] != inCurCell[:2][1])):
                     if (inCurCell[3] in set("0123456789")) and (inCurCell[1] < 10):
                         print("\u0003{:d},{:02d}{}".format(*inCurCell[:2], inCurCell[3]), end="", file=outFile)
                     else:
                         print("\u0003{:d},{:d}{}".format(*inCurCell[:2], inCurCell[3]), end="", file=outFile)
                     lastColours = inCurCell[:2]
-                elif (lastColours[1] == inCurCell[:2][1])   \
-                and  (lastColours[0] != inCurCell[:2][0]):
+                elif (lastColours[0] != inCurCell[:2][0])   \
+                and  (lastColours[1] == inCurCell[:2][1]):
                     if (inCurCell[3] in set("0123456789")) and (inCurCell[0] < 10):
                         print("\u0003{:02d}{}".format(inCurCell[0], inCurCell[3]), end="", file=outFile)
                     else:
