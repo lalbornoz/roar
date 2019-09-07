@@ -4,194 +4,90 @@
 # Copyright (c) 2018, 2019 Lucio Andrés Illanes Albornoz <lucio@lucioillanes.de>
 #
 
-from CanvasBackend import CanvasBackend
-from CanvasJournal import CanvasJournal
-from CanvasExportStore import CanvasExportStore, havePIL, haveUrllib
+from CanvasExportStore import CanvasExportStore
 from CanvasImportStore import CanvasImportStore
-import wx
+from CanvasJournal import CanvasJournal
 
-class Canvas(wx.Panel):
+class Canvas():
     """XXX"""
 
     # {{{ _commitPatch(self, patch): XXX
     def _commitPatch(self, patch):
-        self.canvasMap[patch[1]][patch[0]] = patch[2:]
-    # }}}
-    # {{{ _dispatchDeltaPatches(self, deltaPatches): XXX
-    def _dispatchDeltaPatches(self, deltaPatches):
-        eventDc = self.canvasBackend.getDeviceContext(self)
-        for patch in deltaPatches:
-            if patch[0] == "resize":
-                del eventDc
-                self.resize(patch[1:], False)
-                eventDc = self.canvasBackend.getDeviceContext(self)
-            elif self.canvasBackend.drawPatch(eventDc, patch):
-                self._commitPatch(patch)
-        self.parentFrame.onCanvasUpdate(undoLevel=self.canvasJournal.patchesUndoLevel)
-    # }}}
-    # {{{ _dispatchPatch(self, eventDc, isCursor, patch, commitUndo=True): XXX
-    def _dispatchPatch(self, eventDc, isCursor, patch, commitUndo=True):
-        if not self._canvasDirtyCursor:
-            self.canvasBackend.drawCursorMaskWithJournal(self.canvasJournal, eventDc)
-            self._canvasDirtyCursor = True
-        if self.canvasBackend.drawPatch(eventDc, patch):
-            patchDeltaCell = self.canvasMap[patch[1]][patch[0]]
-            patchDelta = [*patch[0:2], *patchDeltaCell]
-            if isCursor and commitUndo:
-                self.canvasJournal.pushCursor(patchDelta)
-            else:
-                if commitUndo:
-                    if not self._canvasDirty:
-                        self.canvasJournal.pushDeltas([], []); self._canvasDirty = True;
-                    self.canvasJournal.updateCurrentDeltas(patch, patchDelta)
-                self._commitPatch(patch)
+        self.map[patch[1]][patch[0]] = patch[2:]
     # }}}
 
-    # {{{ onPanelClose(self, event): XXX
-    def onPanelClose(self, event):
-        self.Destroy()
-    # }}}
-    # {{{ onPanelEnterWindow(self, event): XXX
-    def onPanelEnterWindow(self, event):
-        self.parentFrame.SetFocus()
-    # }}}
-    # {{{ onPanelInput(self, event): XXX
-    def onPanelInput(self, event):
-        eventDc = self.canvasBackend.getDeviceContext(self)
-        eventType = event.GetEventType()
-        self._canvasDirty = self._canvasDirtyCursor = False
-        tool = self.canvasInterface.canvasTool
-        if eventType == wx.wxEVT_CHAR:
-            mapPoint = self.brushPos
-            doSkip = tool.onKeyboardEvent(                                  \
-                event, mapPoint, self.brushColours, self.brushSize,         \
-                chr(event.GetUnicodeKey()), self._dispatchPatch, eventDc)
-            if doSkip:
-                event.Skip(); return;
+    # {{{ dispatchPatch(self, isCursor, patch, commitUndo=True): XXX
+    def dispatchPatch(self, isCursor, patch, commitUndo=True):
+        patchDeltaCell = self.map[patch[1]][patch[0]]; patchDelta = [*patch[0:2], *patchDeltaCell];
+        if isCursor:
+            self.journal.pushCursor(patchDelta)
         else:
-            mapPoint = self.canvasBackend.xlateEventPoint(event, eventDc)
-            if mapPoint[0] >= self.canvasSize[0]                            \
-            or mapPoint[1] >= self.canvasSize[1]:
-                return
-            self.brushPos = mapPoint
-            tool.onMouseEvent(                                              \
-                event, mapPoint, self.brushColours, self.brushSize,         \
-                event.Dragging(), event.LeftIsDown(), event.RightIsDown(),  \
-                self._dispatchPatch, eventDc)
-        if self._canvasDirty:
-            self.parentFrame.onCanvasUpdate(cellPos=self.brushPos, undoLevel=self.canvasJournal.patchesUndoLevel)
-        if eventType == wx.wxEVT_MOTION:
-            self.parentFrame.onCanvasUpdate(cellPos=mapPoint)
-    # }}}
-    # {{{ onPanelLeaveWindow(self, event): XXX
-    def onPanelLeaveWindow(self, event):
-        eventDc = self.canvasBackend.getDeviceContext(self)
-        self.canvasBackend.drawCursorMaskWithJournal(self.canvasJournal, eventDc)
-    # }}}
-    # {{{ onPanelPaint(self, event): XXX
-    def onPanelPaint(self, event):
-        self.canvasBackend.onPanelPaintEvent(event, self)
-    # }}}
-    # {{{ onStoreUpdate(self, newCanvasSize, newCanvas=None): XXX
-    def onStoreUpdate(self, newCanvasSize, newCanvas=None):
-        self.resize(newCanvasSize=newCanvasSize, commitUndo=False)
-        eventDc = self.canvasBackend.getDeviceContext(self)
-        for numRow in range(self.canvasSize[1]):
-            for numCol in range(self.canvasSize[0]):
-                if  newCanvas != None       \
-                and numRow < len(newCanvas) \
-                and numCol < len(newCanvas[numRow]):
-                    self._commitPatch([numCol, numRow, *newCanvas[numRow][numCol]])
-                self.canvasBackend.drawPatch(eventDc, [numCol, numRow, *self.canvasMap[numRow][numCol]])
-        wx.SafeYield()
-    # }}}
-    # {{{ resize(self, newCanvasSize, commitUndo=True): XXX
-    def resize(self, newCanvasSize, commitUndo=True):
-        if newCanvasSize != self.canvasSize:
-            self._canvasDirty, self._canvasDirtyCursor = False, False
-            if self.canvasMap == None:
-                self.canvasMap, oldCanvasSize = [], [0, 0]
-            else:
-                oldCanvasSize = self.canvasSize
-            deltaCanvasSize = [b - a for a, b in zip(oldCanvasSize, newCanvasSize)]
-
-            newWinSize = [a * b for a, b in zip(newCanvasSize, self.canvasBackend.cellSize)]
-            self.SetMinSize(newWinSize); self.SetSize(wx.DefaultCoord, wx.DefaultCoord, *newWinSize);
-            curWindow = self
-            while curWindow != None:
-                curWindow.Layout(); curWindow = curWindow.GetParent();
-
-            self.canvasBackend.resize(newCanvasSize, self.canvasBackend.cellSize)
-            eventDc = self.canvasBackend.getDeviceContext(self)
-            self.canvasJournal.resetCursor()
-
             if commitUndo:
-                undoPatches, redoPatches = ["resize", *oldCanvasSize], ["resize", *newCanvasSize]
-                if not self._canvasDirty:
-                    self.canvasJournal.pushDeltas([], []); self._canvasDirty = True;
-                self.canvasJournal.updateCurrentDeltas(redoPatches, undoPatches)
-
-            if deltaCanvasSize[0] < 0:
-                for numRow in range(oldCanvasSize[1]):
-                    if commitUndo:
-                        for numCol in range((oldCanvasSize[0] + deltaCanvasSize[0]), oldCanvasSize[0]):
-                            if not self._canvasDirty:
-                                self.canvasJournal.pushDeltas([], []); self._canvasDirty = True;
-                            self.canvasJournal.updateCurrentDeltas([numCol, numRow, 1, 1, 0, " "], [numCol, numRow, *self.canvasMap[numRow][numCol]])
-                    del self.canvasMap[numRow][-1:(deltaCanvasSize[0]-1):-1]
-            else:
-                for numRow in range(oldCanvasSize[1]):
-                    self.canvasMap[numRow].extend([[1, 1, 0, " "]] * deltaCanvasSize[0])
-                    for numNewCol in range(oldCanvasSize[0], newCanvasSize[0]):
-                        self._dispatchPatch(eventDc, False, [numNewCol, numRow, 1, 1, 0, " "], commitUndo)
-            if deltaCanvasSize[1] < 0:
-                if commitUndo:
-                    for numRow in range((oldCanvasSize[1] + deltaCanvasSize[1]), oldCanvasSize[1]):
-                        for numCol in range(oldCanvasSize[0] + deltaCanvasSize[0]):
-                            if not self._canvasDirty:
-                                self.canvasJournal.pushDeltas([], []); self._canvasDirty = True;
-                            self.canvasJournal.updateCurrentDeltas([numCol, numRow, 1, 1, 0, " "], [numCol, numRow, *self.canvasMap[numRow][numCol]])
-                del self.canvasMap[-1:(deltaCanvasSize[1]-1):-1]
-            else:
-                for numNewRow in range(oldCanvasSize[1], newCanvasSize[1]):
-                    self.canvasMap.extend([[[1, 1, 0, " "]] * newCanvasSize[0]])
-                    for numNewCol in range(newCanvasSize[0]):
-                        self._dispatchPatch(eventDc, False, [numNewCol, numNewRow, 1, 1, 0, " "], commitUndo)
-
-            self.canvasSize = newCanvasSize; wx.SafeYield(); self.parentFrame.onCanvasUpdate(size=newCanvasSize, undoLevel=self.canvasJournal.patchesUndoLevel)
+                if not self.dirty:
+                    self.journal.pushDeltas([], []); self.dirty = True;
+                self.journal.updateCurrentDeltas(patch, patchDelta)
+            self._commitPatch(patch)
     # }}}
-
-    # {{{ __del__(self): destructor method
-    def __del__(self):
-        if self.canvasMap != None:
-            self.canvasMap.clear(); self.canvasMap = None;
+    # {{{ resize(self, newSize, commitUndo=True): XXX
+    def resize(self, newSize, commitUndo=True):
+        if newSize != self.size:
+            self.dirty = False
+            if self.map == None:
+                self.map, oldSize = [], [0, 0]
+            else:
+                oldSize = self.size
+            deltaSize = [b - a for a, b in zip(oldSize, newSize)]
+            self.journal.resetCursor()
+            if commitUndo:
+                undoPatches, redoPatches = ["resize", *oldSize], ["resize", *newSize]
+                if not self.dirty:
+                    self.journal.pushDeltas([], []); self.dirty = True;
+                self.journal.updateCurrentDeltas(redoPatches, undoPatches)
+            if deltaSize[0] < 0:
+                for numRow in range(oldSize[1]):
+                    if commitUndo:
+                        for numCol in range((oldSize[0] + deltaSize[0]), oldSize[0]):
+                            if not self.dirty:
+                                self.journal.pushDeltas([], []); self.dirty = True;
+                            self.journal.updateCurrentDeltas(None, [numCol, numRow, *self.map[numRow][numCol]])
+                    del self.map[numRow][-1:(deltaSize[0]-1):-1]
+            else:
+                for numRow in range(oldSize[1]):
+                    self.map[numRow].extend([[1, 1, 0, " "]] * deltaSize[0])
+                    for numNewCol in range(oldSize[0], newSize[0]):
+                        self.dispatchPatch(False, [numNewCol, numRow, 1, 1, 0, " "], commitUndo)
+            if deltaSize[1] < 0:
+                if commitUndo:
+                    for numRow in range((oldSize[1] + deltaSize[1]), oldSize[1]):
+                        for numCol in range(oldSize[0] + deltaSize[0]):
+                            if not self.dirty:
+                                self.journal.pushDeltas([], []); self.dirty = True;
+                            self.journal.updateCurrentDeltas(None, [numCol, numRow, *self.map[numRow][numCol]])
+                del self.map[-1:(deltaSize[1]-1):-1]
+            else:
+                for numNewRow in range(oldSize[1], newSize[1]):
+                    self.map.extend([[[1, 1, 0, " "]] * newSize[0]])
+                    for numNewCol in range(newSize[0]):
+                        self.dispatchPatch(False, [numNewCol, numNewRow, 1, 1, 0, " "], commitUndo)
+            self.size = newSize
+            return True
+        else:
+            return False
+    # }}}
+    # {{{ update(self, newSize, newCanvas=None): XXX
+    def update(self, newSize, newCanvas=None):
+        for numRow in range(self.size[1]):
+            for numCol in range(self.size[0]):
+                if  (newCanvas != None)         \
+                and (numRow < len(newCanvas))   \
+                and (numCol < len(newCanvas[numRow])):
+                    self._commitPatch([numCol, numRow, *newCanvas[numRow][numCol]])
     # }}}
 
     #
-    # __init__(self, parent, parentFrame, canvasInterface, defaultCanvasPos, defaultCanvasSize, defaultCellSize): initialisation method
-    def __init__(self, parent, parentFrame, canvasInterface, defaultCanvasPos, defaultCanvasSize, defaultCellSize):
-        super().__init__(parent, pos=defaultCanvasPos, size=[w * h for w, h in zip(defaultCanvasSize, defaultCellSize)])
-
-        self.brushColours, self.brushPos, self.brushSize = [4, 1], [0, 0], [1, 1]
-        self._canvasDirty, self._canvasDirtyCursor = False, False
-        self.canvasMap, self.canvasPos, self.canvasSize, = None, defaultCanvasPos, defaultCanvasSize
-        self.defaultCanvasPos, self.defaultCanvasSize, self.defaultCellSize = defaultCanvasPos, defaultCanvasSize, defaultCellSize
-        self.parentFrame = parentFrame
-        self.parentFrame.onCanvasUpdate(brushSize=self.brushSize, colours=self.brushColours)
-
-        self.canvasBackend = CanvasBackend(defaultCanvasSize, defaultCellSize)
-        self.canvasJournal = CanvasJournal()
-        self.canvasExportStore = CanvasExportStore()
-        self.canvasImportStore = CanvasImportStore()
-        self.canvasInterface = canvasInterface(self, parentFrame)
-
-        # Bind event handlers
-        self.Bind(wx.EVT_CLOSE, self.onPanelClose)
-        self.Bind(wx.EVT_ENTER_WINDOW, self.onPanelEnterWindow)
-        self.Bind(wx.EVT_LEAVE_WINDOW, self.onPanelLeaveWindow)
-        self.parentFrame.Bind(wx.EVT_CHAR, self.onPanelInput)
-        for eventType in (wx.EVT_LEFT_DOWN, wx.EVT_MOTION, wx.EVT_RIGHT_DOWN):
-            self.Bind(eventType, self.onPanelInput)
-        self.Bind(wx.EVT_PAINT, self.onPanelPaint)
+    # __init__(self, size): initialisation method
+    def __init__(self, size):
+        self.dirty, self.dirtyCursor, self.map, self.size = False, False, None, size
+        self.exportStore, self.importStore, self.journal = CanvasExportStore(), CanvasImportStore(), CanvasJournal()
 
 # vim:expandtab foldmethod=marker sw=4 ts=4 tw=0
