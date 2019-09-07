@@ -1,14 +1,15 @@
 1)  General {cleanup,refactor}
-2)  Implement ANSI CSI CU[BDPU] sequences
-3)  Incremental auto{load,save} & {backup,restore}
-4)  Open and toggle a reference image in the background
-5)  Client-Server or Peer-to-Peer realtime collaboration
-6)  Arbitrary {format,palette}s ({4,8} bit ANSI/mIRC, etc.)
-7)  Hotkey & graphical interfaces to {composed,parametrised} tools
-8)  GUI: a) scrollbar b) switch from wxPython to GTK c) revisit About dialogue
-9)  Layers, layout (e.g. for comics, zines, etc.) & asset management (e.g. kade, lion, etc.) & traits w/ {inserting,merging,linking}
-10) Sprites & scripted (Python?) animation on the basis of asset traits and {composable,parametrised} patterns (metric flow, particle system, rigging, ...)
-11) Composition and parametrisation of tools from higher-order operators (brushes, filters, outlines, patterns & shaders) and unit tools; unit tools:
+2)  Transparent {back,fore}ground colour
+3)  Implement ANSI CSI CU[BDPU] sequences
+4)  Incremental auto{load,save} & {backup,restore}
+5)  Open and toggle a reference image in the background
+6)  Client-Server or Peer-to-Peer realtime collaboration
+7)  Arbitrary {format,palette}s ({4,8} bit ANSI/mIRC, etc.)
+8)  Hotkey & graphical interfaces to {composed,parametrised} tools
+9)  GUI: a) scrollbar b) switch from wxPython to GTK c) revisit About dialogue
+10) Layers, layout (e.g. for comics, zines, etc.) & asset management (e.g. kade, lion, etc.) & traits w/ {inserting,merging,linking}
+11) Sprites & scripted (Python?) animation on the basis of asset traits and {composable,parametrised} patterns (metric flow, particle system, rigging, ...)
+13) Composition and parametrisation of tools from higher-order operators (brushes, filters, outlines, patterns & shaders) and unit tools; unit tools:
     a) geometric primitives (arrow, circle, cloud/speech bubble, curve, heart, hexagon, line, pentagon, polygon, rhombus, triangle, square, star)
     b) regions (crop, duplicate, erase, fill, invert, measure, pick, rotate, scale, select, shift, slice, tile, translate)
     c) text (edit, Unicode sets)
