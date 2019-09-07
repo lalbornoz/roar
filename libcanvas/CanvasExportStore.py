@@ -125,7 +125,7 @@ class CanvasExportStore():
             outImgDraw = ImageDraw.Draw(outImg); outImgDraw.fontmode = "1";
             for inCurRow in range(len(canvasMap)):
                 for inCurCol in range(len(canvasMap[inCurRow])):
-                    inCurCell = canvasMap[inCurRow][inCurCol]; outColours = (0, 0);
+                    inCurCell = canvasMap[inCurRow][inCurCol]; outColours = [0, 0];
                     if inCurCell[2] & self._CellState.CS_BOLD:
                         if inCurCell[3] != " ":
                             if inCurCell[3] == "█":
