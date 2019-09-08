@@ -14,4 +14,4 @@
     b) regions (crop, duplicate, erase, fill, invert, measure, pick, rotate, scale, select, shift, slice, tile, translate)
     c) text (edit, Unicode sets)
 
-vim:tw=0
+vim:ff=dos tw=0

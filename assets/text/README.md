@@ -8,4 +8,4 @@
 References:  
 Fri, 05 Jan 2018 17:01:47 +0100 [1] Python Releases for Windows | Python.org <https://www.python.org/downloads/windows/> 
  
-vim:tw=0
+vim:ff=dos tw=0
