@@ -281,7 +281,7 @@ class GuiCanvasInterface():
                 self.parentCanvas.brushSize[dimension] += 1
                 self.update(brushSize=self.parentCanvas.brushSize)
             elif dimension == 2:
-                [self.canvasBrushSize(f, dimension_, incrFlag) for dimension_ in [0, 1]]
+                [self.canvasBrushSize(f, dimension_, incrFlag)(self, None) for dimension_ in [0, 1]]
         setattr(canvasBrushSize_, "attrDict", f.attrList[dimension + (0 if not incrFlag else 3)])
         return canvasBrushSize_
     # }}}
@@ -307,7 +307,7 @@ class GuiCanvasInterface():
                 elif dimension == 1:
                     self.parentCanvas.resize([self.parentCanvas.canvas.size[0] + 1, self.parentCanvas.canvas.size[1]])
             elif dimension == 2:
-                [self.canvasCanvasSize(f, dimension_, incrFlag) for dimension_ in [0, 1]]
+                [self.canvasCanvasSize(f, dimension_, incrFlag)(self, None) for dimension_ in [0, 1]]
         setattr(canvasCanvasSize_, "attrDict", f.attrList[dimension + (0 if not incrFlag else 3)])
         return canvasCanvasSize_
     # }}}
