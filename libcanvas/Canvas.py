@@ -16,15 +16,20 @@ class Canvas():
 
     # {{{ dispatchPatch(self, isCursor, patch, commitUndo=True)
     def dispatchPatch(self, isCursor, patch, commitUndo=True):
-        patchDeltaCell = self.map[patch[1]][patch[0]]; patchDelta = [*patch[0:2], *patchDeltaCell];
-        if isCursor:
-            self.journal.pushCursor(patchDelta)
+        if (patch[0] >= self.size[0])   \
+        or (patch[1] >= self.size[1]):
+            return False
         else:
-            if commitUndo:
-                if not self.dirtyJournal:
-                    self.journal.pushDeltas([], []); self.dirtyJournal = True;
-                self.journal.updateCurrentDeltas(patch, patchDelta)
-            self._commitPatch(patch)
+            patchDeltaCell = self.map[patch[1]][patch[0]]; patchDelta = [*patch[0:2], *patchDeltaCell];
+            if isCursor:
+                self.journal.pushCursor(patchDelta)
+            else:
+                if commitUndo:
+                    if not self.dirtyJournal:
+                        self.journal.pushDeltas([], []); self.dirtyJournal = True;
+                    self.journal.updateCurrentDeltas(patch, patchDelta)
+                self._commitPatch(patch)
+            return True
     # }}}
     # {{{ resize(self, newSize, commitUndo=True)
     def resize(self, newSize, commitUndo=True):
