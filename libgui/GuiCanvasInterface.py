@@ -5,6 +5,12 @@
 #
 
 try:
+    from ImgurApiKey import ImgurApiKey
+    haveImgurApiKey = True
+except ImportError:
+    haveImgurApiKey = False
+
+try:
     import base64, json, requests, urllib.request
     haveUrllib = True
 except ImportError:
@@ -21,7 +27,6 @@ from ToolText import ToolText
 from GuiCanvasColours import Colours
 from GuiCanvasInterfaceAbout import GuiCanvasInterfaceAbout
 from GuiFrame import NID_MENU_SEP, NID_TOOLBAR_HSEP
-from ImgurApiKey import ImgurApiKey
 import io, os, sys, wx
 
 class GuiCanvasInterface():
@@ -359,7 +364,7 @@ class GuiCanvasInterface():
                 return True
     # }}}
     # {{{ canvasExportImgur(self, event)
-    @CommandDecorator("Export to Imgur...", "Export to I&mgur...", None, None, haveUrllib)
+    @CommandDecorator("Export to Imgur...", "Export to I&mgur...", None, None, haveImgurApiKey and haveUrllib)
     def canvasExportImgur(self, event):
         self.parentCanvas.SetCursor(wx.Cursor(wx.CURSOR_WAIT))
         rc, status, result = self.parentCanvas.canvas.exportStore.exportBitmapToImgur(self.imgurApiKey, self.parentCanvas.backend.canvasBitmap, "", "", wx.BITMAP_TYPE_PNG)
@@ -530,7 +535,8 @@ class GuiCanvasInterface():
     #
     # __init__(self, parentCanvas, parentFrame):
     def __init__(self, parentCanvas, parentFrame):
-        self.canvasPathName, self.imgurApiKey, self.lastPanelState, self.parentCanvas, self.parentFrame = None, ImgurApiKey.imgurApiKey, {}, parentCanvas, parentFrame
+        self.canvasPathName, self.lastPanelState, self.parentCanvas, self.parentFrame = None, {}, parentCanvas, parentFrame
+        self.imgurApiKey = ImgurApiKey.imgurApiKey if haveImgurApiKey else None
         self._initColourBitmaps()
 
 # vim:expandtab foldmethod=marker sw=4 ts=4 tw=0
