@@ -53,9 +53,16 @@ class CanvasExportStore():
                         outBuffer += "\u001b[4m"
                     lastAttribs = inCurCell[2]
                 if lastColours == None or lastColours != inCurCell[:2]:
-                    ansiBg = MiRCARTToAnsiColours[int(inCurCell[1])] + 10
-                    ansiFg = MiRCARTToAnsiColours[int(inCurCell[0])]
-                    outBuffer += "\u001b[{:02d}m\u001b[{:02d}m{}".format(ansiBg, ansiFg, inCurCell[3])
+                    if  (inCurCell[0] == -1)    \
+                    and (inCurCell[1] == -1):
+                        outBuffer += "\u001b[39;49m{}".format(" ")
+                    elif inCurCell[1] == -1:
+                        ansiFg = MiRCARTToAnsiColours[inCurCell[0]]
+                        outBuffer += "\u001b[49;{:02d}m{}".format(ansiFg, inCurCell[3])
+                    else:
+                        ansiBg = MiRCARTToAnsiColours[inCurCell[1]] + 10
+                        ansiFg = MiRCARTToAnsiColours[inCurCell[0] if inCurCell[0] != -1 else inCurCell[1]]
+                        outBuffer += "\u001b[{:02d};{:02d}m{}".format(ansiBg, ansiFg, inCurCell[3])
                     lastColours = inCurCell[:2]
                 else:
                     outBuffer += inCurCell[3]
@@ -145,7 +152,6 @@ class CanvasExportStore():
                     outImgDraw.rectangle((*outCurPos, outCurPos[0] + outImgFontSize[0], outCurPos[1] + outImgFontSize[1]), fill=(*outColours[1], 255))
                     if  not inCurCell[3] in " █"    \
                     and outColours[0] != outColours[1]:
-                        # XXX implement italic
                         outImgDraw.text(outCurPos, inCurCell[3], (*outColours[0], 255), outImgFont)
                     if inCurCell[2] & self._CellState.CS_UNDERLINE:
                         outColours[0] = ColourMapNormal[inCurCell[0]]
@@ -165,16 +171,26 @@ class CanvasExportStore():
             for canvasCol in range(canvasSize[0]):
                 canvasColColours = canvasMap[canvasRow][canvasCol][0:2]
                 canvasColText = canvasMap[canvasRow][canvasCol][3]
-                if   canvasColColours[0] != canvasLastColours[0]    \
-                and  canvasColColours[1] != canvasLastColours[1]:
-                    if  canvasColColours[0] == canvasLastColours[1] \
-                    and canvasColColours[1] == canvasLastColours[0]:
+                if canvasColColours[0] == -1:
+                    canvasColColours[0] = canvasColColours[1]
+                if   (canvasColColours[0] != canvasLastColours[0])      \
+                and  (canvasColColours[1] != canvasLastColours[1]):
+                    if   (canvasColColours[0] == -1)                    \
+                    and  (canvasColColours[1] == -1):
+                        outBuffer += "\u0003 "
+                    elif canvasColColours[1] == -1:
+                        outBuffer += "\u0003\u0003{}".format(canvasColColours[0])
+                    elif (canvasColColours[0] == canvasLastColours[1])  \
+                    and  (canvasColColours[1] == canvasLastColours[0]):
                         outBuffer += "\u0016"
                     else:
                         outBuffer += "\u0003{},{}".format(canvasColColours[0], canvasColColours[1])
                     canvasLastColours = canvasColColours
                 elif canvasColColours[1] != canvasLastColours[1]:
-                    outBuffer += "\u0003{},{}".format(canvasLastColours[0], canvasColColours[1])
+                    if canvasColColours[1] == -1:
+                        outBuffer += "\u0003\u0003{}".format(canvasLastColours[0])
+                    else:
+                        outBuffer += "\u0003{},{}".format(canvasLastColours[0], canvasColColours[1])
                     canvasLastColours[1] = canvasColColours[1]
                 elif canvasColColours[0] != canvasLastColours[0]:
                     outBuffer += "\u0003{}".format(canvasColColours[0])

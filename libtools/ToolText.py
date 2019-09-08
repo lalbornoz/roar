@@ -19,11 +19,9 @@ class ToolText(Tool):
         and keyModifiers != wx.MOD_SHIFT:
             return True
         else:
-            if self.textColours == None:
-                self.textColours = brushColours.copy()
             if self.textPos == None:
                 self.textPos = list(atPoint)
-        dispatchFn(eventDc, False, [*self.textPos, *self.textColours, 0, keyChar])
+        dispatchFn(eventDc, False, [*self.textPos, *brushColours, 0, keyChar])
         if self.textPos[0] < (self.parentCanvas.canvas.size[0] - 1):
             self.textPos[0] += 1
         elif self.textPos[1] < (self.parentCanvas.canvas.size[1] - 1):
@@ -35,15 +33,8 @@ class ToolText(Tool):
     #
     # onMouseEvent(self, event, atPoint, brushColours, brushSize, isDragging, isLeftDown, isRightDown, dispatchFn, eventDc): XXX
     def onMouseEvent(self, event, atPoint, brushColours, brushSize, isDragging, isLeftDown, isRightDown, dispatchFn, eventDc):
-        if isLeftDown:
-            self.textColours, self.textPos = brushColours.copy(), list(atPoint)
-        elif isRightDown:
-            self.textColours, self.textPos = [brushColours[1], brushColours[0]], list(atPoint)
-        else:
-            if self.textColours == None:
-                self.textColours = brushColours.copy()
-            self.textPos = list(atPoint)
-        dispatchFn(eventDc, True, [*self.textPos, *self.textColours, 0, "_"])
+        self.textPos = list(atPoint)
+        dispatchFn(eventDc, True, [*self.textPos, *brushColours, 0, "_"])
 
     # __init__(self, *args): initialisation method
     def __init__(self, *args):

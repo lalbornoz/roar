@@ -57,7 +57,7 @@ class GuiCanvasPanel(wx.Panel):
                     for numNewCol in range(newSize[0]):
                         self._drawPatch(eventDc, False, [numNewCol, numNewRow, 1, 1, 0, " "])
             del eventDc; wx.SafeYield();
-            self.parentFrame.update(size=newSize, undoLevel=self.canvas.journal.patchesUndoLevel)
+            self.interface.update(size=newSize, undoLevel=self.canvas.journal.patchesUndoLevel)
     # }}}
     # {{{ update(self, newSize, commitUndo=True, newCanvas=None): XXX
     def update(self, newSize, commitUndo=True, newCanvas=None):
@@ -81,7 +81,7 @@ class GuiCanvasPanel(wx.Panel):
     # {{{ onPanelInput(self, event): XXX
     def onPanelInput(self, event):
         self.canvas.dirty, self.canvas.dirtyCursor = False, False
-        eventDc, eventType, tool = self.backend.getDeviceContext(self), event.GetEventType(), self.interface.canvasTool
+        eventDc, eventType, tool = self.backend.getDeviceContext(self), event.GetEventType(), self.interface.currentTool
         if eventType == wx.wxEVT_CHAR:
             mapPoint = self.brushPos
             doSkip = tool.onKeyboardEvent(event, mapPoint, self.brushColours, self.brushSize, chr(event.GetUnicodeKey()), self.dispatchPatch, eventDc)
@@ -89,7 +89,7 @@ class GuiCanvasPanel(wx.Panel):
                 event.Skip(); return;
         else:
             mapPoint = self.backend.xlateEventPoint(event, eventDc)
-            if mapPoint[0] >= self.canvas.size[0]                            \
+            if mapPoint[0] >= self.canvas.size[0]                           \
             or mapPoint[1] >= self.canvas.size[1]:
                 return
             self.brushPos = mapPoint
@@ -98,9 +98,9 @@ class GuiCanvasPanel(wx.Panel):
                 event.Dragging(), event.LeftIsDown(), event.RightIsDown(),  \
                 self.dispatchPatch, eventDc)
         if self.canvas.dirty:
-            self.parentFrame.update(cellPos=self.brushPos, undoLevel=self.canvas.journal.patchesUndoLevel)
+            self.interface.update(cellPos=self.brushPos, undoLevel=self.canvas.journal.patchesUndoLevel)
         if eventType == wx.wxEVT_MOTION:
-            self.parentFrame.update(cellPos=mapPoint)
+            self.interface.update(cellPos=mapPoint)
     # }}}
     # {{{ onPanelLeaveWindow(self, event): XXX
     def onPanelLeaveWindow(self, event):
@@ -120,7 +120,6 @@ class GuiCanvasPanel(wx.Panel):
         self.brushColours, self.brushPos, self.brushSize = [4, 1], [0, 0], [1, 1]
         self.canvas, self.canvasPos, self.defaultCanvasPos, self.defaultCanvasSize, self.defaultCellSize = canvas, defaultCanvasPos, defaultCanvasPos, defaultCanvasSize, defaultCellSize
         self.parentFrame = parentFrame
-        self.parentFrame.update(brushSize=self.brushSize, colours=self.brushColours)
 
         self.Bind(wx.EVT_CLOSE, self.onPanelClose)
         self.Bind(wx.EVT_ENTER_WINDOW, self.onPanelEnterWindow)
@@ -130,4 +129,4 @@ class GuiCanvasPanel(wx.Panel):
             self.Bind(eventType, self.onPanelInput)
         self.Bind(wx.EVT_PAINT, self.onPanelPaint)
 
-# vim:expandtab foldmethod=marker sw=4 ts=4 tw=0
+# vim:expandtab foldmethod=marker sw=4 ts=4 tw=120
