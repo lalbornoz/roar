@@ -1,16 +1,15 @@
 1)  General {cleanup,refactor}
-2)  Transparent {back,fore}ground colour
-3)  Implement instrumentation & unit tests
-4)  Implement ANSI CSI CU[BDPU] sequences
-5)  Incremental auto{load,save} & {backup,restore}
-6)  Open and toggle a reference image in the background
-7)  Client-Server or Peer-to-Peer realtime collaboration
-8)  Arbitrary {format,palette}s ({4,8} bit ANSI/mIRC, etc.)
-9)  Hotkey & graphical interfaces to {composed,parametrised} tools
-10) GUI: a) scrollbar b) switch from wxPython to GTK c) revisit About dialogue
-11) Layers, layout (e.g. for comics, zines, etc.) & asset management (e.g. kade, lion, etc.) & traits w/ {inserting,merging,linking}
-12) Sprites & scripted (Python?) animation on the basis of asset traits and {composable,parametrised} patterns (metric flow, particle system, rigging, ...)
-13) Composition and parametrisation of tools from higher-order operators (brushes, filters, outlines, patterns & shaders) and unit tools; unit tools:
+2)  Implement ANSI CSI CU[BDPU] sequences & italic
+3)  Incremental auto{load,save} & {backup,restore}
+4)  Implement instrumentation & unit tests, document
+5)  Open and toggle a reference image in the background
+6)  Client-Server or Peer-to-Peer realtime collaboration
+7)  Arbitrary {format,palette}s ({4,8} bit ANSI/mIRC, etc.)
+8)  Hotkey & graphical interfaces to {composed,parametrised} tools
+9)  GUI: a) scrollbar b) {de,in}crease cell size c) revisit About dialogue d) Settings panel e) switch from wxPython to GTK
+10) Layers, layout (e.g. for comics, zines, etc.) & asset management (e.g. kade, lion, etc.) & traits w/ {inserting,merging,linking}
+11) Sprites & scripted (Python?) animation on the basis of asset traits and {composable,parametrised} patterns (metric flow, particle system, rigging, ...)
+12) Composition and parametrisation of tools from higher-order operators (brushes, filters, outlines, patterns & shaders) and unit tools; unit tools:
     a) geometric primitives (arrow, circle, cloud/speech bubble, curve, heart, hexagon, line, pentagon, polygon, rhombus, triangle, square, star)
     b) regions (crop, duplicate, erase, fill, invert, measure, pick, rotate, scale, select, shift, slice, tile, translate)
     c) text (edit, Unicode sets)

@@ -13,14 +13,14 @@ class GuiCanvasWxBackend():
     # {{{ _drawBrushPatch(self, eventDc, patch): XXX
     def _drawBrushPatch(self, eventDc, patch):
         absPoint = self._xlatePoint(patch)
-        brushBg, brushFg, pen = self._brushes[patch[2]], self._brushes[patch[3]], self._pens[patch[3]]
+        brushBg, brushFg, pen = self._getBrushPatchColours(patch)
         self._setBrushDc(brushBg, brushFg, eventDc, pen)
         eventDc.DrawRectangle(*absPoint, *self.cellSize)
     # }}}
     # {{{ _drawCharPatch(self, eventDc, patch): XXX
     def _drawCharPatch(self, eventDc, patch):
         absPoint, fontBitmap = self._xlatePoint(patch), wx.Bitmap(*self.cellSize)
-        brushBg, brushFg, pen = self._brushes[patch[3]], self._brushes[patch[2]], self._pens[patch[3]]
+        brushBg, brushFg, pen = self._getCharPatchColours(patch)
         fontDc = wx.MemoryDC(); fontDc.SelectObject(fontBitmap);
         fontDc.SetTextForeground(wx.Colour(Colours[patch[2]][:4]))
         fontDc.SetTextBackground(wx.Colour(Colours[patch[3]][:4]))
@@ -34,6 +34,30 @@ class GuiCanvasWxBackend():
         [brush.Destroy() for brush in self._brushes or []]
         [pen.Destroy() for pen in self._pens or []]
         self._brushes, self._lastBrushBg, self._lastBrushFg, self._lastPen, self._pens = None, None, None, None, None
+    # }}}
+    # {{{ _getBrushPatchColours(self, patch): XXX
+    def _getBrushPatchColours(self, patch):
+        if (patch[2] != -1) and (patch[3] != -1):
+            brushBg, brushFg, pen = self._brushes[patch[2]], self._brushes[patch[3]], self._pens[patch[3]]
+        elif (patch[2] == -1) and (patch[3] == -1):
+            brushBg, brushFg, pen = self._brushes[1], self._brushes[1], self._pens[1]
+        elif patch[2] == -1:
+            brushBg, brushFg, pen = self._brushes[patch[3]], self._brushes[patch[3]], self._pens[patch[3]]
+        elif patch[3] == -1:
+            brushBg, brushFg, pen = self._brushes[1], self._brushes[patch[2]], self._pens[1]
+        return (brushBg, brushFg, pen)
+    # }}}
+    # {{{ _getCharPatchColours(self, patch): XXX
+    def _getCharPatchColours(self, patch):
+        if (patch[2] != -1) and (patch[3] != -1):
+            brushBg, brushFg, pen = self._brushes[patch[3]], self._brushes[patch[2]], self._pens[patch[3]]
+        elif (patch[2] == -1) and (patch[3] == -1):
+            brushBg, brushFg, pen = self._brushes[1], self._brushes[1], self._pens[1]
+        elif patch[2] == -1:
+            brushBg, brushFg, pen = self._brushes[patch[3]], self._brushes[patch[3]], self._pens[patch[3]]
+        elif patch[3] == -1:
+            brushBg, brushFg, pen = self._brushes[1], self._brushes[patch[2]], self._pens[1]
+        return (brushBg, brushFg, pen)
     # }}}
     # {{{ _initBrushesAndPens(self): XXX
     def _initBrushesAndPens(self):
