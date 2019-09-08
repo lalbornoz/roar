@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 #
-# GuiCanvasInterface.py -- XXX
+# GuiCanvasInterface.py 
 # Copyright (c) 2018, 2019 Lucio Andrés Illanes Albornoz <lucio@lucioillanes.de>
 #
 
@@ -25,8 +25,7 @@ from ImgurApiKey import ImgurApiKey
 import io, os, sys, wx
 
 def GuiCanvasCommandDecorator(caption, label, icon, accel, initialState):
-    """XXX"""
-    # {{{ GuiCanvasCommandDecoratorOuter(targetObject): XXX
+    # {{{ GuiCanvasCommandDecoratorOuter(targetObject)
     def GuiCanvasCommandDecoratorOuter(targetObject):
         if callable(targetObject):
             if not hasattr(targetObject, "attrDict"):
@@ -37,8 +36,7 @@ def GuiCanvasCommandDecorator(caption, label, icon, accel, initialState):
     # }}}
 
 def GuiCanvasSelectDecorator(idx, caption, label, icon, accel, initialState):
-    """XXX"""
-    # {{{ GuiCanvasSelectDecoratorOuter(targetObject): XXX
+    # {{{ GuiCanvasSelectDecoratorOuter(targetObject)
     def GuiCanvasSelectDecoratorOuter(targetObject):
         if callable(targetObject):
             if not hasattr(targetObject, "attrList"):
@@ -50,9 +48,7 @@ def GuiCanvasSelectDecorator(idx, caption, label, icon, accel, initialState):
     # }}}
 
 class GuiCanvasInterface():
-    """XXX"""
-
-    # {{{ _initColourBitmaps(self): XXX
+    # {{{ _initColourBitmaps(self)
     def _initColourBitmaps(self):
         for numColour in range(len(self.canvasColour.attrList)):
             if numColour < len(Colours):
@@ -76,7 +72,7 @@ class GuiCanvasInterface():
         toolBitmapDc.DrawRectangle(8, 8, 16, 16)
         self.canvasColourAlpha.attrList[0]["icon"] = ["", None, toolBitmap]
     # }}}
-    # {{{ _promptSaveChanges(self): XXX
+    # {{{ _promptSaveChanges(self)
     def _promptSaveChanges(self):
         if self.parentCanvas.dirty:
            with wx.MessageDialog(self.parentCanvas,                                                                                    \
@@ -95,12 +91,12 @@ class GuiCanvasInterface():
             return True
     # }}}
 
-    # {{{ canvasAbout(self, event): XXX
+    # {{{ canvasAbout(self, event)
     @GuiCanvasCommandDecorator("About", "&About", None, None, True)
     def canvasAbout(self, event):
         GuiCanvasInterfaceAbout(self.parentFrame)
     # }}}
-    # {{{ canvasBrush(self, f, idx): XXX
+    # {{{ canvasBrush(self, f, idx)
     @GuiCanvasSelectDecorator(0, "Solid brush", "Solid brush", None, None, True)
     def canvasBrush(self, f, idx):
         def canvasBrush_(self, event):
@@ -109,7 +105,7 @@ class GuiCanvasInterface():
         setattr(canvasBrush_, "isSelect", True)
         return canvasBrush_
     # }}}
-    # {{{ canvasColour(self, f, idx): XXX
+    # {{{ canvasColour(self, f, idx)
     @GuiCanvasSelectDecorator(0, "Colour #00", "Colour #00 (Bright White)", None, None, False)
     @GuiCanvasSelectDecorator(1, "Colour #01", "Colour #01 (Black)", None, None, False)
     @GuiCanvasSelectDecorator(2, "Colour #02", "Colour #02 (Blue)", None, None, False)
@@ -137,7 +133,7 @@ class GuiCanvasInterface():
         setattr(canvasColour_, "isSelect", True)
         return canvasColour_
     # }}}
-    # {{{ canvasColourAlpha(self, f, idx): XXX
+    # {{{ canvasColourAlpha(self, f, idx)
     @GuiCanvasSelectDecorator(0, "Transparent colour", "Transparent colour", None, None, False)
     def canvasColourAlpha(self, f, idx):
         def canvasColourAlpha_(self, event):
@@ -150,28 +146,28 @@ class GuiCanvasInterface():
         setattr(canvasColourAlpha_, "isSelect", True)
         return canvasColourAlpha_
     # }}}
-    # {{{ canvasCopy(self, event): XXX
+    # {{{ canvasCopy(self, event)
     @GuiCanvasCommandDecorator("Copy", "&Copy", ["", wx.ART_COPY], None, False)
     def canvasCopy(self, event):
         pass
     # }}}
-    # {{{ canvasCut(self, event): XXX
+    # {{{ canvasCut(self, event)
     @GuiCanvasCommandDecorator("Cut", "Cu&t", ["", wx.ART_CUT], None, False)
     def canvasCut(self, event):
         pass
     # }}}
-    # {{{ canvasDelete(self, event): XXX
+    # {{{ canvasDelete(self, event)
     @GuiCanvasCommandDecorator("Delete", "De&lete", ["", wx.ART_DELETE], None, False)
     def canvasDelete(self, event):
         pass
     # }}}
-    # {{{ canvasExit(self, event): XXX
+    # {{{ canvasExit(self, event)
     @GuiCanvasCommandDecorator("Exit", "E&xit", None, [wx.ACCEL_CTRL, ord("X")], None)
     def canvasExit(self, event):
         if self._promptSaveChanges():
             self.parentFrame.Close(True)
     # }}}
-    # {{{ canvasNew(self, event, newCanvasSize=None): XXX
+    # {{{ canvasNew(self, event, newCanvasSize=None)
     @GuiCanvasCommandDecorator("New", "&New", ["", wx.ART_NEW], [wx.ACCEL_CTRL, ord("N")], None)
     def canvasNew(self, event, newCanvasSize=None):
         if self._promptSaveChanges():
@@ -185,7 +181,7 @@ class GuiCanvasInterface():
             self.parentCanvas.SetCursor(wx.Cursor(wx.NullCursor))
             self.update(dirty=self.parentCanvas.dirty, pathName=self.canvasPathName, undoLevel=-1)
     # }}}
-    # {{{ canvasOpen(self, event): XXX
+    # {{{ canvasOpen(self, event)
     @GuiCanvasCommandDecorator("Open", "&Open", ["", wx.ART_FILE_OPEN], [wx.ACCEL_CTRL, ord("O")], None)
     def canvasOpen(self, event):
         if self._promptSaveChanges():
@@ -206,18 +202,18 @@ class GuiCanvasInterface():
                         print("error: {}".format(error), file=sys.stderr)
                         return False
     # }}}
-    # {{{ canvasPaste(self, event): XXX
+    # {{{ canvasPaste(self, event)
     @GuiCanvasCommandDecorator("Paste", "&Paste", ["", wx.ART_PASTE], None, False)
     def canvasPaste(self, event):
         pass
     # }}}
-    # {{{ canvasRedo(self, event): XXX
+    # {{{ canvasRedo(self, event)
     @GuiCanvasCommandDecorator("Redo", "&Redo", ["", wx.ART_REDO], [wx.ACCEL_CTRL, ord("Y")], False)
     def canvasRedo(self, event):
         self.parentCanvas.dispatchDeltaPatches(self.parentCanvas.canvas.journal.popRedo())
         self.update(size=self.parentCanvas.canvas.size, undoLevel=self.parentCanvas.canvas.journal.patchesUndoLevel)
     # }}}
-    # {{{ canvasSave(self, event): XXX
+    # {{{ canvasSave(self, event)
     @GuiCanvasCommandDecorator("Save", "&Save", ["", wx.ART_FILE_SAVE], [wx.ACCEL_CTRL, ord("S")], None)
     def canvasSave(self, event):
         if self.canvasPathName == None:
@@ -234,7 +230,7 @@ class GuiCanvasInterface():
         except IOError as error:
             return False
     # }}}
-    # {{{ canvasSaveAs(self, event): XXX
+    # {{{ canvasSaveAs(self, event)
     @GuiCanvasCommandDecorator("Save As...", "Save &As...", ["", wx.ART_FILE_SAVE_AS], None, None)
     def canvasSaveAs(self, event):
         with wx.FileDialog(self.parentCanvas, "Save As", os.getcwd(), "", "mIRC art files (*.txt)|*.txt|All Files (*.*)|*.*", wx.FD_SAVE|wx.FD_OVERWRITE_PROMPT) as dialog:
@@ -244,86 +240,86 @@ class GuiCanvasInterface():
                 self.canvasPathName = dialog.GetPath()
                 return self.canvasSave(event)
     # }}}
-    # {{{ canvasUndo(self, event): XXX
+    # {{{ canvasUndo(self, event)
     @GuiCanvasCommandDecorator("Undo", "&Undo", ["", wx.ART_UNDO], [wx.ACCEL_CTRL, ord("Z")], False)
     def canvasUndo(self, event):
         self.parentCanvas.dispatchDeltaPatches(self.parentCanvas.canvas.journal.popUndo())
         self.update(size=self.parentCanvas.canvas.size, undoLevel=self.parentCanvas.canvas.journal.patchesUndoLevel)
     # }}}
 
-    # {{{ canvasDecrBrushHeight(self, event): XXX
+    # {{{ canvasDecrBrushHeight(self, event)
     @GuiCanvasCommandDecorator("Decrease brush height", "Decrease brush height", ["toolDecrBrushH.png"], None, None)
     def canvasDecrBrushHeight(self, event):
         if  self.parentCanvas.brushSize[1] > 1:
             self.parentCanvas.brushSize[1] -= 1
             self.update(brushSize=self.parentCanvas.brushSize)
     # }}}
-    # {{{ canvasDecrBrushHeightWidth(self, event): XXX
+    # {{{ canvasDecrBrushHeightWidth(self, event)
     @GuiCanvasCommandDecorator("Decrease brush size", "Decrease brush size", ["toolDecrBrushHW.png"], None, None)
     def canvasDecrBrushHeightWidth(self, event):
         self.canvasDecrBrushHeight(event)
         self.canvasDecrBrushWidth(event)
     # }}}
-    # {{{ canvasDecrBrushWidth(self, event): XXX
+    # {{{ canvasDecrBrushWidth(self, event)
     @GuiCanvasCommandDecorator("Decrease brush width", "Decrease brush width", ["toolDecrBrushW.png"], None, None)
     def canvasDecrBrushWidth(self, event):
         if  self.parentCanvas.brushSize[0] > 1:
             self.parentCanvas.brushSize[0] -= 1
             self.update(brushSize=self.parentCanvas.brushSize)
     # }}}
-    # {{{ canvasDecrCanvasHeight(self, event): XXX
+    # {{{ canvasDecrCanvasHeight(self, event)
     @GuiCanvasCommandDecorator("Decrease canvas height", "Decrease canvas height", ["toolDecrCanvasH.png"], None, None)
     def canvasDecrCanvasHeight(self, event):
         if self.parentCanvas.canvas.size[1] > 1:
             self.parentCanvas.resize([self.parentCanvas.canvas.size[0], self.parentCanvas.canvas.size[1] - 1])
     # }}}
-    # {{{ canvasDecrCanvasHeightWidth(self, event): XXX
+    # {{{ canvasDecrCanvasHeightWidth(self, event)
     @GuiCanvasCommandDecorator("Decrease canvas size", "Decrease canvas size", ["toolDecrCanvasHW.png"], None, None)
     def canvasDecrCanvasHeightWidth(self, event):
         self.canvasDecrCanvasHeight(event)
         self.canvasDecrCanvasWidth(event)
     # }}}
-    # {{{ canvasDecrCanvasWidth(self, event): XXX
+    # {{{ canvasDecrCanvasWidth(self, event)
     @GuiCanvasCommandDecorator("Decrease canvas width", "Decrease canvas width", ["toolDecrCanvasW.png"], None, None)
     def canvasDecrCanvasWidth(self, event):
         if self.parentCanvas.canvas.size[0] > 1:
             self.parentCanvas.resize([self.parentCanvas.canvas.size[0] - 1, self.parentCanvas.canvas.size[1]])
     # }}}
-    # {{{ canvasIncrBrushHeight(self, event): XXX
+    # {{{ canvasIncrBrushHeight(self, event)
     @GuiCanvasCommandDecorator("Increase brush height", "Increase brush height", ["toolIncrBrushH.png"], None, None)
     def canvasIncrBrushHeight(self, event):
         self.parentCanvas.brushSize[1] += 1
         self.update(brushSize=self.parentCanvas.brushSize)
     # }}}
-    # {{{ canvasIncrBrushHeightWidth(self, event): XXX
+    # {{{ canvasIncrBrushHeightWidth(self, event)
     @GuiCanvasCommandDecorator("Increase brush size", "Increase brush size", ["toolIncrBrushHW.png"], None, None)
     def canvasIncrBrushHeightWidth(self, event):
         self.canvasIncrBrushHeight(event)
         self.canvasIncrBrushWidth(event)
     # }}}
-    # {{{ canvasIncrBrushWidth(self, event): XXX
+    # {{{ canvasIncrBrushWidth(self, event)
     @GuiCanvasCommandDecorator("Increase brush width", "Increase brush width", ["toolIncrBrushW.png"], None, None)
     def canvasIncrBrushWidth(self, event):
         self.parentCanvas.brushSize[0] += 1
         self.update(brushSize=self.parentCanvas.brushSize)
     # }}}
-    # {{{ canvasIncrCanvasHeight(self, event): XXX
+    # {{{ canvasIncrCanvasHeight(self, event)
     @GuiCanvasCommandDecorator("Increase canvas height", "Increase canvas height", ["toolIncrCanvasH.png"], None, None)
     def canvasIncrCanvasHeight(self, event):
         self.parentCanvas.resize([self.parentCanvas.canvas.size[0], self.parentCanvas.canvas.size[1] + 1])
     # }}}
-    # {{{ canvasIncrCanvasHeightWidth(self, event): XXX
+    # {{{ canvasIncrCanvasHeightWidth(self, event)
     @GuiCanvasCommandDecorator("Increase canvas size", "Increase canvas size", ["toolIncrCanvasHW.png"], None, None)
     def canvasIncrCanvasHeightWidth(self, event):
         self.canvasIncrCanvasHeight(event)
         self.canvasIncrCanvasWidth(event)
     # }}}
-    # {{{ canvasIncrCanvasWidth(self, event): XXX
+    # {{{ canvasIncrCanvasWidth(self, event)
     @GuiCanvasCommandDecorator("Increase canvas width", "Increase canvas width", ["toolIncrCanvasW.png"], None, None)
     def canvasIncrCanvasWidth(self, event):
         self.parentCanvas.resize([self.parentCanvas.canvas.size[0] + 1, self.parentCanvas.canvas.size[1]])
     # }}}
-    # {{{ canvasTool(self, f, idx): XXX
+    # {{{ canvasTool(self, f, idx)
     @GuiCanvasSelectDecorator(0, "Circle", "&Circle", ["toolCircle.png"], [wx.ACCEL_CTRL, ord("C")], False)
     @GuiCanvasSelectDecorator(1, "Clone", "Cl&one", ["toolClone.png"], [wx.ACCEL_CTRL, ord("E")], False)
     @GuiCanvasSelectDecorator(2, "Fill", "&Fill", ["toolFill.png"], [wx.ACCEL_CTRL, ord("F")], False)
@@ -343,7 +339,7 @@ class GuiCanvasInterface():
         return canvasTool_
     # }}}
 
-    # {{{ canvasExportAsAnsi(self, event): XXX
+    # {{{ canvasExportAsAnsi(self, event)
     @GuiCanvasCommandDecorator("Export as ANSI...", "Export as ANSI...", None, None, None)
     def canvasExportAsAnsi(self, event):
         with wx.FileDialog(self.parentFrame, "Save As...", os.getcwd(), "", "ANSI files (*.ans;*.txt)|*.ans;*.txt|All Files (*.*)|*.*", wx.FD_SAVE|wx.FD_OVERWRITE_PROMPT) as dialog:
@@ -357,7 +353,7 @@ class GuiCanvasInterface():
                 self.parentCanvas.SetCursor(wx.Cursor(wx.NullCursor))
                 return True
     # }}}
-    # {{{ canvasExportAsPng(self, event): XXX
+    # {{{ canvasExportAsPng(self, event)
     @GuiCanvasCommandDecorator("Export as PNG...", "Export as PN&G...", None, None, None)
     def canvasExportAsPng(self, event):
         with wx.FileDialog(self.parentFrame, "Save As...", os.getcwd(), "", "PNG (*.png)|*.png|All Files (*.*)|*.*", wx.FD_SAVE|wx.FD_OVERWRITE_PROMPT) as dialog:
@@ -370,7 +366,7 @@ class GuiCanvasInterface():
                 self.parentCanvas.SetCursor(wx.Cursor(wx.NullCursor))
                 return True
     # }}}
-    # {{{ canvasExportImgur(self, event): XXX
+    # {{{ canvasExportImgur(self, event)
     @GuiCanvasCommandDecorator("Export to Imgur...", "Export to I&mgur...", None, None, haveUrllib)
     def canvasExportImgur(self, event):
         self.parentCanvas.SetCursor(wx.Cursor(wx.CURSOR_WAIT))
@@ -383,7 +379,7 @@ class GuiCanvasInterface():
         else:
             wx.MessageBox("Failed to export to Imgur: {}".format(result), "Export to Imgur", wx.ICON_EXCLAMATION | wx.OK)
     # }}}
-    # {{{ canvasExportPastebin(self, event): XXX
+    # {{{ canvasExportPastebin(self, event)
     @GuiCanvasCommandDecorator("Export to Pastebin...", "Export to Pasteb&in...", None, None, haveUrllib)
     def canvasExportPastebin(self, event):
         self.parentCanvas.SetCursor(wx.Cursor(wx.CURSOR_WAIT))
@@ -398,7 +394,7 @@ class GuiCanvasInterface():
         else:
             wx.MessageBox("Failed to export to Pastebin: " + pasteResult, "Export to Pastebin", wx.OK|wx.ICON_EXCLAMATION)
     # }}}
-    # {{{ canvasExportToClipboard(self, event): XXX
+    # {{{ canvasExportToClipboard(self, event)
     @GuiCanvasCommandDecorator("Export to clipboard", "&Export to clipboard", None, None, None)
     def canvasExportToClipboard(self, event):
         self.parentCanvas.SetCursor(wx.Cursor(wx.CURSOR_WAIT))
@@ -409,7 +405,7 @@ class GuiCanvasInterface():
         self.parentCanvas.SetCursor(wx.Cursor(wx.NullCursor))
         return True
     # }}}
-    # {{{ canvasImportAnsi(self, event): XXX
+    # {{{ canvasImportAnsi(self, event)
     @GuiCanvasCommandDecorator("Import ANSI...", "Import ANSI...", None, None, None)
     def canvasImportAnsi(self, event):
         with wx.FileDialog(self.parentCanvas, "Open", os.getcwd(), "", "ANSI files (*.ans;*.txt)|*.ans;*.txt|All Files (*.*)|*.*", wx.FD_OPEN) as dialog:
@@ -430,7 +426,7 @@ class GuiCanvasInterface():
                     print("error: {}".format(error), file=sys.stderr)
                     return False
     # }}}
-    # {{{ canvasImportFromClipboard(self, event): XXX
+    # {{{ canvasImportFromClipboard(self, event)
     @GuiCanvasCommandDecorator("Import from clipboard", "&Import from clipboard", None, None, None)
     def canvasImportFromClipboard(self, event):
         rc = False
@@ -454,7 +450,7 @@ class GuiCanvasInterface():
             with wx.MessageDialog(self.parentCanvas, "Clipboard does not contain text data and/or cannot be opened", "", wx.ICON_QUESTION | wx.OK | wx.OK_DEFAULT) as dialog:
                 dialog.ShowModal()
     # }}}
-    # {{{ canvasImportSauce(self, event): XXX
+    # {{{ canvasImportSauce(self, event)
     @GuiCanvasCommandDecorator("Import SAUCE...", "Import SAUCE...", None, None, None)
     def canvasImportSauce(self, event):
         with wx.FileDialog(self.parentCanvas, "Open", os.getcwd(), "", "SAUCE files (*.ans;*.txt)|*.ans;*.txt|All Files (*.*)|*.*", wx.FD_OPEN) as dialog:
@@ -476,7 +472,7 @@ class GuiCanvasInterface():
                     return False
     # }}}
 
-    # {{{ update(self, **kwargs): XXX
+    # {{{ update(self, **kwargs)
     def update(self, **kwargs):
         self.lastPanelState.update(kwargs); textItems = [];
         if "cellPos" in self.lastPanelState:

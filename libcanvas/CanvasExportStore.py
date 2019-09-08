@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 #
-# CanvasExportStore.py -- XXX
+# CanvasExportStore.py 
 # Copyright (c) 2018, 2019 Lucio Andrés Illanes Albornoz <lucio@lucioillanes.de>
 #
 
@@ -20,7 +20,6 @@ except ImportError:
     haveUrllib = False
 
 class CanvasExportStore():
-    """XXX"""
     # {{{ _CellState(): Cell state
     class _CellState():
         CS_NONE             = 0x00
@@ -31,7 +30,7 @@ class CanvasExportStore():
     ImgurUploadUrl = "https://api.imgur.com/3/upload.json"
     PastebinPostUrl = "https://pastebin.com/api/api_post.php"
 
-    # {{{ _drawUnderline(self, curPos, fillColour, fontSize, imgDraw): XXX
+    # {{{ _drawUnderline(self, curPos, fillColour, fontSize, imgDraw)
     def _drawUnderLine(self, curPos, fillColour, fontSize, imgDraw):
         imgDraw.line(                                                       \
             xy=(curPos[0], curPos[1] + (fontSize[1] - 2),                   \
@@ -39,7 +38,7 @@ class CanvasExportStore():
                 fill=fillColour)
     # }}}
 
-    # {{{ exportAnsiFile(self, canvasMap, canvasSize, outFile): XXX
+    # {{{ exportAnsiFile(self, canvasMap, canvasSize, outFile)
     def exportAnsiFile(self, canvasMap, canvasSize, outFile):
         outBuffer = ""
         for inCurRow in range(len(canvasMap)):
@@ -73,7 +72,7 @@ class CanvasExportStore():
         else:
             return (False, "empty buffer generated")
     # }}}
-    # {{{ exportBitmapToImgur(self, apiKey, canvasBitmap, imgName, imgTitle, imgType): XXX
+    # {{{ exportBitmapToImgur(self, apiKey, canvasBitmap, imgName, imgTitle, imgType)
     def exportBitmapToImgur(self, apiKey, canvasBitmap, imgName, imgTitle, imgType):
         tmpPathName = tempfile.mkstemp()
         os.close(tmpPathName[0])
@@ -96,11 +95,11 @@ class CanvasExportStore():
         os.remove(tmpPathName[1])
         return imgurResult
     # }}}
-    # {{{ exportBitmapToPngFile(self, canvasBitmap, outPathName, outType): XXX
+    # {{{ exportBitmapToPngFile(self, canvasBitmap, outPathName, outType)
     def exportBitmapToPngFile(self, canvasBitmap, outPathName, outType):
         return canvasBitmap.ConvertToImage().SaveFile(outPathName, outType)
     # }}}
-    # {{{ exportPastebin(self, apiDevKey, canvasMap, canvasSize, pasteName="", pastePrivate=0): XXX
+    # {{{ exportPastebin(self, apiDevKey, canvasMap, canvasSize, pasteName="", pastePrivate=0)
     def exportPastebin(self, apiDevKey, canvasMap, canvasSize, pasteName="", pastePrivate=0):
         if haveUrllib:
             outFile = io.StringIO()
@@ -119,7 +118,7 @@ class CanvasExportStore():
         else:
             return (False, "missing requests and/or urllib3 module(s)")
     # }}}
-    # {{{ exportPngFile(self, canvasMap, fontFilePath, fontSize, outPathName): XXX
+    # {{{ exportPngFile(self, canvasMap, fontFilePath, fontSize, outPathName)
     def exportPngFile(self, canvasMap, fontFilePath, fontSize, outPathName):
         if havePIL:
             inSize = (len(canvasMap[0]), len(canvasMap))
@@ -163,7 +162,7 @@ class CanvasExportStore():
         else:
             return (False, "missing PIL modules")
     # }}}
-    # {{{ exportTextBuffer(self, canvasMap, canvasSize): XXX
+    # {{{ exportTextBuffer(self, canvasMap, canvasSize)
     def exportTextBuffer(self, canvasMap, canvasSize):
         outBuffer = ""
         for canvasRow in range(canvasSize[1]):
@@ -202,7 +201,7 @@ class CanvasExportStore():
         else:
             return (False, "empty buffer generated")
     # }}}
-    # {{{ exportTextFile(self, canvasMap, canvasSize, outFile): XXX
+    # {{{ exportTextFile(self, canvasMap, canvasSize, outFile)
     def exportTextFile(self, canvasMap, canvasSize, outFile):
         rc, outBuffer = self.exportTextBuffer(canvasMap, canvasSize)
         return outFile.write(outBuffer) if rc else (rc, outBuffer)

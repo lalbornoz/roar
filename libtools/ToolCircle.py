@@ -1,17 +1,16 @@
 #!/usr/bin/env python3
 #
-# ToolCircle.py -- XXX
+# ToolCircle.py 
 # Copyright (c) 2018, 2019 Lucio Andrés Illanes Albornoz <lucio@lucioillanes.de>
 #
 
 from Tool import Tool
 
 class ToolCircle(Tool):
-    """XXX"""
     name = "Circle"
 
     #
-    # onMouseEvent(self, event, atPoint, brushColours, brushSize, isDragging, isLeftDown, isRightDown, dispatchFn, eventDc): XXX
+    # onMouseEvent(self, event, atPoint, brushColours, brushSize, isDragging, isLeftDown, isRightDown, dispatchFn, eventDc)
     def onMouseEvent(self, event, atPoint, brushColours, brushSize, isDragging, isLeftDown, isRightDown, dispatchFn, eventDc):
         brushColours = brushColours.copy()
         if isLeftDown:

@@ -1,15 +1,13 @@
 #!/usr/bin/env python3
 #
-# GuiCanvasPanel.py -- XXX
+# GuiCanvasPanel.py 
 # Copyright (c) 2018, 2019 Lucio Andrés Illanes Albornoz <lucio@lucioillanes.de>
 #
 
 import wx
 
 class GuiCanvasPanel(wx.Panel):
-    """XXX"""
-
-    # {{{ _drawPatch(self, eventDc, isCursor, patch): XXX
+    # {{{ _drawPatch(self, eventDc, isCursor, patch)
     def _drawPatch(self, eventDc, isCursor, patch):
         if not self.canvas.dirtyCursor:
             self.backend.drawCursorMaskWithJournal(self.canvas.journal, eventDc)
@@ -20,7 +18,7 @@ class GuiCanvasPanel(wx.Panel):
             self.canvas.journal.pushCursor(patchDelta)
     # }}}
 
-    # {{{ dispatchDeltaPatches(self, deltaPatches): XXX
+    # {{{ dispatchDeltaPatches(self, deltaPatches)
     def dispatchDeltaPatches(self, deltaPatches):
         eventDc = self.backend.getDeviceContext(self)
         for patch in deltaPatches:
@@ -31,12 +29,12 @@ class GuiCanvasPanel(wx.Panel):
             else:
                 self.canvas._commitPatch(patch); self.backend.drawPatch(eventDc, patch);
     # }}}
-    # {{{ dispatchPatch(self, eventDc, isCursor, patch): XXX
+    # {{{ dispatchPatch(self, eventDc, isCursor, patch)
     def dispatchPatch(self, eventDc, isCursor, patch):
         self.canvas.dispatchPatch(isCursor, patch, False if isCursor else True)
         self._drawPatch(eventDc, isCursor, patch)
     # }}}
-    # {{{ resize(self, newSize, commitUndo=True): XXX
+    # {{{ resize(self, newSize, commitUndo=True)
     def resize(self, newSize, commitUndo=True):
         oldSize = [0, 0] if self.canvas.map == None else self.canvas.size
         deltaSize = [b - a for a, b in zip(oldSize, newSize)]
@@ -59,7 +57,7 @@ class GuiCanvasPanel(wx.Panel):
             del eventDc; wx.SafeYield();
             self.interface.update(size=newSize, undoLevel=self.canvas.journal.patchesUndoLevel)
     # }}}
-    # {{{ update(self, newSize, commitUndo=True, newCanvas=None): XXX
+    # {{{ update(self, newSize, commitUndo=True, newCanvas=None)
     def update(self, newSize, commitUndo=True, newCanvas=None):
         self.resize(newSize, commitUndo)
         self.canvas.update(newSize, newCanvas)
@@ -70,15 +68,15 @@ class GuiCanvasPanel(wx.Panel):
         wx.SafeYield()
     # }}}
 
-    # {{{ onPanelClose(self, event): XXX
+    # {{{ onPanelClose(self, event)
     def onPanelClose(self, event):
         self.Destroy()
     # }}}
-    # {{{ onPanelEnterWindow(self, event): XXX
+    # {{{ onPanelEnterWindow(self, event)
     def onPanelEnterWindow(self, event):
         self.parentFrame.SetFocus()
     # }}}
-    # {{{ onPanelInput(self, event): XXX
+    # {{{ onPanelInput(self, event)
     def onPanelInput(self, event):
         self.canvas.dirtyJournal, self.canvas.dirtyCursor = False, False
         eventDc, eventType, tool = self.backend.getDeviceContext(self), event.GetEventType(), self.interface.currentTool
@@ -103,12 +101,12 @@ class GuiCanvasPanel(wx.Panel):
         if eventType == wx.wxEVT_MOTION:
             self.interface.update(cellPos=mapPoint)
     # }}}
-    # {{{ onPanelLeaveWindow(self, event): XXX
+    # {{{ onPanelLeaveWindow(self, event)
     def onPanelLeaveWindow(self, event):
         eventDc = self.backend.getDeviceContext(self)
         self.backend.drawCursorMaskWithJournal(self.canvas.journal, eventDc)
     # }}}
-    # {{{ onPanelPaint(self, event): XXX
+    # {{{ onPanelPaint(self, event)
     def onPanelPaint(self, event):
         self.backend.onPanelPaintEvent(event, self)
     # }}}

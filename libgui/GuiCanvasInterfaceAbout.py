@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 #
-# GuiCanvasInterfaceAbout.py -- XXX
+# GuiCanvasInterfaceAbout.py 
 # Copyright (c) 2018, 2019 Lucio Andrés Illanes Albornoz <lucio@lucioillanes.de>
 #
 
@@ -8,15 +8,13 @@ from glob import glob
 import os, random, wx, wx.adv
 
 class GuiCanvasInterfaceAbout(wx.Dialog):
-    """XXX"""
-
-    # {{{ onButtonRoar(self, event): XXX
+    # {{{ onButtonRoar(self, event)
     def onButtonRoar(self, event):
         self.Destroy()
     # }}}
 
     #
-    # __init__(self, parent, size=(320, 240), title="About roar"): XXX
+    # __init__(self, parent, size=(320, 240), title="About roar")
     def __init__(self, parent, size=(320, 240), title="About roar"):
         super(GuiCanvasInterfaceAbout, self).__init__(parent, size=size, title=title)
         self.panel, self.sizer, self.sizerH1, self.sizerH2 = wx.Panel(self), wx.BoxSizer(wx.VERTICAL), wx.BoxSizer(wx.HORIZONTAL), wx.BoxSizer(wx.HORIZONTAL)

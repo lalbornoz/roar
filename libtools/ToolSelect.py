@@ -1,19 +1,18 @@
 #!/usr/bin/env python3
 #
-# ToolSelect.py -- XXX
+# ToolSelect.py 
 # Copyright (c) 2018, 2019 Lucio Andrés Illanes Albornoz <lucio@lucioillanes.de>
 #
 
 from Tool import Tool
 
 class ToolSelect(Tool):
-    """XXX"""
     TS_NONE     = 0
     TS_ORIGIN   = 1
     TS_SELECT   = 2
     TS_TARGET   = 3
 
-    # {{{ _dispatchSelectEvent(self, atPoint, dispatchFn, eventDc, isLeftDown, isRightDown, selectRect): XXX
+    # {{{ _dispatchSelectEvent(self, atPoint, dispatchFn, eventDc, isLeftDown, isRightDown, selectRect)
     def _dispatchSelectEvent(self, atPoint, dispatchFn, eventDc, isLeftDown, isRightDown, selectRect):
         if isLeftDown:
             disp, isCursor = [atPoint[m] - self.lastAtPoint[m] for m in [0, 1]], True
@@ -27,7 +26,7 @@ class ToolSelect(Tool):
         self._drawSelectRect(newTargetRect, dispatchFn, eventDc)
         self.targetRect = newTargetRect
     # }}}
-    # {{{ _drawSelectRect(self, rect, dispatchFn, eventDc): XXX
+    # {{{ _drawSelectRect(self, rect, dispatchFn, eventDc)
     def _drawSelectRect(self, rect, dispatchFn, eventDc):
         rectFrame = [[rect[m[0]][n] + m[1] for n in [0, 1]] for m in [[0, -1], [1, +1]]]
         if rectFrame[0][0] > rectFrame[1][0]:
@@ -44,14 +43,14 @@ class ToolSelect(Tool):
             dispatchFn(eventDc, True, [rectFrame[0][0], rectY, *curColours, 0, " "])
             dispatchFn(eventDc, True, [rectFrame[1][0], rectY, *curColours, 0, " "])
     # }}}
-    # {{{ _mouseEventTsNone(self, atPoint, brushColours, dispatchFn, eventDc, isDragging, isLeftDown, isRightDown): XXX
+    # {{{ _mouseEventTsNone(self, atPoint, brushColours, dispatchFn, eventDc, isDragging, isLeftDown, isRightDown)
     def _mouseEventTsNone(self, atPoint, brushColours, dispatchFn, eventDc, isDragging, isLeftDown, isRightDown):
         if isLeftDown:
             self.targetRect, self.toolState = [list(atPoint), []], self.TS_ORIGIN
         else:
             dispatchFn(eventDc, True, [*atPoint, *brushColours, 0, " "])
     # }}}
-    # {{{ _mouseEventTsOrigin(self, atPoint, brushColours, dispatchFn, eventDc, isDragging, isLeftDown, isRightDown): XXX
+    # {{{ _mouseEventTsOrigin(self, atPoint, brushColours, dispatchFn, eventDc, isDragging, isLeftDown, isRightDown)
     def _mouseEventTsOrigin(self, atPoint, brushColours, dispatchFn, eventDc, isDragging, isLeftDown, isRightDown):
         if isLeftDown:
             self.targetRect[1] = list(atPoint)
@@ -72,7 +71,7 @@ class ToolSelect(Tool):
             self.targetRect[1] = list(atPoint)
             self._drawSelectRect(self.targetRect, dispatchFn, eventDc)
     # }}}
-    # {{{ _mouseEventTsSelect(self, atPoint, brushColours, dispatchFn, eventDc, isDragging, isLeftDown, isRightDown): XXX
+    # {{{ _mouseEventTsSelect(self, atPoint, brushColours, dispatchFn, eventDc, isDragging, isLeftDown, isRightDown)
     def _mouseEventTsSelect(self, atPoint, brushColours, dispatchFn, eventDc, isDragging, isLeftDown, isRightDown):
         if isLeftDown                                       \
         and  (atPoint[0] >= (self.targetRect[0][0] - 1))    \
@@ -86,7 +85,7 @@ class ToolSelect(Tool):
         else:
             self._dispatchSelectEvent(atPoint, dispatchFn, eventDc, isLeftDown, isRightDown, self.targetRect)
     # }}}
-    # {{{ _mouseEventTsTarget(self, atPoint, brushColours, dispatchFn, eventDc, isDragging, isLeftDown, isRightDown): XXX
+    # {{{ _mouseEventTsTarget(self, atPoint, brushColours, dispatchFn, eventDc, isDragging, isLeftDown, isRightDown)
     def _mouseEventTsTarget(self, atPoint, brushColours, dispatchFn, eventDc, isDragging, isLeftDown, isRightDown):
         if isLeftDown:
             self.toolState = self.TS_TARGET
@@ -99,7 +98,7 @@ class ToolSelect(Tool):
     # }}}
 
     #
-    # onMouseEvent(self, event, atPoint, brushColours, brushSize, isDragging, isLeftDown, isRightDown, dispatchFn, eventDc): XXX
+    # onMouseEvent(self, event, atPoint, brushColours, brushSize, isDragging, isLeftDown, isRightDown, dispatchFn, eventDc)
     def onMouseEvent(self, event, atPoint, brushColours, brushSize, isDragging, isLeftDown, isRightDown, dispatchFn, eventDc):
         if self.toolState == self.TS_NONE:
             self._mouseEventTsNone(atPoint, brushColours, dispatchFn, eventDc, isDragging, isLeftDown, isRightDown)
@@ -111,7 +110,7 @@ class ToolSelect(Tool):
             self._mouseEventTsTarget(atPoint, brushColours, dispatchFn, eventDc, isDragging, isLeftDown, isRightDown)
 
     #
-    # onSelectEvent(self, disp, dispatchFn, eventDc, isCursor, newTargetRect, selectRect): XXX
+    # onSelectEvent(self, disp, dispatchFn, eventDc, isCursor, newTargetRect, selectRect)
     def onSelectEvent(self, disp, dispatchFn, eventDc, isCursor, newTargetRect, selectRect):
         pass
 

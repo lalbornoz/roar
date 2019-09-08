@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 #
-# CanvasImportStore.py -- XXX
+# CanvasImportStore.py 
 # Copyright (c) 2018, 2019 Lucio Andrés Illanes Albornoz <lucio@lucioillanes.de>
 # This project is licensed under the terms of the MIT licence.
 #
@@ -9,7 +9,6 @@ from CanvasColours import AnsiBgToMiRCARTColours, AnsiFgToMiRCARTColours, AnsiFg
 import io, os, re, struct, sys
 
 class CanvasImportStore():
-    """XXX"""
     # {{{ _CellState(): Cell state
     class _CellState():
         CS_NONE             = 0x00
@@ -18,12 +17,12 @@ class CanvasImportStore():
         CS_UNDERLINE        = 0x04
     # }}}
 
-    # {{{ _flipCellStateBit(self, bit, cellState): XXX
+    # {{{ _flipCellStateBit(self, bit, cellState)
     def _flipCellStateBit(self, bit, cellState):
         return cellState & ~bit if cellState & bit else cellState | bit
     # }}}
 
-    # {{{ importAnsiBuffer(self, inBuffer, encoding="cp437", width=None): XXX
+    # {{{ importAnsiBuffer(self, inBuffer, encoding="cp437", width=None)
     def importAnsiBuffer(self, inBuffer, encoding="cp437", width=None):
         curBg, curBgAnsi, curBoldAnsi, curFg, curFgAnsi = 1, 30, False, 15, 37
         done, outMap, outMaxCols = False, [[]], 0
@@ -76,11 +75,11 @@ class CanvasImportStore():
         else:
             return (False, "empty output map")
     # }}}
-    # {{{ importAnsiFile(self, inPathName, encoding="cp437"): XXX
+    # {{{ importAnsiFile(self, inPathName, encoding="cp437")
     def importAnsiFile(self, inPathName, encoding="cp437"):
         return self.importAnsiBuffer(open(inPathName, "rb").read(), encoding)
     # }}}
-    # {{{ importSauceFile(self, inPathName, encoding="cp437"): XXX
+    # {{{ importSauceFile(self, inPathName, encoding="cp437")
     def importSauceFile(self, inPathName, encoding="cp437"):
         with open(inPathName, "rb") as inFile:
             inFileStat = os.stat(inPathName)
@@ -92,7 +91,7 @@ class CanvasImportStore():
             else:
                 return (False, "only character based ANSi SAUCE files are supported")
     # }}}
-    # {{{ importTextBuffer(self, inFile): XXX
+    # {{{ importTextBuffer(self, inFile)
     def importTextBuffer(self, inFile):
         inLine, outMap, outMaxCols = inFile.readline(), [], 0
         while inLine:
@@ -133,7 +132,7 @@ class CanvasImportStore():
         else:
             return (False, "empty output map")
     # }}}
-    # {{{ importTextFile(self, pathName): XXX
+    # {{{ importTextFile(self, pathName)
     def importTextFile(self, pathName):
         with open(pathName, "r", encoding="utf-8-sig") as inFile:
             return self.importTextBuffer(inFile)
