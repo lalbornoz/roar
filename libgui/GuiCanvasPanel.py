@@ -80,7 +80,7 @@ class GuiCanvasPanel(wx.Panel):
     # }}}
     # {{{ onPanelInput(self, event): XXX
     def onPanelInput(self, event):
-        self.canvas.dirty, self.canvas.dirtyCursor = False, False
+        self.canvas.dirtyJournal, self.canvas.dirtyCursor = False, False
         eventDc, eventType, tool = self.backend.getDeviceContext(self), event.GetEventType(), self.interface.currentTool
         if eventType == wx.wxEVT_CHAR:
             mapPoint = self.brushPos
@@ -97,8 +97,9 @@ class GuiCanvasPanel(wx.Panel):
                 event, mapPoint, self.brushColours, self.brushSize,         \
                 event.Dragging(), event.LeftIsDown(), event.RightIsDown(),  \
                 self.dispatchPatch, eventDc)
-        if self.canvas.dirty:
-            self.interface.update(cellPos=self.brushPos, undoLevel=self.canvas.journal.patchesUndoLevel)
+        if self.canvas.dirtyJournal:
+            self.dirty = True
+            self.interface.update(dirty=self.dirty, cellPos=self.brushPos, undoLevel=self.canvas.journal.patchesUndoLevel)
         if eventType == wx.wxEVT_MOTION:
             self.interface.update(cellPos=mapPoint)
     # }}}
@@ -119,7 +120,7 @@ class GuiCanvasPanel(wx.Panel):
         self.backend, self.interface = backend(defaultCanvasSize, defaultCellSize), interface(self, parentFrame)
         self.brushColours, self.brushPos, self.brushSize = [4, 1], [0, 0], [1, 1]
         self.canvas, self.canvasPos, self.defaultCanvasPos, self.defaultCanvasSize, self.defaultCellSize = canvas, defaultCanvasPos, defaultCanvasPos, defaultCanvasSize, defaultCellSize
-        self.parentFrame = parentFrame
+        self.dirty, self.parentFrame = False, parentFrame
 
         self.Bind(wx.EVT_CLOSE, self.onPanelClose)
         self.Bind(wx.EVT_ENTER_WINDOW, self.onPanelEnterWindow)

@@ -52,14 +52,6 @@ def GuiCanvasSelectDecorator(idx, caption, label, icon, accel, initialState):
 class GuiCanvasInterface():
     """XXX"""
 
-    # {{{ _dialogSaveChanges(self): XXX
-    def _dialogSaveChanges(self):
-        with wx.MessageDialog(self.parentCanvas,                                    \
-                "Do you want to save changes to {}?".format(self.canvasPathName),   \
-                "", wx.CANCEL|wx.CANCEL_DEFAULT|wx.ICON_QUESTION|wx.YES_NO) as dialog:
-            dialogChoice = dialog.ShowModal()
-            return dialogChoice
-    # }}}
     # {{{ _initColourBitmaps(self): XXX
     def _initColourBitmaps(self):
         for numColour in range(len(self.canvasColour.attrList)):
@@ -83,6 +75,24 @@ class GuiCanvasInterface():
         toolBitmapDc.DrawRectangle(0, 0, 8, 8)
         toolBitmapDc.DrawRectangle(8, 8, 16, 16)
         self.canvasColourAlpha.attrList[0]["icon"] = ["", None, toolBitmap]
+    # }}}
+    # {{{ _promptSaveChanges(self): XXX
+    def _promptSaveChanges(self):
+        if self.parentCanvas.dirty:
+           with wx.MessageDialog(self.parentCanvas,                                                                                    \
+                        "Do you want to save changes to {}?".format(self.canvasPathName if self.canvasPathName != None else "(Untitled)"),  \
+                        "", wx.CANCEL|wx.CANCEL_DEFAULT|wx.ICON_QUESTION|wx.YES_NO) as dialog:
+                dialogChoice = dialog.ShowModal()
+                if dialogChoice == wx.ID_CANCEL:
+                    return False
+                elif dialogChoice == wx.ID_NO:
+                    return True
+                elif dialogChoice == wx.ID_YES:
+                    return self.canvasSaveAs(None) if self.canvasPathName == None else self.canvasSave(None)
+                else:
+                    return False
+        else:
+            return True
     # }}}
 
     # {{{ canvasAbout(self, event): XXX
@@ -158,62 +168,43 @@ class GuiCanvasInterface():
     # {{{ canvasExit(self, event): XXX
     @GuiCanvasCommandDecorator("Exit", "E&xit", None, [wx.ACCEL_CTRL, ord("X")], None)
     def canvasExit(self, event):
-        if self.canvasPathName != None:
-            saveChanges = self._dialogSaveChanges()
-            if saveChanges == wx.ID_CANCEL:
-                return
-            elif saveChanges == wx.ID_NO:
-                pass
-            elif saveChanges == wx.ID_YES:
-                self.canvasSave(event)
-        self.parentFrame.Close(True)
+        if self._promptSaveChanges():
+            self.parentFrame.Close(True)
     # }}}
     # {{{ canvasNew(self, event, newCanvasSize=None): XXX
     @GuiCanvasCommandDecorator("New", "&New", ["", wx.ART_NEW], [wx.ACCEL_CTRL, ord("N")], None)
     def canvasNew(self, event, newCanvasSize=None):
-        if self.canvasPathName != None:
-            saveChanges = self._dialogSaveChanges()
-            if saveChanges == wx.ID_CANCEL:
-                return
-            elif saveChanges == wx.ID_NO:
-                pass
-            elif saveChanges == wx.ID_YES:
-                self.canvasSave(event)
-        self.parentCanvas.SetCursor(wx.Cursor(wx.CURSOR_WAIT))
-        if newCanvasSize == None:
-            newCanvasSize = list(self.parentCanvas.defaultCanvasSize)
-        newMap = [[[1, 1, 0, " "] for x in range(newCanvasSize[0])] for y in range(newCanvasSize[1])]
-        self.parentCanvas.update(newCanvasSize, False, newMap)
-        self.canvasPathName = None
-        self.parentCanvas.SetCursor(wx.Cursor(wx.NullCursor))
-        self.update(pathName="", undoLevel=-1)
+        if self._promptSaveChanges():
+            self.parentCanvas.SetCursor(wx.Cursor(wx.CURSOR_WAIT))
+            if newCanvasSize == None:
+                newCanvasSize = list(self.parentCanvas.defaultCanvasSize)
+            newMap = [[[1, 1, 0, " "] for x in range(newCanvasSize[0])] for y in range(newCanvasSize[1])]
+            self.parentCanvas.dirty = False
+            self.parentCanvas.update(newCanvasSize, False, newMap)
+            self.canvasPathName = None
+            self.parentCanvas.SetCursor(wx.Cursor(wx.NullCursor))
+            self.update(dirty=self.parentCanvas.dirty, pathName=self.canvasPathName, undoLevel=-1)
     # }}}
     # {{{ canvasOpen(self, event): XXX
     @GuiCanvasCommandDecorator("Open", "&Open", ["", wx.ART_FILE_OPEN], [wx.ACCEL_CTRL, ord("O")], None)
     def canvasOpen(self, event):
-        if self.canvasPathName != None:
-            saveChanges = self._dialogSaveChanges()
-            if saveChanges == wx.ID_CANCEL:
-                return
-            elif saveChanges == wx.ID_NO:
-                pass
-            elif saveChanges == wx.ID_YES:
-                self.canvasSave(event)
-        with wx.FileDialog(self.parentCanvas, "Open", os.getcwd(), "", "mIRC art files (*.txt)|*.txt|All Files (*.*)|*.*", wx.FD_OPEN) as dialog:
-            if dialog.ShowModal() == wx.ID_CANCEL:
-                return False
-            else:
-                self.canvasPathName = dialog.GetPath()
-                self.parentCanvas.SetCursor(wx.Cursor(wx.CURSOR_WAIT))
-                rc, error = self.parentCanvas.canvas.importStore.importTextFile(self.canvasPathName)
-                if rc:
-                    self.parentCanvas.update(self.parentCanvas.canvas.importStore.inSize, False, self.parentCanvas.canvas.importStore.outMap)
-                    self.parentCanvas.SetCursor(wx.Cursor(wx.NullCursor))
-                    self.update(pathName=self.canvasPathName, undoLevel=-1)
-                    return True
-                else:
-                    print("error: {}".format(error), file=sys.stderr)
+        if self._promptSaveChanges():
+            with wx.FileDialog(self.parentCanvas, "Open", os.getcwd(), "", "mIRC art files (*.txt)|*.txt|All Files (*.*)|*.*", wx.FD_OPEN) as dialog:
+                if dialog.ShowModal() == wx.ID_CANCEL:
                     return False
+                else:
+                    self.canvasPathName = dialog.GetPath()
+                    self.parentCanvas.SetCursor(wx.Cursor(wx.CURSOR_WAIT))
+                    rc, error = self.parentCanvas.canvas.importStore.importTextFile(self.canvasPathName)
+                    if rc:
+                        self.parentCanvas.dirty = False
+                        self.parentCanvas.update(self.parentCanvas.canvas.importStore.inSize, False, self.parentCanvas.canvas.importStore.outMap)
+                        self.parentCanvas.SetCursor(wx.Cursor(wx.NullCursor))
+                        self.update(dirty=self.parentCanvas.dirty, pathName=self.canvasPathName, undoLevel=-1)
+                        return True
+                    else:
+                        print("error: {}".format(error), file=sys.stderr)
+                        return False
     # }}}
     # {{{ canvasPaste(self, event): XXX
     @GuiCanvasCommandDecorator("Paste", "&Paste", ["", wx.ART_PASTE], None, False)
@@ -231,14 +222,15 @@ class GuiCanvasInterface():
     def canvasSave(self, event):
         if self.canvasPathName == None:
             if self.canvasSaveAs(event) == False:
-                return
+                return False
         try:
             with open(self.canvasPathName, "w", encoding="utf-8") as outFile:
                 self.parentCanvas.SetCursor(wx.Cursor(wx.CURSOR_WAIT))
-                self.parentCanvas.canvas.exportStore.exportTextFile(                 \
-                    self.parentCanvas.canvas.map, self.parentCanvas.canvas.size, outFile)
+                self.parentCanvas.canvas.exportStore.exportTextFile(self.parentCanvas.canvas.map, self.parentCanvas.canvas.size, outFile)
                 self.parentCanvas.SetCursor(wx.Cursor(wx.NullCursor))
-                return True
+                self.parentCanvas.dirty = False
+                self.update(dirty=self.parentCanvas.dirty)
+            return True
         except IOError as error:
             return False
     # }}}
@@ -420,26 +412,19 @@ class GuiCanvasInterface():
     # {{{ canvasImportAnsi(self, event): XXX
     @GuiCanvasCommandDecorator("Import ANSI...", "Import ANSI...", None, None, None)
     def canvasImportAnsi(self, event):
-        if self.canvasPathName != None:
-            saveChanges = self._dialogSaveChanges()
-            if saveChanges == wx.ID_CANCEL:
-                return
-            elif saveChanges == wx.ID_NO:
-                pass
-            elif saveChanges == wx.ID_YES:
-                self.canvasSave(event)
         with wx.FileDialog(self.parentCanvas, "Open", os.getcwd(), "", "ANSI files (*.ans;*.txt)|*.ans;*.txt|All Files (*.*)|*.*", wx.FD_OPEN) as dialog:
             if dialog.ShowModal() == wx.ID_CANCEL:
                 return False
-            else:
+            elif self._promptSaveChanges():
                 self.canvasPathName = dialog.GetPath()
                 self.parentCanvas.SetCursor(wx.Cursor(wx.CURSOR_WAIT))
                 rc, error = self.parentCanvas.canvas.importStore.importAnsiFile(self.canvasPathName)
                 if rc:
+                    self.parentCanvas.dirty = True
                     self.parentCanvas.update(self.parentCanvas.canvas.importStore.inSize, False, self.parentCanvas.canvas.importStore.outMap)
-                    self.canvasPathName = "(Imported)"
+                    self.canvasPathName = None
                     self.parentCanvas.SetCursor(wx.Cursor(wx.NullCursor))
-                    self.update(pathName="(Imported)", undoLevel=-1)
+                    self.update(dirty=self.parentCanvas.dirty, pathName=self.canvasPathName, undoLevel=-1)
                     return True
                 else:
                     print("error: {}".format(error), file=sys.stderr)
@@ -449,27 +434,21 @@ class GuiCanvasInterface():
     @GuiCanvasCommandDecorator("Import from clipboard", "&Import from clipboard", None, None, None)
     def canvasImportFromClipboard(self, event):
         rc = False
-        if  wx.TheClipboard.IsSupported(wx.DataFormat(wx.DF_TEXT))                  \
+        if  wx.TheClipboard.IsSupported(wx.DataFormat(wx.DF_TEXT))  \
         and wx.TheClipboard.Open():
             inBuffer = wx.TextDataObject()
             if wx.TheClipboard.GetData(inBuffer):
-                if self.canvasPathName != None:
-                    saveChanges = self._dialogSaveChanges()
-                    if saveChanges == wx.ID_CANCEL:
-                        return
-                    elif saveChanges == wx.ID_NO:
-                        pass
-                    elif saveChanges == wx.ID_YES:
-                        self.canvasSave(event)
-                self.parentCanvas.SetCursor(wx.Cursor(wx.CURSOR_WAIT))
-                rc, error = self.parentCanvas.canvas.importStore.importTextBuffer(io.StringIO(inBuffer.GetText()))
-                if rc:
-                    self.parentCanvas.update(self.parentCanvas.canvas.importStore.inSize, False, self.parentCanvas.canvas.importStore.outMap)
-                    self.canvasPathName = "(Clipboard)"
-                    self.parentCanvas.SetCursor(wx.Cursor(wx.NullCursor))
-                    self.update(pathName="(Clipboard)", undoLevel=-1)
-                else:
-                    print("error: {}".format(error), file=sys.stderr)
+                if self._promptSaveChanges():
+                    self.parentCanvas.SetCursor(wx.Cursor(wx.CURSOR_WAIT))
+                    rc, error = self.parentCanvas.canvas.importStore.importTextBuffer(io.StringIO(inBuffer.GetText()))
+                    if rc:
+                        self.parentCanvas.dirty = True
+                        self.parentCanvas.update(self.parentCanvas.canvas.importStore.inSize, False, self.parentCanvas.canvas.importStore.outMap)
+                        self.canvasPathName = None
+                        self.parentCanvas.SetCursor(wx.Cursor(wx.NullCursor))
+                        self.update(dirty=self.parentCanvas.dirty, pathName=self.canvasPathName, undoLevel=-1)
+                    else:
+                        print("error: {}".format(error), file=sys.stderr)
             wx.TheClipboard.Close()
         if not rc:
             with wx.MessageDialog(self.parentCanvas, "Clipboard does not contain text data and/or cannot be opened", "", wx.ICON_QUESTION | wx.OK | wx.OK_DEFAULT) as dialog:
@@ -478,26 +457,19 @@ class GuiCanvasInterface():
     # {{{ canvasImportSauce(self, event): XXX
     @GuiCanvasCommandDecorator("Import SAUCE...", "Import SAUCE...", None, None, None)
     def canvasImportSauce(self, event):
-        if self.canvasPathName != None:
-            saveChanges = self._dialogSaveChanges()
-            if saveChanges == wx.ID_CANCEL:
-                return
-            elif saveChanges == wx.ID_NO:
-                pass
-            elif saveChanges == wx.ID_YES:
-                self.canvasSave(event)
         with wx.FileDialog(self.parentCanvas, "Open", os.getcwd(), "", "SAUCE files (*.ans;*.txt)|*.ans;*.txt|All Files (*.*)|*.*", wx.FD_OPEN) as dialog:
             if dialog.ShowModal() == wx.ID_CANCEL:
                 return False
-            else:
+            elif self._promptSaveChanges():
                 self.canvasPathName = dialog.GetPath()
                 self.parentCanvas.SetCursor(wx.Cursor(wx.CURSOR_WAIT))
                 rc, error = self.parentCanvas.canvas.importStore.importSauceFile(self.canvasPathName)
                 if rc:
+                    self.parentCanvas.dirty = True
                     self.parentCanvas.update(self.parentCanvas.canvas.importStore.inSize, False, self.parentCanvas.canvas.importStore.outMap)
-                    self.canvasPathName = "(Imported)"
+                    self.canvasPathName = None
                     self.parentCanvas.SetCursor(wx.Cursor(wx.NullCursor))
-                    self.update(pathName="(Imported)", undoLevel=-1)
+                    self.update(dirty=self.parentCanvas.dirty, pathName=self.canvasPathName, undoLevel=-1)
                     return True
                 else:
                     print("error: {}".format(error), file=sys.stderr)
@@ -519,7 +491,7 @@ class GuiCanvasInterface():
                 Colours[self.lastPanelState["colours"][0]][4] if self.lastPanelState["colours"][0] != -1 else "Transparent",
                 Colours[self.lastPanelState["colours"][1]][4] if self.lastPanelState["colours"][1] != -1 else "Transparent"))
         if "pathName" in self.lastPanelState:
-            if self.lastPanelState["pathName"] != "":
+            if self.lastPanelState["pathName"] != None:
                 basePathName = os.path.basename(self.lastPanelState["pathName"])
                 textItems.append("Current file: {}".format(basePathName))
                 self.parentFrame.SetTitle("{} - roar".format(basePathName))
@@ -527,6 +499,9 @@ class GuiCanvasInterface():
                 self.parentFrame.SetTitle("roar")
         if "toolName" in self.lastPanelState:
             textItems.append("Current tool: {}".format(self.lastPanelState["toolName"]))
+        if  "dirty" in self.lastPanelState  \
+        and self.lastPanelState["dirty"]:
+            textItems.append("*")
         self.parentFrame.statusBar.SetStatusText(" | ".join(textItems))
         if "undoLevel" in self.lastPanelState:
             if self.lastPanelState["undoLevel"] >= 0:
