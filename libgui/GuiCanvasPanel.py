@@ -31,8 +31,8 @@ class GuiCanvasPanel(wx.Panel):
     # }}}
     # {{{ dispatchPatch(self, eventDc, isCursor, patch)
     def dispatchPatch(self, eventDc, isCursor, patch):
-        self.canvas.dispatchPatch(isCursor, patch, False if isCursor else True)
-        self._drawPatch(eventDc, isCursor, patch)
+        if self.canvas.dispatchPatch(isCursor, patch, False if isCursor else True):
+            self._drawPatch(eventDc, isCursor, patch)
     # }}}
     # {{{ resize(self, newSize, commitUndo=True)
     def resize(self, newSize, commitUndo=True):
