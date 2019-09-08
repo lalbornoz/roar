@@ -23,15 +23,15 @@ class Canvas():
             self.journal.pushCursor(patchDelta)
         else:
             if commitUndo:
-                if not self.dirty:
-                    self.journal.pushDeltas([], []); self.dirty = True;
+                if not self.dirtyJournal:
+                    self.journal.pushDeltas([], []); self.dirtyJournal = True;
                 self.journal.updateCurrentDeltas(patch, patchDelta)
             self._commitPatch(patch)
     # }}}
     # {{{ resize(self, newSize, commitUndo=True): XXX
     def resize(self, newSize, commitUndo=True):
         if newSize != self.size:
-            self.dirty = False
+            self.dirtyJournal = False
             if self.map == None:
                 self.map, oldSize = [], [0, 0]
             else:
@@ -40,35 +40,43 @@ class Canvas():
             self.journal.resetCursor()
             if commitUndo:
                 undoPatches, redoPatches = ["resize", *oldSize], ["resize", *newSize]
-                if not self.dirty:
-                    self.journal.pushDeltas([], []); self.dirty = True;
+                if not self.dirtyJournal:
+                    self.journal.pushDeltas([], []); self.dirtyJournal = True;
                 self.journal.updateCurrentDeltas(redoPatches, undoPatches)
             if deltaSize[0] < 0:
                 for numRow in range(oldSize[1]):
                     if commitUndo:
                         for numCol in range((oldSize[0] + deltaSize[0]), oldSize[0]):
-                            if not self.dirty:
-                                self.journal.pushDeltas([], []); self.dirty = True;
+                            if not self.dirtyJournal:
+                                self.journal.pushDeltas([], []); self.dirtyJournal = True;
                             self.journal.updateCurrentDeltas(None, [numCol, numRow, *self.map[numRow][numCol]])
                     del self.map[numRow][-1:(deltaSize[0]-1):-1]
             else:
                 for numRow in range(oldSize[1]):
                     self.map[numRow].extend([[1, 1, 0, " "]] * deltaSize[0])
                     for numNewCol in range(oldSize[0], newSize[0]):
-                        self.dispatchPatch(False, [numNewCol, numRow, 1, 1, 0, " "], commitUndo)
+                        if commitUndo:
+                            if not self.dirtyJournal:
+                                self.journal.pushDeltas([], []); self.dirtyJournal = True;
+                            self.journal.updateCurrentDeltas([numNewCol, numRow, 1, 1, 0, " "], None)
+                        self.dispatchPatch(False, [numNewCol, numRow, 1, 1, 0, " "], False)
             if deltaSize[1] < 0:
                 if commitUndo:
                     for numRow in range((oldSize[1] + deltaSize[1]), oldSize[1]):
                         for numCol in range(oldSize[0] + deltaSize[0]):
-                            if not self.dirty:
-                                self.journal.pushDeltas([], []); self.dirty = True;
+                            if not self.dirtyJournal:
+                                self.journal.pushDeltas([], []); self.dirtyJournal = True;
                             self.journal.updateCurrentDeltas(None, [numCol, numRow, *self.map[numRow][numCol]])
                 del self.map[-1:(deltaSize[1]-1):-1]
             else:
                 for numNewRow in range(oldSize[1], newSize[1]):
                     self.map.extend([[[1, 1, 0, " "]] * newSize[0]])
                     for numNewCol in range(newSize[0]):
-                        self.dispatchPatch(False, [numNewCol, numNewRow, 1, 1, 0, " "], commitUndo)
+                        if commitUndo:
+                            if not self.dirtyJournal:
+                                self.journal.pushDeltas([], []); self.dirtyJournal = True;
+                            self.journal.updateCurrentDeltas([numNewCol, numNewRow, 1, 1, 0, " "], None)
+                        self.dispatchPatch(False, [numNewCol, numNewRow, 1, 1, 0, " "], False)
             self.size = newSize
             return True
         else:
@@ -87,7 +95,7 @@ class Canvas():
     #
     # __init__(self, size): initialisation method
     def __init__(self, size):
-        self.dirty, self.dirtyCursor, self.map, self.size = False, False, None, size
+        self.dirtyJournal, self.dirtyCursor, self.map, self.size = False, False, None, size
         self.exportStore, self.importStore, self.journal = CanvasExportStore(), CanvasImportStore(), CanvasJournal()
 
 # vim:expandtab foldmethod=marker sw=4 ts=4 tw=120
