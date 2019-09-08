@@ -33,8 +33,9 @@ class ToolText(Tool):
     #
     # onMouseEvent(self, event, atPoint, brushColours, brushSize, isDragging, isLeftDown, isRightDown, dispatchFn, eventDc): XXX
     def onMouseEvent(self, event, atPoint, brushColours, brushSize, isDragging, isLeftDown, isRightDown, dispatchFn, eventDc):
-        self.textPos = list(atPoint)
-        dispatchFn(eventDc, True, [*self.textPos, *brushColours, 0, "_"])
+        if isLeftDown or isRightDown:
+            self.textPos = list(atPoint)
+        dispatchFn(eventDc, True, [*atPoint, *brushColours, 0, "_"])
 
     # __init__(self, *args): initialisation method
     def __init__(self, *args):
