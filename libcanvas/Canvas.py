@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 #
-# Canvas.py -- XXX
+# Canvas.py 
 # Copyright (c) 2018, 2019 Lucio Andrés Illanes Albornoz <lucio@lucioillanes.de>
 #
 
@@ -9,14 +9,12 @@ from CanvasImportStore import CanvasImportStore
 from CanvasJournal import CanvasJournal
 
 class Canvas():
-    """XXX"""
-
-    # {{{ _commitPatch(self, patch): XXX
+    # {{{ _commitPatch(self, patch)
     def _commitPatch(self, patch):
         self.map[patch[1]][patch[0]] = patch[2:]
     # }}}
 
-    # {{{ dispatchPatch(self, isCursor, patch, commitUndo=True): XXX
+    # {{{ dispatchPatch(self, isCursor, patch, commitUndo=True)
     def dispatchPatch(self, isCursor, patch, commitUndo=True):
         patchDeltaCell = self.map[patch[1]][patch[0]]; patchDelta = [*patch[0:2], *patchDeltaCell];
         if isCursor:
@@ -28,7 +26,7 @@ class Canvas():
                 self.journal.updateCurrentDeltas(patch, patchDelta)
             self._commitPatch(patch)
     # }}}
-    # {{{ resize(self, newSize, commitUndo=True): XXX
+    # {{{ resize(self, newSize, commitUndo=True)
     def resize(self, newSize, commitUndo=True):
         if newSize != self.size:
             self.dirtyJournal = False
@@ -82,7 +80,7 @@ class Canvas():
         else:
             return False
     # }}}
-    # {{{ update(self, newSize, newCanvas=None): XXX
+    # {{{ update(self, newSize, newCanvas=None)
     def update(self, newSize, newCanvas=None):
         for numRow in range(self.size[1]):
             for numCol in range(self.size[0]):

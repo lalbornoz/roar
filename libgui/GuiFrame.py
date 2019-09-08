@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 #
-# GuiFrame.py -- XXX
+# GuiFrame.py 
 # Copyright (c) 2018, 2019 Lucio Andrés Illanes Albornoz <lucio@lucioillanes.de>
 #
 
@@ -18,9 +18,7 @@ NID_MENU_SEP     = 0xf000
 NID_TOOLBAR_HSEP = 0xf001
 
 class GuiFrame(wx.Frame):
-    """XXX"""
-
-    # {{{ _initAccelTable(self, accels): XXX
+    # {{{ _initAccelTable(self, accels)
     def _initAccelTable(self, accels):
         accelTableEntries = []
         for accel in accels:
@@ -34,13 +32,13 @@ class GuiFrame(wx.Frame):
                 self.Bind(wx.EVT_MENU, self.onInput, id=accel.attrDict["id"])
         self.SetAcceleratorTable(wx.AcceleratorTable(accelTableEntries))
     # }}}
-    # {{{ _initIcon(self): XXX
+    # {{{ _initIcon(self)
     def _initIcon(self):
         iconPathNames = glob(os.path.join("assets", "images", "logo*.bmp"))
         iconPathName = iconPathNames[random.randint(0, len(iconPathNames) - 1)]
         icon = wx.Icon(); icon.CopyFromBitmap(wx.Bitmap(iconPathName, wx.BITMAP_TYPE_ANY)); self.SetIcon(icon);
     # }}}
-    # {{{ _initMenus(self, menus): XXX
+    # {{{ _initMenus(self, menus)
     def _initMenus(self, menus):
         menuBar = wx.MenuBar()
         for menu in menus:
@@ -68,11 +66,11 @@ class GuiFrame(wx.Frame):
             menuBar.Append(menuWindow, menu[0])
         self.SetMenuBar(menuBar)
     # }}}
-    # {{{ _initStatusBar(self): XXX
+    # {{{ _initStatusBar(self)
     def _initStatusBar(self):
         self.statusBar = self.CreateStatusBar()
     # }}}
-    # {{{ _initToolBars(self, toolBars, panelSkin): XXX
+    # {{{ _initToolBars(self, toolBars, panelSkin)
     def _initToolBars(self, toolBars, panelSkin):
         for toolBar in toolBars:
             self.toolBars.append(wx.ToolBar(panelSkin, -1, style=wx.TB_FLAT | wx.HORIZONTAL | wx.TB_NODIVIDER))
@@ -100,7 +98,7 @@ class GuiFrame(wx.Frame):
             self.sizerSkin.Add(toolBar, 0, wx.ALIGN_LEFT | wx.ALL, 3)
             toolBar.Realize(); toolBar.Fit();
     # }}}
-    # {{{ _initToolBitmaps(self, toolBars): XXX
+    # {{{ _initToolBitmaps(self, toolBars)
     def _initToolBitmaps(self, toolBars):
         for toolBar in toolBars:
             for toolBarItem in toolBar:
@@ -122,7 +120,7 @@ class GuiFrame(wx.Frame):
                     toolBarItem.attrDict["icon"] = ["", None, toolBitmap]
     # }}}
 
-    # {{{ onInput(self, event): XXX
+    # {{{ onInput(self, event)
     def onInput(self, event):
         eventId = event.GetId(); self.itemsById[eventId](self.canvasPanel.interface, event);
     # }}}

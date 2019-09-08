@@ -1,18 +1,17 @@
 #!/usr/bin/env python3
 #
-# ToolLine.py -- XXX
+# ToolLine.py 
 # Copyright (c) 2018, 2019 Lucio Andrés Illanes Albornoz <lucio@lucioillanes.de>
 #
 
 from Tool import Tool
 
 class ToolLine(Tool):
-    """XXX"""
     name = "Line"
     TS_NONE     = 0
     TS_ORIGIN   = 1
 
-    # {{{ _getLine(self, brushColours, brushSize, dispatchFn, eventDc, isCursor, originPoint, targetPoint): XXX
+    # {{{ _getLine(self, brushColours, brushSize, dispatchFn, eventDc, isCursor, originPoint, targetPoint)
     def _getLine(self, brushColours, brushSize, dispatchFn, eventDc, isCursor, originPoint, targetPoint):
         originPoint, targetPoint = originPoint.copy(), targetPoint.copy()
         pointDelta = self._pointDelta(originPoint, targetPoint)
@@ -38,17 +37,17 @@ class ToolLine(Tool):
                 lineD -= pointDelta[0]; lineY += 1;
             lineD += pointDelta[1]
     # }}}
-    # {{{ _pointDelta(self, a, b): XXX
+    # {{{ _pointDelta(self, a, b)
     def _pointDelta(self, a, b):
         return [a2 - a1 for a1, a2 in zip(a, b)]
     # }}}
-    # {{{ _pointSwap(self, a, b): XXX
+    # {{{ _pointSwap(self, a, b)
     def _pointSwap(self, a, b):
         return [b, a]
     # }}}
 
     #
-    # onMouseEvent(self, event, atPoint, brushColours, brushSize, isDragging, isLeftDown, isRightDown, dispatchFn, eventDc): XXX
+    # onMouseEvent(self, event, atPoint, brushColours, brushSize, isDragging, isLeftDown, isRightDown, dispatchFn, eventDc)
     def onMouseEvent(self, event, atPoint, brushColours, brushSize, isDragging, isLeftDown, isRightDown, dispatchFn, eventDc):
         brushColours = brushColours.copy()
         if isLeftDown:

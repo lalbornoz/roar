@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 #
-# CanvasColours.py -- XXX
+# CanvasColours.py 
 # Copyright (c) 2018, 2019 Lucio Andrés Illanes Albornoz <lucio@lucioillanes.de>
 #
 
-# {{{ AnsiBgToMiRCARTColours: XXX
+# {{{ AnsiBgToMiRCARTColours
 AnsiBgToMiRCARTColours = {
     107: 0,  # Bright White
     40:  1,  # Black
@@ -24,7 +24,7 @@ AnsiBgToMiRCARTColours = {
     47:  15, # Light Grey
 };
 # }}}
-# {{{ AnsiFgBoldToMiRCARTColours: XXX
+# {{{ AnsiFgBoldToMiRCARTColours
 AnsiFgBoldToMiRCARTColours = {
     97: 0,   # Bright White
     30: 14,  # Grey
@@ -44,7 +44,7 @@ AnsiFgBoldToMiRCARTColours = {
     37: 0,   # Bright White
 };
 # }}}
-# {{{ AnsiFgToMiRCARTColours: XXX
+# {{{ AnsiFgToMiRCARTColours
 AnsiFgToMiRCARTColours = {
     97: 0,   # Bright White
     30: 1,   # Black
@@ -104,7 +104,7 @@ ColourMapNormal = [
     [187, 187, 187],    # Light Grey
 ]
 # }}}
-# {{{ MiRCARTToAnsiColours: XXX
+# {{{ MiRCARTToAnsiColours
 MiRCARTToAnsiColours = [
     97,  # Bright White
     30,  # Black

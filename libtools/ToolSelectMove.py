@@ -1,17 +1,16 @@
 #!/usr/bin/env python3
 #
-# ToolSelectMove.py -- XXX
+# ToolSelectMove.py 
 # Copyright (c) 2018, 2019 Lucio Andrés Illanes Albornoz <lucio@lucioillanes.de>
 #
 
 from ToolSelect import ToolSelect
 
 class ToolSelectMove(ToolSelect):
-    """XXX"""
     name = "Move selection"
 
     #
-    # onSelectEvent(self, disp, dispatchFn, eventDc, isCursor, newToolRect, selectRect): XXX
+    # onSelectEvent(self, disp, dispatchFn, eventDc, isCursor, newToolRect, selectRect)
     def onSelectEvent(self, disp, dispatchFn, eventDc, isCursor, newToolRect, selectRect):
         for numRow in range(len(self.toolSelectMap)):
             for numCol in range(len(self.toolSelectMap[numRow])):

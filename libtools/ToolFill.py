@@ -1,17 +1,16 @@
 #!/usr/bin/env python3
 #
-# ToolFill.py -- XXX
+# ToolFill.py 
 # Copyright (c) 2018, 2019 Lucio Andrés Illanes Albornoz <lucio@lucioillanes.de>
 #
 
 from Tool import Tool
 
 class ToolFill(Tool):
-    """XXX"""
     name = "Fill"
 
     #
-    # onMouseEvent(self, event, atPoint, brushColours, brushSize, isDragging, isLeftDown, isRightDown, dispatchFn, eventDc): XXX
+    # onMouseEvent(self, event, atPoint, brushColours, brushSize, isDragging, isLeftDown, isRightDown, dispatchFn, eventDc)
     def onMouseEvent(self, event, atPoint, brushColours, brushSize, isDragging, isLeftDown, isRightDown, dispatchFn, eventDc):
         pointStack, pointsDone = [list(atPoint)], []
         testColour = self.parentCanvas.canvas.map[atPoint[1]][atPoint[0]][0:2]

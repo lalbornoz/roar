@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 #
-# ToolText.py -- XXX
+# ToolText.py 
 # Copyright (c) 2018, 2019 Lucio Andrés Illanes Albornoz <lucio@lucioillanes.de>
 #
 
@@ -8,11 +8,10 @@ from Tool import Tool
 import wx
 
 class ToolText(Tool):
-    """XXX"""
     name = "Text"
 
     #
-    # onKeyboardEvent(self, event, atPoint, brushColours, brushSize, keyChar, dispatchFn, eventDc): XXX
+    # onKeyboardEvent(self, event, atPoint, brushColours, brushSize, keyChar, dispatchFn, eventDc)
     def onKeyboardEvent(self, event, atPoint, brushColours, brushSize, keyChar, dispatchFn, eventDc):
         keyModifiers = event.GetModifiers()
         if  keyModifiers != wx.MOD_NONE \
@@ -31,7 +30,7 @@ class ToolText(Tool):
         return False
 
     #
-    # onMouseEvent(self, event, atPoint, brushColours, brushSize, isDragging, isLeftDown, isRightDown, dispatchFn, eventDc): XXX
+    # onMouseEvent(self, event, atPoint, brushColours, brushSize, isDragging, isLeftDown, isRightDown, dispatchFn, eventDc)
     def onMouseEvent(self, event, atPoint, brushColours, brushSize, isDragging, isLeftDown, isRightDown, dispatchFn, eventDc):
         if isLeftDown or isRightDown:
             self.textPos = list(atPoint)

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 #
-# GuiCanvasWxBackend.py -- XXX
+# GuiCanvasWxBackend.py 
 # Copyright (c) 2018, 2019 Lucio Andrés Illanes Albornoz <lucio@lucioillanes.de>
 #
 
@@ -8,16 +8,14 @@ from GuiCanvasColours import Colours
 import wx
 
 class GuiCanvasWxBackend():
-    """XXX"""
-
-    # {{{ _drawBrushPatch(self, eventDc, patch): XXX
+    # {{{ _drawBrushPatch(self, eventDc, patch)
     def _drawBrushPatch(self, eventDc, patch):
         absPoint = self._xlatePoint(patch)
         brushBg, brushFg, pen = self._getBrushPatchColours(patch)
         self._setBrushDc(brushBg, brushFg, eventDc, pen)
         eventDc.DrawRectangle(*absPoint, *self.cellSize)
     # }}}
-    # {{{ _drawCharPatch(self, eventDc, patch): XXX
+    # {{{ _drawCharPatch(self, eventDc, patch)
     def _drawCharPatch(self, eventDc, patch):
         absPoint, fontBitmap = self._xlatePoint(patch), wx.Bitmap(*self.cellSize)
         brushBg, brushFg, pen = self._getCharPatchColours(patch)
@@ -29,13 +27,13 @@ class GuiCanvasWxBackend():
         fontDc.DrawRectangle(0, 0, *self.cellSize); fontDc.DrawText(patch[5], 0, 0);
         eventDc.Blit(*absPoint, *self.cellSize, fontDc, 0, 0)
     # }}}
-    # {{{ _finiBrushesAndPens(self): XXX
+    # {{{ _finiBrushesAndPens(self)
     def _finiBrushesAndPens(self):
         [brush.Destroy() for brush in self._brushes or []]
         [pen.Destroy() for pen in self._pens or []]
         self._brushes, self._lastBrushBg, self._lastBrushFg, self._lastPen, self._pens = None, None, None, None, None
     # }}}
-    # {{{ _getBrushPatchColours(self, patch): XXX
+    # {{{ _getBrushPatchColours(self, patch)
     def _getBrushPatchColours(self, patch):
         if (patch[2] != -1) and (patch[3] != -1):
             brushBg, brushFg, pen = self._brushes[patch[2]], self._brushes[patch[3]], self._pens[patch[3]]
@@ -47,7 +45,7 @@ class GuiCanvasWxBackend():
             brushBg, brushFg, pen = self._brushes[1], self._brushes[patch[2]], self._pens[1]
         return (brushBg, brushFg, pen)
     # }}}
-    # {{{ _getCharPatchColours(self, patch): XXX
+    # {{{ _getCharPatchColours(self, patch)
     def _getCharPatchColours(self, patch):
         if (patch[2] != -1) and (patch[3] != -1):
             brushBg, brushFg, pen = self._brushes[patch[3]], self._brushes[patch[2]], self._pens[patch[3]]
@@ -59,7 +57,7 @@ class GuiCanvasWxBackend():
             brushBg, brushFg, pen = self._brushes[1], self._brushes[patch[2]], self._pens[1]
         return (brushBg, brushFg, pen)
     # }}}
-    # {{{ _initBrushesAndPens(self): XXX
+    # {{{ _initBrushesAndPens(self)
     def _initBrushesAndPens(self):
         self._brushes, self._pens = [None for x in range(len(Colours))], [None for x in range(len(Colours))]
         for mircColour in range(len(Colours)):
@@ -67,7 +65,7 @@ class GuiCanvasWxBackend():
             self._pens[mircColour] = wx.Pen(wx.Colour(Colours[mircColour][:4]), 1)
         self._lastBrushBg, self._lastBrushFg, self._lastPen = None, None, None
     # }}}
-    # {{{ _setBrushDc(self, brushBg, brushFg, dc, pen): XXX
+    # {{{ _setBrushDc(self, brushBg, brushFg, dc, pen)
     def _setBrushDc(self, brushBg, brushFg, dc, pen):
         if self._lastBrushBg != brushBg:
             dc.SetBackground(brushBg); self._lastBrushBg = brushBg;
@@ -76,16 +74,16 @@ class GuiCanvasWxBackend():
         if self._lastPen != pen:
             dc.SetPen(pen); self._lastPen = pen;
     # }}}
-    # {{{ _xlatePoint(self, patch): XXX
+    # {{{ _xlatePoint(self, patch)
     def _xlatePoint(self, patch):
         return [a * b for a, b in zip(patch[:2], self.cellSize)]
     # }}}
 
-    # {{{ drawCursorMaskWithJournal(self, canvasJournal, eventDc): XXX
+    # {{{ drawCursorMaskWithJournal(self, canvasJournal, eventDc)
     def drawCursorMaskWithJournal(self, canvasJournal, eventDc):
         [self.drawPatch(eventDc, patch) for patch in canvasJournal.popCursor()]
     # }}}
-    # {{{ drawPatch(self, eventDc, patch): XXX
+    # {{{ drawPatch(self, eventDc, patch)
     def drawPatch(self, eventDc, patch):
         if  ((patch[0] >= 0) and (patch[0] < self.canvasSize[0]))   \
         and ((patch[1] >= 0) and (patch[1] < self.canvasSize[1])):
@@ -94,13 +92,13 @@ class GuiCanvasWxBackend():
         else:
             return False
     # }}}
-    # {{{ getDeviceContext(self, parentWindow): XXX
+    # {{{ getDeviceContext(self, parentWindow)
     def getDeviceContext(self, parentWindow):
         eventDc = wx.BufferedDC(wx.ClientDC(parentWindow), self.canvasBitmap)
         self._lastBrushBg, self._lastBrushFg, self._lastPen = None, None, None
         return eventDc
     # }}}
-    # {{{ onPanelPaintEvent(self, panelEvent, panelWindow): XXX
+    # {{{ onPanelPaintEvent(self, panelEvent, panelWindow)
     def onPanelPaintEvent(self, panelEvent, panelWindow):
         if self.canvasBitmap != None:
             eventDc = wx.BufferedPaintDC(panelWindow, self.canvasBitmap)
@@ -123,7 +121,7 @@ class GuiCanvasWxBackend():
         self.canvasSize, self.cellSize = canvasSize, cellSize
         self._font = wx.Font(8, wx.FONTFAMILY_TELETYPE, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL)
     # }}}
-    # {{{ xlateEventPoint(self, event, eventDc): XXX
+    # {{{ xlateEventPoint(self, event, eventDc)
     def xlateEventPoint(self, event, eventDc):
         eventPoint = event.GetLogicalPosition(eventDc)
         rectX, rectY = eventPoint.x - (eventPoint.x % self.cellSize[0]), eventPoint.y - (eventPoint.y % self.cellSize[1])
