@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 #
-# GuiCanvasColours.py -- XXX
+# GuiCanvasColours.py 
 # Copyright (c) 2018, 2019 Lucía Andrea Illanes Albornoz <lucia@luciaillanes.de>
 #
 

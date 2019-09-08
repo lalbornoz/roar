@@ -1,17 +1,16 @@
 #!/usr/bin/env python3
 #
-# ToolSelectClone.py -- XXX
+# ToolSelectClone.py 
 # Copyright (c) 2018, 2019 Lucía Andrea Illanes Albornoz <lucia@luciaillanes.de>
 #
 
 from ToolSelect import ToolSelect
 
 class ToolSelectClone(ToolSelect):
-    """XXX"""
     name = "Clone selection"
 
     #
-    # onSelectEvent(self, disp, dispatchFn, eventDc, isCursor, newToolRect, selectRect): XXX
+    # onSelectEvent(self, disp, dispatchFn, eventDc, isCursor, newToolRect, selectRect)
     def onSelectEvent(self, disp, dispatchFn, eventDc, isCursor, newToolRect, selectRect):
         for numRow in range(len(self.toolSelectMap)):
             for numCol in range(len(self.toolSelectMap[numRow])):

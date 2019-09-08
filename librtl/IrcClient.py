@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 #
-# IrcClient.py -- XXX
+# IrcClient.py 
 # Copyright (c) 2018, 2019 Lucía Andrea Illanes Albornoz <lucia@luciaillanes.de>
 # This project is licensed under the terms of the MIT licence.
 #
