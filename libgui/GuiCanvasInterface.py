@@ -48,6 +48,29 @@ def GuiCanvasSelectDecorator(idx, caption, label, icon, accel, initialState):
     # }}}
 
 class GuiCanvasInterface():
+    # {{{ _import(self, f, newDirty, pathName)
+    def _import(self, f, newDirty, pathName):
+        self.parentCanvas.SetCursor(wx.Cursor(wx.CURSOR_WAIT))
+        rc, error, newMap, newPathName, newSize = f(pathName)
+        if rc:
+            self.parentCanvas.dirty = newDirty
+            self.parentCanvas.update(newSize, False, newMap)
+            self.canvasPathName = newPathName
+            self.update(dirty=self.parentCanvas.dirty, pathName=self.canvasPathName, undoLevel=-1)
+        else:
+            with wx.MessageDialog(self.parentCanvas, "Error: {}".format(error), "", wx.OK | wx.OK_DEFAULT) as dialog:
+                dialogChoice = dialog.ShowModal()
+        self.parentCanvas.SetCursor(wx.Cursor(wx.NullCursor))
+        return rc
+    # }}}
+    # {{{ _importFile(self, f, newDirty, wildcard)
+    def _importFile(self, f, newDirty, wildcard):
+        with wx.FileDialog(self.parentCanvas, "Open", os.getcwd(), "", wildcard, wx.FD_OPEN) as dialog:
+            if dialog.ShowModal() == wx.ID_CANCEL:
+                return False
+            elif self._promptSaveChanges():
+                return self._import(f, newDirty, dialog.GetPath())
+    # }}}
     # {{{ _initColourBitmaps(self)
     def _initColourBitmaps(self):
         for numColour in range(len(self.canvasColour.attrList)):
@@ -170,37 +193,22 @@ class GuiCanvasInterface():
     # {{{ canvasNew(self, event, newCanvasSize=None)
     @GuiCanvasCommandDecorator("New", "&New", ["", wx.ART_NEW], [wx.ACCEL_CTRL, ord("N")], None)
     def canvasNew(self, event, newCanvasSize=None):
-        if self._promptSaveChanges():
-            self.parentCanvas.SetCursor(wx.Cursor(wx.CURSOR_WAIT))
+        def canvasImportEmpty(pathName):
+            nonlocal newCanvasSize
             if newCanvasSize == None:
                 newCanvasSize = list(self.parentCanvas.defaultCanvasSize)
             newMap = [[[1, 1, 0, " "] for x in range(newCanvasSize[0])] for y in range(newCanvasSize[1])]
-            self.parentCanvas.dirty = False
-            self.parentCanvas.update(newCanvasSize, False, newMap)
-            self.canvasPathName = None
-            self.parentCanvas.SetCursor(wx.Cursor(wx.NullCursor))
-            self.update(dirty=self.parentCanvas.dirty, pathName=self.canvasPathName, undoLevel=-1)
+            return (True, "", newMap, None, newCanvasSize)
+        if self._promptSaveChanges():
+            self._import(canvasImportEmpty, False, None)
     # }}}
     # {{{ canvasOpen(self, event)
     @GuiCanvasCommandDecorator("Open", "&Open", ["", wx.ART_FILE_OPEN], [wx.ACCEL_CTRL, ord("O")], None)
     def canvasOpen(self, event):
-        if self._promptSaveChanges():
-            with wx.FileDialog(self.parentCanvas, "Open", os.getcwd(), "", "mIRC art files (*.txt)|*.txt|All Files (*.*)|*.*", wx.FD_OPEN) as dialog:
-                if dialog.ShowModal() == wx.ID_CANCEL:
-                    return False
-                else:
-                    self.canvasPathName = dialog.GetPath()
-                    self.parentCanvas.SetCursor(wx.Cursor(wx.CURSOR_WAIT))
-                    rc, error = self.parentCanvas.canvas.importStore.importTextFile(self.canvasPathName)
-                    if rc:
-                        self.parentCanvas.dirty = False
-                        self.parentCanvas.update(self.parentCanvas.canvas.importStore.inSize, False, self.parentCanvas.canvas.importStore.outMap)
-                        self.parentCanvas.SetCursor(wx.Cursor(wx.NullCursor))
-                        self.update(dirty=self.parentCanvas.dirty, pathName=self.canvasPathName, undoLevel=-1)
-                        return True
-                    else:
-                        print("error: {}".format(error), file=sys.stderr)
-                        return False
+        def canvasImportmIRC(pathName):
+            rc, error = self.parentCanvas.canvas.importStore.importTextFile(pathName)
+            return (rc, error, self.parentCanvas.canvas.importStore.outMap, pathName, self.parentCanvas.canvas.importStore.inSize)
+        self._importFile(canvasImportmIRC, False, "mIRC art files (*.txt)|*.txt|All Files (*.*)|*.*")
     # }}}
     # {{{ canvasPaste(self, event)
     @GuiCanvasCommandDecorator("Paste", "&Paste", ["", wx.ART_PASTE], None, False)
@@ -408,68 +416,35 @@ class GuiCanvasInterface():
     # {{{ canvasImportAnsi(self, event)
     @GuiCanvasCommandDecorator("Import ANSI...", "Import ANSI...", None, None, None)
     def canvasImportAnsi(self, event):
-        with wx.FileDialog(self.parentCanvas, "Open", os.getcwd(), "", "ANSI files (*.ans;*.txt)|*.ans;*.txt|All Files (*.*)|*.*", wx.FD_OPEN) as dialog:
-            if dialog.ShowModal() == wx.ID_CANCEL:
-                return False
-            elif self._promptSaveChanges():
-                self.canvasPathName = dialog.GetPath()
-                self.parentCanvas.SetCursor(wx.Cursor(wx.CURSOR_WAIT))
-                rc, error = self.parentCanvas.canvas.importStore.importAnsiFile(self.canvasPathName)
-                if rc:
-                    self.parentCanvas.dirty = True
-                    self.parentCanvas.update(self.parentCanvas.canvas.importStore.inSize, False, self.parentCanvas.canvas.importStore.outMap)
-                    self.canvasPathName = None
-                    self.parentCanvas.SetCursor(wx.Cursor(wx.NullCursor))
-                    self.update(dirty=self.parentCanvas.dirty, pathName=self.canvasPathName, undoLevel=-1)
-                    return True
-                else:
-                    print("error: {}".format(error), file=sys.stderr)
-                    return False
+        def canvasImportAnsi_(pathName):
+            rc, error = self.parentCanvas.canvas.importStore.importAnsiFile(pathName)
+            return (rc, error, self.parentCanvas.canvas.importStore.outMap, pathName, self.parentCanvas.canvas.importStore.inSize)
+        self._importFile(canvasImportAnsi_, True, "ANSI files (*.ans;*.txt)|*.ans;*.txt|All Files (*.*)|*.*")
     # }}}
     # {{{ canvasImportFromClipboard(self, event)
     @GuiCanvasCommandDecorator("Import from clipboard", "&Import from clipboard", None, None, None)
     def canvasImportFromClipboard(self, event):
-        rc = False
-        if  wx.TheClipboard.IsSupported(wx.DataFormat(wx.DF_TEXT))  \
-        and wx.TheClipboard.Open():
-            inBuffer = wx.TextDataObject()
-            if wx.TheClipboard.GetData(inBuffer):
-                if self._promptSaveChanges():
-                    self.parentCanvas.SetCursor(wx.Cursor(wx.CURSOR_WAIT))
-                    rc, error = self.parentCanvas.canvas.importStore.importTextBuffer(io.StringIO(inBuffer.GetText()))
-                    if rc:
-                        self.parentCanvas.dirty = True
-                        self.parentCanvas.update(self.parentCanvas.canvas.importStore.inSize, False, self.parentCanvas.canvas.importStore.outMap)
-                        self.canvasPathName = None
-                        self.parentCanvas.SetCursor(wx.Cursor(wx.NullCursor))
-                        self.update(dirty=self.parentCanvas.dirty, pathName=self.canvasPathName, undoLevel=-1)
-                    else:
-                        print("error: {}".format(error), file=sys.stderr)
-            wx.TheClipboard.Close()
-        if not rc:
-            with wx.MessageDialog(self.parentCanvas, "Clipboard does not contain text data and/or cannot be opened", "", wx.ICON_QUESTION | wx.OK | wx.OK_DEFAULT) as dialog:
-                dialog.ShowModal()
+        def canvasImportFromClipboard_(pathName):
+            if  wx.TheClipboard.IsSupported(wx.DataFormat(wx.DF_TEXT))  \
+            and wx.TheClipboard.Open():
+                inBuffer = wx.TextDataObject()
+                if wx.TheClipboard.GetData(inBuffer):
+                    if self._promptSaveChanges():
+                        rc, error = self.parentCanvas.canvas.importStore.importTextBuffer(io.StringIO(inBuffer.GetText()))
+                wx.TheClipboard.Close()
+            else:
+                rc, error = False, "Clipboard does not contain text data and/or cannot be opened"
+            return (rc, error, self.parentCanvas.canvas.importStore.outMap, None, self.parentCanvas.canvas.importStore.inSize)
+        if self._promptSaveChanges():
+            self._import(canvasImportFromClipboard_, True, None)
     # }}}
     # {{{ canvasImportSauce(self, event)
     @GuiCanvasCommandDecorator("Import SAUCE...", "Import SAUCE...", None, None, None)
     def canvasImportSauce(self, event):
-        with wx.FileDialog(self.parentCanvas, "Open", os.getcwd(), "", "SAUCE files (*.ans;*.txt)|*.ans;*.txt|All Files (*.*)|*.*", wx.FD_OPEN) as dialog:
-            if dialog.ShowModal() == wx.ID_CANCEL:
-                return False
-            elif self._promptSaveChanges():
-                self.canvasPathName = dialog.GetPath()
-                self.parentCanvas.SetCursor(wx.Cursor(wx.CURSOR_WAIT))
-                rc, error = self.parentCanvas.canvas.importStore.importSauceFile(self.canvasPathName)
-                if rc:
-                    self.parentCanvas.dirty = True
-                    self.parentCanvas.update(self.parentCanvas.canvas.importStore.inSize, False, self.parentCanvas.canvas.importStore.outMap)
-                    self.canvasPathName = None
-                    self.parentCanvas.SetCursor(wx.Cursor(wx.NullCursor))
-                    self.update(dirty=self.parentCanvas.dirty, pathName=self.canvasPathName, undoLevel=-1)
-                    return True
-                else:
-                    print("error: {}".format(error), file=sys.stderr)
-                    return False
+        def canvasImportSauce_(pathName):
+            rc, error = self.parentCanvas.canvas.importStore.importSauceFile(pathName)
+            return (rc, error, self.parentCanvas.canvas.importStore.outMap, pathName, self.parentCanvas.canvas.importStore.inSize)
+        self._importFile(canvasImportSauce_, True, "SAUCE files (*.ans;*.txt)|*.ans;*.txt|All Files (*.*)|*.*")
     # }}}
 
     # {{{ update(self, **kwargs)
