@@ -90,4 +90,4 @@ class Canvas():
         self.dirty, self.dirtyCursor, self.map, self.size = False, False, None, size
         self.exportStore, self.importStore, self.journal = CanvasExportStore(), CanvasImportStore(), CanvasJournal()
 
-# vim:expandtab foldmethod=marker sw=4 ts=4 tw=0
+# vim:expandtab foldmethod=marker sw=4 ts=4 tw=120
