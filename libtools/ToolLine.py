@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 #
-# ToolLine.py 
+# ToolLine.py
 # Copyright (c) 2018, 2019 Lucía Andrea Illanes Albornoz <lucia@luciaillanes.de>
 #
 

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 #
-# GuiCanvasInterfaceAbout.py 
+# GuiCanvasInterfaceAbout.py
 # Copyright (c) 2018, 2019 Lucía Andrea Illanes Albornoz <lucia@luciaillanes.de>
 #
 
