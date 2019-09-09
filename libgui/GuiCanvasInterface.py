@@ -39,6 +39,8 @@ class GuiCanvasInterface():
             self.parentCanvas.update(newSize, False, newMap)
             self.canvasPathName = newPathName
             self.update(dirty=self.parentCanvas.dirty, pathName=self.canvasPathName, undoLevel=-1)
+            self.parentCanvas.canvas.journal.resetCursor()
+            self.parentCanvas.canvas.journal.resetUndo()
         else:
             with wx.MessageDialog(self.parentCanvas, "Error: {}".format(error), "", wx.OK | wx.OK_DEFAULT) as dialog:
                 dialogChoice = dialog.ShowModal()
