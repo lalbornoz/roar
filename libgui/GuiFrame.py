@@ -120,6 +120,10 @@ class GuiFrame(wx.Frame):
                     toolBarItem.attrDict["icon"] = ["", None, toolBitmap]
     # }}}
 
+    # {{{ onChar(self, event)
+    def onChar(self, event):
+        self.canvasPanel.onPanelInput(event)
+    # }}}
     # {{{ onInput(self, event)
     def onInput(self, event):
         eventId = event.GetId(); self.itemsById[eventId](self.canvasPanel.interface, event);
@@ -161,6 +165,7 @@ class GuiFrame(wx.Frame):
         self.canvasPanel.interface.canvasTool(self.canvasPanel.interface.canvasTool, 5)(self.canvasPanel.interface, None)
         self.canvasPanel.interface.update(brushSize=self.canvasPanel.brushSize, colours=self.canvasPanel.brushColours)
 
+        self.Bind(wx.EVT_CHAR, self.onChar)
         self.Bind(wx.EVT_MOUSEWHEEL, self.onMouseWheel)
 
         # Set focus on & show window
