@@ -30,7 +30,7 @@ deploy() {
 		-not -name '.gitignore'			\
 		-not -name "${0##*/}"			|\
 			cpio --quiet -dLmp "${_release_dname}";
-	sed -i"" "s/__ROAR_RELEASE_GIT_SHORT_REV__/${_release_version}/" "${_release_dname}/libgui/GuiCanvasInterface.py";
+	sed -i"" "s/__ROAR_RELEASE_GIT_SHORT_REV__/${_release_version}/" "${_release_dname}/libgui/GuiCanvasInterfaceAbout.py";
 	cd "${RELEASES_DNAME}";
 	if [ "${_vflag:-0}" -eq 0 ]; then
 		zip -9 -r "${_release_fname##${RELEASES_DNAME}/}" "${_release_dname##${RELEASES_DNAME}/}" >/dev/null;
