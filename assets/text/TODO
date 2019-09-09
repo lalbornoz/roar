@@ -18,6 +18,5 @@
     d) switch from wxPython to GTK
     e) {copy,cut,insert from,paste}
     f) {fix,reduce} flickering when viewRect > (0, 0)
-12) fix text tool {re,un}do bug when viewRect > (0, 0) & redo bug when redoing during cursor motion
 
 vim:ff=dos tw=0
