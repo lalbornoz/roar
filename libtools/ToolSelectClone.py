@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 #
-# ToolSelectClone.py 
+# ToolSelectClone.py
 # Copyright (c) 2018, 2019 Lucio Andrés Illanes Albornoz <lucio@lucioillanes.de>
 #
 
