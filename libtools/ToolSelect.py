@@ -36,19 +36,19 @@ class ToolSelect(Tool):
         curColours = [0, 0]
         for rectX in range(rectFrame[0][0], rectFrame[1][0] + 1):
             curColours = [1, 1] if curColours == [0, 0] else [0, 0]
-            dispatchFn(eventDc, True, [rectX, rectFrame[0][1], *curColours, 0, " "])
-            dispatchFn(eventDc, True, [rectX, rectFrame[1][1], *curColours, 0, " "])
+            dispatchFn(eventDc, True, [rectX, rectFrame[0][1], *curColours, 0, " "], viewRect)
+            dispatchFn(eventDc, True, [rectX, rectFrame[1][1], *curColours, 0, " "], viewRect)
         for rectY in range(rectFrame[0][1], rectFrame[1][1] + 1):
             curColours = [1, 1] if curColours == [0, 0] else [0, 0]
-            dispatchFn(eventDc, True, [rectFrame[0][0], rectY, *curColours, 0, " "])
-            dispatchFn(eventDc, True, [rectFrame[1][0], rectY, *curColours, 0, " "])
+            dispatchFn(eventDc, True, [rectFrame[0][0], rectY, *curColours, 0, " "], viewRect)
+            dispatchFn(eventDc, True, [rectFrame[1][0], rectY, *curColours, 0, " "], viewRect)
     # }}}
     # {{{ _mouseEventTsNone(self, atPoint, brushColours, dispatchFn, eventDc, isDragging, isLeftDown, isRightDown)
     def _mouseEventTsNone(self, atPoint, brushColours, dispatchFn, eventDc, isDragging, isLeftDown, isRightDown):
         if isLeftDown:
             self.targetRect, self.toolState = [list(atPoint), []], self.TS_ORIGIN
         else:
-            dispatchFn(eventDc, True, [*atPoint, *brushColours, 0, " "])
+            dispatchFn(eventDc, True, [*atPoint, *brushColours, 0, " "], viewRect)
     # }}}
     # {{{ _mouseEventTsOrigin(self, atPoint, brushColours, dispatchFn, eventDc, isDragging, isLeftDown, isRightDown)
     def _mouseEventTsOrigin(self, atPoint, brushColours, dispatchFn, eventDc, isDragging, isLeftDown, isRightDown):
@@ -98,8 +98,8 @@ class ToolSelect(Tool):
     # }}}
 
     #
-    # onMouseEvent(self, event, atPoint, brushColours, brushSize, isDragging, isLeftDown, isRightDown, dispatchFn, eventDc)
-    def onMouseEvent(self, event, atPoint, brushColours, brushSize, isDragging, isLeftDown, isRightDown, dispatchFn, eventDc):
+    # onMouseEvent(self, event, atPoint, brushColours, brushSize, isDragging, isLeftDown, isRightDown, dispatchFn, eventDc, viewRect)
+    def onMouseEvent(self, event, atPoint, brushColours, brushSize, isDragging, isLeftDown, isRightDown, dispatchFn, eventDc, viewRect):
         if self.toolState == self.TS_NONE:
             self._mouseEventTsNone(atPoint, brushColours, dispatchFn, eventDc, isDragging, isLeftDown, isRightDown)
         elif self.toolState == self.TS_ORIGIN:

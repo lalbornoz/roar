@@ -16,6 +16,6 @@ class ToolSelectClone(ToolSelect):
             for numCol in range(len(self.toolSelectMap[numRow])):
                 cellOld = self.toolSelectMap[numRow][numCol]
                 rectX, rectY = selectRect[0][0] + numCol, selectRect[0][1] + numRow
-                dispatchFn(eventDc, isCursor, [rectX + disp[0], rectY + disp[1], *cellOld])
+                dispatchFn(eventDc, isCursor, [rectX + disp[0], rectY + disp[1], *cellOld], viewRect)
 
 # vim:expandtab foldmethod=marker sw=4 ts=4 tw=120
