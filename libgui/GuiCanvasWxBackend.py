@@ -5,26 +5,26 @@
 #
 
 from GuiCanvasColours import Colours
-import wx
+import math, wx
 
 class GuiCanvasWxBackend():
-    # {{{ _drawBrushPatch(self, eventDc, patch)
-    def _drawBrushPatch(self, eventDc, patch):
-        absPoint = self._xlatePoint(patch)
+    # {{{ _drawBrushPatch(self, eventDc, patch, point)
+    def _drawBrushPatch(self, eventDc, patch, point):
+        absPoint = self._xlatePoint(point)
         brushBg, brushFg, pen = self._getBrushPatchColours(patch)
         self._setBrushDc(brushBg, brushFg, eventDc, pen)
         eventDc.DrawRectangle(*absPoint, *self.cellSize)
     # }}}
-    # {{{ _drawCharPatch(self, eventDc, patch)
-    def _drawCharPatch(self, eventDc, patch):
-        absPoint, fontBitmap = self._xlatePoint(patch), wx.Bitmap(*self.cellSize)
+    # {{{ _drawCharPatch(self, eventDc, patch, point)
+    def _drawCharPatch(self, eventDc, patch, point):
+        absPoint, fontBitmap = self._xlatePoint(point), wx.Bitmap(*self.cellSize)
         brushBg, brushFg, pen = self._getCharPatchColours(patch)
         fontDc = wx.MemoryDC(); fontDc.SelectObject(fontBitmap);
-        fontDc.SetTextForeground(wx.Colour(Colours[patch[2]][:4]))
-        fontDc.SetTextBackground(wx.Colour(Colours[patch[3]][:4]))
+        fontDc.SetTextForeground(wx.Colour(Colours[patch[0]][:4]))
+        fontDc.SetTextBackground(wx.Colour(Colours[patch[1]][:4]))
         fontDc.SetBrush(brushBg); fontDc.SetBackground(brushBg); fontDc.SetPen(pen);
         fontDc.SetFont(self._font)
-        fontDc.DrawRectangle(0, 0, *self.cellSize); fontDc.DrawText(patch[5], 0, 0);
+        fontDc.DrawRectangle(0, 0, *self.cellSize); fontDc.DrawText(patch[3], 0, 0);
         eventDc.Blit(*absPoint, *self.cellSize, fontDc, 0, 0)
     # }}}
     # {{{ _finiBrushesAndPens(self)
@@ -35,26 +35,26 @@ class GuiCanvasWxBackend():
     # }}}
     # {{{ _getBrushPatchColours(self, patch)
     def _getBrushPatchColours(self, patch):
-        if (patch[2] != -1) and (patch[3] != -1):
-            brushBg, brushFg, pen = self._brushes[patch[2]], self._brushes[patch[3]], self._pens[patch[3]]
-        elif (patch[2] == -1) and (patch[3] == -1):
+        if (patch[0] != -1) and (patch[1] != -1):
+            brushBg, brushFg, pen = self._brushes[patch[0]], self._brushes[patch[1]], self._pens[patch[1]]
+        elif (patch[0] == -1) and (patch[1] == -1):
             brushBg, brushFg, pen = self._brushes[1], self._brushes[1], self._pens[1]
-        elif patch[2] == -1:
-            brushBg, brushFg, pen = self._brushes[patch[3]], self._brushes[patch[3]], self._pens[patch[3]]
-        elif patch[3] == -1:
-            brushBg, brushFg, pen = self._brushes[1], self._brushes[patch[2]], self._pens[1]
+        elif patch[0] == -1:
+            brushBg, brushFg, pen = self._brushes[patch[1]], self._brushes[patch[1]], self._pens[patch[1]]
+        elif patch[1] == -1:
+            brushBg, brushFg, pen = self._brushes[1], self._brushes[patch[0]], self._pens[1]
         return (brushBg, brushFg, pen)
     # }}}
     # {{{ _getCharPatchColours(self, patch)
     def _getCharPatchColours(self, patch):
-        if (patch[2] != -1) and (patch[3] != -1):
-            brushBg, brushFg, pen = self._brushes[patch[3]], self._brushes[patch[2]], self._pens[patch[3]]
-        elif (patch[2] == -1) and (patch[3] == -1):
+        if (patch[0] != -1) and (patch[1] != -1):
+            brushBg, brushFg, pen = self._brushes[patch[1]], self._brushes[patch[0]], self._pens[patch[1]]
+        elif (patch[0] == -1) and (patch[1] == -1):
             brushBg, brushFg, pen = self._brushes[1], self._brushes[1], self._pens[1]
-        elif patch[2] == -1:
-            brushBg, brushFg, pen = self._brushes[patch[3]], self._brushes[patch[3]], self._pens[patch[3]]
-        elif patch[3] == -1:
-            brushBg, brushFg, pen = self._brushes[1], self._brushes[patch[2]], self._pens[1]
+        elif patch[0] == -1:
+            brushBg, brushFg, pen = self._brushes[patch[1]], self._brushes[patch[1]], self._pens[patch[1]]
+        elif patch[1] == -1:
+            brushBg, brushFg, pen = self._brushes[1], self._brushes[patch[0]], self._pens[1]
         return (brushBg, brushFg, pen)
     # }}}
     # {{{ _initBrushesAndPens(self)
@@ -74,34 +74,51 @@ class GuiCanvasWxBackend():
         if self._lastPen != pen:
             dc.SetPen(pen); self._lastPen = pen;
     # }}}
-    # {{{ _xlatePoint(self, patch)
-    def _xlatePoint(self, patch):
-        return [a * b for a, b in zip(patch[:2], self.cellSize)]
+    # {{{ _xlatePoint(self, point)
+    def _xlatePoint(self, point):
+        return [a * b for a, b in zip(point, self.cellSize)]
     # }}}
 
-    # {{{ drawCursorMaskWithJournal(self, canvasJournal, eventDc)
-    def drawCursorMaskWithJournal(self, canvasJournal, eventDc):
-        [self.drawPatch(eventDc, patch) for patch in canvasJournal.popCursor()]
+    # {{{ drawCursorMaskWithJournal(self, canvasJournal, eventDc, viewRect)
+    def drawCursorMaskWithJournal(self, canvasJournal, eventDc, viewRect):
+        [self.drawPatch(eventDc, patch, viewRect) for patch in canvasJournal.popCursor()]
     # }}}
-    # {{{ drawPatch(self, eventDc, patch)
-    def drawPatch(self, eventDc, patch):
-        if  ((patch[0] >= 0) and (patch[0] < self.canvasSize[0]))   \
-        and ((patch[1] >= 0) and (patch[1] < self.canvasSize[1])):
-            self._drawBrushPatch(eventDc, patch) if patch[5] == " " else self._drawCharPatch(eventDc, patch)
+    # {{{ drawPatch(self, eventDc, patch, viewRect)
+    def drawPatch(self, eventDc, patch, viewRect):
+        point = [m - n for m, n in zip(patch[:2], viewRect)]
+        if [(c >= 0) and (c < s) for c, s in zip(point, self.canvasSize)] == [True, True]:
+            if patch[5] == " ":
+                self._drawBrushPatch(eventDc, patch[2:], point)
+            else:
+                self._drawCharPatch(eventDc, patch[2:], point)
             return True
         else:
             return False
     # }}}
-    # {{{ getDeviceContext(self, parentWindow)
-    def getDeviceContext(self, parentWindow):
-        eventDc = wx.BufferedDC(wx.ClientDC(parentWindow), self.canvasBitmap)
+    # {{{ getDeviceContext(self, parentWindow, viewRect)
+    def getDeviceContext(self, parentWindow, viewRect):
+        if viewRect == (0, 0):
+            eventDc = wx.BufferedDC(wx.ClientDC(parentWindow), self.canvasBitmap)
+        else:
+            eventDc = wx.ClientDC(parentWindow)
         self._lastBrushBg, self._lastBrushFg, self._lastPen = None, None, None
         return eventDc
     # }}}
-    # {{{ onPanelPaintEvent(self, panelEvent, panelWindow)
-    def onPanelPaintEvent(self, panelEvent, panelWindow):
+    # {{{ onPanelPaintEvent(self, canvasSize, cellSize, clientSize, panelWindow, viewRect)
+    def onPanelPaintEvent(self, canvasSize, cellSize, clientSize, panelWindow, viewRect):
         if self.canvasBitmap != None:
-            eventDc = wx.BufferedPaintDC(panelWindow, self.canvasBitmap)
+            if viewRect == (0, 0):
+                eventDc = wx.BufferedPaintDC(panelWindow, self.canvasBitmap)
+            else:
+                canvasSize = [a - b for a, b in zip(canvasSize, viewRect)]
+                clientSize = [math.ceil(m / n) for m, n in zip(clientSize, cellSize)]
+                viewSize = [min(m, n) for m, n in zip(canvasSize, clientSize)]
+                viewSize = [m * n for m, n in zip(cellSize, viewSize)]
+                canvasDc = wx.MemoryDC(); canvasDc.SelectObject(self.canvasBitmap);
+                viewDc = wx.MemoryDC(); viewBitmap = wx.Bitmap(viewSize); viewDc.SelectObject(viewBitmap);
+                viewDc.Blit(0, 0, *viewSize, canvasDc, *[m * n for m, n in zip(cellSize, viewRect)])
+                canvasDc.SelectObject(wx.NullBitmap); viewDc.SelectObject(wx.NullBitmap);
+                eventDc = wx.BufferedPaintDC(panelWindow, viewBitmap)
     # }}}
     # {{{ reset(self, canvasSize, cellSize):
     def reset(self, canvasSize, cellSize):
@@ -121,12 +138,12 @@ class GuiCanvasWxBackend():
         self.canvasSize, self.cellSize = canvasSize, cellSize
         self._font = wx.Font(8, wx.FONTFAMILY_TELETYPE, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL)
     # }}}
-    # {{{ xlateEventPoint(self, event, eventDc)
-    def xlateEventPoint(self, event, eventDc):
+    # {{{ xlateEventPoint(self, event, eventDc, viewRect)
+    def xlateEventPoint(self, event, eventDc, viewRect):
         eventPoint = event.GetLogicalPosition(eventDc)
         rectX, rectY = eventPoint.x - (eventPoint.x % self.cellSize[0]), eventPoint.y - (eventPoint.y % self.cellSize[1])
         mapX, mapY = int(rectX / self.cellSize[0] if rectX else 0), int(rectY / self.cellSize[1] if rectY else 0)
-        return (mapX, mapY)
+        return [m + n for m, n in zip((mapX, mapY), viewRect)]
     # }}}
 
     # {{{ __del__(self): destructor method

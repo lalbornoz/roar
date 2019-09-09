@@ -10,8 +10,8 @@ class ToolCircle(Tool):
     name = "Circle"
 
     #
-    # onMouseEvent(self, event, atPoint, brushColours, brushSize, isDragging, isLeftDown, isRightDown, dispatchFn, eventDc)
-    def onMouseEvent(self, event, atPoint, brushColours, brushSize, isDragging, isLeftDown, isRightDown, dispatchFn, eventDc):
+    # onMouseEvent(self, event, atPoint, brushColours, brushSize, isDragging, isLeftDown, isRightDown, dispatchFn, eventDc, viewRect)
+    def onMouseEvent(self, event, atPoint, brushColours, brushSize, isDragging, isLeftDown, isRightDown, dispatchFn, eventDc, viewRect):
         brushColours = brushColours.copy()
         if isLeftDown:
             brushColours[1] = brushColours[0]
@@ -29,8 +29,8 @@ class ToolCircle(Tool):
                         atPoint[1] + int(originPoint[1] + brushY),  \
                         *brushColours, 0, " "]
                     if isLeftDown or isRightDown:
-                        dispatchFn(eventDc, False, patch); dispatchFn(eventDc, True, patch);
+                        dispatchFn(eventDc, False, patch, viewRect); dispatchFn(eventDc, True, patch, viewRect);
                     else:
-                        dispatchFn(eventDc, True, patch)
+                        dispatchFn(eventDc, True, patch, viewRect)
 
 # vim:expandtab foldmethod=marker sw=4 ts=4 tw=120

@@ -124,6 +124,10 @@ class GuiFrame(wx.Frame):
     def onInput(self, event):
         eventId = event.GetId(); self.itemsById[eventId](self.canvasPanel.interface, event);
     # }}}
+    # {{{ onMouseWheel(self, event)
+    def onMouseWheel(self, event):
+        self.canvasPanel.GetEventHandler().ProcessEvent(event)
+    # }}}
 
     #
     # __init__(self, canvasInterface, parent, appSize=(840, 630), defaultCanvasPos=(0, 75), defaultCanvasSize=(100, 30), defaultCellSize=(7, 14)): initialisation method
@@ -156,6 +160,8 @@ class GuiFrame(wx.Frame):
         self.canvasPanel.interface.canvasNew(None)
         self.canvasPanel.interface.canvasTool(self.canvasPanel.interface.canvasTool, 5)(self.canvasPanel.interface, None)
         self.canvasPanel.interface.update(brushSize=self.canvasPanel.brushSize, colours=self.canvasPanel.brushColours)
+
+        self.Bind(wx.EVT_MOUSEWHEEL, self.onMouseWheel)
 
         # Set focus on & show window
         self.SetFocus(); self.Show(True);

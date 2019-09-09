@@ -5,7 +5,7 @@
 5)  Client-Server or Peer-to-Peer realtime collaboration
 6)  Arbitrary {format,palette}s ({4,8} bit ANSI/mIRC, etc.)
 7)  Hotkey & graphical interfaces to {composed,parametrised} tools
-8)  GUI: a) scrollbar b) {de,in}crease cell size c) revisit About dialogue d) Settings panel e) switch from wxPython to GTK
+8)  GUI: a) {de,in}crease cell size b) revisit About dialogue c) Settings panel d) switch from wxPython to GTK
 9)  Layers, layout (e.g. for comics, zines, etc.) & asset management (e.g. kade, lion, etc.) & traits w/ {inserting,merging,linking}
 10) Sprites & scripted (Python?) animation on the basis of asset traits and {composable,parametrised} patterns (metric flow, particle system, rigging, ...)
 11) Composition and parametrisation of tools from higher-order operators (brushes, filters, outlines, patterns & shaders) and unit tools; unit tools:
