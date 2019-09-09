@@ -131,6 +131,15 @@ class GuiCanvasPanel(wx.ScrolledWindow):
     def onPanelSize(self, event):
         self._updateScrollBars(); event.Skip();
     # }}}
+    # {{{ onPanelScroll(self, event)
+    def onPanelScroll(self, event):
+        if self.canvas.dirtyCursor:
+            viewRect = self.GetViewStart()
+            eventDc = self.backend.getDeviceContext(self, viewRect)
+            self.backend.drawCursorMaskWithJournal(self.canvas.journal, eventDc, viewRect)
+            self.canvas.dirtyCursor = False
+        event.Skip()
+    # }}}
 
     #
     # __init__(self, parent, parentFrame, backend, canvas, defaultCanvasPos, defaultCanvasSize, defaultCellSize, interface): initialisation method
@@ -149,6 +158,8 @@ class GuiCanvasPanel(wx.ScrolledWindow):
         for eventType in (wx.EVT_LEFT_DOWN, wx.EVT_MOTION, wx.EVT_RIGHT_DOWN):
             self.Bind(eventType, self.onPanelInput)
         self.Bind(wx.EVT_PAINT, self.onPanelPaint)
+        self.Bind(wx.EVT_SCROLLWIN_LINEDOWN, self.onPanelScroll)
+        self.Bind(wx.EVT_SCROLLWIN_LINEUP, self.onPanelScroll)
         self.Bind(wx.EVT_SIZE, self.onPanelSize)
 
 # vim:expandtab foldmethod=marker sw=4 ts=4 tw=120
