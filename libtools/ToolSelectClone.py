@@ -10,12 +10,13 @@ class ToolSelectClone(ToolSelect):
     name = "Clone selection"
 
     #
-    # onSelectEvent(self, disp, dispatchFn, eventDc, isCursor, newToolRect, selectRect)
-    def onSelectEvent(self, disp, dispatchFn, eventDc, isCursor, newToolRect, selectRect):
+    # onSelectEvent(self, disp, dispatchFn, eventDc, isCursor, newToolRect, selectRect, viewRect)
+    def onSelectEvent(self, disp, dispatchFn, eventDc, isCursor, newToolRect, selectRect, viewRect):
         for numRow in range(len(self.toolSelectMap)):
             for numCol in range(len(self.toolSelectMap[numRow])):
                 cellOld = self.toolSelectMap[numRow][numCol]
                 rectX, rectY = selectRect[0][0] + numCol, selectRect[0][1] + numRow
                 dispatchFn(eventDc, isCursor, [rectX + disp[0], rectY + disp[1], *cellOld], viewRect)
+        return True
 
 # vim:expandtab foldmethod=marker sw=4 ts=4 tw=120

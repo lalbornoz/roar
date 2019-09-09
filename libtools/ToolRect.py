@@ -10,12 +10,12 @@ class ToolRect(Tool):
     name = "Rectangle"
 
     #
-    # onMouseEvent(self, event, atPoint, brushColours, brushSize, isDragging, isLeftDown, isRightDown, dispatchFn, eventDc, viewRect)
-    def onMouseEvent(self, event, atPoint, brushColours, brushSize, isDragging, isLeftDown, isRightDown, dispatchFn, eventDc, viewRect):
+    # onMouseEvent(self, brushColours, brushSize, dispatchFn, eventDc, mapPoint, mouseDragging, mouseLeftDown, mouseRightDown, viewRect)
+    def onMouseEvent(self, brushColours, brushSize, dispatchFn, eventDc, mapPoint, mouseDragging, mouseLeftDown, mouseRightDown, viewRect):
         brushColours = brushColours.copy()
-        if isLeftDown:
+        if mouseLeftDown:
             brushColours[1] = brushColours[0]
-        elif isRightDown:
+        elif mouseRightDown:
             brushColours[0] = brushColours[1]
         else:
             brushColours[1] = brushColours[0]
@@ -24,10 +24,11 @@ class ToolRect(Tool):
             brushSize[0] *= 2
         for brushRow in range(brushSize[1]):
             for brushCol in range(brushSize[0]):
-                patch = [atPoint[0] + brushCol, atPoint[1] + brushRow, *brushColours, 0, " "]
-                if isLeftDown or isRightDown:
+                patch = [mapPoint[0] + brushCol, mapPoint[1] + brushRow, *brushColours, 0, " "]
+                if mouseLeftDown or mouseRightDown:
                     dispatchFn(eventDc, False, patch, viewRect); dispatchFn(eventDc, True, patch, viewRect);
                 else:
                     dispatchFn(eventDc, True, patch, viewRect)
+        return True
 
 # vim:expandtab foldmethod=marker sw=4 ts=4 tw=120

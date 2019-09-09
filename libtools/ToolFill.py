@@ -10,12 +10,12 @@ class ToolFill(Tool):
     name = "Fill"
 
     #
-    # onMouseEvent(self, event, atPoint, brushColours, brushSize, isDragging, isLeftDown, isRightDown, dispatchFn, eventDc, viewRect)
-    def onMouseEvent(self, event, atPoint, brushColours, brushSize, isDragging, isLeftDown, isRightDown, dispatchFn, eventDc, viewRect):
-        pointStack, pointsDone = [list(atPoint)], []
-        testColour = self.parentCanvas.canvas.map[atPoint[1]][atPoint[0]][0:2]
-        if isLeftDown or isRightDown:
-            if isRightDown:
+    # onMouseEvent(self, brushColours, brushSize, dispatchFn, eventDc, mapPoint, mouseDragging, mouseLeftDown, mouseRightDown, viewRect)
+    def onMouseEvent(self, brushColours, brushSize, dispatchFn, eventDc, mapPoint, mouseDragging, mouseLeftDown, mouseRightDown, viewRect):
+        pointStack, pointsDone = [list(mapPoint)], []
+        testColour = self.parentCanvas.canvas.map[mapPoint[1]][mapPoint[0]][0:2]
+        if mouseLeftDown or mouseRightDown:
+            if mouseRightDown:
                 brushColours = [brushColours[1], brushColours[0]]
             while len(pointStack) > 0:
                 point = pointStack.pop()
@@ -33,5 +33,9 @@ class ToolFill(Tool):
                         if point[1] < (self.parentCanvas.canvas.size[1] - 1):
                             pointStack.append([point[0], point[1] + 1])
                         pointsDone += [point]
+        else:
+            patch = [mapPoint[0], mapPoint[1], brushColours[0], brushColours[0], 0, " "]
+            dispatchFn(eventDc, True, patch, viewRect)
+        return True
 
 # vim:expandtab foldmethod=marker sw=4 ts=4 tw=120
