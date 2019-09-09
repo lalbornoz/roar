@@ -74,10 +74,6 @@ class GuiCanvasPanel(wx.ScrolledWindow):
     def onPanelClose(self, event):
         self.Destroy()
     # }}}
-    # {{{ onPanelEnterWindow(self, event)
-    def onPanelEnterWindow(self, event):
-        self.parentFrame.SetFocus()
-    # }}}
     # {{{ onPanelInput(self, event)
     def onPanelInput(self, event):
         self.canvas.dirtyJournal, self.canvas.dirtyCursor = False, False
@@ -120,9 +116,8 @@ class GuiCanvasPanel(wx.ScrolledWindow):
         self.dirty, self.parentFrame = False, parentFrame
 
         self.Bind(wx.EVT_CLOSE, self.onPanelClose)
-        self.Bind(wx.EVT_ENTER_WINDOW, self.onPanelEnterWindow)
         self.Bind(wx.EVT_LEAVE_WINDOW, self.onPanelLeaveWindow)
-        self.parentFrame.Bind(wx.EVT_CHAR, self.onPanelInput)
+        self.Bind(wx.EVT_CHAR, self.onPanelInput)
         for eventType in (wx.EVT_LEFT_DOWN, wx.EVT_MOTION, wx.EVT_RIGHT_DOWN):
             self.Bind(eventType, self.onPanelInput)
         self.Bind(wx.EVT_PAINT, self.onPanelPaint)
