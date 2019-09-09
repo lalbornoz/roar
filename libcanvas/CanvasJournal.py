@@ -7,8 +7,6 @@
 class CanvasJournal():
     # {{{ begin(self)
     def begin(self):
-        if self.patchesUndoLevel > 0:
-            del self.patchesUndo[0:self.patchesUndoLevel]; self.patchesUndoLevel = 0;
         deltaItem = [[], []]; self.patchesUndo.insert(0, deltaItem);
     # }}}
     # {{{ end(self)
