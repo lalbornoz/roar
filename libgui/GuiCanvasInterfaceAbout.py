@@ -24,7 +24,7 @@ class GuiCanvasInterfaceAbout(wx.Dialog):
         self.logo = wx.StaticBitmap(self, -1, wx.Bitmap(logoPathName))
         self.sizerH1.Add(self.logo, 0, wx.CENTER)
 
-        self.title = wx.StaticText(self.panel, label="roar -- mIRC art editor for Windows & Linux (Git revision __ROAR_RELEASE_GIT_SHORT_REV__)\nhttps://www.github.com/lalbornoz/roar/\nCopyright (c) 2018, 2019 Lucio Andrés Illanes Albornoz <lucio@lucioillanes.de>", style=wx.ALIGN_CENTER)
+        self.title = wx.StaticText(self.panel, label="roar -- mIRC art editor for Windows && Linux\nGit revision __ROAR_RELEASE_GIT_SHORT_REV__\nhttps://www.github.com/lalbornoz/roar/\nCopyright (c) 2018, 2019 Lucio Andrés Illanes Albornoz <lucio@lucioillanes.de>", style=wx.ALIGN_CENTER)
         self.title.SetFont(wx.Font(8, wx.DEFAULT, wx.NORMAL, wx.NORMAL, underline=False))
         self.sizer.Add(self.title)
 
