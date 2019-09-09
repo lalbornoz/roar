@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 #
-# GuiCanvasPanel.py 
+# GuiCanvasPanel.py
 # Copyright (c) 2018, 2019 Lucio Andrés Illanes Albornoz <lucio@lucioillanes.de>
 #
 

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 #
-# GuiFrame.py 
+# GuiFrame.py
 # Copyright (c) 2018, 2019 Lucio Andrés Illanes Albornoz <lucio@lucioillanes.de>
 #
 

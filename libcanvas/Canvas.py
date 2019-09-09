@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 #
-# Canvas.py 
+# Canvas.py
 # Copyright (c) 2018, 2019 Lucio Andrés Illanes Albornoz <lucio@lucioillanes.de>
 #
 
