@@ -28,6 +28,24 @@ class GuiCanvasPanel(wx.ScrolledWindow):
             self.scrollFlag = False; super().SetVirtualSize((0, 0));
     # }}}
 
+    # {{{ applyTool(self, eventDc, eventType, keyChar, keyModifiers, mapPoint, mouseDragging, mouseLeftDown, mouseRightDown, tool, viewRect)
+    def applyTool(self, eventDc, eventType, keyChar, keyModifiers, mapPoint, mouseDragging, mouseLeftDown, mouseRightDown, tool, viewRect):
+        rc = False
+        self.canvas.dirtyJournal, self.canvas.dirtyCursor, rc = False, False, False
+        if eventType == wx.wxEVT_CHAR:
+            rc = tool.onKeyboardEvent(self.brushColours, self.brushSize, self.dispatchPatch, eventDc, keyChar, keyModifiers, self.brushPos, viewRect)
+        else:
+            if  (mapPoint[0] < self.canvas.size[0])   \
+            and (mapPoint[1] < self.canvas.size[1]):
+                self.brushPos = mapPoint
+                rc = tool.onMouseEvent(self.brushColours, self.brushSize, self.dispatchPatch, eventDc, self.brushPos, mouseDragging, mouseLeftDown, mouseRightDown, viewRect)
+        if self.canvas.dirtyJournal:
+            self.dirty = True
+            self.interface.update(dirty=self.dirty, cellPos=self.brushPos, undoLevel=self.canvas.journal.patchesUndoLevel)
+        if eventType == wx.wxEVT_MOTION:
+            self.interface.update(cellPos=mapPoint)
+        return rc
+    # }}}
     # {{{ dispatchDeltaPatches(self, deltaPatches)
     def dispatchDeltaPatches(self, deltaPatches):
         eventDc = self.backend.getDeviceContext(self, self.GetViewStart())
@@ -82,24 +100,17 @@ class GuiCanvasPanel(wx.ScrolledWindow):
     # }}}
     # {{{ onPanelInput(self, event)
     def onPanelInput(self, event):
-        self.canvas.dirtyJournal, self.canvas.dirtyCursor = False, False
-        eventType, tool, viewRect = event.GetEventType(), self.interface.currentTool, self.GetViewStart()
-        eventDc = self.backend.getDeviceContext(self, self.GetViewStart())
+        eventType, viewRect = event.GetEventType(), self.GetViewStart()
+        eventDc = self.backend.getDeviceContext(self, viewRect)
         if eventType == wx.wxEVT_CHAR:
-            mapPoint = self.brushPos
-            if tool.onKeyboardEvent(event, mapPoint, self.brushColours, self.brushSize, chr(event.GetUnicodeKey()), self.dispatchPatch, eventDc, viewRect):
-                event.Skip(); return;
+            keyChar, keyModifiers = chr(event.GetUnicodeKey()), event.GetModifiers()
+            mapPoint, mouseDragging, mouseLeftDown, mouseRightDown = None, None, None, None
         else:
+            keyChar, keyModifiers = None, None
+            mouseDragging, mouseLeftDown, mouseRightDown = event.Dragging(), event.LeftIsDown(), event.RightIsDown()
             mapPoint = self.backend.xlateEventPoint(event, eventDc, viewRect)
-            if  (mapPoint[0] < self.canvas.size[0]) \
-            and (mapPoint[1] < self.canvas.size[1]):
-                self.brushPos = mapPoint
-                tool.onMouseEvent(event, self.brushPos, self.brushColours, self.brushSize, event.Dragging(), event.LeftIsDown(), event.RightIsDown(), self.dispatchPatch, eventDc, viewRect)
-        if self.canvas.dirtyJournal:
-            self.dirty = True
-            self.interface.update(dirty=self.dirty, cellPos=self.brushPos, undoLevel=self.canvas.journal.patchesUndoLevel)
-        if eventType == wx.wxEVT_MOTION:
-            self.interface.update(cellPos=mapPoint)
+        if not self.applyTool(eventDc, eventType, keyChar, keyModifiers, mapPoint, mouseDragging, mouseLeftDown, mouseRightDown, self.interface.currentTool, self.GetViewStart()):
+            event.Skip()
     # }}}
     # {{{ onPanelLeaveWindow(self, event)
     def onPanelLeaveWindow(self, event):

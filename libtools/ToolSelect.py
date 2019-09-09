@@ -12,22 +12,22 @@ class ToolSelect(Tool):
     TS_SELECT   = 2
     TS_TARGET   = 3
 
-    # {{{ _dispatchSelectEvent(self, atPoint, dispatchFn, eventDc, isLeftDown, isRightDown, selectRect)
-    def _dispatchSelectEvent(self, atPoint, dispatchFn, eventDc, isLeftDown, isRightDown, selectRect):
-        if isLeftDown:
-            disp, isCursor = [atPoint[m] - self.lastAtPoint[m] for m in [0, 1]], True
+    # {{{ _dispatchSelectEvent(self, mapPoint, dispatchFn, eventDc, mouseLeftDown, mouseRightDown, selectRect, viewRect)
+    def _dispatchSelectEvent(self, mapPoint, dispatchFn, eventDc, mouseLeftDown, mouseRightDown, selectRect, viewRect):
+        if mouseLeftDown:
+            disp, isCursor = [mapPoint[m] - self.lastAtPoint[m] for m in [0, 1]], True
             newTargetRect = [[selectRect[n][m] + disp[m] for m in [0, 1]] for n in [0, 1]]
-            self.lastAtPoint = list(atPoint)
-        elif isRightDown:
+            self.lastAtPoint = list(mapPoint)
+        elif mouseRightDown:
             disp, isCursor, newTargetRect = [0, 0], False, selectRect.copy()
         else:
             disp, isCursor, newTargetRect = [0, 0], True, selectRect.copy()
-        self.onSelectEvent(disp, dispatchFn, eventDc, isCursor, newTargetRect, selectRect)
-        self._drawSelectRect(newTargetRect, dispatchFn, eventDc)
+        self.onSelectEvent(disp, dispatchFn, eventDc, isCursor, newTargetRect, selectRect, viewRect)
+        self._drawSelectRect(newTargetRect, dispatchFn, eventDc, viewRect)
         self.targetRect = newTargetRect
     # }}}
-    # {{{ _drawSelectRect(self, rect, dispatchFn, eventDc)
-    def _drawSelectRect(self, rect, dispatchFn, eventDc):
+    # {{{ _drawSelectRect(self, rect, dispatchFn, eventDc, viewRect)
+    def _drawSelectRect(self, rect, dispatchFn, eventDc, viewRect):
         rectFrame = [[rect[m[0]][n] + m[1] for n in [0, 1]] for m in [[0, -1], [1, +1]]]
         if rectFrame[0][0] > rectFrame[1][0]:
             rectFrame[0][0], rectFrame[1][0] = rectFrame[1][0], rectFrame[0][0]
@@ -43,75 +43,78 @@ class ToolSelect(Tool):
             dispatchFn(eventDc, True, [rectFrame[0][0], rectY, *curColours, 0, " "], viewRect)
             dispatchFn(eventDc, True, [rectFrame[1][0], rectY, *curColours, 0, " "], viewRect)
     # }}}
-    # {{{ _mouseEventTsNone(self, atPoint, brushColours, dispatchFn, eventDc, isDragging, isLeftDown, isRightDown)
-    def _mouseEventTsNone(self, atPoint, brushColours, dispatchFn, eventDc, isDragging, isLeftDown, isRightDown):
-        if isLeftDown:
-            self.targetRect, self.toolState = [list(atPoint), []], self.TS_ORIGIN
+    # {{{ _mouseEventTsNone(self, mapPoint, brushColours, dispatchFn, eventDc, mouseDragging, mouseLeftDown, mouseRightDown, viewRect)
+    def _mouseEventTsNone(self, mapPoint, brushColours, dispatchFn, eventDc, mouseDragging, mouseLeftDown, mouseRightDown, viewRect):
+        if mouseLeftDown:
+            self.targetRect, self.toolState = [list(mapPoint), []], self.TS_ORIGIN
         else:
-            dispatchFn(eventDc, True, [*atPoint, *brushColours, 0, " "], viewRect)
+            dispatchFn(eventDc, True, [*mapPoint, *brushColours, 0, " "], viewRect)
     # }}}
-    # {{{ _mouseEventTsOrigin(self, atPoint, brushColours, dispatchFn, eventDc, isDragging, isLeftDown, isRightDown)
-    def _mouseEventTsOrigin(self, atPoint, brushColours, dispatchFn, eventDc, isDragging, isLeftDown, isRightDown):
-        if isLeftDown:
-            self.targetRect[1] = list(atPoint)
+    # {{{ _mouseEventTsOrigin(self, mapPoint, brushColours, dispatchFn, eventDc, mouseDragging, mouseLeftDown, mouseRightDown, viewRect)
+    def _mouseEventTsOrigin(self, mapPoint, brushColours, dispatchFn, eventDc, mouseDragging, mouseLeftDown, mouseRightDown, viewRect):
+        if mouseLeftDown:
+            self.targetRect[1] = list(mapPoint)
             if self.targetRect[0][0] > self.targetRect[1][0]:
                 self.targetRect[0][0], self.targetRect[1][0] = self.targetRect[1][0], self.targetRect[0][0]
             if self.targetRect[0][1] > self.targetRect[1][1]:
                 self.targetRect[0][1], self.targetRect[1][1] = self.targetRect[1][1], self.targetRect[0][1]
-            self.srcRect, self.lastAtPoint, self.toolSelectMap, self.toolState = self.targetRect[0], list(atPoint), [], self.TS_SELECT
+            self.srcRect, self.lastAtPoint, self.toolSelectMap, self.toolState = self.targetRect[0], list(mapPoint), [], self.TS_SELECT
             for numRow in range((self.targetRect[1][1] - self.targetRect[0][1]) + 1):
                 self.toolSelectMap.append([])
                 for numCol in range((self.targetRect[1][0] - self.targetRect[0][0]) + 1):
                     rectX, rectY = self.targetRect[0][0] + numCol, self.targetRect[0][1] + numRow
                     self.toolSelectMap[numRow].append(self.parentCanvas.canvas.map[rectY][rectX])
-            self._drawSelectRect(self.targetRect, dispatchFn, eventDc)
-        elif isRightDown:
+            self._drawSelectRect(self.targetRect, dispatchFn, eventDc, viewRect)
+        elif mouseRightDown:
             self.targetRect, self.toolState = None, self.TS_NONE
         else:
-            self.targetRect[1] = list(atPoint)
-            self._drawSelectRect(self.targetRect, dispatchFn, eventDc)
+            self.targetRect[1] = list(mapPoint)
+            self._drawSelectRect(self.targetRect, dispatchFn, eventDc, viewRect)
     # }}}
-    # {{{ _mouseEventTsSelect(self, atPoint, brushColours, dispatchFn, eventDc, isDragging, isLeftDown, isRightDown)
-    def _mouseEventTsSelect(self, atPoint, brushColours, dispatchFn, eventDc, isDragging, isLeftDown, isRightDown):
-        if isLeftDown                                       \
-        and  (atPoint[0] >= (self.targetRect[0][0] - 1))    \
-        and  (atPoint[0] <= (self.targetRect[1][0] + 1))    \
-        and  (atPoint[1] >= (self.targetRect[0][1] - 1))    \
-        and  (atPoint[1] <= (self.targetRect[1][1] + 1)):
-            self.lastAtPoint, self.toolState = list(atPoint), self.TS_TARGET
-        elif isRightDown:
-            self._dispatchSelectEvent(atPoint, dispatchFn, eventDc, isLeftDown, isRightDown, self.targetRect)
+    # {{{ _mouseEventTsSelect(self, mapPoint, brushColours, dispatchFn, eventDc, mouseDragging, mouseLeftDown, mouseRightDown, viewRect)
+    def _mouseEventTsSelect(self, mapPoint, brushColours, dispatchFn, eventDc, mouseDragging, mouseLeftDown, mouseRightDown, viewRect):
+        if mouseLeftDown                                       \
+        and  (mapPoint[0] >= (self.targetRect[0][0] - 1))    \
+        and  (mapPoint[0] <= (self.targetRect[1][0] + 1))    \
+        and  (mapPoint[1] >= (self.targetRect[0][1] - 1))    \
+        and  (mapPoint[1] <= (self.targetRect[1][1] + 1)):
+            self.lastAtPoint, self.toolState = list(mapPoint), self.TS_TARGET
+        elif mouseRightDown:
+            self._dispatchSelectEvent(mapPoint, dispatchFn, eventDc, mouseLeftDown, mouseRightDown, self.targetRect, viewRect)
             self.targetRect, self.toolState = None, self.TS_NONE
         else:
-            self._dispatchSelectEvent(atPoint, dispatchFn, eventDc, isLeftDown, isRightDown, self.targetRect)
+            self._dispatchSelectEvent(mapPoint, dispatchFn, eventDc, mouseLeftDown, mouseRightDown, self.targetRect, viewRect)
     # }}}
-    # {{{ _mouseEventTsTarget(self, atPoint, brushColours, dispatchFn, eventDc, isDragging, isLeftDown, isRightDown)
-    def _mouseEventTsTarget(self, atPoint, brushColours, dispatchFn, eventDc, isDragging, isLeftDown, isRightDown):
-        if isLeftDown:
+    # {{{ _mouseEventTsTarget(self, mapPoint, brushColours, dispatchFn, eventDc, mouseDragging, mouseLeftDown, mouseRightDown, viewRect)
+    def _mouseEventTsTarget(self, mapPoint, brushColours, dispatchFn, eventDc, mouseDragging, mouseLeftDown, mouseRightDown, viewRect):
+        if mouseLeftDown:
             self.toolState = self.TS_TARGET
-            self._dispatchSelectEvent(atPoint, dispatchFn, eventDc, isLeftDown, isRightDown, self.targetRect)
-        elif isRightDown:
-            self._dispatchSelectEvent(atPoint, dispatchFn, eventDc, isLeftDown, isRightDown, self.targetRect)
+            self._dispatchSelectEvent(mapPoint, dispatchFn, eventDc, mouseLeftDown, mouseRightDown, self.targetRect, viewRect)
+        elif mouseRightDown:
+            self._dispatchSelectEvent(mapPoint, dispatchFn, eventDc, mouseLeftDown, mouseRightDown, self.targetRect, viewRect)
             self.targetRect, self.toolState = None, self.TS_NONE
         else:
             self.toolState = self.TS_SELECT
     # }}}
 
     #
-    # onMouseEvent(self, event, atPoint, brushColours, brushSize, isDragging, isLeftDown, isRightDown, dispatchFn, eventDc, viewRect)
-    def onMouseEvent(self, event, atPoint, brushColours, brushSize, isDragging, isLeftDown, isRightDown, dispatchFn, eventDc, viewRect):
+    # onMouseEvent(self, brushColours, brushSize, dispatchFn, eventDc, mapPoint, mouseDragging, mouseLeftDown, mouseRightDown, viewRect)
+    def onMouseEvent(self, brushColours, brushSize, dispatchFn, eventDc, mapPoint, mouseDragging, mouseLeftDown, mouseRightDown, viewRect):
         if self.toolState == self.TS_NONE:
-            self._mouseEventTsNone(atPoint, brushColours, dispatchFn, eventDc, isDragging, isLeftDown, isRightDown)
+            self._mouseEventTsNone(mapPoint, brushColours, dispatchFn, eventDc, mouseDragging, mouseLeftDown, mouseRightDown, viewRect)
         elif self.toolState == self.TS_ORIGIN:
-            self._mouseEventTsOrigin(atPoint, brushColours, dispatchFn, eventDc, isDragging, isLeftDown, isRightDown)
+            self._mouseEventTsOrigin(mapPoint, brushColours, dispatchFn, eventDc, mouseDragging, mouseLeftDown, mouseRightDown, viewRect)
         elif self.toolState == self.TS_SELECT:
-            self._mouseEventTsSelect(atPoint, brushColours, dispatchFn, eventDc, isDragging, isLeftDown, isRightDown)
+            self._mouseEventTsSelect(mapPoint, brushColours, dispatchFn, eventDc, mouseDragging, mouseLeftDown, mouseRightDown, viewRect)
         elif self.toolState == self.TS_TARGET:
-            self._mouseEventTsTarget(atPoint, brushColours, dispatchFn, eventDc, isDragging, isLeftDown, isRightDown)
+            self._mouseEventTsTarget(mapPoint, brushColours, dispatchFn, eventDc, mouseDragging, mouseLeftDown, mouseRightDown, viewRect)
+        else:
+            return False
+        return True
 
     #
-    # onSelectEvent(self, disp, dispatchFn, eventDc, isCursor, newTargetRect, selectRect)
-    def onSelectEvent(self, disp, dispatchFn, eventDc, isCursor, newTargetRect, selectRect):
+    # onSelectEvent(self, disp, dispatchFn, eventDc, isCursor, newTargetRect, selectRect, viewRect)
+    def onSelectEvent(self, disp, dispatchFn, eventDc, isCursor, newTargetRect, selectRect, viewRect):
         pass
 
     # __init__(self, *args): initialisation method

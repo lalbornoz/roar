@@ -331,6 +331,9 @@ class GuiCanvasInterface():
             toolBar = self.parentFrame.toolBarItemsById[self.canvasTool.attrList[idx]["id"]].GetToolBar()
             toolBar.ToggleTool(self.canvasTool.attrList[idx]["id"], True)
             self.update(toolName=self.currentTool.name)
+            viewRect = self.parentCanvas.GetViewStart()
+            eventDc = self.parentCanvas.backend.getDeviceContext(self.parentCanvas, viewRect)
+            self.parentCanvas.applyTool(eventDc, wx.wxEVT_MOTION, None, None, self.parentCanvas.brushPos, False, False, False, self.currentTool, viewRect)
         setattr(canvasTool_, "attrDict", f.attrList[idx])
         setattr(canvasTool_, "isSelect", True)
         return canvasTool_

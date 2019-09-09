@@ -11,8 +11,8 @@ class ToolLine(Tool):
     TS_NONE     = 0
     TS_ORIGIN   = 1
 
-    # {{{ _getLine(self, brushColours, brushSize, dispatchFn, eventDc, isCursor, originPoint, targetPoint)
-    def _getLine(self, brushColours, brushSize, dispatchFn, eventDc, isCursor, originPoint, targetPoint):
+    # {{{ _getLine(self, brushColours, brushSize, dispatchFn, eventDc, isCursor, originPoint, targetPoint, viewRect)
+    def _getLine(self, brushColours, brushSize, dispatchFn, eventDc, isCursor, originPoint, targetPoint, viewRect):
         originPoint, targetPoint = originPoint.copy(), targetPoint.copy()
         pointDelta = self._pointDelta(originPoint, targetPoint)
         lineXSign = 1 if pointDelta[0] > 0 else -1; lineYSign = 1 if pointDelta[1] > 0 else -1;
@@ -47,24 +47,27 @@ class ToolLine(Tool):
     # }}}
 
     #
-    # onMouseEvent(self, event, atPoint, brushColours, brushSize, isDragging, isLeftDown, isRightDown, dispatchFn, eventDc, viewRect)
-    def onMouseEvent(self, event, atPoint, brushColours, brushSize, isDragging, isLeftDown, isRightDown, dispatchFn, eventDc, viewRect):
+    # onMouseEvent(self, brushColours, brushSize, dispatchFn, eventDc, mapPoint, mouseDragging, mouseLeftDown, mouseRightDown, viewRect)
+    def onMouseEvent(self, brushColours, brushSize, dispatchFn, eventDc, mapPoint, mouseDragging, mouseLeftDown, mouseRightDown, viewRect):
         brushColours = brushColours.copy()
-        if isLeftDown:
+        if mouseLeftDown:
             brushColours[1] = brushColours[0]
-        elif isRightDown:
+        elif mouseRightDown:
             brushColours[0] = brushColours[1]
         else:
             brushColours[1] = brushColours[0]
         if self.toolState == self.TS_NONE:
-            if isLeftDown or isRightDown:
-                self.toolColours, self.toolOriginPoint, self.toolState = brushColours, list(atPoint), self.TS_ORIGIN
-            dispatchFn(eventDc, True, [*atPoint, *brushColours, 0, " "], viewRect)
+            if mouseLeftDown or mouseRightDown:
+                self.toolColours, self.toolOriginPoint, self.toolState = brushColours, list(mapPoint), self.TS_ORIGIN
+            dispatchFn(eventDc, True, [*mapPoint, *brushColours, 0, " "], viewRect)
         elif self.toolState == self.TS_ORIGIN:
-            originPoint, targetPoint = self.toolOriginPoint, list(atPoint)
-            self._getLine(self.toolColours, brushSize, dispatchFn, eventDc, isLeftDown or isRightDown, originPoint, targetPoint)
-            if isLeftDown or isRightDown:
+            originPoint, targetPoint = self.toolOriginPoint, list(mapPoint)
+            self._getLine(self.toolColours, brushSize, dispatchFn, eventDc, mouseLeftDown or mouseRightDown, originPoint, targetPoint, viewRect)
+            if mouseLeftDown or mouseRightDown:
                 self.toolColours, self.toolOriginPoint, self.toolState = None, None, self.TS_NONE
+        else:
+            return False
+        return True
 
     # __init__(self, *args): initialisation method
     def __init__(self, *args):
