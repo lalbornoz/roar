@@ -5,6 +5,17 @@
 #
 
 class CanvasJournal():
+    # {{{ begin(self)
+    def begin(self):
+        if self.patchesUndoLevel > 0:
+            del self.patchesUndo[0:self.patchesUndoLevel]; self.patchesUndoLevel = 0;
+        deltaItem = [[], []]; self.patchesUndo.insert(0, deltaItem);
+    # }}}
+    # {{{ end(self)
+    def end(self):
+        if self.patchesUndo[0] == [[], []]:
+            del self.patchesUndo[0]
+    # }}}
     # {{{ popCursor(self)
     def popCursor(self):
         if len(self.patchesCursor):
@@ -32,13 +43,6 @@ class CanvasJournal():
     # {{{ pushCursor(self, patches)
     def pushCursor(self, patches):
         self.patchesCursor.append(patches)
-    # }}}
-    # {{{ pushDeltas(self, redoPatches, undoPatches)
-    def pushDeltas(self, redoPatches, undoPatches):
-        if self.patchesUndoLevel > 0:
-            del self.patchesUndo[0:self.patchesUndoLevel]; self.patchesUndoLevel = 0;
-        deltaItem = [undoPatches, redoPatches]; self.patchesUndo.insert(0, deltaItem);
-        return deltaItem
     # }}}
     # {{{ resetCursor(self)
     def resetCursor(self):

@@ -30,18 +30,19 @@ class GuiCanvasPanel(wx.ScrolledWindow):
 
     # {{{ applyTool(self, eventDc, eventType, keyChar, keyModifiers, mapPoint, mouseDragging, mouseLeftDown, mouseRightDown, tool, viewRect)
     def applyTool(self, eventDc, eventType, keyChar, keyModifiers, mapPoint, mouseDragging, mouseLeftDown, mouseRightDown, tool, viewRect):
-        rc = False
-        self.canvas.dirtyJournal, self.canvas.dirtyCursor, rc = False, False, False
+        dirty, self.canvas.dirtyCursor, rc = False, False, False
+        self.canvas.journal.begin()
         if eventType == wx.wxEVT_CHAR:
-            rc = tool.onKeyboardEvent(self.brushColours, self.brushSize, self.dispatchPatch, eventDc, keyChar, keyModifiers, self.brushPos, viewRect)
+            rc, dirty = tool.onKeyboardEvent(self.brushColours, self.brushSize, self.dispatchPatchSingle, eventDc, keyChar, keyModifiers, self.brushPos, viewRect)
         else:
-            if  (mapPoint[0] < self.canvas.size[0])   \
+            if  (mapPoint[0] < self.canvas.size[0]) \
             and (mapPoint[1] < self.canvas.size[1]):
                 self.brushPos = mapPoint
-                rc = tool.onMouseEvent(self.brushColours, self.brushSize, self.dispatchPatch, eventDc, self.brushPos, mouseDragging, mouseLeftDown, mouseRightDown, viewRect)
-        if self.canvas.dirtyJournal:
+                rc, dirty = tool.onMouseEvent(self.brushColours, self.brushSize, self.dispatchPatchSingle, eventDc, self.brushPos, mouseDragging, mouseLeftDown, mouseRightDown, viewRect)
+        if dirty:
             self.dirty = True
             self.interface.update(dirty=self.dirty, cellPos=self.brushPos, undoLevel=self.canvas.journal.patchesUndoLevel)
+        self.canvas.journal.end()
         if eventType == wx.wxEVT_MOTION:
             self.interface.update(cellPos=mapPoint)
         return rc
@@ -60,6 +61,11 @@ class GuiCanvasPanel(wx.ScrolledWindow):
     # {{{ dispatchPatch(self, eventDc, isCursor, patch, viewRect)
     def dispatchPatch(self, eventDc, isCursor, patch, viewRect):
         if self.canvas.dispatchPatch(isCursor, patch, False if isCursor else True):
+            self._drawPatch(eventDc, isCursor, patch, viewRect)
+    # }}}
+    # {{{ dispatchPatchSingle(self, eventDc, isCursor, patch, viewRect)
+    def dispatchPatchSingle(self, eventDc, isCursor, patch, viewRect):
+        if self.canvas.dispatchPatchSingle(isCursor, patch, False if isCursor else True):
             self._drawPatch(eventDc, isCursor, patch, viewRect)
     # }}}
     # {{{ resize(self, newSize, commitUndo=True)

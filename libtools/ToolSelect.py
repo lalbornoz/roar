@@ -22,9 +22,10 @@ class ToolSelect(Tool):
             disp, isCursor, newTargetRect = [0, 0], False, selectRect.copy()
         else:
             disp, isCursor, newTargetRect = [0, 0], True, selectRect.copy()
-        self.onSelectEvent(disp, dispatchFn, eventDc, isCursor, newTargetRect, selectRect, viewRect)
+        dirty = self.onSelectEvent(disp, dispatchFn, eventDc, isCursor, newTargetRect, selectRect, viewRect)
         self._drawSelectRect(newTargetRect, dispatchFn, eventDc, viewRect)
         self.targetRect = newTargetRect
+        return dirty
     # }}}
     # {{{ _drawSelectRect(self, rect, dispatchFn, eventDc, viewRect)
     def _drawSelectRect(self, rect, dispatchFn, eventDc, viewRect):
@@ -49,6 +50,7 @@ class ToolSelect(Tool):
             self.targetRect, self.toolState = [list(mapPoint), []], self.TS_ORIGIN
         else:
             dispatchFn(eventDc, True, [*mapPoint, *brushColours, 0, " "], viewRect)
+        return False
     # }}}
     # {{{ _mouseEventTsOrigin(self, mapPoint, brushColours, dispatchFn, eventDc, mouseDragging, mouseLeftDown, mouseRightDown, viewRect)
     def _mouseEventTsOrigin(self, mapPoint, brushColours, dispatchFn, eventDc, mouseDragging, mouseLeftDown, mouseRightDown, viewRect):
@@ -70,47 +72,53 @@ class ToolSelect(Tool):
         else:
             self.targetRect[1] = list(mapPoint)
             self._drawSelectRect(self.targetRect, dispatchFn, eventDc, viewRect)
+        return False
     # }}}
     # {{{ _mouseEventTsSelect(self, mapPoint, brushColours, dispatchFn, eventDc, mouseDragging, mouseLeftDown, mouseRightDown, viewRect)
     def _mouseEventTsSelect(self, mapPoint, brushColours, dispatchFn, eventDc, mouseDragging, mouseLeftDown, mouseRightDown, viewRect):
-        if mouseLeftDown                                       \
-        and  (mapPoint[0] >= (self.targetRect[0][0] - 1))    \
-        and  (mapPoint[0] <= (self.targetRect[1][0] + 1))    \
-        and  (mapPoint[1] >= (self.targetRect[0][1] - 1))    \
+        dirty = False
+        if mouseLeftDown                                    \
+        and  (mapPoint[0] >= (self.targetRect[0][0] - 1))   \
+        and  (mapPoint[0] <= (self.targetRect[1][0] + 1))   \
+        and  (mapPoint[1] >= (self.targetRect[0][1] - 1))   \
         and  (mapPoint[1] <= (self.targetRect[1][1] + 1)):
             self.lastAtPoint, self.toolState = list(mapPoint), self.TS_TARGET
         elif mouseRightDown:
-            self._dispatchSelectEvent(mapPoint, dispatchFn, eventDc, mouseLeftDown, mouseRightDown, self.targetRect, viewRect)
+            dirty = self._dispatchSelectEvent(mapPoint, dispatchFn, eventDc, mouseLeftDown, mouseRightDown, self.targetRect, viewRect)
             self.targetRect, self.toolState = None, self.TS_NONE
         else:
-            self._dispatchSelectEvent(mapPoint, dispatchFn, eventDc, mouseLeftDown, mouseRightDown, self.targetRect, viewRect)
+            dirty = self._dispatchSelectEvent(mapPoint, dispatchFn, eventDc, mouseLeftDown, mouseRightDown, self.targetRect, viewRect)
+        return dirty
     # }}}
     # {{{ _mouseEventTsTarget(self, mapPoint, brushColours, dispatchFn, eventDc, mouseDragging, mouseLeftDown, mouseRightDown, viewRect)
     def _mouseEventTsTarget(self, mapPoint, brushColours, dispatchFn, eventDc, mouseDragging, mouseLeftDown, mouseRightDown, viewRect):
+        dirty = False
         if mouseLeftDown:
             self.toolState = self.TS_TARGET
-            self._dispatchSelectEvent(mapPoint, dispatchFn, eventDc, mouseLeftDown, mouseRightDown, self.targetRect, viewRect)
+            dirty = self._dispatchSelectEvent(mapPoint, dispatchFn, eventDc, mouseLeftDown, mouseRightDown, self.targetRect, viewRect)
         elif mouseRightDown:
-            self._dispatchSelectEvent(mapPoint, dispatchFn, eventDc, mouseLeftDown, mouseRightDown, self.targetRect, viewRect)
+            dirty = self._dispatchSelectEvent(mapPoint, dispatchFn, eventDc, mouseLeftDown, mouseRightDown, self.targetRect, viewRect)
             self.targetRect, self.toolState = None, self.TS_NONE
         else:
             self.toolState = self.TS_SELECT
+        return dirty
     # }}}
 
     #
     # onMouseEvent(self, brushColours, brushSize, dispatchFn, eventDc, mapPoint, mouseDragging, mouseLeftDown, mouseRightDown, viewRect)
     def onMouseEvent(self, brushColours, brushSize, dispatchFn, eventDc, mapPoint, mouseDragging, mouseLeftDown, mouseRightDown, viewRect):
+        dirty = False
         if self.toolState == self.TS_NONE:
-            self._mouseEventTsNone(mapPoint, brushColours, dispatchFn, eventDc, mouseDragging, mouseLeftDown, mouseRightDown, viewRect)
+            dirty = self._mouseEventTsNone(mapPoint, brushColours, dispatchFn, eventDc, mouseDragging, mouseLeftDown, mouseRightDown, viewRect)
         elif self.toolState == self.TS_ORIGIN:
-            self._mouseEventTsOrigin(mapPoint, brushColours, dispatchFn, eventDc, mouseDragging, mouseLeftDown, mouseRightDown, viewRect)
+            dirty = self._mouseEventTsOrigin(mapPoint, brushColours, dispatchFn, eventDc, mouseDragging, mouseLeftDown, mouseRightDown, viewRect)
         elif self.toolState == self.TS_SELECT:
-            self._mouseEventTsSelect(mapPoint, brushColours, dispatchFn, eventDc, mouseDragging, mouseLeftDown, mouseRightDown, viewRect)
+            dirty = self._mouseEventTsSelect(mapPoint, brushColours, dispatchFn, eventDc, mouseDragging, mouseLeftDown, mouseRightDown, viewRect)
         elif self.toolState == self.TS_TARGET:
-            self._mouseEventTsTarget(mapPoint, brushColours, dispatchFn, eventDc, mouseDragging, mouseLeftDown, mouseRightDown, viewRect)
+            dirty = self._mouseEventTsTarget(mapPoint, brushColours, dispatchFn, eventDc, mouseDragging, mouseLeftDown, mouseRightDown, viewRect)
         else:
-            return False
-        return True
+            return False, dirty
+        return True, dirty
 
     #
     # onSelectEvent(self, disp, dispatchFn, eventDc, isCursor, newTargetRect, selectRect, viewRect)
