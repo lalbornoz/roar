@@ -12,8 +12,7 @@ class ToolFill(Tool):
     #
     # onMouseEvent(self, brushColours, brushSize, dispatchFn, eventDc, mapPoint, mouseDragging, mouseLeftDown, mouseRightDown, viewRect)
     def onMouseEvent(self, brushColours, brushSize, dispatchFn, eventDc, mapPoint, mouseDragging, mouseLeftDown, mouseRightDown, viewRect):
-        pointStack, pointsDone = [list(mapPoint)], []
-        testColour = self.parentCanvas.canvas.map[mapPoint[1]][mapPoint[0]][0:2]
+        dirty, pointsDone, pointStack, testColour, = False, [], [list(mapPoint)], self.parentCanvas.canvas.map[mapPoint[1]][mapPoint[0]][0:2]
         if mouseLeftDown or mouseRightDown:
             if mouseRightDown:
                 brushColours = [brushColours[1], brushColours[0]]
@@ -23,6 +22,8 @@ class ToolFill(Tool):
                 if (pointCell[0:2] == testColour)   \
                 or ((pointCell[3] == " ") and (pointCell[1] == testColour[1])):
                     if not point in pointsDone:
+                        if not dirty:
+                            dirty = True
                         dispatchFn(eventDc, False, [*point, brushColours[0], brushColours[0], 0, " "], viewRect)
                         if point[0] > 0:
                             pointStack.append([point[0] - 1, point[1]])
@@ -36,6 +37,6 @@ class ToolFill(Tool):
         else:
             patch = [mapPoint[0], mapPoint[1], brushColours[0], brushColours[0], 0, " "]
             dispatchFn(eventDc, True, patch, viewRect)
-        return True
+        return True, dirty
 
 # vim:expandtab foldmethod=marker sw=4 ts=4 tw=120

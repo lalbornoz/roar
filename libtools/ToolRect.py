@@ -12,7 +12,7 @@ class ToolRect(Tool):
     #
     # onMouseEvent(self, brushColours, brushSize, dispatchFn, eventDc, mapPoint, mouseDragging, mouseLeftDown, mouseRightDown, viewRect)
     def onMouseEvent(self, brushColours, brushSize, dispatchFn, eventDc, mapPoint, mouseDragging, mouseLeftDown, mouseRightDown, viewRect):
-        brushColours = brushColours.copy()
+        brushColours, dirty = brushColours.copy(), False
         if mouseLeftDown:
             brushColours[1] = brushColours[0]
         elif mouseRightDown:
@@ -26,9 +26,11 @@ class ToolRect(Tool):
             for brushCol in range(brushSize[0]):
                 patch = [mapPoint[0] + brushCol, mapPoint[1] + brushRow, *brushColours, 0, " "]
                 if mouseLeftDown or mouseRightDown:
+                    if not dirty:
+                        dirty = True
                     dispatchFn(eventDc, False, patch, viewRect); dispatchFn(eventDc, True, patch, viewRect);
                 else:
                     dispatchFn(eventDc, True, patch, viewRect)
-        return True
+        return True, dirty
 
 # vim:expandtab foldmethod=marker sw=4 ts=4 tw=120
