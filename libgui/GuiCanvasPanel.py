@@ -110,6 +110,10 @@ class GuiCanvasPanel(wx.ScrolledWindow):
     def onPanelPaint(self, event):
         self.backend.onPanelPaintEvent(self.canvas.size, self.defaultCellSize, self.GetClientSize(), self, self.GetViewStart())
     # }}}
+    # {{{ onPanelSize(self, event)
+    def onPanelSize(self, event):
+        self._updateScrollBars(); event.Skip();
+    # }}}
 
     #
     # __init__(self, parent, parentFrame, backend, canvas, defaultCanvasPos, defaultCanvasSize, defaultCellSize, interface): initialisation method
@@ -128,5 +132,6 @@ class GuiCanvasPanel(wx.ScrolledWindow):
         for eventType in (wx.EVT_LEFT_DOWN, wx.EVT_MOTION, wx.EVT_RIGHT_DOWN):
             self.Bind(eventType, self.onPanelInput)
         self.Bind(wx.EVT_PAINT, self.onPanelPaint)
+        self.Bind(wx.EVT_SIZE, self.onPanelSize)
 
 # vim:expandtab foldmethod=marker sw=4 ts=4 tw=120
