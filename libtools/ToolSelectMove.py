@@ -12,6 +12,7 @@ class ToolSelectMove(ToolSelect):
     #
     # onSelectEvent(self, disp, dispatchFn, eventDc, isCursor, newToolRect, selectRect, viewRect)
     def onSelectEvent(self, disp, dispatchFn, eventDc, isCursor, newToolRect, selectRect, viewRect):
+        dirty = False
         for numRow in range(len(self.toolSelectMap)):
             for numCol in range(len(self.toolSelectMap[numRow])):
                 dispatchFn(eventDc, isCursor, [self.srcRect[0] + numCol, self.srcRect[1] + numRow, 1, 1, 0, " "], viewRect)
@@ -19,7 +20,8 @@ class ToolSelectMove(ToolSelect):
             for numCol in range(len(self.toolSelectMap[numRow])):
                 cellOld = self.toolSelectMap[numRow][numCol]
                 rectX, rectY = selectRect[0][0] + numCol, selectRect[0][1] + numRow
+                dirty = False if isCursor else True
                 dispatchFn(eventDc, isCursor, [rectX + disp[0], rectY + disp[1], *cellOld], viewRect)
-        return True
+        return dirty
 
 # vim:expandtab foldmethod=marker sw=4 ts=4 tw=120

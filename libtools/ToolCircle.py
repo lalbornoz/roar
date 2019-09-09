@@ -12,7 +12,7 @@ class ToolCircle(Tool):
     #
     # onMouseEvent(self, brushColours, brushSize, dispatchFn, eventDc, mapPoint, mouseDragging, mouseLeftDown, mouseRightDown, viewRect)
     def onMouseEvent(self, brushColours, brushSize, dispatchFn, eventDc, mapPoint, mouseDragging, mouseLeftDown, mouseRightDown, viewRect):
-        brushColours = brushColours.copy()
+        brushColours, dirty = brushColours.copy(), False
         if mouseLeftDown:
             brushColours[1] = brushColours[0]
         elif mouseRightDown:
@@ -29,9 +29,11 @@ class ToolCircle(Tool):
                         mapPoint[1] + int(originPoint[1] + brushY),  \
                         *brushColours, 0, " "]
                     if mouseLeftDown or mouseRightDown:
+                        if not dirty:
+                            dirty = True
                         dispatchFn(eventDc, False, patch, viewRect); dispatchFn(eventDc, True, patch, viewRect);
                     else:
                         dispatchFn(eventDc, True, patch, viewRect)
-        return True
+        return True, dirty
 
 # vim:expandtab foldmethod=marker sw=4 ts=4 tw=120
