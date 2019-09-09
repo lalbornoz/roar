@@ -120,10 +120,6 @@ class GuiCanvasWxBackend():
                 canvasDc.SelectObject(wx.NullBitmap); viewDc.SelectObject(wx.NullBitmap);
                 eventDc = wx.BufferedPaintDC(panelWindow, viewBitmap)
     # }}}
-    # {{{ reset(self, canvasSize, cellSize):
-    def reset(self, canvasSize, cellSize):
-        self.resize(canvasSize, cellSize)
-    # }}}
     # {{{ resize(self, canvasSize, cellSize):
     def resize(self, canvasSize, cellSize):
         winSize = [a * b for a, b in zip(canvasSize, cellSize)]
@@ -158,6 +154,6 @@ class GuiCanvasWxBackend():
     def __init__(self, canvasSize, cellSize):
         self._brushes, self._font, self._lastBrush, self._lastPen, self._pens = None, None, None, None, None
         self.canvasBitmap, self.cellSize = None, None
-        self._initBrushesAndPens(); self.reset(canvasSize, cellSize);
+        self._initBrushesAndPens(); self.resize(canvasSize, cellSize);
 
 # vim:expandtab foldmethod=marker sw=4 ts=4 tw=120
