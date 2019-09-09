@@ -11,15 +11,13 @@ class ToolText(Tool):
     name = "Text"
 
     #
-    # onKeyboardEvent(self, event, atPoint, brushColours, brushSize, keyChar, dispatchFn, eventDc, viewRect)
-    def onKeyboardEvent(self, event, atPoint, brushColours, brushSize, keyChar, dispatchFn, eventDc, viewRect):
-        keyModifiers = event.GetModifiers()
-        if  keyModifiers != wx.MOD_NONE \
-        and keyModifiers != wx.MOD_SHIFT:
-            return True
+    # onKeyboardEvent(self, brushColours, brushSize, dispatchFn, eventDc, keyChar, keyModifiers, mapPoint, viewRect)
+    def onKeyboardEvent(self, brushColours, brushSize, dispatchFn, eventDc, keyChar, keyModifiers, mapPoint, viewRect):
+        if not keyModifiers in (wx.MOD_NONE, wx.MOD_SHIFT):
+            return False
         else:
             if self.textPos == None:
-                self.textPos = list(atPoint)
+                self.textPos = list(mapPoint)
         dispatchFn(eventDc, False, [*self.textPos, *brushColours, 0, keyChar], viewRect)
         if self.textPos[0] < (self.parentCanvas.canvas.size[0] - 1):
             self.textPos[0] += 1
@@ -27,14 +25,15 @@ class ToolText(Tool):
             self.textPos[0] = 0; self.textPos[1] += 1;
         else:
             self.textPos = [0, 0]
-        return False
+        return True
 
     #
-    # onMouseEvent(self, event, atPoint, brushColours, brushSize, isDragging, isLeftDown, isRightDown, dispatchFn, eventDc, viewRect)
-    def onMouseEvent(self, event, atPoint, brushColours, brushSize, isDragging, isLeftDown, isRightDown, dispatchFn, eventDc, viewRect):
-        if isLeftDown or isRightDown:
-            self.textPos = list(atPoint)
-        dispatchFn(eventDc, True, [*atPoint, *brushColours, 0, "_"], viewRect)
+    # onMouseEvent(self, brushColours, brushSize, dispatchFn, eventDc, mapPoint, mouseDragging, mouseLeftDown, mouseRightDown, viewRect)
+    def onMouseEvent(self, brushColours, brushSize, dispatchFn, eventDc, mapPoint, mouseDragging, mouseLeftDown, mouseRightDown, viewRect):
+        if mouseLeftDown or mouseRightDown:
+            self.textPos = list(mapPoint)
+        dispatchFn(eventDc, True, [*mapPoint, *brushColours, 0, "_"], viewRect)
+        return True
 
     # __init__(self, *args): initialisation method
     def __init__(self, *args):

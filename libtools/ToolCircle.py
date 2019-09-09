@@ -10,12 +10,12 @@ class ToolCircle(Tool):
     name = "Circle"
 
     #
-    # onMouseEvent(self, event, atPoint, brushColours, brushSize, isDragging, isLeftDown, isRightDown, dispatchFn, eventDc, viewRect)
-    def onMouseEvent(self, event, atPoint, brushColours, brushSize, isDragging, isLeftDown, isRightDown, dispatchFn, eventDc, viewRect):
+    # onMouseEvent(self, brushColours, brushSize, dispatchFn, eventDc, mapPoint, mouseDragging, mouseLeftDown, mouseRightDown, viewRect)
+    def onMouseEvent(self, brushColours, brushSize, dispatchFn, eventDc, mapPoint, mouseDragging, mouseLeftDown, mouseRightDown, viewRect):
         brushColours = brushColours.copy()
-        if isLeftDown:
+        if mouseLeftDown:
             brushColours[1] = brushColours[0]
-        elif isRightDown:
+        elif mouseRightDown:
             brushColours[0] = brushColours[1]
         else:
             brushColours[1] = brushColours[0]
@@ -25,12 +25,13 @@ class ToolCircle(Tool):
             for brushX in range(-radius, radius + 1):
                 if ((brushX ** 2) + (brushY ** 2) < (((radius ** 2) + radius) * 0.8)):
                     patch = [                                       \
-                        atPoint[0] + int(originPoint[0] + brushX),  \
-                        atPoint[1] + int(originPoint[1] + brushY),  \
+                        mapPoint[0] + int(originPoint[0] + brushX),  \
+                        mapPoint[1] + int(originPoint[1] + brushY),  \
                         *brushColours, 0, " "]
-                    if isLeftDown or isRightDown:
+                    if mouseLeftDown or mouseRightDown:
                         dispatchFn(eventDc, False, patch, viewRect); dispatchFn(eventDc, True, patch, viewRect);
                     else:
                         dispatchFn(eventDc, True, patch, viewRect)
+        return True
 
 # vim:expandtab foldmethod=marker sw=4 ts=4 tw=120
