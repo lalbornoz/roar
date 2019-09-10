@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 #
-# GuiCanvasPanel.py
+# RoarCanvasWindow.py
 # Copyright (c) 2018, 2019 Lucio Andrés Illanes Albornoz <lucio@lucioillanes.de>
 #
 
-import wx
+from GuiWindow import GuiWindow
 
-class GuiCanvasPanel(wx.ScrolledWindow):
+class RoarCanvasWindow(GuiWindow):
     # {{{ _drawPatch(self, eventDc, isCursor, patch, viewRect)
     def _drawPatch(self, eventDc, isCursor, patch, viewRect):
         if not self.canvas.dirtyCursor:
@@ -16,35 +16,24 @@ class GuiCanvasPanel(wx.ScrolledWindow):
             patchDeltaCell = self.canvas.map[patch[1]][patch[0]]; patchDelta = [*patch[0:2], *patchDeltaCell];
             self.canvas.journal.pushCursor(patchDelta)
     # }}}
-    # {{{ _updateScrollBars(self)
-    def _updateScrollBars(self):
-        clientSize = self.GetClientSize()
-        if   (self.winSize[0] > clientSize[0])      \
-        or   (self.winSize[1] > clientSize[1]):
-            self.scrollFlag = True; super().SetVirtualSize(self.winSize);
-        elif self.scrollFlag                        \
-        and  ((self.winSize[0] <= clientSize[0])    \
-        or    (self.winSize[1] <= clientSize[1])):
-            self.scrollFlag = False; super().SetVirtualSize((0, 0));
-    # }}}
 
-    # {{{ applyTool(self, eventDc, eventType, keyChar, keyModifiers, mapPoint, mouseDragging, mouseLeftDown, mouseRightDown, tool, viewRect)
-    def applyTool(self, eventDc, eventType, keyChar, keyModifiers, mapPoint, mouseDragging, mouseLeftDown, mouseRightDown, tool, viewRect):
+    # {{{ applyTool(self, eventDc, eventMouse, keyChar, keyModifiers, mapPoint, mouseDragging, mouseLeftDown, mouseRightDown, tool, viewRect)
+    def applyTool(self, eventDc, eventMouse, keyChar, keyModifiers, mapPoint, mouseDragging, mouseLeftDown, mouseRightDown, tool, viewRect):
         dirty, self.canvas.dirtyCursor, rc = False, False, False
         self.canvas.journal.begin()
-        if eventType == wx.wxEVT_CHAR:
-            rc, dirty = tool.onKeyboardEvent(self.brushColours, self.brushSize, self.dispatchPatchSingle, eventDc, keyChar, keyModifiers, self.brushPos, viewRect)
-        else:
+        if eventMouse:
             if  (mapPoint[0] < self.canvas.size[0]) \
             and (mapPoint[1] < self.canvas.size[1]):
                 self.brushPos = mapPoint
                 rc, dirty = tool.onMouseEvent(self.brushColours, self.brushSize, self.dispatchPatchSingle, eventDc, self.brushPos, mouseDragging, mouseLeftDown, mouseRightDown, viewRect)
+        else:
+            rc, dirty = tool.onKeyboardEvent(self.brushColours, self.brushSize, self.dispatchPatchSingle, eventDc, keyChar, keyModifiers, self.brushPos, viewRect)
         if dirty:
             self.dirty = True
             self.interface.update(dirty=self.dirty, cellPos=self.brushPos, undoLevel=self.canvas.journal.patchesUndoLevel)
+        else:
+            self.interface.update(cellPos=mapPoint if mapPoint else self.brushPos)
         self.canvas.journal.end()
-        if eventType == wx.wxEVT_MOTION:
-            self.interface.update(cellPos=mapPoint)
         return rc
     # }}}
     # {{{ dispatchDeltaPatches(self, deltaPatches)
@@ -73,11 +62,7 @@ class GuiCanvasPanel(wx.ScrolledWindow):
         oldSize = [0, 0] if self.canvas.map == None else self.canvas.size
         deltaSize = [b - a for a, b in zip(oldSize, newSize)]
         if self.canvas.resize(newSize, commitUndo):
-            self.winSize = [a * b for a, b in zip(newSize, self.backend.cellSize)]; self._updateScrollBars();
-            self.SetMinSize(self.winSize); self.SetSize(wx.DefaultCoord, wx.DefaultCoord, *self.winSize);
-            curWindow = self
-            while curWindow != None:
-                curWindow.Layout(); curWindow = curWindow.GetParent();
+            super().resize([a * b for a, b in zip(newSize, self.backend.cellSize)])
             self.backend.resize(newSize, self.backend.cellSize)
             viewRect = self.GetViewStart(); eventDc = self.backend.getDeviceContext(self, viewRect);
             if deltaSize[0] > 0:
@@ -100,39 +85,32 @@ class GuiCanvasPanel(wx.ScrolledWindow):
                 self.backend.drawPatch(eventDc, [numCol, numRow, *self.canvas.map[numRow][numCol]], self.GetViewStart())
     # }}}
 
-    # {{{ onPanelClose(self, event)
-    def onPanelClose(self, event):
-        self.Destroy()
-    # }}}
-    # {{{ onPanelInput(self, event)
-    def onPanelInput(self, event):
-        eventType, viewRect = event.GetEventType(), self.GetViewStart()
-        eventDc = self.backend.getDeviceContext(self, viewRect)
-        if eventType == wx.wxEVT_CHAR:
-            keyChar, keyModifiers = chr(event.GetUnicodeKey()), event.GetModifiers()
-            mapPoint, mouseDragging, mouseLeftDown, mouseRightDown = None, None, None, None
-        else:
-            keyChar, keyModifiers = None, None
-            mouseDragging, mouseLeftDown, mouseRightDown = event.Dragging(), event.LeftIsDown(), event.RightIsDown()
-            mapPoint = self.backend.xlateEventPoint(event, eventDc, viewRect)
-        if not self.applyTool(eventDc, eventType, keyChar, keyModifiers, mapPoint, mouseDragging, mouseLeftDown, mouseRightDown, self.interface.currentTool, self.GetViewStart()):
+    # {{{ onKeyboardInput(self, event)
+    def onKeyboardInput(self, event):
+        viewRect = self.GetViewStart(); eventDc = self.backend.getDeviceContext(self, viewRect);
+        keyChar, keyModifiers = chr(event.GetUnicodeKey()), event.GetModifiers()
+        if not self.applyTool(eventDc, False, keyChar, keyModifiers, None, None, None, None, self.interface.currentTool, viewRect):
             event.Skip()
     # }}}
-    # {{{ onPanelLeaveWindow(self, event)
-    def onPanelLeaveWindow(self, event):
+    # {{{ onLeaveWindow(self, event)
+    def onLeaveWindow(self, event):
         eventDc = self.backend.getDeviceContext(self, self.GetViewStart())
         self.backend.drawCursorMaskWithJournal(self.canvas.journal, eventDc, self.GetViewStart())
     # }}}
-    # {{{ onPanelPaint(self, event)
-    def onPanelPaint(self, event):
-        self.backend.onPanelPaintEvent(self.canvas.size, self.defaultCellSize, self.GetClientSize(), self, self.GetViewStart())
+    # {{{ onMouseInput(self, event)
+    def onMouseInput(self, event):
+        viewRect = self.GetViewStart(); eventDc = self.backend.getDeviceContext(self, viewRect);
+        mouseDragging, mouseLeftDown, mouseRightDown = event.Dragging(), event.LeftIsDown(), event.RightIsDown()
+        mapPoint = self.backend.xlateEventPoint(event, eventDc, viewRect)
+        if not self.applyTool(eventDc, True, None, None, mapPoint, mouseDragging, mouseLeftDown, mouseRightDown, self.interface.currentTool, viewRect):
+            event.Skip()
     # }}}
-    # {{{ onPanelSize(self, event)
-    def onPanelSize(self, event):
-        self._updateScrollBars(); event.Skip();
+    # {{{ onPaint(self, event)
+    def onPaint(self, event):
+        self.backend.onPaintEvent(self.canvas.size, self.cellSize, self.GetClientSize(), self, self.GetViewStart())
     # }}}
-    # {{{ onPanelScroll(self, event)
-    def onPanelScroll(self, event):
+    # {{{ onScroll(self, event)
+    def onScroll(self, event):
         if self.canvas.dirtyCursor:
             viewRect = self.GetViewStart()
             eventDc = self.backend.getDeviceContext(self, viewRect)
@@ -142,24 +120,10 @@ class GuiCanvasPanel(wx.ScrolledWindow):
     # }}}
 
     #
-    # __init__(self, parent, parentFrame, backend, canvas, defaultCanvasPos, defaultCanvasSize, defaultCellSize, interface): initialisation method
-    def __init__(self, parent, parentFrame, backend, canvas, defaultCanvasPos, defaultCanvasSize, defaultCellSize, interface):
-        self.winSize = [w * h for w, h in zip(defaultCanvasSize, defaultCellSize)]
-        super().__init__(parent, pos=defaultCanvasPos, size=self.winSize)
-        self.backend, self.interface = backend(defaultCanvasSize, defaultCellSize), interface(self, parentFrame)
-        self.brushColours, self.brushPos, self.brushSize = [4, 1], [0, 0], [1, 1]
-        self.canvas, self.canvasPos, self.defaultCanvasPos, self.defaultCanvasSize, self.defaultCellSize = canvas, defaultCanvasPos, defaultCanvasPos, defaultCanvasSize, defaultCellSize
-        self.dirty, self.parentFrame, self.scrollFlag = False, parentFrame, False
-        self.SetScrollRate(*defaultCellSize); self._updateScrollBars();
-
-        self.Bind(wx.EVT_CLOSE, self.onPanelClose)
-        self.Bind(wx.EVT_LEAVE_WINDOW, self.onPanelLeaveWindow)
-        self.Bind(wx.EVT_CHAR, self.onPanelInput)
-        for eventType in (wx.EVT_LEFT_DOWN, wx.EVT_MOTION, wx.EVT_RIGHT_DOWN):
-            self.Bind(eventType, self.onPanelInput)
-        self.Bind(wx.EVT_PAINT, self.onPanelPaint)
-        self.Bind(wx.EVT_SCROLLWIN_LINEDOWN, self.onPanelScroll)
-        self.Bind(wx.EVT_SCROLLWIN_LINEUP, self.onPanelScroll)
-        self.Bind(wx.EVT_SIZE, self.onPanelSize)
+    # __init__(self, backend, canvas, cellSize, interface, parent, parentFrame, pos, scrollStep, size): initialisation method
+    def __init__(self, backend, canvas, cellSize, interface, parent, parentFrame, pos, scrollStep, size):
+        super().__init__(parent, pos, scrollStep, [w * h for w, h in zip(cellSize, size)])
+        self.backend, self.canvas, self.cellSize, self.interface, self.parentFrame = backend(self.size, cellSize), canvas, cellSize, interface(self, parentFrame), parentFrame
+        self.brushColours, self.brushPos, self.brushSize, self.dirty = [4, 1], [0, 0], [1, 1], False
 
 # vim:expandtab foldmethod=marker sw=4 ts=4 tw=120
