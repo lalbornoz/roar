@@ -5,9 +5,9 @@
 #
 
 from Canvas import Canvas
-from GuiCanvasInterface import GuiCanvasInterface
 from GuiCanvasWxBackend import GuiCanvasWxBackend
 from GuiFrame import GuiFrame, NID_TOOLBAR_HSEP
+from RoarCanvasInterface import RoarCanvasInterface
 from RoarCanvasWindow import RoarCanvasWindow
 
 from glob import glob
@@ -45,7 +45,7 @@ class RoarClient(GuiFrame):
     def __init__(self, parent, defaultCanvasPos=(0, 75), defaultCanvasSize=(100, 30), defaultCellSize=(7, 14), size=(840, 630), title=""):
         super().__init__(self._getIconPathName(), size, parent, title)
         self.canvas = Canvas(defaultCanvasSize)
-        self.canvasPanel = RoarCanvasWindow(GuiCanvasWxBackend, self.canvas, defaultCellSize, GuiCanvasInterface, self.panelSkin, self, defaultCanvasPos, defaultCellSize, defaultCanvasSize)
+        self.canvasPanel = RoarCanvasWindow(GuiCanvasWxBackend, self.canvas, defaultCellSize, RoarCanvasInterface, self.panelSkin, self, defaultCanvasPos, defaultCellSize, defaultCanvasSize)
         self.loadAccels(self.canvasPanel.interface.accels)
         self.loadMenus(self.canvasPanel.interface.menus)
         self._initToolBitmaps(self.canvasPanel.interface.toolBars)

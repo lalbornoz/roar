@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 #
-# GuiCanvasInterfaceAbout.py
+# RoarClientAboutWindow.py
 # Copyright (c) 2018, 2019 Lucio Andrés Illanes Albornoz <lucio@lucioillanes.de>
 #
 
 from glob import glob
 import os, random, wx, wx.adv
 
-class GuiCanvasInterfaceAbout(wx.Dialog):
+class RoarClientAboutWindow(wx.Dialog):
     # {{{ onButtonRoar(self, event)
     def onButtonRoar(self, event):
         self.Destroy()
@@ -16,7 +16,7 @@ class GuiCanvasInterfaceAbout(wx.Dialog):
     #
     # __init__(self, parent, size=(320, 240), title="About roar")
     def __init__(self, parent, size=(320, 240), title="About roar"):
-        super(GuiCanvasInterfaceAbout, self).__init__(parent, size=size, title=title)
+        super().__init__(parent, size=size, title=title)
         self.panel, self.sizer, self.sizerH1, self.sizerH2 = wx.Panel(self), wx.BoxSizer(wx.VERTICAL), wx.BoxSizer(wx.HORIZONTAL), wx.BoxSizer(wx.HORIZONTAL)
 
         logoPathNames = glob(os.path.join("assets", "images", "logo*.bmp"))
