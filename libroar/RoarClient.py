@@ -42,7 +42,7 @@ class RoarClient(GuiFrame):
         super().__init__(self._getIconPathName(), size, parent, title)
         self.canvas = Canvas(defaultCanvasSize)
         self.canvasPanel = RoarCanvasWindow(GuiCanvasWxBackend, self.canvas, defaultCellSize, RoarCanvasCommands, self.panelSkin, self, defaultCanvasPos, defaultCellSize, defaultCanvasSize)
-        self.loadAccels(self.canvasPanel.commands.accels)
+        self.loadAccels(self.canvasPanel.commands.menus, self.canvasPanel.commands.toolBars)
         self.loadMenus(self.canvasPanel.commands.menus)
         self._initToolBitmaps(self.canvasPanel.commands.toolBars)
         self.loadToolBars(self.canvasPanel.commands.toolBars)

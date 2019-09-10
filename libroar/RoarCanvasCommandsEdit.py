@@ -141,7 +141,6 @@ class RoarCanvasCommandsEdit():
     #
     # __init__(self)
     def __init__(self):
-        self.accels = (self.canvasUndo, self.canvasRedo)
         self.menus = (
             ("&Edit",
                 self.canvasUndo, self.canvasRedo, NID_MENU_SEP,

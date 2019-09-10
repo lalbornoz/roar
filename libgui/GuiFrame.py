@@ -53,18 +53,22 @@ class GuiFrame(wx.Frame):
         self.SetIcon(icon)
     # }}}
 
-    # {{{ loadAccels(self, accels)
-    def loadAccels(self, accels):
+    # {{{ loadAccels(self, menus, toolBars)
+    def loadAccels(self, menus, toolBars):
+        def loadAccels_(accels):
+            nonlocal accelTableEntries
+            for accel in accels:
+                if (not accel in [NID_MENU_SEP, NID_TOOLBAR_HSEP])  \
+                and (accel.attrDict["accel"] != None):
+                    accelTableEntries += [wx.AcceleratorEntry()]
+                    if accel.attrDict["id"] == None:
+                        accel.attrDict["id"] = self.lastId; self.lastId += 1;
+                    accelTableEntries[-1].Set(*accel.attrDict["accel"], accel.attrDict["id"])
+                    accel.attrDict["accelEntry"] = accelTableEntries[-1]
+                    self.itemsById[accel.attrDict["id"]] = accel
+                    self.Bind(wx.EVT_MENU, self.onMenu, id=accel.attrDict["id"])
         accelTableEntries = []
-        for accel in accels:
-            if accel.attrDict["accel"] != None:
-                accelTableEntries += [wx.AcceleratorEntry()]
-                if accel.attrDict["id"] == None:
-                    accel.attrDict["id"] = self.lastId; self.lastId += 1;
-                accelTableEntries[-1].Set(*accel.attrDict["accel"], accel.attrDict["id"])
-                accel.attrDict["accelEntry"] = accelTableEntries[-1]
-                self.itemsById[accel.attrDict["id"]] = accel
-                self.Bind(wx.EVT_MENU, self.onMenu, id=accel.attrDict["id"])
+        [loadAccels_(menu[1:]) for menu in menus]; [loadAccels_(toolBar) for toolBar in toolBars];
         self.SetAcceleratorTable(wx.AcceleratorTable(accelTableEntries))
     # }}}
     # {{{ loadBitmap(self, basePathName, descr, size=(16, 16))

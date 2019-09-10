@@ -87,12 +87,10 @@ class RoarCanvasCommands(RoarCanvasCommandsFile, RoarCanvasCommandsEdit, RoarCan
     #
     # __init__(self, parentCanvas, parentFrame):
     def __init__(self, parentCanvas, parentFrame):
-        accels, menus, toolBars = [], [], []
+        menus, toolBars = [], []
         self.canvasPathName, self.lastPanelState, self.parentCanvas, self.parentFrame = None, {}, parentCanvas, parentFrame
         for classObject in self.__class__.__bases__:
             classObject.__init__(self)
-            if len(self.accels):
-                accels += self.accels
             if len(self.menus):
                 menus += self.menus
             if len(self.toolBars):
@@ -118,6 +116,6 @@ class RoarCanvasCommands(RoarCanvasCommandsFile, RoarCanvasCommandsEdit, RoarCan
              self.canvasBrushSize(self.canvasBrushSize, 1, True), self.canvasBrushSize(self.canvasBrushSize, 0, False), self.canvasBrushSize(self.canvasBrushSize, 1, True), self.canvasBrushSize(self.canvasBrushSize, 1, False), NID_TOOLBAR_HSEP,
              self.canvasBrushSize(self.canvasBrushSize, 2, True), self.canvasBrushSize(self.canvasBrushSize, 2, False),
             ])
-        self.accels, self.menus, self.toolBars = accels, menus, toolBars
+        self.menus, self.toolBars = menus, toolBars
 
 # vim:expandtab foldmethod=marker sw=4 ts=4 tw=0
