@@ -13,22 +13,20 @@ class ToolText(Tool):
     #
     # onKeyboardEvent(self, brushColours, brushSize, dispatchFn, eventDc, keyChar, keyModifiers, mapPoint, viewRect)
     def onKeyboardEvent(self, brushColours, brushSize, canvas, dispatchFn, eventDc, keyChar, keyModifiers, mapPoint, viewRect):
-        dirty = False
-        if not keyModifiers in (wx.MOD_NONE, wx.MOD_SHIFT):
-            return False
-        else:
+        if keyModifiers in (wx.MOD_NONE, wx.MOD_SHIFT):
+            rc, dirty = True, True
             if self.textPos == None:
                 self.textPos = list(mapPoint)
-        if not dirty:
-            dirty = True
-        dispatchFn(eventDc, False, [*self.textPos, *brushColours, 0, keyChar], viewRect)
-        if self.textPos[0] < (canvas.size[0] - 1):
-            self.textPos[0] += 1
-        elif self.textPos[1] < (canvas.size[1] - 1):
-            self.textPos[0] = 0; self.textPos[1] += 1;
+            dispatchFn(eventDc, False, [*self.textPos, *brushColours, 0, keyChar], viewRect)
+            if self.textPos[0] < (canvas.size[0] - 1):
+                self.textPos[0] += 1
+            elif self.textPos[1] < (canvas.size[1] - 1):
+                self.textPos[0] = 0; self.textPos[1] += 1;
+            else:
+                self.textPos = [0, 0]
         else:
-            self.textPos = [0, 0]
-        return True, dirty
+            rc, dirty = False, False
+        return rc, dirty
 
     #
     # onMouseEvent(self, brushColours, brushSize, dispatchFn, eventDc, mapPoint, mouseDragging, mouseLeftDown, mouseRightDown, viewRect)
