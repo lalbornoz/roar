@@ -41,7 +41,6 @@ class RoarCanvasCommandsTools():
     #
     # __init__(self)
     def __init__(self):
-        self.accels = (self.canvasTool(self.canvasTool, 5), self.canvasTool(self.canvasTool, 0), self.canvasTool(self.canvasTool, 2), self.canvasTool(self.canvasTool, 3), self.canvasTool(self.canvasTool, 6), self.canvasTool(self.canvasTool, 1), self.canvasTool(self.canvasTool, 4),)
         self.menus = (
             ("&Tools",
                 self.canvasTool(self.canvasTool, 5), self.canvasTool(self.canvasTool, 0), self.canvasTool(self.canvasTool, 2), self.canvasTool(self.canvasTool, 3), self.canvasTool(self.canvasTool, 6), self.canvasTool(self.canvasTool, 1), self.canvasTool(self.canvasTool, 4),

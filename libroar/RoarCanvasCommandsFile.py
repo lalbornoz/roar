@@ -220,7 +220,6 @@ class RoarCanvasCommandsFile():
     # __init__(self)
     def __init__(self):
         self.imgurApiKey = ImgurApiKey.imgurApiKey if haveImgurApiKey else None
-        self.accels = (self.canvasExit, self.canvasNew, self.canvasOpen, self.canvasSave)
         self.menus = (
             ("&File",
                 self.canvasNew, self.canvasOpen, self.canvasSave, self.canvasSaveAs, NID_MENU_SEP,
