@@ -25,9 +25,9 @@ class RoarCanvasWindow(GuiWindow):
             if  (mapPoint[0] < self.canvas.size[0]) \
             and (mapPoint[1] < self.canvas.size[1]):
                 self.brushPos = mapPoint
-                rc, dirty = tool.onMouseEvent(self.brushColours, self.brushSize, self.dispatchPatchSingle, eventDc, self.brushPos, mouseDragging, mouseLeftDown, mouseRightDown, viewRect)
+                rc, dirty = tool.onMouseEvent(self.brushColours, self.brushSize, self.canvas, self.dispatchPatchSingle, eventDc, self.brushPos, mouseDragging, mouseLeftDown, mouseRightDown, viewRect)
         else:
-            rc, dirty = tool.onKeyboardEvent(self.brushColours, self.brushSize, self.dispatchPatchSingle, eventDc, keyChar, keyModifiers, self.brushPos, viewRect)
+            rc, dirty = tool.onKeyboardEvent(self.brushColours, self.brushSize, self.canvas, self.dispatchPatchSingle, eventDc, keyChar, keyModifiers, self.brushPos, viewRect)
         if dirty:
             self.dirty = True
             self.commands.update(dirty=self.dirty, cellPos=self.brushPos, undoLevel=self.canvas.journal.patchesUndoLevel)

@@ -12,7 +12,7 @@ class ToolText(Tool):
 
     #
     # onKeyboardEvent(self, brushColours, brushSize, dispatchFn, eventDc, keyChar, keyModifiers, mapPoint, viewRect)
-    def onKeyboardEvent(self, brushColours, brushSize, dispatchFn, eventDc, keyChar, keyModifiers, mapPoint, viewRect):
+    def onKeyboardEvent(self, brushColours, brushSize, canvas, dispatchFn, eventDc, keyChar, keyModifiers, mapPoint, viewRect):
         dirty = False
         if not keyModifiers in (wx.MOD_NONE, wx.MOD_SHIFT):
             return False
@@ -22,9 +22,9 @@ class ToolText(Tool):
         if not dirty:
             dirty = True
         dispatchFn(eventDc, False, [*self.textPos, *brushColours, 0, keyChar], viewRect)
-        if self.textPos[0] < (self.parentCanvas.canvas.size[0] - 1):
+        if self.textPos[0] < (canvas.size[0] - 1):
             self.textPos[0] += 1
-        elif self.textPos[1] < (self.parentCanvas.canvas.size[1] - 1):
+        elif self.textPos[1] < (canvas.size[1] - 1):
             self.textPos[0] = 0; self.textPos[1] += 1;
         else:
             self.textPos = [0, 0]
@@ -32,7 +32,7 @@ class ToolText(Tool):
 
     #
     # onMouseEvent(self, brushColours, brushSize, dispatchFn, eventDc, mapPoint, mouseDragging, mouseLeftDown, mouseRightDown, viewRect)
-    def onMouseEvent(self, brushColours, brushSize, dispatchFn, eventDc, mapPoint, mouseDragging, mouseLeftDown, mouseRightDown, viewRect):
+    def onMouseEvent(self, brushColours, brushSize, canvas, dispatchFn, eventDc, mapPoint, mouseDragging, mouseLeftDown, mouseRightDown, viewRect):
         if mouseLeftDown or mouseRightDown:
             self.textPos = list(mapPoint)
         dispatchFn(eventDc, True, [*mapPoint, *brushColours, 0, "_"], viewRect)
