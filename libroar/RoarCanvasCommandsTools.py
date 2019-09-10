@@ -25,7 +25,7 @@ class RoarCanvasCommandsTools():
     @GuiSelectDecorator(6, "Text", "&Text", ["toolText.png"], [wx.ACCEL_CTRL, ord("T")], False)
     def canvasTool(self, f, idx):
         def canvasTool_(event):
-            self.currentTool = [ToolCircle, ToolSelectClone, ToolFill, ToolLine, ToolSelectMove, ToolRect, ToolText][idx](self.parentCanvas)
+            self.currentTool = [ToolCircle, ToolSelectClone, ToolFill, ToolLine, ToolSelectMove, ToolRect, ToolText][idx]()
             self.parentFrame.menuItemsById[self.canvasTool.attrList[idx]["id"]].Check(True)
             toolBar = self.parentFrame.toolBarItemsById[self.canvasTool.attrList[idx]["id"]].GetToolBar()
             toolBar.ToggleTool(self.canvasTool.attrList[idx]["id"], True)

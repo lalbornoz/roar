@@ -65,7 +65,7 @@ class ToolSelect(Tool):
                 self.toolSelectMap.append([])
                 for numCol in range((self.targetRect[1][0] - self.targetRect[0][0]) + 1):
                     rectX, rectY = self.targetRect[0][0] + numCol, self.targetRect[0][1] + numRow
-                    self.toolSelectMap[numRow].append(self.parentCanvas.canvas.map[rectY][rectX])
+                    self.toolSelectMap[numRow].append(canvas.map[rectY][rectX])
             self._drawSelectRect(self.targetRect, dispatchFn, eventDc, viewRect)
         elif mouseRightDown:
             self.targetRect, self.toolState = None, self.TS_NONE
@@ -106,7 +106,7 @@ class ToolSelect(Tool):
 
     #
     # onMouseEvent(self, brushColours, brushSize, dispatchFn, eventDc, mapPoint, mouseDragging, mouseLeftDown, mouseRightDown, viewRect)
-    def onMouseEvent(self, brushColours, brushSize, dispatchFn, eventDc, mapPoint, mouseDragging, mouseLeftDown, mouseRightDown, viewRect):
+    def onMouseEvent(self, brushColours, brushSize, canvas, dispatchFn, eventDc, mapPoint, mouseDragging, mouseLeftDown, mouseRightDown, viewRect):
         dirty = False
         if self.toolState == self.TS_NONE:
             dirty = self._mouseEventTsNone(mapPoint, brushColours, dispatchFn, eventDc, mouseDragging, mouseLeftDown, mouseRightDown, viewRect)
