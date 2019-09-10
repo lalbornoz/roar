@@ -4,22 +4,23 @@
 # Copyright (c) 2018, 2019 Lucio Andrés Illanes Albornoz <lucio@lucioillanes.de>
 #
 
-from Canvas import Canvas
-from GuiCanvasColours import Colours
-from GuiCanvasPanel import GuiCanvasPanel
-from GuiCanvasWxBackend import GuiCanvasWxBackend
-
-from glob import glob
-import os, random, sys, wx
+import os, sys, wx
 
 #
 # Non-items (0xf000-0xffff)
-NID_MENU_SEP     = 0xf000
-NID_TOOLBAR_HSEP = 0xf001
+NID_MENU_SEP        = 0xf000
+NID_TOOLBAR_HSEP    = 0xf001
 
 class GuiFrame(wx.Frame):
-    # {{{ _initAccelTable(self, accels)
-    def _initAccelTable(self, accels):
+    # {{{ _initIcon(self, iconPathName)
+    def _initIcon(self, iconPathName):
+        icon = wx.Icon()
+        icon.CopyFromBitmap(wx.Bitmap(iconPathName, wx.BITMAP_TYPE_ANY))
+        self.SetIcon(icon)
+    # }}}
+
+    # {{{ loadAccels(self, accels)
+    def loadAccels(self, accels):
         accelTableEntries = []
         for accel in accels:
             if accel.attrDict["accel"] != None:
@@ -29,17 +30,25 @@ class GuiFrame(wx.Frame):
                 accelTableEntries[-1].Set(*accel.attrDict["accel"], accel.attrDict["id"])
                 accel.attrDict["accelEntry"] = accelTableEntries[-1]
                 self.itemsById[accel.attrDict["id"]] = accel
-                self.Bind(wx.EVT_MENU, self.onInput, id=accel.attrDict["id"])
+                self.Bind(wx.EVT_MENU, self.onMenu, id=accel.attrDict["id"])
         self.SetAcceleratorTable(wx.AcceleratorTable(accelTableEntries))
     # }}}
-    # {{{ _initIcon(self)
-    def _initIcon(self):
-        iconPathNames = glob(os.path.join("assets", "images", "logo*.bmp"))
-        iconPathName = iconPathNames[random.randint(0, len(iconPathNames) - 1)]
-        icon = wx.Icon(); icon.CopyFromBitmap(wx.Bitmap(iconPathName, wx.BITMAP_TYPE_ANY)); self.SetIcon(icon);
+    # {{{ loadBitmap(self, basePathName, descr, size=(16, 16))
+    def loadBitmap(self, basePathName, descr, size=(16, 16)):
+        if descr == None:
+            descr = ["", None, wx.ArtProvider.GetBitmap(wx.ART_HELP, wx.ART_TOOLBAR, size)]
+        elif (descr[0] == "") and (descr[1] != None):
+            descr = ["", None, wx.ArtProvider.GetBitmap(descr[1], wx.ART_TOOLBAR, size)]
+        elif descr[0] != "":
+            bitmap, bitmapPathName = wx.Bitmap((16, 16)), os.path.join(basePathName, descr[0])
+            bitmap.LoadFile(bitmapPathName, wx.BITMAP_TYPE_ANY)
+            descr = ["", None, bitmap]
+        elif len(descr) == 3:
+            descr = ("", None, descr[2])
+        return descr
     # }}}
-    # {{{ _initMenus(self, menus)
-    def _initMenus(self, menus):
+    # {{{ loadMenus(self, menus)
+    def loadMenus(self, menus):
         menuBar = wx.MenuBar()
         for menu in menus:
             menuWindow = wx.Menu()
@@ -57,7 +66,7 @@ class GuiFrame(wx.Frame):
                     if menuItem.attrDict["accel"] != None:
                         menuItemWindow.SetAccel(menuItem.attrDict["accelEntry"])
                     self.menuItemsById[menuItem.attrDict["id"]] = menuItemWindow
-                    self.Bind(wx.EVT_MENU, self.onInput, menuItemWindow)
+                    self.Bind(wx.EVT_MENU, self.onMenu, menuItemWindow)
                     if menuItem.attrDict["initialState"] != None:
                         if hasattr(menuItem, "isSelect"):
                             menuItemWindow.Check(menuItem.attrDict["initialState"])
@@ -66,14 +75,10 @@ class GuiFrame(wx.Frame):
             menuBar.Append(menuWindow, menu[0])
         self.SetMenuBar(menuBar)
     # }}}
-    # {{{ _initStatusBar(self)
-    def _initStatusBar(self):
-        self.statusBar = self.CreateStatusBar()
-    # }}}
-    # {{{ _initToolBars(self, toolBars, panelSkin)
-    def _initToolBars(self, toolBars, panelSkin):
+    # {{{ loadToolBars(self, toolBars)
+    def loadToolBars(self, toolBars):
         for toolBar in toolBars:
-            self.toolBars.append(wx.ToolBar(panelSkin, -1, style=wx.TB_FLAT | wx.HORIZONTAL | wx.TB_NODIVIDER))
+            self.toolBars.append(wx.ToolBar(self.panelSkin, -1, style=wx.TB_FLAT | wx.HORIZONTAL | wx.TB_NODIVIDER))
             self.toolBars[-1].SetToolBitmapSize((16, 16))
             for toolBarItem in toolBar:
                 if toolBarItem == NID_TOOLBAR_HSEP:
@@ -87,8 +92,8 @@ class GuiFrame(wx.Frame):
                     else:
                         toolBarItemWindow = self.toolBars[-1].AddTool(toolBarItem.attrDict["id"], toolBarItem.attrDict["caption"], toolBarItem.attrDict["icon"][2], shortHelp=toolBarItem.attrDict["label"])
                     self.toolBarItemsById[toolBarItem.attrDict["id"]] = toolBarItemWindow
-                    self.Bind(wx.EVT_TOOL, self.onInput, toolBarItemWindow)
-                    self.Bind(wx.EVT_TOOL_RCLICKED, self.onInput, toolBarItemWindow)
+                    self.Bind(wx.EVT_TOOL, self.onMenu, toolBarItemWindow)
+                    self.Bind(wx.EVT_TOOL_RCLICKED, self.onMenu, toolBarItemWindow)
                     if toolBarItem.attrDict["initialState"] != None:
                         if hasattr(toolBarItem, "isSelect"):
                             toolBarItemWindow.Toggle(toolBarItem.attrDict["initialState"])
@@ -98,77 +103,34 @@ class GuiFrame(wx.Frame):
             self.sizerSkin.Add(toolBar, 0, wx.ALIGN_LEFT | wx.ALL, 3)
             toolBar.Realize(); toolBar.Fit();
     # }}}
-    # {{{ _initToolBitmaps(self, toolBars)
-    def _initToolBitmaps(self, toolBars):
-        for toolBar in toolBars:
-            for toolBarItem in toolBar:
-                if   toolBarItem == NID_TOOLBAR_HSEP:
-                    continue
-                elif toolBarItem.attrDict["icon"] == None:
-                    toolBarItem.attrDict["icon"] = ["", None, wx.ArtProvider.GetBitmap(wx.ART_HELP, wx.ART_TOOLBAR, (16, 16))]
-                elif (toolBarItem.attrDict["icon"][0] == "")    \
-                and  (toolBarItem.attrDict["icon"][1] != None):
-                    toolBarItem.attrDict["icon"] = ["", None, wx.ArtProvider.GetBitmap(toolBarItem.attrDict["icon"][1], wx.ART_TOOLBAR, (16, 16))]
-                elif (toolBarItem.attrDict["icon"][0] == "")    \
-                and  (toolBarItem.attrDict["icon"][1] == None):
-                    toolBarItem.attrDict["icon"] = ["", None, toolBarItem.attrDict["icon"][2]]
-                elif toolBarItem.attrDict["icon"][0] != "":
-                    toolBitmapPathName = os.path.dirname(sys.argv[0])
-                    toolBitmapPathName = os.path.join(toolBitmapPathName, "assets", "images", toolBarItem.attrDict["icon"][0])
-                    toolBitmap = wx.Bitmap((16, 16))
-                    toolBitmap.LoadFile(toolBitmapPathName, wx.BITMAP_TYPE_ANY)
-                    toolBarItem.attrDict["icon"] = ["", None, toolBitmap]
+    # {{{ addWindow(self, window, border=14, expand=False)
+    def addWindow(self, window, border=14, expand=False):
+        flags = wx.ALL; flags = flags | wx.EXPAND if expand else flags;
+        self.sizerSkin.Add(window, 0, flags, border); self.sizerSkin.Fit(self.panelSkin);
     # }}}
-
     # {{{ onChar(self, event)
     def onChar(self, event):
-        self.canvasPanel.onPanelInput(event)
+        event.Skip()
     # }}}
-    # {{{ onInput(self, event)
-    def onInput(self, event):
-        eventId = event.GetId(); self.itemsById[eventId](self.canvasPanel.interface, event);
+    # {{{ onMenu(self, event)
+    def onMenu(self, event):
+        event.Skip()
     # }}}
     # {{{ onMouseWheel(self, event)
     def onMouseWheel(self, event):
-        self.canvasPanel.GetEventHandler().ProcessEvent(event)
+        event.Skip()
     # }}}
 
     #
-    # __init__(self, canvasInterface, parent, appSize=(840, 630), defaultCanvasPos=(0, 75), defaultCanvasSize=(100, 30), defaultCellSize=(7, 14)): initialisation method
-    def __init__(self, canvasInterface, parent, appSize=(840, 630), defaultCanvasPos=(0, 75), defaultCanvasSize=(100, 30), defaultCellSize=(7, 14)):
-        super().__init__(parent, wx.ID_ANY, "", size=appSize)
-        self.itemsById, self.menuItemsById, self.toolBarItemsById = {}, {}, {}; self.lastId = 0;
+    # __init__(self, iconPathName, size, parent=None, title=""): initialisation method
+    def __init__(self, iconPathName, size, parent=None, title=""):
+        super().__init__(parent, wx.ID_ANY, title, size=size)
+        self.itemsById, self.lastId, self.menuItemsById, self.toolBarItemsById = {}, 0, {}, {}
         self.panelSkin, self.sizerSkin, self.toolBars = wx.Panel(self, wx.ID_ANY), wx.BoxSizer(wx.VERTICAL), []
-
-        self.canvas, self.canvasPanel = Canvas(defaultCanvasSize), None
-        self.canvasPanel = GuiCanvasPanel(self.panelSkin, self, GuiCanvasWxBackend, self.canvas, defaultCanvasPos, defaultCanvasSize, defaultCellSize, canvasInterface)
-
-        # Initialise accelerators (hotkeys)
-        # Initialise icon
-        # Initialise menu bar, menus & menu items
-        # Initialise status bar
-        # Initialise toolbar & toolbar items
-        self._initAccelTable(self.canvasPanel.interface.accels)
-        self._initIcon()
-        self._initMenus(self.canvasPanel.interface.menus)
-        self._initStatusBar()
-        self._initToolBitmaps(self.canvasPanel.interface.toolBars)
-        self._initToolBars(self.canvasPanel.interface.toolBars, self.panelSkin)
-
-        self.sizerSkin.AddSpacer(5)
-        self.sizerSkin.Add(self.canvasPanel, 0, wx.ALL | wx.EXPAND, 14)
-        self.panelSkin.SetSizer(self.sizerSkin)
-        self.panelSkin.SetAutoLayout(1)
-        self.sizerSkin.Fit(self.panelSkin)
-
-        self.canvasPanel.interface.canvasNew(None)
-        self.canvasPanel.interface.canvasTool(self.canvasPanel.interface.canvasTool, 5)(self.canvasPanel.interface, None)
-        self.canvasPanel.interface.update(brushSize=self.canvasPanel.brushSize, colours=self.canvasPanel.brushColours)
-
-        self.Bind(wx.EVT_CHAR, self.onChar)
-        self.Bind(wx.EVT_MOUSEWHEEL, self.onMouseWheel)
-
-        # Set focus on & show window
-        self.SetFocus(); self.Show(True);
+        self.sizerSkin.AddSpacer(5); self.panelSkin.SetSizer(self.sizerSkin); self.panelSkin.SetAutoLayout(1);
+        self._initIcon(iconPathName); self.statusBar = self.CreateStatusBar();
+        self.sizerSkin.Fit(self.panelSkin); self.SetFocus(); self.Show(True);
+        for event, f in ((wx.EVT_CHAR, self.onChar), (wx.EVT_MENU, self.onMenu), (wx.EVT_MOUSEWHEEL, self.onMouseWheel)):
+            self.Bind(event, f)
 
 # vim:expandtab foldmethod=marker sw=4 ts=4 tw=120

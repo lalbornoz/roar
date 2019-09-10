@@ -212,7 +212,7 @@ class GuiCanvasInterface():
         def canvasImportEmpty(pathName):
             nonlocal newCanvasSize
             if newCanvasSize == None:
-                newCanvasSize = list(self.parentCanvas.defaultCanvasSize)
+                newCanvasSize = list(self.parentCanvas.canvas.size)
             newMap = [[[1, 1, 0, " "] for x in range(newCanvasSize[0])] for y in range(newCanvasSize[1])]
             return (True, "", newMap, None, newCanvasSize)
         if self._promptSaveChanges():
@@ -335,7 +335,7 @@ class GuiCanvasInterface():
             self.update(toolName=self.currentTool.name)
             viewRect = self.parentCanvas.GetViewStart()
             eventDc = self.parentCanvas.backend.getDeviceContext(self.parentCanvas, viewRect)
-            self.parentCanvas.applyTool(eventDc, wx.wxEVT_MOTION, None, None, self.parentCanvas.brushPos, False, False, False, self.currentTool, viewRect)
+            self.parentCanvas.applyTool(eventDc, True, None, None, self.parentCanvas.brushPos, False, False, False, self.currentTool, viewRect)
         setattr(canvasTool_, "attrDict", f.attrList[idx])
         setattr(canvasTool_, "isSelect", True)
         return canvasTool_
