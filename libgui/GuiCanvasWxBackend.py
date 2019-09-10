@@ -104,8 +104,8 @@ class GuiCanvasWxBackend():
         self._lastBrushBg, self._lastBrushFg, self._lastPen = None, None, None
         return eventDc
     # }}}
-    # {{{ onPanelPaintEvent(self, canvasSize, cellSize, clientSize, panelWindow, viewRect)
-    def onPanelPaintEvent(self, canvasSize, cellSize, clientSize, panelWindow, viewRect):
+    # {{{ onPaintEvent(self, canvasSize, cellSize, clientSize, panelWindow, viewRect)
+    def onPaintEvent(self, canvasSize, cellSize, clientSize, panelWindow, viewRect):
         if self.canvasBitmap != None:
             if viewRect == (0, 0):
                 eventDc = wx.BufferedPaintDC(panelWindow, self.canvasBitmap)
