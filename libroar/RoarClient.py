@@ -7,7 +7,7 @@
 from Canvas import Canvas
 from GuiCanvasWxBackend import GuiCanvasWxBackend
 from GuiFrame import GuiFrame, NID_TOOLBAR_HSEP
-from RoarCanvasInterface import RoarCanvasInterface
+from RoarCanvasCommands import RoarCanvasCommands
 from RoarCanvasWindow import RoarCanvasWindow
 
 from glob import glob
@@ -31,10 +31,6 @@ class RoarClient(GuiFrame):
     def onChar(self, event):
         self.canvasPanel.onKeyboardInput(event)
     # }}}
-    # {{{ onMenu(self, event)
-    def onMenu(self, event):
-        eventId = event.GetId(); self.itemsById[eventId](self.canvasPanel.interface, event);
-    # }}}
     # {{{ onMouseWheel(self, event)
     def onMouseWheel(self, event):
         self.canvasPanel.GetEventHandler().ProcessEvent(event)
@@ -45,15 +41,15 @@ class RoarClient(GuiFrame):
     def __init__(self, parent, defaultCanvasPos=(0, 75), defaultCanvasSize=(100, 30), defaultCellSize=(7, 14), size=(840, 630), title=""):
         super().__init__(self._getIconPathName(), size, parent, title)
         self.canvas = Canvas(defaultCanvasSize)
-        self.canvasPanel = RoarCanvasWindow(GuiCanvasWxBackend, self.canvas, defaultCellSize, RoarCanvasInterface, self.panelSkin, self, defaultCanvasPos, defaultCellSize, defaultCanvasSize)
-        self.loadAccels(self.canvasPanel.interface.accels)
-        self.loadMenus(self.canvasPanel.interface.menus)
-        self._initToolBitmaps(self.canvasPanel.interface.toolBars)
-        self.loadToolBars(self.canvasPanel.interface.toolBars)
+        self.canvasPanel = RoarCanvasWindow(GuiCanvasWxBackend, self.canvas, defaultCellSize, RoarCanvasCommands, self.panelSkin, self, defaultCanvasPos, defaultCellSize, defaultCanvasSize)
+        self.loadAccels(self.canvasPanel.commands.accels)
+        self.loadMenus(self.canvasPanel.commands.menus)
+        self._initToolBitmaps(self.canvasPanel.commands.toolBars)
+        self.loadToolBars(self.canvasPanel.commands.toolBars)
 
-        self.canvasPanel.interface.canvasNew(None)
-        self.canvasPanel.interface.canvasTool(self.canvasPanel.interface.canvasTool, 5)(self.canvasPanel.interface, None)
-        self.canvasPanel.interface.update(brushSize=self.canvasPanel.brushSize, colours=self.canvasPanel.brushColours)
+        self.canvasPanel.commands.canvasNew(None)
+        self.canvasPanel.commands.canvasTool(self.canvasPanel.commands.canvasTool, 5)(None)
+        self.canvasPanel.commands.update(brushSize=self.canvasPanel.brushSize, colours=self.canvasPanel.brushColours)
         self.addWindow(self.canvasPanel, expand=True)
 
 # vim:expandtab foldmethod=marker sw=4 ts=4 tw=120

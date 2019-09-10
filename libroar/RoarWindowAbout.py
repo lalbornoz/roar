@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 #
-# RoarClientAboutWindow.py
+# RoarWindowAbout.py
 # Copyright (c) 2018, 2019 Lucio Andrés Illanes Albornoz <lucio@lucioillanes.de>
 #
 
 from glob import glob
 import os, random, wx, wx.adv
 
-class RoarClientAboutWindow(wx.Dialog):
+class RoarWindowAbout(wx.Dialog):
     # {{{ onButtonRoar(self, event)
     def onButtonRoar(self, event):
         self.Destroy()
