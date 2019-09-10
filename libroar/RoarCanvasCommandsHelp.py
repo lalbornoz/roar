@@ -17,6 +17,6 @@ class RoarCanvasCommandsHelp():
     #
     # __init__(self)
     def __init__(self):
-        self.accels, self.menus, self.toolBars = (), (("&Help", self.canvasAbout,),), ()
+        self.menus, self.toolBars = (("&Help", self.canvasAbout,),), ()
 
 # vim:expandtab foldmethod=marker sw=4 ts=4 tw=0
