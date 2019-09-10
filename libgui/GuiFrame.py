@@ -7,6 +7,40 @@
 import os, sys, wx
 
 #
+# Decorators
+# {{{ GuiCommandDecorator(targetObject)
+def GuiCommandDecorator(caption, label, icon, accel, initialState):
+    def GuiCommandDecoratorOuter(targetObject):
+        if callable(targetObject):
+            if not hasattr(targetObject, "attrDict"):
+                setattr(targetObject, "attrDict", [])
+            targetObject.attrDict = {"caption": caption, "label": label, "icon": icon, "accel": accel, "initialState": initialState, "id": None}
+            return targetObject
+    return GuiCommandDecoratorOuter
+# }}}
+# {{{ GuiCommandListDecorator(targetObject)
+def GuiCommandListDecorator(idx, caption, label, icon, accel, initialState):
+    def GuiCommandListDecoratorOuter(targetObject):
+        if callable(targetObject):
+            if not hasattr(targetObject, "attrList"):
+                setattr(targetObject, "attrList", [])
+            targetObject.attrList.insert(0, {"caption": caption, "label": label, "icon": icon, "accel": accel, "initialState": initialState, "id": None, "idx": idx})
+            return targetObject
+    return GuiCommandListDecoratorOuter
+# }}}
+# {{{ GuiSelectDecorator(targetObject)
+def GuiSelectDecorator(idx, caption, label, icon, accel, initialState):
+    def GuiSelectDecoratorOuter(targetObject):
+        if callable(targetObject):
+            if not hasattr(targetObject, "attrList"):
+                setattr(targetObject, "attrList", [])
+            setattr(targetObject, "isSelect", True)
+            targetObject.attrList.insert(0, {"caption": caption, "label": label, "icon": icon, "accel": accel, "initialState": initialState, "id": None, "idx": idx})
+            return targetObject
+    return GuiSelectDecoratorOuter
+# }}}
+
+#
 # Non-items (0xf000-0xffff)
 NID_MENU_SEP        = 0xf000
 NID_TOOLBAR_HSEP    = 0xf001
