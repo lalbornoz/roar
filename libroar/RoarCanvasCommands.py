@@ -12,7 +12,7 @@ from RoarCanvasCommandsHelp import RoarCanvasCommandsHelp
 from RoarCanvasCommandsTools import RoarCanvasCommandsTools
 import os, wx
 
-class RoarCanvasCommands(RoarCanvasCommandsFile, RoarCanvasCommandsEdit, RoarCanvasCommandsHelp, RoarCanvasCommandsTools):
+class RoarCanvasCommands(RoarCanvasCommandsFile, RoarCanvasCommandsEdit, RoarCanvasCommandsTools, RoarCanvasCommandsHelp):
     # {{{ _initColourBitmaps(self)
     def _initColourBitmaps(self):
         for numColour in range(len(RoarCanvasCommandsEdit.canvasColour.attrList)):
