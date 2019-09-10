@@ -30,9 +30,9 @@ class RoarCanvasWindow(GuiWindow):
             rc, dirty = tool.onKeyboardEvent(self.brushColours, self.brushSize, self.dispatchPatchSingle, eventDc, keyChar, keyModifiers, self.brushPos, viewRect)
         if dirty:
             self.dirty = True
-            self.interface.update(dirty=self.dirty, cellPos=self.brushPos, undoLevel=self.canvas.journal.patchesUndoLevel)
+            self.commands.update(dirty=self.dirty, cellPos=self.brushPos, undoLevel=self.canvas.journal.patchesUndoLevel)
         else:
-            self.interface.update(cellPos=mapPoint if mapPoint else self.brushPos)
+            self.commands.update(cellPos=mapPoint if mapPoint else self.brushPos)
         self.canvas.journal.end()
         return rc
     # }}}
@@ -73,7 +73,7 @@ class RoarCanvasWindow(GuiWindow):
                 for numNewRow in range(oldSize[1], newSize[1]):
                     for numNewCol in range(newSize[0]):
                         self._drawPatch(eventDc, False, [numNewCol, numNewRow, 1, 1, 0, " "], viewRect)
-            self.interface.update(size=newSize, undoLevel=self.canvas.journal.patchesUndoLevel)
+            self.commands.update(size=newSize, undoLevel=self.canvas.journal.patchesUndoLevel)
     # }}}
     # {{{ update(self, newSize, commitUndo=True, newCanvas=None)
     def update(self, newSize, commitUndo=True, newCanvas=None):
@@ -89,7 +89,7 @@ class RoarCanvasWindow(GuiWindow):
     def onKeyboardInput(self, event):
         viewRect = self.GetViewStart(); eventDc = self.backend.getDeviceContext(self, viewRect);
         keyChar, keyModifiers = chr(event.GetUnicodeKey()), event.GetModifiers()
-        if not self.applyTool(eventDc, False, keyChar, keyModifiers, None, None, None, None, self.interface.currentTool, viewRect):
+        if not self.applyTool(eventDc, False, keyChar, keyModifiers, None, None, None, None, self.commands.currentTool, viewRect):
             event.Skip()
     # }}}
     # {{{ onLeaveWindow(self, event)
@@ -102,7 +102,7 @@ class RoarCanvasWindow(GuiWindow):
         viewRect = self.GetViewStart(); eventDc = self.backend.getDeviceContext(self, viewRect);
         mouseDragging, mouseLeftDown, mouseRightDown = event.Dragging(), event.LeftIsDown(), event.RightIsDown()
         mapPoint = self.backend.xlateEventPoint(event, eventDc, viewRect)
-        if not self.applyTool(eventDc, True, None, None, mapPoint, mouseDragging, mouseLeftDown, mouseRightDown, self.interface.currentTool, viewRect):
+        if not self.applyTool(eventDc, True, None, None, mapPoint, mouseDragging, mouseLeftDown, mouseRightDown, self.commands.currentTool, viewRect):
             event.Skip()
     # }}}
     # {{{ onPaint(self, event)
@@ -120,10 +120,10 @@ class RoarCanvasWindow(GuiWindow):
     # }}}
 
     #
-    # __init__(self, backend, canvas, cellSize, interface, parent, parentFrame, pos, scrollStep, size): initialisation method
-    def __init__(self, backend, canvas, cellSize, interface, parent, parentFrame, pos, scrollStep, size):
+    # __init__(self, backend, canvas, cellSize, commands, parent, parentFrame, pos, scrollStep, size): initialisation method
+    def __init__(self, backend, canvas, cellSize, commands, parent, parentFrame, pos, scrollStep, size):
         super().__init__(parent, pos, scrollStep, [w * h for w, h in zip(cellSize, size)])
-        self.backend, self.canvas, self.cellSize, self.interface, self.parentFrame = backend(self.size, cellSize), canvas, cellSize, interface(self, parentFrame), parentFrame
+        self.backend, self.canvas, self.cellSize, self.commands, self.parentFrame = backend(self.size, cellSize), canvas, cellSize, commands(self, parentFrame), parentFrame
         self.brushColours, self.brushPos, self.brushSize, self.dirty = [4, 1], [0, 0], [1, 1], False
 
 # vim:expandtab foldmethod=marker sw=4 ts=4 tw=120

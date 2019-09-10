@@ -16,11 +16,11 @@ import wx
 def main(*argv):
     wxApp, roarClient = wx.App(False), RoarClient(None)
     if (len(argv) > 1) and (len(argv[1]) > 0):
-        roarClient.canvasPanel.interface.canvasPathName = argv[1]
+        roarClient.canvasPanel.commands.canvasPathName = argv[1]
         rc, error = roarClient.canvasPanel.canvas.importStore.importTextFile(argv[1])
         if rc:
             roarClient.canvasPanel.update(roarClient.canvasPanel.canvas.importStore.inSize, False, roarClient.canvasPanel.canvas.importStore.outMap)
-            roarClient.canvasPanel.interface.update(pathName=argv[1], undoLevel=-1)
+            roarClient.canvasPanel.commands.update(pathName=argv[1], undoLevel=-1)
         else:
             print("error: {}".format(error), file=sys.stderr)
     wxApp.MainLoop()
