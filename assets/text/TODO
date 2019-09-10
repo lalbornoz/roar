@@ -13,10 +13,8 @@
     c) text (edit, Unicode sets)
 11) GUI: 
     a) Settings panel
-    b) revisit About panel
-    c) {de,in}crease cell size
-    d) switch from wxPython to GTK
-    e) {copy,cut,insert from,paste}
-    f) {fix,reduce} flickering when viewRect > (0, 0)
+    b) switch from wxPython to GTK
+    c) {fix,reduce} flickering when viewRect > (0, 0)
+    d) {copy,cut,insert from,paste}, {de,in}crease cell size
 
 vim:ff=dos tw=0
