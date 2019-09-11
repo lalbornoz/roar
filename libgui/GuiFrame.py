@@ -62,7 +62,7 @@ class GuiFrame(wx.Frame):
                 and (accel.attrDict["accel"] != None):
                     accelTableEntries += [wx.AcceleratorEntry()]
                     if accel.attrDict["id"] == None:
-                        accel.attrDict["id"] = self.lastId; self.lastId += 1;
+                        accel.attrDict["id"] = wx.NewId()
                     accelTableEntries[-1].Set(*accel.attrDict["accel"], accel.attrDict["id"])
                     accel.attrDict["accelEntry"] = accelTableEntries[-1]
                     self.itemsById[accel.attrDict["id"]] = accel
@@ -95,7 +95,7 @@ class GuiFrame(wx.Frame):
                     menuWindow.AppendSeparator()
                 else:
                     if menuItem.attrDict["id"] == None:
-                        menuItem.attrDict["id"] = self.lastId; self.lastId += 1;
+                        menuItem.attrDict["id"] = wx.NewId()
                     self.itemsById[menuItem.attrDict["id"]] = menuItem
                     if hasattr(menuItem, "isSelect"):
                         menuItemWindow = menuWindow.AppendRadioItem(menuItem.attrDict["id"], menuItem.attrDict["label"], menuItem.attrDict["caption"])
@@ -123,7 +123,7 @@ class GuiFrame(wx.Frame):
                     self.toolBars[-1].AddSeparator()
                 else:
                     if toolBarItem.attrDict["id"] == None:
-                        toolBarItem.attrDict["id"] = self.lastId; self.lastId += 1;
+                        toolBarItem.attrDict["id"] = wx.NewId()
                     self.itemsById[toolBarItem.attrDict["id"]] = toolBarItem
                     if hasattr(toolBarItem, "isSelect"):
                         toolBarItemWindow = self.toolBars[-1].AddRadioTool(toolBarItem.attrDict["id"], toolBarItem.attrDict["caption"], toolBarItem.attrDict["icon"][2], shortHelp=toolBarItem.attrDict["label"])
@@ -167,7 +167,7 @@ class GuiFrame(wx.Frame):
     # __init__(self, iconPathName, size, parent=None, title=""): initialisation method
     def __init__(self, iconPathName, size, parent=None, title=""):
         super().__init__(parent, wx.ID_ANY, title, size=size)
-        self.itemsById, self.lastId, self.menuItemsById, self.toolBarItemsById = {}, 0, {}, {}
+        self.itemsById, self.menuItemsById, self.toolBarItemsById = {}, {}, {}
         self.panelSkin, self.sizerSkin, self.toolBars = wx.Panel(self, wx.ID_ANY), wx.BoxSizer(wx.VERTICAL), []
         self.sizerSkin.AddSpacer(5); self.panelSkin.SetSizer(self.sizerSkin); self.panelSkin.SetAutoLayout(1);
         self._initIcon(iconPathName); self.statusBar = self.CreateStatusBar();
