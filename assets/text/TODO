@@ -1,20 +1,16 @@
 1)  Implement ANSI CSI CU[BDPU] sequences & italic
-2)  Incremental auto{load,save} & {backup,restore}
-3)  Implement instrumentation & unit tests, document
-4)  Open and toggle a reference image in the background
-5)  Client-Server or Peer-to-Peer realtime collaboration
-6)  Arbitrary {format,palette}s ({4,8} bit ANSI/mIRC, etc.)
-7)  Hotkey & graphical interfaces to {composed,parametrised} tools
-8)  Layers, layout (e.g. for comics, zines, etc.) & asset management (e.g. kade, lion, etc.) & traits w/ {inserting,merging,linking}
-9)  Sprites & scripted (Python?) animation on the basis of asset traits and {composable,parametrised} patterns (metric flow, particle system, rigging, ...)
-10) Composition and parametrisation of tools from higher-order operators (brushes, filters, outlines, patterns & shaders) and unit tools; unit tools:
+2)  Implement instrumentation & unit tests, document
+3)  Open and toggle a reference image in the background
+4)  Client-Server or Peer-to-Peer realtime collaboration
+5)  Arbitrary {format,palette}s ({4,8} bit ANSI/mIRC, etc.)
+6)  Hotkey & graphical interfaces to {composed,parametrised} tools
+7)  Incremental auto{load,save} & {backup,restore} (needs Settings window)
+8)  GUI: a) switch from wxPython to GTK b) {copy,cut,insert from,paste}, {de,in}crease cell size c) MRU {directories,files}
+9)  Layers, layout (e.g. for comics, zines, etc.) & asset management (e.g. kade, lion, etc.) & traits w/ {inserting,merging,linking}
+10) Sprites & scripted (Python?) animation on the basis of asset traits and {composable,parametrised} patterns (metric flow, particle system, rigging, ...)
+11) Composition and parametrisation of tools from higher-order operators (brushes, filters, outlines, patterns & shaders) and unit tools; unit tools:
     a) geometric primitives (arrow, circle, cloud/speech bubble, curve, heart, hexagon, line, pentagon, polygon, rhombus, triangle, square, star)
     b) regions (crop, duplicate, erase, fill, invert, measure, pick, rotate, scale, select, shift, slice, tile, translate)
     c) text (edit, Unicode sets)
-11) GUI: 
-    a) Settings panel
-    b) switch from wxPython to GTK
-    c) {fix,reduce} flickering when viewRect > (0, 0)
-    d) {copy,cut,insert from,paste}, {de,in}crease cell size
 
 vim:ff=dos tw=0
