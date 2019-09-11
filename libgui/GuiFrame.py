@@ -152,7 +152,11 @@ class GuiFrame(wx.Frame):
     # }}}
     # {{{ onMenu(self, event)
     def onMenu(self, event):
-        eventId = event.GetId(); self.itemsById[eventId](event);
+        eventId = event.GetId()
+        if eventId in self.itemsById:
+            self.itemsById[eventId](event)
+        else:
+            event.Skip()
     # }}}
     # {{{ onMouseWheel(self, event)
     def onMouseWheel(self, event):
