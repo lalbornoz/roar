@@ -4,8 +4,9 @@
 # Copyright (c) 2018, 2019 Lucio Andrés Illanes Albornoz <lucio@lucioillanes.de>
 #
 
+from ctypes import *
 from GuiCanvasColours import Colours
-import math, wx
+import math, os, wx
 
 class GuiBufferedDC(wx.MemoryDC):
     # {{{ __del__(self)
@@ -145,7 +146,7 @@ class GuiCanvasWxBackend():
             oldDc.SelectObject(wx.NullBitmap)
             self.canvasBitmap.Destroy(); self.canvasBitmap = newBitmap;
         self.canvasSize, self.cellSize = canvasSize, cellSize
-        self._font = wx.Font(8, wx.FONTFAMILY_TELETYPE, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL)
+        self._font = wx.TheFontList.FindOrCreateFont(8, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, False, self.fontName)
     # }}}
     # {{{ xlateEventPoint(self, event, eventDc, viewRect)
     def xlateEventPoint(self, event, eventDc, viewRect):
@@ -163,10 +164,11 @@ class GuiCanvasWxBackend():
     # }}}
 
     #
-    # __init__(self, canvasSize, cellSize): initialisation method
-    def __init__(self, canvasSize, cellSize):
+    # __init__(self, canvasSize, cellSize, fontName="Dejavu Sans Mono", fontPathName=os.path.join("assets", "fonts", "DejaVuSansMono.ttf")): initialisation method
+    def __init__(self, canvasSize, cellSize, fontName="Dejavu Sans Mono", fontPathName=os.path.join("assets", "fonts", "DejaVuSansMono.ttf")):
         self._brushes, self._font, self._lastBrush, self._lastPen, self._pens = None, None, None, None, None
-        self.canvasBitmap, self.cellSize = None, None
+        self.canvasBitmap, self.cellSize, self.fontName, self.fontPathName = None, None, fontName, fontPathName
+        WinDLL("gdi32.dll").AddFontResourceW(self.fontPathName.encode("utf16"))
         self._initBrushesAndPens(); self.resize(canvasSize, cellSize);
 
 # vim:expandtab foldmethod=marker sw=4 ts=4 tw=120
