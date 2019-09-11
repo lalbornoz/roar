@@ -22,16 +22,20 @@ import io, os, wx
 class RoarCanvasCommandsFile():
     # {{{ _import(self, f, newDirty, pathName)
     def _import(self, f, newDirty, pathName):
+        rc = False
         self.parentCanvas.SetCursor(wx.Cursor(wx.CURSOR_WAIT))
-        rc, error, newMap, newPathName, newSize = f(pathName)
-        if rc:
-            self.parentCanvas.dirty = newDirty
-            self.parentCanvas.update(newSize, False, newMap)
-            self.canvasPathName = newPathName
-            self.update(dirty=self.parentCanvas.dirty, pathName=self.canvasPathName, undoLevel=-1)
-            self.parentCanvas.canvas.journal.resetCursor()
-            self.parentCanvas.canvas.journal.resetUndo()
-        else:
+        try:
+            rc, error, newMap, newPathName, newSize = f(pathName)
+            if rc:
+                self.parentCanvas.dirty = newDirty
+                self.parentCanvas.update(newSize, False, newMap)
+                self.canvasPathName = newPathName
+                self.update(dirty=self.parentCanvas.dirty, pathName=self.canvasPathName, undoLevel=-1)
+                self.parentCanvas.canvas.journal.resetCursor()
+                self.parentCanvas.canvas.journal.resetUndo()
+        except FileNotFoundError as e:
+            rc, error, newMap, newPathName, newSize = False, str(e), None, None, None
+        if not rc:
             with wx.MessageDialog(self.parentCanvas, "Error: {}".format(error), "", wx.OK | wx.OK_DEFAULT) as dialog:
                 dialogChoice = dialog.ShowModal()
         self.parentCanvas.SetCursor(wx.Cursor(wx.NullCursor))
