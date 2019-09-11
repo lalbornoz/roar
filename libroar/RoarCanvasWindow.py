@@ -38,12 +38,12 @@ class RoarCanvasWindow(GuiWindow):
     # }}}
     # {{{ dispatchDeltaPatches(self, deltaPatches)
     def dispatchDeltaPatches(self, deltaPatches):
-        eventDc = self.backend.getDeviceContext(self, self.GetViewStart())
+        eventDc = self.backend.getDeviceContext(self.GetClientSize(), self, self.GetViewStart())
         for patch in deltaPatches:
             if patch == None:
                 continue
             elif patch[0] == "resize":
-                del eventDc; self.resize(patch[1:], False); eventDc = self.backend.getDeviceContext(self, self.GetViewStart());
+                del eventDc; self.resize(patch[1:], False); eventDc = self.backend.getDeviceContext(self.GetClientSize(), self, self.GetViewStart());
             else:
                 self.canvas._commitPatch(patch); self.backend.drawPatch(eventDc, patch, self.GetViewStart());
     # }}}
@@ -64,7 +64,7 @@ class RoarCanvasWindow(GuiWindow):
         if self.canvas.resize(newSize, commitUndo):
             super().resize([a * b for a, b in zip(newSize, self.backend.cellSize)])
             self.backend.resize(newSize, self.backend.cellSize)
-            viewRect = self.GetViewStart(); eventDc = self.backend.getDeviceContext(self, viewRect);
+            viewRect = self.GetViewStart(); eventDc = self.backend.getDeviceContext(self.GetClientSize(), self, viewRect);
             if deltaSize[0] > 0:
                 for numRow in range(oldSize[1]):
                     for numNewCol in range(oldSize[0], newSize[0]):
@@ -79,7 +79,7 @@ class RoarCanvasWindow(GuiWindow):
     def update(self, newSize, commitUndo=True, newCanvas=None):
         self.resize(newSize, commitUndo)
         self.canvas.update(newSize, newCanvas)
-        eventDc = self.backend.getDeviceContext(self, self.GetViewStart())
+        eventDc = self.backend.getDeviceContext(self.GetClientSize(), self, self.GetViewStart())
         for numRow in range(newSize[1]):
             for numCol in range(newSize[0]):
                 self.backend.drawPatch(eventDc, [numCol, numRow, *self.canvas.map[numRow][numCol]], self.GetViewStart())
@@ -87,19 +87,19 @@ class RoarCanvasWindow(GuiWindow):
 
     # {{{ onKeyboardInput(self, event)
     def onKeyboardInput(self, event):
-        viewRect = self.GetViewStart(); eventDc = self.backend.getDeviceContext(self, viewRect);
+        viewRect = self.GetViewStart(); eventDc = self.backend.getDeviceContext(self.GetClientSize(), self, viewRect);
         keyChar, keyModifiers = chr(event.GetUnicodeKey()), event.GetModifiers()
         if not self.applyTool(eventDc, False, keyChar, keyModifiers, None, None, None, None, self.commands.currentTool, viewRect):
             event.Skip()
     # }}}
     # {{{ onLeaveWindow(self, event)
     def onLeaveWindow(self, event):
-        eventDc = self.backend.getDeviceContext(self, self.GetViewStart())
+        eventDc = self.backend.getDeviceContext(self.GetClientSize(), self, self.GetViewStart())
         self.backend.drawCursorMaskWithJournal(self.canvas.journal, eventDc, self.GetViewStart())
     # }}}
     # {{{ onMouseInput(self, event)
     def onMouseInput(self, event):
-        viewRect = self.GetViewStart(); eventDc = self.backend.getDeviceContext(self, viewRect);
+        viewRect = self.GetViewStart(); eventDc = self.backend.getDeviceContext(self.GetClientSize(), self, viewRect);
         mouseDragging, mouseLeftDown, mouseRightDown = event.Dragging(), event.LeftIsDown(), event.RightIsDown()
         mapPoint = self.backend.xlateEventPoint(event, eventDc, viewRect)
         if not self.applyTool(eventDc, True, None, None, mapPoint, mouseDragging, mouseLeftDown, mouseRightDown, self.commands.currentTool, viewRect):
@@ -107,13 +107,13 @@ class RoarCanvasWindow(GuiWindow):
     # }}}
     # {{{ onPaint(self, event)
     def onPaint(self, event):
-        self.backend.onPaintEvent(self.canvas.size, self.cellSize, self.GetClientSize(), self, self.GetViewStart())
+        self.backend.onPaint(self.GetClientSize(), self, self.GetViewStart())
     # }}}
     # {{{ onScroll(self, event)
     def onScroll(self, event):
         if self.canvas.dirtyCursor:
             viewRect = self.GetViewStart()
-            eventDc = self.backend.getDeviceContext(self, viewRect)
+            eventDc = self.backend.getDeviceContext(self.GetClientSize(), self, viewRect)
             self.backend.drawCursorMaskWithJournal(self.canvas.journal, eventDc, viewRect)
             self.canvas.dirtyCursor = False
         event.Skip()

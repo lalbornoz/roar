@@ -7,6 +7,27 @@
 from GuiCanvasColours import Colours
 import math, wx
 
+class GuiBufferedDC(wx.MemoryDC):
+    # {{{ __del__(self)
+    def __del__(self):
+        self.dc.Blit(0, 0, *self.viewSize, self, 0, 0)
+        self.SelectObject(wx.NullBitmap)
+    # }}}
+    # {{{ __init__(self, backend, buffer, clientSize, dc, viewRect)
+    def __init__(self, backend, buffer, clientSize, dc, viewRect):
+        super().__init__()
+        canvasSize = [a - b for a, b in zip(backend.canvasSize, viewRect)]
+        clientSize = [math.ceil(m / n) for m, n in zip(clientSize, backend.cellSize)]
+        viewRect = [m * n for m, n in zip(backend.cellSize, viewRect)]
+        viewSize = [min(m, n) for m, n in zip(canvasSize, clientSize)]
+        viewSize = [m * n for m, n in zip(backend.cellSize, viewSize)]
+        bitmap = wx.Bitmap(viewSize); self.SelectObject(bitmap);
+        bufferDc = wx.MemoryDC(); bufferDc.SelectObject(buffer);
+        self.Blit(0, 0, *viewSize, bufferDc, *viewRect)
+        bufferDc.SelectObject(wx.NullBitmap)
+        self.dc, self.viewSize = dc, viewSize
+    # }}}
+
 class GuiCanvasWxBackend():
     # {{{ _drawBrushPatch(self, eventDc, patch, point)
     def _drawBrushPatch(self, eventDc, patch, point):
@@ -95,30 +116,22 @@ class GuiCanvasWxBackend():
         else:
             return False
     # }}}
-    # {{{ getDeviceContext(self, parentWindow, viewRect)
-    def getDeviceContext(self, parentWindow, viewRect):
+    # {{{ getDeviceContext(self, clientSize, parentWindow, viewRect)
+    def getDeviceContext(self, clientSize, parentWindow, viewRect):
         if viewRect == (0, 0):
             eventDc = wx.BufferedDC(wx.ClientDC(parentWindow), self.canvasBitmap)
         else:
-            eventDc = wx.ClientDC(parentWindow)
+            eventDc = GuiBufferedDC(self, self.canvasBitmap, clientSize, wx.ClientDC(parentWindow), viewRect)
         self._lastBrushBg, self._lastBrushFg, self._lastPen = None, None, None
         return eventDc
     # }}}
-    # {{{ onPaintEvent(self, canvasSize, cellSize, clientSize, panelWindow, viewRect)
-    def onPaintEvent(self, canvasSize, cellSize, clientSize, panelWindow, viewRect):
+    # {{{ onPaint(self, clientSize, panelWindow, viewRect)
+    def onPaint(self, clientSize, panelWindow, viewRect):
         if self.canvasBitmap != None:
             if viewRect == (0, 0):
                 eventDc = wx.BufferedPaintDC(panelWindow, self.canvasBitmap)
             else:
-                canvasSize = [a - b for a, b in zip(canvasSize, viewRect)]
-                clientSize = [math.ceil(m / n) for m, n in zip(clientSize, cellSize)]
-                viewSize = [min(m, n) for m, n in zip(canvasSize, clientSize)]
-                viewSize = [m * n for m, n in zip(cellSize, viewSize)]
-                canvasDc = wx.MemoryDC(); canvasDc.SelectObject(self.canvasBitmap);
-                viewDc = wx.MemoryDC(); viewBitmap = wx.Bitmap(viewSize); viewDc.SelectObject(viewBitmap);
-                viewDc.Blit(0, 0, *viewSize, canvasDc, *[m * n for m, n in zip(cellSize, viewRect)])
-                canvasDc.SelectObject(wx.NullBitmap); viewDc.SelectObject(wx.NullBitmap);
-                eventDc = wx.BufferedPaintDC(panelWindow, viewBitmap)
+                eventDc = GuiBufferedDC(self, self.canvasBitmap, clientSize, wx.PaintDC(panelWindow), viewRect)
     # }}}
     # {{{ resize(self, canvasSize, cellSize):
     def resize(self, canvasSize, cellSize):
