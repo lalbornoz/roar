@@ -5,7 +5,7 @@
 #
 
 from Tool import Tool
-import wx
+import string, wx
 
 class ToolText(Tool):
     name = "Text"
@@ -13,7 +13,10 @@ class ToolText(Tool):
     #
     # onKeyboardEvent(self, brushColours, brushSize, canvas, dispatchFn, eventDc, keyChar, keyModifiers, mapPoint, viewRect)
     def onKeyboardEvent(self, brushColours, brushSize, canvas, dispatchFn, eventDc, keyChar, keyModifiers, mapPoint, viewRect):
-        if keyModifiers in (wx.MOD_NONE, wx.MOD_SHIFT):
+        if  (ord(keyChar) != wx.WXK_NONE)                           \
+        and (not keyChar in set("\t\n\v\f\r"))                      \
+        and ((ord(keyChar) >= 32) if ord(keyChar) < 127 else True)  \
+        and (keyModifiers in (wx.MOD_NONE, wx.MOD_SHIFT)):
             rc, dirty = True, True
             if self.textPos == None:
                 self.textPos = list(mapPoint)
