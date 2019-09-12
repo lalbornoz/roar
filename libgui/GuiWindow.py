@@ -21,6 +21,10 @@ class GuiWindow(wx.ScrolledWindow):
     def onClose(self, event):
         self.Destroy()
     # }}}
+    # {{{ onEnterWindow(self, event)
+    def onEnterWindow(self, event):
+        event.Skip()
+    # }}}
     # {{{ onKeyboardInput(self, event)
     def onKeyboardInput(self, event):
         return False
@@ -60,10 +64,10 @@ class GuiWindow(wx.ScrolledWindow):
         super().__init__(parent, pos=pos, size=size, style=style)
         self.pos, self.scrollFlag, self.scrollStep, self.size = pos, False, scrollStep, size
         for eventType, f in (
-                (wx.EVT_CHAR, self.onKeyboardInput), (wx.EVT_CLOSE, self.onClose), (wx.EVT_LEAVE_WINDOW, self.onLeaveWindow),
-                (wx.EVT_LEFT_DOWN, self.onMouseInput), (wx.EVT_MOTION, self.onMouseInput), (wx.EVT_PAINT, self.onPaint),
-                (wx.EVT_RIGHT_DOWN, self.onMouseInput), (wx.EVT_SCROLLWIN_LINEDOWN, self.onScroll), (wx.EVT_SCROLLWIN_LINEUP, self.onScroll),
-                (wx.EVT_SIZE, self.onSize)):
+                (wx.EVT_CHAR, self.onKeyboardInput), (wx.EVT_CLOSE, self.onClose), (wx.EVT_ENTER_WINDOW, self.onEnterWindow),
+                (wx.EVT_LEAVE_WINDOW, self.onLeaveWindow), (wx.EVT_LEFT_DOWN, self.onMouseInput), (wx.EVT_MOTION, self.onMouseInput),
+                (wx.EVT_PAINT, self.onPaint), (wx.EVT_RIGHT_DOWN, self.onMouseInput), (wx.EVT_SCROLLWIN_LINEDOWN, self.onScroll),
+                (wx.EVT_SCROLLWIN_LINEUP, self.onScroll), (wx.EVT_SIZE, self.onSize)):
             self.Bind(eventType, f)
         self.SetScrollRate(*self.scrollStep); self._updateScrollBars();
 
