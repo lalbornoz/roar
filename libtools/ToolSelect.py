@@ -60,7 +60,7 @@ class ToolSelect(Tool):
                 self.targetRect[0][0], self.targetRect[1][0] = self.targetRect[1][0], self.targetRect[0][0]
             if self.targetRect[0][1] > self.targetRect[1][1]:
                 self.targetRect[0][1], self.targetRect[1][1] = self.targetRect[1][1], self.targetRect[0][1]
-            self.srcRect, self.lastAtPoint, self.toolSelectMap, self.toolState = self.targetRect[0], list(mapPoint), [], self.TS_SELECT
+            self.lastAtPoint, self.srcRect, self.toolSelectMap, self.toolState = list(mapPoint), self.targetRect, [], self.TS_SELECT
             for numRow in range((self.targetRect[1][1] - self.targetRect[0][1]) + 1):
                 self.toolSelectMap.append([])
                 for numCol in range((self.targetRect[1][0] - self.targetRect[0][0]) + 1):
