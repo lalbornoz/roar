@@ -13,9 +13,12 @@ class ToolSelectMove(ToolSelect):
     # onSelectEvent(self, disp, dispatchFn, eventDc, isCursor, newToolRect, selectRect, viewRect)
     def onSelectEvent(self, disp, dispatchFn, eventDc, isCursor, newToolRect, selectRect, viewRect):
         dirty = False
-        for numRow in range(len(self.toolSelectMap)):
-            for numCol in range(len(self.toolSelectMap[numRow])):
-                dispatchFn(eventDc, isCursor, [self.srcRect[0] + numCol, self.srcRect[1] + numRow, 1, 1, 0, " "], viewRect)
+        for numRow in range(self.srcRect[0][1], self.srcRect[1][1]):
+            for numCol in range(self.srcRect[0][0], self.srcRect[1][0]):
+                if  ((numCol < selectRect[0][0]) or (numCol > selectRect[1][0]))    \
+                or  ((numRow < selectRect[0][1]) or (numRow > selectRect[1][1])):
+                    dirty = False if isCursor else True
+                    dispatchFn(eventDc, isCursor, [numCol, numRow, 1, 1, 0, " "], viewRect)
         for numRow in range(len(self.toolSelectMap)):
             for numCol in range(len(self.toolSelectMap[numRow])):
                 cellOld = self.toolSelectMap[numRow][numCol]
