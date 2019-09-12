@@ -4,20 +4,18 @@
 4)  Open and toggle a reference image in the background
 5)  Client-Server or Peer-to-Peer realtime collaboration
 6)  Arbitrary {format,palette}s ({4,8} bit ANSI/mIRC, etc.)
-7)  Hotkey & graphical interfaces to {composed,parametrised} tools
-8)  Incremental auto{load,save} & {backup,restore} (needs Settings window)
-9)  Sprites & scripted (Python?) animation on the basis of asset traits and {composable,parametrised} patterns (metric flow, particle system, rigging, ...)
-10) Composition and parametrisation of tools from higher-order operators (brushes, filters, outlines, patterns & shaders) and unit tools; unit tools:
-    a) geometric primitives (arrow, circle, cloud/speech bubble, curve, heart, hexagon, line, pentagon, polygon, rhombus, triangle, square, star)
-    b) regions (crop, duplicate, erase, fill, invert, measure, pick, rotate, scale, select, shift, slice, tile, translate)
-    c) text (edit, Unicode sets)
-11) GUI:
-    a) {copy,cut,insert from,paste}, {de,in}crease cell size
-    b) replace logo w/ canvas panel in About dialogue
-    c) switch from wxPython to GTK
-    d) edit asset in new canvas
-    e) MRU {directories,files}
-    f) ruler
-12) fix outstanding {re,un}do bugs
+7)  Incremental auto{load,save} & {backup,restore} (needs Settings window)
+8)  Sprites & scripted (Python?) animation on the basis of asset traits and {composable,parametrised} patterns (metric flow, particle system, rigging, ...)
+9)  Composition, parametrisation & keying of tools from higher-order operators (brushes, filters, outlines, patterns & shaders) and unit tools
+10) GUI: a) switch to GTK b) replace logo w/ canvas panel in About dialogue c) {copy,cut,insert from,paste}, {edit asset in new canvas,import from canvas}
+
+High-priority list:
+1)  geometric primitives: arrow, circle, cloud/speech bubble, curve, heart, hexagon, line, pentagon, polygon, rhombus, triangle, square, star
+2)  region filters: crop, duplicate, erase, fill, invert, measure, pick, rotate, scale, select, shift, slice, tile, translate
+3)  text tool: a) allow navigating w/ cursor keys b) Unicode set key & GUI w/ MRU
+4)  fix outstanding {re,un}do bugs
+5)  GUI: {de,in}crease cell size
+6)  GUI: MRU {directories,files}
+7)  cleanup & refactor
 
 vim:ff=dos tw=0
