@@ -13,6 +13,9 @@ class CanvasJournal():
     def end(self):
         if self.patchesUndo[self.patchesUndoLevel] == [[], []]:
             del self.patchesUndo[self.patchesUndoLevel]
+        else:
+            if self.patchesUndoLevel > 0:
+                del self.patchesUndo[:self.patchesUndoLevel]; self.patchesUndoLevel = 0;
     # }}}
     # {{{ popCursor(self)
     def popCursor(self):
