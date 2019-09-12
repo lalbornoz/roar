@@ -25,7 +25,7 @@ class RoarCanvasCommandsTools():
     @GuiSelectDecorator(6, "Text", "&Text", ["toolText.png"], [wx.ACCEL_CTRL, ord("T")], False)
     def canvasTool(self, f, idx):
         def canvasTool_(event):
-            self.currentTool = [ToolCircle, ToolSelectClone, ToolFill, ToolLine, ToolSelectMove, ToolRect, ToolText][idx]()
+            self.lastTool, self.currentTool = self.currentTool, [ToolCircle, ToolSelectClone, ToolFill, ToolLine, ToolSelectMove, ToolRect, ToolText][idx]()
             self.parentFrame.menuItemsById[self.canvasTool.attrList[idx]["id"]].Check(True)
             toolBar = self.parentFrame.toolBarItemsById[self.canvasTool.attrList[idx]["id"]].GetToolBar()
             toolBar.ToggleTool(self.canvasTool.attrList[idx]["id"], True)
@@ -47,5 +47,6 @@ class RoarCanvasCommandsTools():
             ),
         )
         self.toolBars = ()
+        self.currentTool, self.lastTool = None, None
 
 # vim:expandtab foldmethod=marker sw=4 ts=4 tw=0
