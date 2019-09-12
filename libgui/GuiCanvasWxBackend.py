@@ -41,13 +41,13 @@ class GuiCanvasWxBackend():
     def _drawCharPatch(self, eventDc, patch, point):
         absPoint, fontBitmap = self._xlatePoint(point), wx.Bitmap(*self.cellSize)
         brushBg, brushFg, pen = self._getCharPatchColours(patch)
-        fontDc = wx.MemoryDC(); fontDc.SelectObject(fontBitmap);
+        fontDc = wx.MemoryDC(); fontDc.SelectObject(fontBitmap); fontDc.SetFont(self._font);
+        fontDc.SetBackground(brushBg); fontDc.SetBrush(brushFg); fontDc.SetPen(pen);
         fontDc.SetTextForeground(wx.Colour(Colours[patch[0]][:4]))
         fontDc.SetTextBackground(wx.Colour(Colours[patch[1]][:4]))
-        fontDc.SetBrush(brushBg); fontDc.SetPen(self._pens[patch[1]]);
         fontDc.DrawRectangle(0, 0, *self.cellSize)
-        fontDc.SetBackground(brushBg); fontDc.SetPen(pen); fontDc.SetFont(self._font);
         if patch[3] == "_":
+            fontDc.SetPen(self._pens[patch[0]])
             fontDc.DrawLine(0, self.cellSize[1] - 1, self.cellSize[0], self.cellSize[1] - 1)
         else:
             fontDc.DrawText(patch[3], 0, 0)
@@ -64,23 +64,23 @@ class GuiCanvasWxBackend():
         if (patch[0] != -1) and (patch[1] != -1):
             brushBg, brushFg, pen = self._brushes[patch[1]], self._brushes[patch[1]], self._pens[patch[1]]
         elif (patch[0] == -1) and (patch[1] == -1):
-            brushBg, brushFg, pen = self._brushes[1], self._brushes[1], self._pens[1]
+            brushBg, brushFg, pen = self._brushAlpha, self._brushAlpha, self._penAlpha
         elif patch[0] == -1:
             brushBg, brushFg, pen = self._brushes[patch[1]], self._brushes[patch[1]], self._pens[patch[1]]
         elif patch[1] == -1:
-            brushBg, brushFg, pen = self._brushes[1], self._brushes[patch[0]], self._pens[1]
+            brushBg, brushFg, pen = self._brushAlpha, self._brushAlpha, self._penAlpha
         return (brushBg, brushFg, pen)
     # }}}
     # {{{ _getCharPatchColours(self, patch)
     def _getCharPatchColours(self, patch):
         if (patch[0] != -1) and (patch[1] != -1):
-            brushBg, brushFg, pen = self._brushes[patch[1]], self._brushes[patch[0]], self._pens[patch[0]]
+            brushBg, brushFg, pen = self._brushes[patch[1]], self._brushes[patch[1]], self._pens[patch[1]]
         elif (patch[0] == -1) and (patch[1] == -1):
-            brushBg, brushFg, pen = self._brushes[1], self._brushes[1], self._pens[1]
+            brushBg, brushFg, pen = self._brushAlpha, self._brushAlpha, self._penAlpha
         elif patch[0] == -1:
             brushBg, brushFg, pen = self._brushes[patch[1]], self._brushes[patch[1]], self._pens[patch[1]]
         elif patch[1] == -1:
-            brushBg, brushFg, pen = self._brushes[1], self._brushes[patch[0]], self._pens[1]
+            brushBg, brushFg, pen = self._brushAlpha, self._brushAlpha, self._penAlpha
         return (brushBg, brushFg, pen)
     # }}}
     # {{{ _initBrushesAndPens(self)
@@ -89,6 +89,8 @@ class GuiCanvasWxBackend():
         for mircColour in range(len(Colours)):
             self._brushes[mircColour] = wx.Brush(wx.Colour(Colours[mircColour][:4]), wx.BRUSHSTYLE_SOLID)
             self._pens[mircColour] = wx.Pen(wx.Colour(Colours[mircColour][:4]), 1)
+        self._brushAlpha = wx.Brush(wx.Colour(Colours[14][:4]), wx.BRUSHSTYLE_SOLID)
+        self._penAlpha = wx.Pen(wx.Colour(Colours[14][:4]), 1)
         self._lastBrushBg, self._lastBrushFg, self._lastPen = None, None, None
     # }}}
     # {{{ _setBrushDc(self, brushBg, brushFg, dc, pen)
@@ -114,7 +116,10 @@ class GuiCanvasWxBackend():
         point = [m - n for m, n in zip(patch[:2], viewRect)]
         if [(c >= 0) and (c < s) for c, s in zip(point, self.canvasSize)] == [True, True]:
             if patch[5] == " ":
-                self._drawBrushPatch(eventDc, patch[2:], point)
+                if patch[3] == -1:
+                    self._drawCharPatch(eventDc, [*patch[2:-1], "░"], point)
+                else:
+                    self._drawBrushPatch(eventDc, patch[2:], point)
             else:
                 self._drawCharPatch(eventDc, patch[2:], point)
             return True
