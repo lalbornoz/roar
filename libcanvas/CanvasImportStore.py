@@ -24,7 +24,7 @@ class CanvasImportStore():
 
     # {{{ importAnsiBuffer(self, inBuffer, encoding="cp437", width=None)
     def importAnsiBuffer(self, inBuffer, encoding="cp437", width=None):
-        curBg, curBgAnsi, curBoldAnsi, curFg, curFgAnsi = 1, 30, False, 15, 37
+        curBg, curBgAnsi, curBoldAnsi, curFg, curFgAnsi = -1, 30, False, 15, 37
         done, outMap, outMaxCols = False, [[]], 0
         inBufferData = inBuffer.decode(encoding)
         inBufferChar, inBufferCharMax = 0, len(inBufferData)
@@ -40,7 +40,7 @@ class CanvasImportStore():
                         newBg, newFg = -1, -1
                         for ansiCode in [int(c) for c in m[1][:-1].split(";")]:
                             if ansiCode == 0:
-                                curBgAnsi, curBoldAnsi, curFgAnsi, newBg, newFg = 30, False, 37, 1, 15
+                                curBgAnsi, curBoldAnsi, curFgAnsi, newBg, newFg = 30, False, 37, -1, 15
                             elif ansiCode == 1:
                                 curBoldAnsi, newFg = True, AnsiFgBoldToMiRCARTColours[curFgAnsi]
                             elif ansiCode == 2:
@@ -69,7 +69,7 @@ class CanvasImportStore():
         or ((len(outMap) == 1) and len(outMap[0])):
             for numRow in range(len(outMap)):
                 for numCol in range(len(outMap[numRow]), outMaxCols):
-                    outMap[numRow].append([curFg, curBg, self._CellState.CS_NONE, " "])
+                    outMap[numRow].append([15, -1, self._CellState.CS_NONE, " "])
             self.inSize, self.outMap = [outMaxCols, len(outMap)], outMap
             return (True, None)
         else:
@@ -95,7 +95,7 @@ class CanvasImportStore():
     def importTextBuffer(self, inFile):
         inLine, outMap, outMaxCols = inFile.readline(), [], 0
         while inLine:
-            inCellState, inCurCol, inCurColours, inMaxCol = self._CellState.CS_NONE, 0, (15, 1), len(inLine); outMap.append([]);
+            inCellState, inCurCol, inCurColours, inMaxCol = self._CellState.CS_NONE, 0, (15, -1), len(inLine); outMap.append([]);
             while inCurCol < inMaxCol:
                 inChar = inLine[inCurCol]
                 if inChar in set("\r\n"):
@@ -110,14 +110,14 @@ class CanvasImportStore():
                         elif (m[2] != None) and (m[3] == None):
                             inCurColours = (int(m[2]), int(inCurColours[1]))
                         else:
-                            inCurColours = (15, 1)
+                            inCurColours = (15, -1)
                         inCurCol += len(m[0])
                     else:
-                        inCurColours = (15, 1); inCurCol += 1;
+                        inCurColours = (15, -1); inCurCol += 1;
                 elif inChar == "\u0006":
                     inCellState = self._flipCellStateBit(self._CellState.CS_ITALIC, inCellState); inCurCol += 1;
                 elif inChar == "\u000f":
-                    inCellState |= self._CellState.CS_NONE; inCurColours = (15, 1); inCurCol += 1;
+                    inCellState |= self._CellState.CS_NONE; inCurColours = (15, -1); inCurCol += 1;
                 elif inChar == "\u0016":
                     inCurColours = (inCurColours[1], inCurColours[0]); inCurCol += 1;
                 elif inChar == "\u001f":
@@ -127,6 +127,9 @@ class CanvasImportStore():
             inLine, outMaxCols = inFile.readline(), max(outMaxCols, len(outMap[-1]))
         if (len(outMap) > 1)    \
         or ((len(outMap) == 1) and len(outMap[0])):
+            for numRow in range(len(outMap)):
+                for numCol in range(len(outMap[numRow]), outMaxCols):
+                    outMap[numRow].append([15, -1, self._CellState.CS_NONE, " "])
             self.inSize, self.outMap = [outMaxCols, len(outMap)], outMap
             return (True, None)
         else:
