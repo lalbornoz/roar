@@ -95,7 +95,7 @@ class RoarCanvasCommandsEdit():
     # {{{ canvasColourAlpha(self, f, idx)
     @GuiSelectDecorator(0, "Transparent colour", "Transparent colour", None, None, False)
     def canvasColourAlpha(self, f, idx):
-        def canvasColourAlpha_(self, event):
+        def canvasColourAlpha_(event):
             if event.GetEventType() == wx.wxEVT_TOOL:
                 self.parentCanvas.brushColours[0] = -1
             elif event.GetEventType() == wx.wxEVT_TOOL_RCLICKED:
