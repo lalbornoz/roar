@@ -44,9 +44,13 @@ class GuiCanvasWxBackend():
         fontDc = wx.MemoryDC(); fontDc.SelectObject(fontBitmap);
         fontDc.SetTextForeground(wx.Colour(Colours[patch[0]][:4]))
         fontDc.SetTextBackground(wx.Colour(Colours[patch[1]][:4]))
-        fontDc.SetBrush(brushBg); fontDc.SetBackground(brushBg); fontDc.SetPen(pen);
-        fontDc.SetFont(self._font)
-        fontDc.DrawRectangle(0, 0, *self.cellSize); fontDc.DrawText(patch[3], 0, 0);
+        fontDc.SetBrush(brushBg); fontDc.SetPen(self._pens[patch[1]]);
+        fontDc.DrawRectangle(0, 0, *self.cellSize)
+        fontDc.SetBackground(brushBg); fontDc.SetPen(pen); fontDc.SetFont(self._font);
+        if patch[3] == "_":
+            fontDc.DrawLine(0, self.cellSize[1] - 1, self.cellSize[0], self.cellSize[1] - 1)
+        else:
+            fontDc.DrawText(patch[3], 0, 0)
         eventDc.Blit(*absPoint, *self.cellSize, fontDc, 0, 0)
     # }}}
     # {{{ _finiBrushesAndPens(self)
@@ -58,7 +62,7 @@ class GuiCanvasWxBackend():
     # {{{ _getBrushPatchColours(self, patch)
     def _getBrushPatchColours(self, patch):
         if (patch[0] != -1) and (patch[1] != -1):
-            brushBg, brushFg, pen = self._brushes[patch[0]], self._brushes[patch[1]], self._pens[patch[1]]
+            brushBg, brushFg, pen = self._brushes[patch[1]], self._brushes[patch[1]], self._pens[patch[1]]
         elif (patch[0] == -1) and (patch[1] == -1):
             brushBg, brushFg, pen = self._brushes[1], self._brushes[1], self._pens[1]
         elif patch[0] == -1:
@@ -70,7 +74,7 @@ class GuiCanvasWxBackend():
     # {{{ _getCharPatchColours(self, patch)
     def _getCharPatchColours(self, patch):
         if (patch[0] != -1) and (patch[1] != -1):
-            brushBg, brushFg, pen = self._brushes[patch[1]], self._brushes[patch[0]], self._pens[patch[1]]
+            brushBg, brushFg, pen = self._brushes[patch[1]], self._brushes[patch[0]], self._pens[patch[0]]
         elif (patch[0] == -1) and (patch[1] == -1):
             brushBg, brushFg, pen = self._brushes[1], self._brushes[1], self._pens[1]
         elif patch[0] == -1:
