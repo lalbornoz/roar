@@ -71,7 +71,11 @@ class RoarCanvasWindow(GuiWindow):
     # }}}
     # {{{ dispatchDeltaPatches(self, deltaPatches)
     def dispatchDeltaPatches(self, deltaPatches):
-        eventDc = self.backend.getDeviceContext(self.GetClientSize(), self, self.GetViewStart())
+        viewRect = self.GetViewStart()
+        eventDc = self.backend.getDeviceContext(self.GetClientSize(), self, viewRect)
+        if self.canvas.dirtyCursor:
+            self.backend.drawCursorMaskWithJournal(self.canvas.journal, eventDc, viewRect)
+            self.canvas.dirtyCursor = False
         for patch in deltaPatches:
             if patch == None:
                 continue
