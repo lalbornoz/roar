@@ -11,7 +11,7 @@ class ToolText(Tool):
     name = "Text"
 
     #
-    # onKeyboardEvent(self, brushColours, brushSize, dispatchFn, eventDc, keyChar, keyModifiers, mapPoint, viewRect)
+    # onKeyboardEvent(self, brushColours, brushSize, canvas, dispatchFn, eventDc, keyChar, keyModifiers, mapPoint, viewRect)
     def onKeyboardEvent(self, brushColours, brushSize, canvas, dispatchFn, eventDc, keyChar, keyModifiers, mapPoint, viewRect):
         if keyModifiers in (wx.MOD_NONE, wx.MOD_SHIFT):
             rc, dirty = True, True
@@ -29,7 +29,7 @@ class ToolText(Tool):
         return rc, dirty
 
     #
-    # onMouseEvent(self, brushColours, brushSize, dispatchFn, eventDc, mapPoint, mouseDragging, mouseLeftDown, mouseRightDown, viewRect)
+    # onMouseEvent(self, brushColours, brushSize, canvas, dispatchFn, eventDc, mapPoint, mouseDragging, mouseLeftDown, mouseRightDown, viewRect)
     def onMouseEvent(self, brushColours, brushSize, canvas, dispatchFn, eventDc, mapPoint, mouseDragging, mouseLeftDown, mouseRightDown, viewRect):
         if mouseLeftDown or mouseRightDown:
             self.textPos = list(mapPoint)
