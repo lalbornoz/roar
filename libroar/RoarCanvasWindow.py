@@ -5,6 +5,33 @@
 #
 
 from GuiWindow import GuiWindow
+from ToolObject import ToolObject
+import json, wx, sys
+
+class RoarCanvasWindowDropTarget(wx.TextDropTarget):
+    # {{{ OnDropText(self, x, y, data)
+    def OnDropText(self, x, y, data):
+        rc = False
+        try:
+            dropMap, dropSize = json.loads(data)
+            viewRect = self.parent.GetViewStart()
+            rectX, rectY = x - (x % self.parent.backend.cellSize[0]), y - (y % self.parent.backend.cellSize[1])
+            mapX, mapY = int(rectX / self.parent.backend.cellSize[0] if rectX else 0), int(rectY / self.parent.backend.cellSize[1] if rectY else 0)
+            mapPoint = [m + n for m, n in zip((mapX, mapY), viewRect)]
+            self.parent.commands.lastTool, self.parent.commands.currentTool = self.parent.commands.currentTool, ToolObject(self.parent.canvas, mapPoint, dropMap, dropSize)
+            self.parent.commands.update(toolName=self.parent.commands.currentTool.name)
+            eventDc = self.parent.backend.getDeviceContext(self.parent.GetClientSize(), self.parent, viewRect)
+            self.parent.applyTool(eventDc, True, None, None, self.parent.brushPos, False, False, False, self.parent.commands.currentTool, viewRect)
+            rc = True
+        except:
+            with wx.MessageDialog(self.parent, "Error: {}".format(sys.exc_info()[1]), "", wx.OK | wx.OK_DEFAULT) as dialog:
+                dialogChoice = dialog.ShowModal()
+        return rc
+    # }}}
+    # {{{ __init__(self, parent)
+    def __init__(self, parent):
+        super().__init__(); self.parent = parent;
+    # }}}
 
 class RoarCanvasWindow(GuiWindow):
     # {{{ _drawPatch(self, eventDc, isCursor, patch, viewRect)
@@ -34,6 +61,9 @@ class RoarCanvasWindow(GuiWindow):
         else:
             self.commands.update(cellPos=mapPoint if mapPoint else self.brushPos)
         self.canvas.journal.end()
+        if rc and (tool.__class__ == ToolObject) and (tool.toolState == tool.TS_NONE):
+            self.commands.currentTool, self.commands.lastTool = self.commands.lastTool, self.commands.currentTool
+            self.commands.update(toolName=self.commands.currentTool.name)
         return rc
     # }}}
     # {{{ dispatchDeltaPatches(self, deltaPatches)
@@ -125,5 +155,7 @@ class RoarCanvasWindow(GuiWindow):
         super().__init__(parent, pos, scrollStep, [w * h for w, h in zip(cellSize, size)])
         self.backend, self.canvas, self.cellSize, self.commands, self.parentFrame = backend(self.size, cellSize), canvas, cellSize, commands(self, parentFrame), parentFrame
         self.brushColours, self.brushPos, self.brushSize, self.dirty = [4, 1], [0, 0], [1, 1], False
+        self.dropTarget = RoarCanvasWindowDropTarget(self)
+        self.SetDropTarget(self.dropTarget)
 
 # vim:expandtab foldmethod=marker sw=4 ts=4 tw=120

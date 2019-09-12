@@ -55,9 +55,9 @@ class GuiWindow(wx.ScrolledWindow):
     # }}}
 
     #
-    # __init__(self, parent, pos, scrollStep, size): initialisation method
-    def __init__(self, parent, pos, scrollStep, size):
-        super().__init__(parent, pos=pos, size=size)
+    # __init__(self, parent, pos, scrollStep, size, style=0): initialisation method
+    def __init__(self, parent, pos, scrollStep, size, style=0):
+        super().__init__(parent, pos=pos, size=size, style=style)
         self.pos, self.scrollFlag, self.scrollStep, self.size = pos, False, scrollStep, size
         for eventType, f in (
                 (wx.EVT_CHAR, self.onKeyboardInput), (wx.EVT_CLOSE, self.onClose), (wx.EVT_LEAVE_WINDOW, self.onLeaveWindow),
