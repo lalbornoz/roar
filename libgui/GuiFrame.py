@@ -175,4 +175,10 @@ class GuiFrame(wx.Frame):
         for event, f in ((wx.EVT_CHAR, self.onChar), (wx.EVT_MENU, self.onMenu), (wx.EVT_MOUSEWHEEL, self.onMouseWheel)):
             self.Bind(event, f)
 
+class GuiMiniFrame(wx.MiniFrame):
+    #
+    # __init__(self, parent, size, title, pos=wx.DefaultPosition): initialisation method
+    def __init__(self, parent, size, title, pos=wx.DefaultPosition):
+        super().__init__(parent, id=wx.ID_ANY, pos=pos, size=size, title=title)
+
 # vim:expandtab foldmethod=marker sw=4 ts=4 tw=120

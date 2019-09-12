@@ -8,6 +8,20 @@ from GuiFrame import GuiCommandDecorator, GuiCommandListDecorator, GuiSelectDeco
 import wx
 
 class RoarCanvasCommandsEdit():
+    # {{{ canvasAssetsWindowHide(self, event)
+    @GuiCommandDecorator("Hide assets window", "Hide assets window", None, None, False)
+    def canvasAssetsWindowHide(self, event):
+        self.parentFrame.assetsWindow.Show(False)
+        self.parentFrame.menuItemsById[self.canvasAssetsWindowHide.attrDict["id"]].Enable(False)
+        self.parentFrame.menuItemsById[self.canvasAssetsWindowShow.attrDict["id"]].Enable(True)
+    # }}}
+    # {{{ canvasAssetsWindowShow(self, event)
+    @GuiCommandDecorator("Show assets window", "Show assets window", None, None, False)
+    def canvasAssetsWindowShow(self, event):
+        self.parentFrame.assetsWindow.Show(True)
+        self.parentFrame.menuItemsById[self.canvasAssetsWindowHide.attrDict["id"]].Enable(True)
+        self.parentFrame.menuItemsById[self.canvasAssetsWindowShow.attrDict["id"]].Enable(False)
+    # }}}
     # {{{ canvasBrush(self, f, idx)
     @GuiSelectDecorator(0, "Solid brush", "Solid brush", None, None, True)
     def canvasBrush(self, f, idx):
@@ -150,7 +164,8 @@ class RoarCanvasCommandsEdit():
                 self.canvasCanvasSize(self.canvasCanvasSize, 2, True), self.canvasCanvasSize(self.canvasCanvasSize, 2, False), NID_MENU_SEP,
                 self.canvasBrushSize(self.canvasBrushSize, 0, True), self.canvasBrushSize(self.canvasBrushSize, 0, False), self.canvasBrushSize(self.canvasBrushSize, 1, True), self.canvasBrushSize(self.canvasBrushSize, 1, False), NID_MENU_SEP,
                 self.canvasBrushSize(self.canvasBrushSize, 2, True), self.canvasBrushSize(self.canvasBrushSize, 2, False), NID_MENU_SEP,
-                self.canvasBrush(self.canvasBrush, 0),
+                self.canvasBrush(self.canvasBrush, 0), NID_MENU_SEP,
+                self.canvasAssetsWindowHide, self.canvasAssetsWindowShow,
             ),
         )
         self.toolBars = ()

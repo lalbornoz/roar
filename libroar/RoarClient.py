@@ -7,6 +7,7 @@
 from Canvas import Canvas
 from GuiCanvasWxBackend import GuiCanvasWxBackend
 from GuiFrame import GuiFrame, NID_TOOLBAR_HSEP
+from RoarAssetsWindow import RoarAssetsWindow
 from RoarCanvasCommands import RoarCanvasCommands
 from RoarCanvasWindow import RoarCanvasWindow
 
@@ -51,5 +52,7 @@ class RoarClient(GuiFrame):
         self.canvasPanel.commands.canvasTool(self.canvasPanel.commands.canvasTool, 5)(None)
         self.canvasPanel.commands.update(brushSize=self.canvasPanel.brushSize, colours=self.canvasPanel.brushColours)
         self.addWindow(self.canvasPanel, expand=True)
+        self.assetsWindow = RoarAssetsWindow(GuiCanvasWxBackend, defaultCellSize, self)
+        self.canvasPanel.commands.canvasAssetsWindowShow(None)
 
 # vim:expandtab foldmethod=marker sw=4 ts=4 tw=120
