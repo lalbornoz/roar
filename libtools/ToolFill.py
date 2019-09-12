@@ -10,7 +10,7 @@ class ToolFill(Tool):
     name = "Fill"
 
     #
-    # onMouseEvent(self, brushColours, brushSize, dispatchFn, eventDc, mapPoint, mouseDragging, mouseLeftDown, mouseRightDown, viewRect)
+    # onMouseEvent(self, brushColours, brushSize, canvas, dispatchFn, eventDc, mapPoint, mouseDragging, mouseLeftDown, mouseRightDown, viewRect)
     def onMouseEvent(self, brushColours, brushSize, canvas, dispatchFn, eventDc, mapPoint, mouseDragging, mouseLeftDown, mouseRightDown, viewRect):
         dirty, pointsDone, pointStack, testColour, = False, [], [list(mapPoint)], canvas.map[mapPoint[1]][mapPoint[0]][0:2]
         if mouseLeftDown or mouseRightDown:
