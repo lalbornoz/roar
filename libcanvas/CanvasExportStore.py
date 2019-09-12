@@ -166,7 +166,7 @@ class CanvasExportStore():
     def exportTextBuffer(self, canvasMap, canvasSize):
         outBuffer = ""
         for canvasRow in range(canvasSize[1]):
-            canvasLastColours = [15, 1]
+            canvasLastColours = [15, -1]
             for canvasCol in range(canvasSize[0]):
                 canvasColColours = canvasMap[canvasRow][canvasCol][0:2]
                 canvasColText = canvasMap[canvasRow][canvasCol][3]
@@ -176,12 +176,9 @@ class CanvasExportStore():
                 and  (canvasColColours[1] != canvasLastColours[1]):
                     if   (canvasColColours[0] == -1)                    \
                     and  (canvasColColours[1] == -1):
-                        outBuffer += "\u0003 "
+                        outBuffer += "\u000f"
                     elif canvasColColours[1] == -1:
                         outBuffer += "\u0003\u0003{}".format(canvasColColours[0])
-                    elif (canvasColColours[0] == canvasLastColours[1])  \
-                    and  (canvasColColours[1] == canvasLastColours[0]):
-                        outBuffer += "\u0016"
                     else:
                         outBuffer += "\u0003{},{}".format(canvasColColours[0], canvasColColours[1])
                     canvasLastColours = canvasColColours
@@ -192,7 +189,10 @@ class CanvasExportStore():
                         outBuffer += "\u0003{},{}".format(canvasLastColours[0], canvasColColours[1])
                     canvasLastColours[1] = canvasColColours[1]
                 elif canvasColColours[0] != canvasLastColours[0]:
-                    outBuffer += "\u0003{}".format(canvasColColours[0])
+                    if canvasColColours[0] == -1:
+                        outBuffer += "\u000f"
+                    else:
+                        outBuffer += "\u0003{}".format(canvasColColours[0])
                     canvasLastColours[0] = canvasColColours[0]
                 outBuffer += canvasColText
             outBuffer += "\n"
