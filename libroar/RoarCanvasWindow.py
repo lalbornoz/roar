@@ -47,6 +47,8 @@ class RoarCanvasWindow(GuiWindow):
 
     # {{{ applyTool(self, eventDc, eventMouse, keyChar, keyModifiers, mapPoint, mouseDragging, mouseLeftDown, mouseRightDown, tool, viewRect)
     def applyTool(self, eventDc, eventMouse, keyChar, keyModifiers, mapPoint, mouseDragging, mouseLeftDown, mouseRightDown, tool, viewRect):
+        if mapPoint != None:
+            mapPoint = [a + b for a, b in zip(mapPoint, viewRect)]
         dirty, self.canvas.dirtyCursor, rc = False, False, False
         self.canvas.journal.begin()
         if eventMouse:

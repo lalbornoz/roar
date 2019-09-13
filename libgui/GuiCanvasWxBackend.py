@@ -22,11 +22,8 @@ class GuiBufferedDC(wx.MemoryDC):
         viewRect = [m * n for m, n in zip(backend.cellSize, viewRect)]
         viewSize = [min(m, n) for m, n in zip(canvasSize, clientSize)]
         viewSize = [m * n for m, n in zip(backend.cellSize, viewSize)]
-        bitmap = wx.Bitmap(viewSize); self.SelectObject(bitmap);
-        bufferDc = wx.MemoryDC(); bufferDc.SelectObject(buffer);
-        self.Blit(0, 0, *viewSize, bufferDc, *viewRect)
-        bufferDc.SelectObject(wx.NullBitmap)
-        self.dc, self.viewSize = dc, viewSize
+        self.SelectObject(buffer); self.SetDeviceOrigin(*viewRect);
+        self.dc, self.viewRect, self.viewSize = dc, viewRect, viewSize
     # }}}
 
 class GuiCanvasWxBackend():
