@@ -194,7 +194,7 @@ class RoarCanvasCommandsFile():
     # }}}
     # {{{ canvasSave(self, event)
     @GuiCommandDecorator("Save", "&Save", ["", wx.ART_FILE_SAVE], [wx.ACCEL_CTRL, ord("S")], None)
-    def canvasSave(self, event):
+    def canvasSave(self, event, newDirty=False):
         if self.canvasPathName == None:
             if self.canvasSaveAs(event) == False:
                 return False
@@ -203,7 +203,8 @@ class RoarCanvasCommandsFile():
                 self.parentCanvas.SetCursor(wx.Cursor(wx.CURSOR_WAIT))
                 self.parentCanvas.canvas.exportStore.exportTextFile(self.parentCanvas.canvas.map, self.parentCanvas.canvas.size, outFile)
                 self.parentCanvas.SetCursor(wx.Cursor(wx.NullCursor))
-                self.parentCanvas.dirty = False
+                if self.parentCanvas.dirty != newDirty:
+                    self.parentCanvas.dirty = newDirty
                 self.update(dirty=self.parentCanvas.dirty)
             return True
         except IOError as error:
@@ -217,7 +218,7 @@ class RoarCanvasCommandsFile():
                 return False
             else:
                 self.canvasPathName = dialog.GetPath()
-                return self.canvasSave(event)
+                return self.canvasSave(event, newDirty=True)
     # }}}
 
     #
