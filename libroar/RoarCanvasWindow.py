@@ -7,6 +7,7 @@
 from GuiWindow import GuiWindow
 from ToolObject import ToolObject
 import json, wx, sys
+import time
 
 class RoarCanvasWindowDropTarget(wx.TextDropTarget):
     # {{{ OnDropText(self, x, y, data)
@@ -51,11 +52,11 @@ class RoarCanvasWindow(GuiWindow):
         if eventMouse:
             if  ((mapPoint[0] < self.canvas.size[0])    \
             and  (mapPoint[1] < self.canvas.size[1]))   \
-            and ((self.dirtyLastCell == None) or (self.dirtyLastCell != mapPoint)):
+            and ((self.lastCellState == None)           \
+            or   (self.lastCellState != [list(mapPoint), mouseDragging, mouseLeftDown, mouseRightDown, list(viewRect)])):
                 self.brushPos = list(mapPoint)
+                self.lastCellState = [list(mapPoint), mouseDragging, mouseLeftDown, mouseRightDown, list(viewRect)]
                 rc, dirty = tool.onMouseEvent(self.brushColours, self.brushSize, self.canvas, self.dispatchPatchSingle, eventDc, self.brushPos, mouseDragging, mouseLeftDown, mouseRightDown, viewRect)
-                if dirty:
-                    self.dirtyLastCell = list(mapPoint)
         else:
             rc, dirty = tool.onKeyboardEvent(self.brushColours, self.brushSize, self.canvas, self.dispatchPatchSingle, eventDc, keyChar, keyModifiers, self.brushPos, viewRect)
         if dirty:
@@ -131,13 +132,13 @@ class RoarCanvasWindow(GuiWindow):
     # }}}
     # {{{ onEnterWindow(self, event)
     def onEnterWindow(self, event):
-        self.dirtyLastCell = None
+        self.lastCellState = None
     # }}}
     # {{{ onLeaveWindow(self, event)
     def onLeaveWindow(self, event):
         eventDc = self.backend.getDeviceContext(self.GetClientSize(), self, self.GetViewStart())
         self.backend.drawCursorMaskWithJournal(self.canvas.journal, eventDc, self.GetViewStart())
-        self.dirtyLastCell = None
+        self.lastCellState = None
     # }}}
     # {{{ onMouseInput(self, event)
     def onMouseInput(self, event):
@@ -166,7 +167,7 @@ class RoarCanvasWindow(GuiWindow):
     def __init__(self, backend, canvas, cellSize, commands, parent, parentFrame, pos, scrollStep, size):
         super().__init__(parent, pos, scrollStep, [w * h for w, h in zip(cellSize, size)])
         self.backend, self.canvas, self.cellSize, self.commands, self.parentFrame = backend(self.size, cellSize), canvas, cellSize, commands(self, parentFrame), parentFrame
-        self.brushColours, self.brushPos, self.brushSize, self.dirty, self.dirtyLastCell = [4, 1], [0, 0], [1, 1], False, None
+        self.brushColours, self.brushPos, self.brushSize, self.dirty, self.lastCellState = [4, 1], [0, 0], [1, 1], False, None
         self.dropTarget = RoarCanvasWindowDropTarget(self)
         self.SetDropTarget(self.dropTarget)
 
