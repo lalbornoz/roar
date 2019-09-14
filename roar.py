@@ -9,13 +9,18 @@ import os, sys
     ["libcanvas", "libgui", "libroar", "librtl", "libtools"]]
 
 from RoarClient import RoarClient
+from RtlPlatform import getLocalConfPathName
 import wx
 
 #
 # Entry point
 def main(*argv):
+    localConfDirName = getLocalConfPathName()
+    if not os.path.exists(localConfDirName):
+        os.makedirs(localConfirName)
     wxApp, roarClient = wx.App(False), RoarClient(None)
     argv0, argv = argv[0], argv[1:]
+    roarClient.canvasPanel.commands._loadRecent()
     if len(argv) >= 1:
         if (len(argv) >= 2) and (argv[1].endswith(".lst")):
             roarClient.assetsWindow._load_list(argv[1])
@@ -24,6 +29,7 @@ def main(*argv):
         if rc:
             roarClient.canvasPanel.update(roarClient.canvasPanel.canvas.importStore.inSize, False, roarClient.canvasPanel.canvas.importStore.outMap)
             roarClient.canvasPanel.commands.update(pathName=argv[0], undoLevel=-1)
+            roarClient.canvasPanel.commands._pushRecent(argv[0])
         else:
             print("error: {}".format(error), file=sys.stderr)
     wxApp.MainLoop()
