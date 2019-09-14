@@ -150,6 +150,22 @@ class RoarCanvasWindow(GuiWindow):
         if not self.applyTool(eventDc, True, None, None, mapPoint, mouseDragging, mouseLeftDown, mouseRightDown, self.commands.currentTool, viewRect):
             event.Skip()
     # }}}
+    # {{{ onMouseWheel(self, event)
+    def onMouseWheel(self, event):
+        if event.GetModifiers() == wx.MOD_CONTROL:
+            cd = +1 if event.GetWheelRotation() >= event.GetWheelDelta() else -1
+            newCellSize = [cs + cd for cs in self.backend.cellSize]
+            if (newCellSize[0] > 0) and (newCellSize[1] > 0):
+                self.backend.cellSize = newCellSize
+                super().resize([a * b for a, b in zip(self.canvas.size, self.backend.cellSize)])
+                self.backend.resize(self.canvas.size, self.backend.cellSize)
+                viewRect = self.GetViewStart(); eventDc = self.backend.getDeviceContext(self.GetClientSize(), self, viewRect);
+                for numRow in range(self.canvas.size[1]):
+                    for numCol in range(len(self.canvas.map[numRow])):
+                        self._drawPatch(eventDc, False, [numCol, numRow, *self.canvas.map[numRow][numCol]], viewRect)
+        else:
+            event.Skip()
+    # }}}
     # {{{ onPaint(self, event)
     def onPaint(self, event):
         self.backend.onPaint(self.GetClientSize(), self, self.GetViewStart())
@@ -170,5 +186,6 @@ class RoarCanvasWindow(GuiWindow):
         self.brushColours, self.brushPos, self.brushSize, self.dirty, self.lastCellState = [4, 1], [0, 0], [1, 1], False, None
         self.dropTarget = RoarCanvasWindowDropTarget(self)
         self.SetDropTarget(self.dropTarget)
+        self.Bind(wx.EVT_MOUSEWHEEL, self.onMouseWheel)
 
 # vim:expandtab foldmethod=marker sw=4 ts=4 tw=120

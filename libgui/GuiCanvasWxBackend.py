@@ -153,9 +153,9 @@ class GuiCanvasWxBackend():
             self.canvasBitmap.Destroy(); self.canvasBitmap = newBitmap;
         self.canvasSize, self.cellSize = canvasSize, cellSize
         if platform.system() == "Windows":
-            self._font = wx.TheFontList.FindOrCreateFont(8, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, False, self.fontName)
+            self._font = wx.TheFontList.FindOrCreateFont(cellSize[0] + 1, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, False, self.fontName)
         else:
-            self._font = wx.Font(8, wx.FONTFAMILY_TELETYPE, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL)
+            self._font = wx.Font(cellSize[0] + 1, wx.FONTFAMILY_TELETYPE, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL)
     # }}}
     # {{{ xlateEventPoint(self, event, eventDc, viewRect)
     def xlateEventPoint(self, event, eventDc, viewRect):
