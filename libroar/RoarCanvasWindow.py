@@ -156,11 +156,9 @@ class RoarCanvasWindow(GuiWindow):
     # }}}
     # {{{ onScroll(self, event)
     def onScroll(self, event):
-        if self.canvas.dirtyCursor:
-            viewRect = self.GetViewStart()
-            eventDc = self.backend.getDeviceContext(self.GetClientSize(), self, viewRect)
-            self.backend.drawCursorMaskWithJournal(self.canvas.journal, eventDc, viewRect)
-            self.canvas.dirtyCursor = False
+        viewRect = self.GetViewStart()
+        eventDc = self.backend.getDeviceContext(self.GetClientSize(), self, viewRect)
+        self.backend.drawCursorMaskWithJournal(self.canvas.journal, eventDc, viewRect)
         event.Skip()
     # }}}
 
