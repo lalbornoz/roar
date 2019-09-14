@@ -44,10 +44,13 @@ class RoarCanvasCommandsFile():
     # {{{ _importFile(self, f, newDirty, wildcard)
     def _importFile(self, f, newDirty, wildcard):
         with wx.FileDialog(self.parentCanvas, "Open", os.getcwd(), "", wildcard, wx.FD_OPEN) as dialog:
+            if self.lastDir != None:
+                dialog.SetDirectory(self.lastDir)
             if dialog.ShowModal() == wx.ID_CANCEL:
                 return False
             elif self._promptSaveChanges():
-                return self._import(f, newDirty, dialog.GetPath())
+                pathName = dialog.GetPath(); self.lastDir = os.path.dirname(pathName);
+                return self._import(f, newDirty, pathName)
     # }}}
     # {{{ _promptSaveChanges(self)
     def _promptSaveChanges(self):
@@ -77,10 +80,12 @@ class RoarCanvasCommandsFile():
     @GuiCommandDecorator("Export as ANSI...", "Export as ANSI...", None, None, None)
     def canvasExportAsAnsi(self, event):
         with wx.FileDialog(self.parentFrame, "Save As...", os.getcwd(), "", "ANSI files (*.ans;*.txt)|*.ans;*.txt|All Files (*.*)|*.*", wx.FD_SAVE|wx.FD_OVERWRITE_PROMPT) as dialog:
+            if self.lastDir != None:
+                dialog.SetDirectory(self.lastDir)
             if dialog.ShowModal() == wx.ID_CANCEL:
                 return False
             else:
-                outPathName = dialog.GetPath()
+                outPathName = dialog.GetPath(); self.lastDir = os.path.dirname(outPathName);
                 self.parentCanvas.SetCursor(wx.Cursor(wx.CURSOR_WAIT))
                 with open(outPathName, "w", encoding="utf-8") as outFile:
                     self.parentCanvas.canvas.exportStore.exportAnsiFile(self.parentCanvas.canvas.map, self.parentCanvas.canvas.size, outFile)
@@ -91,10 +96,12 @@ class RoarCanvasCommandsFile():
     @GuiCommandDecorator("Export as PNG...", "Export as PN&G...", None, None, None)
     def canvasExportAsPng(self, event):
         with wx.FileDialog(self.parentFrame, "Save As...", os.getcwd(), "", "PNG (*.png)|*.png|All Files (*.*)|*.*", wx.FD_SAVE|wx.FD_OVERWRITE_PROMPT) as dialog:
+            if self.lastDir != None:
+                dialog.SetDirectory(self.lastDir)
             if dialog.ShowModal() == wx.ID_CANCEL:
                 return False
             else:
-                outPathName = dialog.GetPath()
+                outPathName = dialog.GetPath(); self.lastDir = os.path.dirname(outPathName);
                 self.parentCanvas.SetCursor(wx.Cursor(wx.CURSOR_WAIT))
                 self.parentCanvas.canvas.exportStore.exportBitmapToPngFile(self.parentCanvas.backend.canvasBitmap, outPathName, wx.BITMAP_TYPE_PNG)
                 self.parentCanvas.SetCursor(wx.Cursor(wx.NullCursor))
@@ -214,17 +221,19 @@ class RoarCanvasCommandsFile():
     @GuiCommandDecorator("Save As...", "Save &As...", ["", wx.ART_FILE_SAVE_AS], None, None)
     def canvasSaveAs(self, event):
         with wx.FileDialog(self.parentCanvas, "Save As", os.getcwd(), "", "mIRC art files (*.txt)|*.txt|All Files (*.*)|*.*", wx.FD_SAVE|wx.FD_OVERWRITE_PROMPT) as dialog:
+            if self.lastDir != None:
+                dialog.SetDirectory(self.lastDir)
             if dialog.ShowModal() == wx.ID_CANCEL:
                 return False
             else:
-                self.canvasPathName = dialog.GetPath()
+                self.canvasPathName = dialog.GetPath(); self.lastDir = os.path.dirname(self.canvasPathName);
                 return self.canvasSave(event, newDirty=True)
     # }}}
 
     #
     # __init__(self)
     def __init__(self):
-        self.imgurApiKey = ImgurApiKey.imgurApiKey if haveImgurApiKey else None
+        self.imgurApiKey, self.lastDir = ImgurApiKey.imgurApiKey if haveImgurApiKey else None, None
         self.menus = (
             ("&File",
                 self.canvasNew, self.canvasOpen, self.canvasSave, self.canvasSaveAs, NID_MENU_SEP,
