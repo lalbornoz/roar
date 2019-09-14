@@ -23,7 +23,7 @@ class RoarWindowAbout(wx.Dialog):
         logoPathName = logoPathNames[random.randint(0, len(logoPathNames) - 1)]
         self.logo = wx.StaticBitmap(self.panel, -1, wx.Bitmap(logoPathName))
 
-        self.title = wx.StaticText(self.panel, label="roar -- mIRC art editor for Windows && Linux\nGit revision __ROAR_RELEASE_GIT_SHORT_REV__\nhttps://www.github.com/lalbornoz/roar/\nCopyright (c) 2018, 2019 Lucio Andrés Illanes Albornoz <lucio@lucioillanes.de>", style=wx.ALIGN_CENTER)
+        self.title = wx.StaticText(self.panel, label="roar -- mIRC art editor for Windows && Linux\n__ROAR_RELEASE_VERSION__\nhttps://www.github.com/lalbornoz/roar/\nCopyright (c) 2018, 2019 Lucio Andrés Illanes Albornoz <lucio@lucioillanes.de>", style=wx.ALIGN_CENTER)
         self.title.SetFont(wx.Font(8, wx.DEFAULT, wx.NORMAL, wx.NORMAL, underline=False))
         labelsText = ["&roar!", "&ROAR!", "&roaaaaaaar!", "&ROAROARAOR", "_&ROAR_"]
         labelText = labelsText[random.randint(0, len(labelsText) - 1)]
