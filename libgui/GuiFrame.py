@@ -168,7 +168,7 @@ class GuiFrame(wx.Frame):
     def onMenu(self, event):
         eventId = event.GetId()
         if eventId in self.itemsById:
-            self.itemsById[eventId](event)
+            self.itemsById[eventId](event); wx.SafeYield();
         else:
             event.Skip()
     # }}}
