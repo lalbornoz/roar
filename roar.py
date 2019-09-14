@@ -15,7 +15,9 @@ import wx
 # Entry point
 def main(*argv):
     wxApp, roarClient = wx.App(False), RoarClient(None)
-    if (len(argv) > 1) and (len(argv[1]) > 0):
+    if len(argv) >= 1:
+        if argv[2].endswith(".lst"):
+            roarClient.assetsWindow._load_list(argv[2])
         roarClient.canvasPanel.commands.canvasPathName = argv[1]
         rc, error = roarClient.canvasPanel.canvas.importStore.importTextFile(argv[1])
         if rc:
