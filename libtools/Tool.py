@@ -4,7 +4,7 @@
 # Copyright (c) 2018, 2019 Lucía Andrea Illanes Albornoz <lucia@luciaillanes.de>
 #
 
-class Tool():
+class Tool(object):
     # {{{ onKeyboardEvent(self, brushColours, brushSize, canvas, dispatchFn, eventDc, keyChar, keyModifiers, mapPoint, viewRect)
     def onKeyboardEvent(self, brushColours, brushSize, canvas, dispatchFn, eventDc, keyChar, keyModifiers, mapPoint, viewRect):
         return False, False
