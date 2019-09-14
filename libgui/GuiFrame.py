@@ -39,6 +39,17 @@ def GuiSelectDecorator(idx, caption, label, icon, accel, initialState):
             return targetObject
     return GuiSelectDecoratorOuter
 # }}}
+# {{{ GuiSubMenuDecorator(targetObject)
+def GuiSubMenuDecorator(caption, label, icon, accel, initialState):
+    def GuiSubMenuDecoratorOuter(targetObject):
+        if callable(targetObject):
+            if not hasattr(targetObject, "attrDict"):
+                setattr(targetObject, "attrDict", [])
+            setattr(targetObject, "isSubMenu", True)
+            targetObject.attrDict = {"caption": caption, "label": label, "icon": icon, "accel": accel, "initialState": initialState, "id": None, "menu":None}
+            return targetObject
+    return GuiSubMenuDecoratorOuter
+# }}}
 
 #
 # Non-items (0xf000-0xffff)
@@ -99,6 +110,9 @@ class GuiFrame(wx.Frame):
                     self.itemsById[menuItem.attrDict["id"]] = menuItem
                     if hasattr(menuItem, "isSelect"):
                         menuItemWindow = menuWindow.AppendRadioItem(menuItem.attrDict["id"], menuItem.attrDict["label"], menuItem.attrDict["caption"])
+                    elif hasattr(menuItem, "isSubMenu"):
+                        menuItem.attrDict["menu"] = wx.Menu()
+                        menuItemWindow = menuWindow.AppendSubMenu(menuItem.attrDict["menu"], menuItem.attrDict["label"], menuItem.attrDict["caption"])
                     else:
                         menuItemWindow = menuWindow.Append(menuItem.attrDict["id"], menuItem.attrDict["label"], menuItem.attrDict["caption"])
                     if menuItem.attrDict["accel"] != None:

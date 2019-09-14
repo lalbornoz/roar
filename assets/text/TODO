@@ -13,8 +13,7 @@ High-priority list:
 1)  geometric primitives: arrow, circle, cloud/speech bubble, curve, heart, hexagon, line, pentagon, polygon, rhombus, triangle, square, star
 2)  region filters: crop, duplicate, erase, fill, invert, measure, pick, rotate, scale, select, shift, slice, tile, translate
 3)  text tool: a) allow navigating w/ cursor keys b) Unicode set key & GUI w/ MRU
-4)  GUI: {de,in}crease cell size
-5)  GUI: MRU {directories,files}
-6)  cleanup & refactor
+4)  GUI: {de,in}crease cell size on <Ctrl> <Mouse Wheel>
+5)  cleanup & refactor
 
 vim:ff=dos tw=0
