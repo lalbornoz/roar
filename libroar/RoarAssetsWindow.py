@@ -33,11 +33,14 @@ class RoarAssetsWindow(GuiMiniFrame):
     def _importFiles(self, f, wildcard):
         resultList = []
         with wx.FileDialog(self, "Load...", os.getcwd(), "", wildcard, wx.FD_MULTIPLE | wx.FD_OPEN) as dialog:
+            if self.lastDir != None:
+                dialog.SetDirectory(self.lastDir)
             if dialog.ShowModal() == wx.ID_CANCEL:
                 resultList += [[False, "(cancelled)", None, None, None, None]]
             else:
                 for pathName in dialog.GetPaths():
                     resultList += [self._import(f, pathName)]
+                    self.lastDir = os.path.dirname(pathName)
         return resultList
     # }}}
     # {{{ _load_list(self, pathName)
@@ -242,9 +245,11 @@ class RoarAssetsWindow(GuiMiniFrame):
     def onLoadList(self, event):
         rc = True
         with wx.FileDialog(self, "Load from list...", os.getcwd(), "", "List files (*.lst)|*.lst|Text files (*.txt)|*.txt|All Files (*.*)|*.*", wx.FD_OPEN) as dialog:
+            if self.lastDir != None:
+                dialog.SetDirectory(self.lastDir)
             if dialog.ShowModal() != wx.ID_CANCEL:
-                    pathName = dialog.GetPath()
-                    self._load_list(pathName)
+                pathName = dialog.GetPath(); self.lastDir = os.path.dirname(pathName);
+                self._load_list(pathName)
     # }}}
     # {{{ onRemove(self, event)
     def onRemove(self, event):
@@ -271,8 +276,11 @@ class RoarAssetsWindow(GuiMiniFrame):
         rc = True
         if len(self.canvasList):
             with wx.FileDialog(self, "Save as list...", os.getcwd(), "", "List files (*.lst)|*.lst|Text files (*.txt)|*.txt|All Files (*.*)|*.*", wx.FD_SAVE) as dialog:
+                if self.lastDir != None:
+                    dialog.SetDirectory(self.lastDir)
                 if dialog.ShowModal() != wx.ID_CANCEL:
-                    with open(dialog.GetPath(), "w") as fileObject:
+                    pathName = dialog.GetPath(); self.lastDir = os.path.dirname(pathName);
+                    with open(pathName, "w") as fileObject:
                         for pathName in [self.canvasList[k][1] for k in self.canvasList.keys()]:
                             print(pathName, file=fileObject)
                         rc = True
@@ -289,7 +297,7 @@ class RoarAssetsWindow(GuiMiniFrame):
         if pos == None:
             parentRect = parent.GetScreenRect(); pos = (parentRect.x + parentRect.width, parentRect.y);
         super().__init__(parent, size, title, pos=pos)
-        self.backend, self.canvasList = backend((0, 0), cellSize), {}
+        self.backend, self.canvasList, self.lastDir = backend((0, 0), cellSize), {}, None
         self.cellSize, self.currentIndex, self.leftDown, self.parent, self.scrollFlag = cellSize, None, False, parent, False
         self.Bind(wx.EVT_CHAR, self.onChar)
 
