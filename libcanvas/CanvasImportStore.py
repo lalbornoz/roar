@@ -93,47 +93,50 @@ class CanvasImportStore():
     # }}}
     # {{{ importTextBuffer(self, inFile)
     def importTextBuffer(self, inFile):
-        inLine, outMap, outMaxCols = inFile.readline(), [], 0
-        while inLine:
-            inCellState, inCurCol, inCurColours, inMaxCol = self._CellState.CS_NONE, 0, (15, -1), len(inLine); outMap.append([]);
-            while inCurCol < inMaxCol:
-                inChar = inLine[inCurCol]
-                if inChar in set("\r\n"):
-                    inCurCol += 1
-                elif inChar == "\u0002":
-                    inCellState = self._flipCellStateBit(self._CellState.CS_BOLD, inCellState); inCurCol += 1;
-                elif inChar == "\u0003":
-                    m = re.match("\u0003((1[0-5]|0?[0-9])?(?:,(1[0-5]|0?[0-9]))?)", inLine[inCurCol:])
-                    if m:
-                        if (m[2] != None) and (m[3] != None):
-                            inCurColours = (int(m[2]), int(m[3]))
-                        elif (m[2] != None) and (m[3] == None):
-                            inCurColours = (int(m[2]), int(inCurColours[1]))
+        try:
+            inLine, outMap, outMaxCols = inFile.readline(), [], 0
+            while inLine:
+                inCellState, inCurCol, inCurColours, inMaxCol = self._CellState.CS_NONE, 0, (15, -1), len(inLine); outMap.append([]);
+                while inCurCol < inMaxCol:
+                    inChar = inLine[inCurCol]
+                    if inChar in set("\r\n"):
+                        inCurCol += 1
+                    elif inChar == "\u0002":
+                        inCellState = self._flipCellStateBit(self._CellState.CS_BOLD, inCellState); inCurCol += 1;
+                    elif inChar == "\u0003":
+                        m = re.match("\u0003((1[0-5]|0?[0-9])?(?:,(1[0-5]|0?[0-9]))?)", inLine[inCurCol:])
+                        if m:
+                            if (m[2] != None) and (m[3] != None):
+                                inCurColours = (int(m[2]), int(m[3]))
+                            elif (m[2] != None) and (m[3] == None):
+                                inCurColours = (int(m[2]), int(inCurColours[1]))
+                            else:
+                                inCurColours = (15, -1)
+                            inCurCol += len(m[0])
                         else:
-                            inCurColours = (15, -1)
-                        inCurCol += len(m[0])
+                            inCurColours = (15, -1); inCurCol += 1;
+                    elif inChar == "\u0006":
+                        inCellState = self._flipCellStateBit(self._CellState.CS_ITALIC, inCellState); inCurCol += 1;
+                    elif inChar == "\u000f":
+                        inCellState |= self._CellState.CS_NONE; inCurColours = (15, -1); inCurCol += 1;
+                    elif inChar == "\u0016":
+                        inCurColours = (inCurColours[1], inCurColours[0]); inCurCol += 1;
+                    elif inChar == "\u001f":
+                        inCellState = self._flipCellStateBit(self._CellState.CS_UNDERLINE, inCellState); inCurCol += 1;
                     else:
-                        inCurColours = (15, -1); inCurCol += 1;
-                elif inChar == "\u0006":
-                    inCellState = self._flipCellStateBit(self._CellState.CS_ITALIC, inCellState); inCurCol += 1;
-                elif inChar == "\u000f":
-                    inCellState |= self._CellState.CS_NONE; inCurColours = (15, -1); inCurCol += 1;
-                elif inChar == "\u0016":
-                    inCurColours = (inCurColours[1], inCurColours[0]); inCurCol += 1;
-                elif inChar == "\u001f":
-                    inCellState = self._flipCellStateBit(self._CellState.CS_UNDERLINE, inCellState); inCurCol += 1;
-                else:
-                    outMap[-1].append([*inCurColours, inCellState, inChar]); inCurCol += 1;
-            inLine, outMaxCols = inFile.readline(), max(outMaxCols, len(outMap[-1]))
-        if (len(outMap) > 1)    \
-        or ((len(outMap) == 1) and len(outMap[0])):
-            for numRow in range(len(outMap)):
-                for numCol in range(len(outMap[numRow]), outMaxCols):
-                    outMap[numRow].append([15, -1, self._CellState.CS_NONE, " "])
-            self.inSize, self.outMap = [outMaxCols, len(outMap)], outMap
-            return (True, None)
-        else:
-            return (False, "empty output map")
+                        outMap[-1].append([*inCurColours, inCellState, inChar]); inCurCol += 1;
+                inLine, outMaxCols = inFile.readline(), max(outMaxCols, len(outMap[-1]))
+            if (len(outMap) > 1)    \
+            or ((len(outMap) == 1) and len(outMap[0])):
+                for numRow in range(len(outMap)):
+                    for numCol in range(len(outMap[numRow]), outMaxCols):
+                        outMap[numRow].append([15, -1, self._CellState.CS_NONE, " "])
+                self.inSize, self.outMap = [outMaxCols, len(outMap)], outMap
+                return (True, None)
+            else:
+                return (False, "empty output map")
+        except:
+            return (False, sys.exc_info()[1])
     # }}}
     # {{{ importTextFile(self, pathName)
     def importTextFile(self, pathName):
