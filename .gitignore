@@ -1,4 +1,5 @@
 *.sw[op]
 __pycache__/
+build/
 librtl/ImgurApiKey.py
 releases/
