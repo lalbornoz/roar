@@ -102,8 +102,8 @@ class ToolObject(Tool):
                 dirty = False if isCursor else True
                 cellNew = self.objectMap[numRow][numCol]
                 if (cellNew[1] == -1) and (cellNew[3] == " "):
-                    if (rectY < canvas.size[1]) and (rectX < canvas.size[0]):
-                        cellNew = canvas.map[rectY][rectX]
+                    if ((rectY + disp[1]) < canvas.size[1]) and ((rectX + disp[0]) < canvas.size[0]):
+                        cellNew = canvas.map[rectY + disp[1]][rectX + disp[0]]
                 dispatchFn(eventDc, isCursor, [rectX + disp[0], rectY + disp[1], *cellNew], viewRect)
         return dirty
 
