@@ -40,6 +40,48 @@ class RoarAssetsWindow(GuiMiniFrame):
                     resultList += [self._import(f, pathName)]
         return resultList
     # }}}
+    # {{{ _load_list(self, pathName)
+    def _load_list(self, pathName):
+        try:
+            with open(pathName, "r") as fileObject:
+                try:
+                    for line in fileObject.readlines():
+                        line = line.rstrip("\r\n")
+                        if not os.path.isabs(line):
+                            line = os.path.join(os.path.dirname(pathName), line)
+                        def importmIRC(canvas, pathName):
+                            rc, error = canvas.importStore.importTextFile(pathName)
+                            return (rc, error, canvas.importStore.outMap, pathName, canvas.importStore.inSize)
+                        rc, error, canvas, newMap, newPathName, newSize = self._import(importmIRC, line)
+                        if rc:
+                            self.currentIndex = self.listView.GetItemCount()
+                            self.canvasList[self.currentIndex] = [canvas, newPathName]
+                            self.listView.InsertItem(self.currentIndex, "")
+                            idx = -1
+                            while True:
+                                idx = self.listView.GetNextSelected(idx)
+                                if idx != -1:
+                                    self.listView.Select(idx, on=0)
+                                else:
+                                    break
+                            self.listView.Select(self.currentIndex, on=1)
+                            self.listView.SetFocus()
+                            [self.listView.SetItem(self.currentIndex, col, label) for col, label in zip((0, 1), (os.path.basename(newPathName), "{}x{}".format(*newSize)))]
+                            [self.listView.SetColumnWidth(col, wx.LIST_AUTOSIZE) for col in (0, 1)]
+                        else:
+                            with wx.MessageDialog(self, "Error: {}".format(error), "", wx.CANCEL | wx.OK | wx.OK_DEFAULT) as dialog:
+                                dialogChoice = dialog.ShowModal()
+                                if dialogChoice == wx.ID_CANCEL:
+                                    self.SetCursor(wx.Cursor(wx.NullCursor)); break;
+                except:
+                    self.SetCursor(wx.Cursor(wx.NullCursor))
+                    with wx.MessageDialog(self, "Error: {}".format(str(sys.exc_info()[1])), "", wx.OK | wx.OK_DEFAULT) as dialog:
+                        dialogChoice = dialog.ShowModal()
+        except FileNotFoundError as e:
+            self.SetCursor(wx.Cursor(wx.NullCursor))
+            with wx.MessageDialog(self, "Error: {}".format(str(e)), "", wx.OK | wx.OK_DEFAULT) as dialog:
+                dialogChoice = dialog.ShowModal()
+    # }}}
     # {{{ _updateScrollBars(self)
     def _updateScrollBars(self):
         clientSize = self.panelCanvas.GetClientSize()
@@ -201,46 +243,8 @@ class RoarAssetsWindow(GuiMiniFrame):
         rc = True
         with wx.FileDialog(self, "Load from list...", os.getcwd(), "", "List files (*.lst)|*.lst|Text files (*.txt)|*.txt|All Files (*.*)|*.*", wx.FD_OPEN) as dialog:
             if dialog.ShowModal() != wx.ID_CANCEL:
-                try:
                     pathName = dialog.GetPath()
-                    with open(pathName, "r") as fileObject:
-                        try:
-                            for line in fileObject.readlines():
-                                line = line.rstrip("\r\n")
-                                if not os.path.isabs(line):
-                                    line = os.path.join(os.path.dirname(pathName), line)
-                                def importmIRC(canvas, pathName):
-                                    rc, error = canvas.importStore.importTextFile(pathName)
-                                    return (rc, error, canvas.importStore.outMap, pathName, canvas.importStore.inSize)
-                                rc, error, canvas, newMap, newPathName, newSize = self._import(importmIRC, line)
-                                if rc:
-                                    self.currentIndex = self.listView.GetItemCount()
-                                    self.canvasList[self.currentIndex] = [canvas, newPathName]
-                                    self.listView.InsertItem(self.currentIndex, "")
-                                    idx = -1
-                                    while True:
-                                        idx = self.listView.GetNextSelected(idx)
-                                        if idx != -1:
-                                            self.listView.Select(idx, on=0)
-                                        else:
-                                            break
-                                    self.listView.Select(self.currentIndex, on=1)
-                                    self.listView.SetFocus()
-                                    [self.listView.SetItem(self.currentIndex, col, label) for col, label in zip((0, 1), (os.path.basename(newPathName), "{}x{}".format(*newSize)))]
-                                    [self.listView.SetColumnWidth(col, wx.LIST_AUTOSIZE) for col in (0, 1)]
-                                else:
-                                    with wx.MessageDialog(self, "Error: {}".format(error), "", wx.CANCEL | wx.OK | wx.OK_DEFAULT) as dialog:
-                                        dialogChoice = dialog.ShowModal()
-                                        if dialogChoice == wx.ID_CANCEL:
-                                            self.SetCursor(wx.Cursor(wx.NullCursor)); break;
-                        except:
-                            self.SetCursor(wx.Cursor(wx.NullCursor))
-                            with wx.MessageDialog(self, "Error: {}".format(str(sys.exc_info()[1])), "", wx.OK | wx.OK_DEFAULT) as dialog:
-                                dialogChoice = dialog.ShowModal()
-                except FileNotFoundError as e:
-                    self.SetCursor(wx.Cursor(wx.NullCursor))
-                    with wx.MessageDialog(self, "Error: {}".format(str(e)), "", wx.OK | wx.OK_DEFAULT) as dialog:
-                        dialogChoice = dialog.ShowModal()
+                    self._load_list(pathName)
     # }}}
     # {{{ onRemove(self, event)
     def onRemove(self, event):
