@@ -15,14 +15,15 @@ import wx
 # Entry point
 def main(*argv):
     wxApp, roarClient = wx.App(False), RoarClient(None)
+    argv0, argv = argv[0], argv[1:]
     if len(argv) >= 1:
-        if argv[2].endswith(".lst"):
-            roarClient.assetsWindow._load_list(argv[2])
-        roarClient.canvasPanel.commands.canvasPathName = argv[1]
-        rc, error = roarClient.canvasPanel.canvas.importStore.importTextFile(argv[1])
+        if (len(argv) >= 2) and (argv[1].endswith(".lst")):
+            roarClient.assetsWindow._load_list(argv[1])
+        roarClient.canvasPanel.commands.canvasPathName = argv[0]
+        rc, error = roarClient.canvasPanel.canvas.importStore.importTextFile(argv[0])
         if rc:
             roarClient.canvasPanel.update(roarClient.canvasPanel.canvas.importStore.inSize, False, roarClient.canvasPanel.canvas.importStore.outMap)
-            roarClient.canvasPanel.commands.update(pathName=argv[1], undoLevel=-1)
+            roarClient.canvasPanel.commands.update(pathName=argv[0], undoLevel=-1)
         else:
             print("error: {}".format(error), file=sys.stderr)
     wxApp.MainLoop()
