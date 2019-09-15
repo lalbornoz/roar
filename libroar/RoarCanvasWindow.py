@@ -136,10 +136,14 @@ class RoarCanvasWindow(GuiWindow):
 
     # {{{ onKeyboardInput(self, event)
     def onKeyboardInput(self, event):
-        viewRect = self.GetViewStart(); eventDc = self.backend.getDeviceContext(self.GetClientSize(), self, viewRect);
-        keyChar, keyModifiers = chr(event.GetUnicodeKey()), event.GetModifiers()
-        if not self.applyTool(eventDc, False, keyChar, keyModifiers, None, None, None, None, self.commands.currentTool, viewRect):
-            event.Skip()
+        if  (event.GetKeyCode() == wx.WXK_PAUSE)    \
+        and (event.GetModifiers() == wx.MOD_SHIFT):
+            import pdb; pdb.set_trace()
+        else:
+            viewRect = self.GetViewStart(); eventDc = self.backend.getDeviceContext(self.GetClientSize(), self, viewRect);
+            keyChar, keyModifiers = chr(event.GetUnicodeKey()), event.GetModifiers()
+            if not self.applyTool(eventDc, False, keyChar, keyModifiers, None, None, None, None, self.commands.currentTool, viewRect):
+                event.Skip()
     # }}}
     # {{{ onEnterWindow(self, event)
     def onEnterWindow(self, event):
