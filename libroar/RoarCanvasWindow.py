@@ -10,29 +10,34 @@ import json, wx, sys
 import time
 
 class RoarCanvasWindowDropTarget(wx.TextDropTarget):
+    # {{{ done(self)
+    def done(self):
+        self.inProgress = False
+    # }}}
     # {{{ OnDropText(self, x, y, data)
     def OnDropText(self, x, y, data):
         rc = False
-        try:
-            dropMap, dropSize = json.loads(data)
-            viewRect = self.parent.GetViewStart()
-            rectX, rectY = x - (x % self.parent.backend.cellSize[0]), y - (y % self.parent.backend.cellSize[1])
-            mapX, mapY = int(rectX / self.parent.backend.cellSize[0] if rectX else 0), int(rectY / self.parent.backend.cellSize[1] if rectY else 0)
-            mapPoint = [m + n for m, n in zip((mapX, mapY), viewRect)]
-            self.parent.commands.lastTool, self.parent.commands.currentTool = self.parent.commands.currentTool, ToolObject()
-            self.parent.commands.currentTool.setRegion(self.parent.canvas, mapPoint, dropMap, dropSize, external=True)
-            self.parent.commands.update(toolName=self.parent.commands.currentTool.name)
-            eventDc = self.parent.backend.getDeviceContext(self.parent.GetClientSize(), self.parent, viewRect)
-            self.parent.applyTool(eventDc, True, None, None, self.parent.brushPos, False, False, False, self.parent.commands.currentTool, viewRect)
-            rc = True
-        except:
-            with wx.MessageDialog(self.parent, "Error: {}".format(sys.exc_info()[1]), "", wx.OK | wx.OK_DEFAULT) as dialog:
-                dialogChoice = dialog.ShowModal()
+        if not self.inProgress:
+            try:
+                dropMap, dropSize = json.loads(data)
+                viewRect = self.parent.GetViewStart()
+                rectX, rectY = x - (x % self.parent.backend.cellSize[0]), y - (y % self.parent.backend.cellSize[1])
+                mapX, mapY = int(rectX / self.parent.backend.cellSize[0] if rectX else 0), int(rectY / self.parent.backend.cellSize[1] if rectY else 0)
+                mapPoint = [m + n for m, n in zip((mapX, mapY), viewRect)]
+                self.parent.commands.lastTool, self.parent.commands.currentTool = self.parent.commands.currentTool, ToolObject()
+                self.parent.commands.currentTool.setRegion(self.parent.canvas, mapPoint, dropMap, dropSize, external=True)
+                self.parent.commands.update(toolName=self.parent.commands.currentTool.name)
+                eventDc = self.parent.backend.getDeviceContext(self.parent.GetClientSize(), self.parent, viewRect)
+                self.parent.applyTool(eventDc, True, None, None, self.parent.brushPos, False, False, False, self.parent.commands.currentTool, viewRect)
+                rc = True; self.inProgress = True;
+            except:
+                with wx.MessageDialog(self.parent, "Error: {}".format(sys.exc_info()[1]), "", wx.OK | wx.OK_DEFAULT) as dialog:
+                    dialogChoice = dialog.ShowModal()
         return rc
     # }}}
     # {{{ __init__(self, parent)
     def __init__(self, parent):
-        super().__init__(); self.parent = parent;
+        super().__init__(); self.inProgress, self.parent = False, parent;
     # }}}
 
 class RoarCanvasWindow(GuiWindow):
@@ -73,6 +78,7 @@ class RoarCanvasWindow(GuiWindow):
         and tool.external:
             self.commands.currentTool, self.commands.lastTool = self.commands.lastTool, self.commands.currentTool
             self.commands.update(toolName=self.commands.currentTool.name)
+            self.dropTarget.done()
         return rc
     # }}}
     # {{{ dispatchDeltaPatches(self, deltaPatches)
