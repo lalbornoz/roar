@@ -11,7 +11,7 @@
 High-priority list:
 1)  unit tools: arrow, {cloud,speech bubble}, curve, measure, pick, polygon, triangle, unicode
 2)  text tool: a) honour RTL text flow b) navigating w/ cursor keys c) pasting text
-3)  operators: erase, invert, rotate, scale, shift, slice, tile
+3)  operators: erase, rotate, scale, shift, slice, tile
 4)  GUI:
     a) switch to GTK
     b) replace logo w/ canvas panel in About dialogue

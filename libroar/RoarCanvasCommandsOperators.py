@@ -6,6 +6,7 @@
 
 from OperatorFlipHorizontal import OperatorFlipHorizontal
 from OperatorFlipVertical import OperatorFlipVertical
+from OperatorInvert import OperatorInvert
 from GuiFrame import GuiCommandListDecorator
 from ToolObject import ToolObject
 import copy, wx
@@ -14,9 +15,10 @@ class RoarCanvasCommandsOperators():
     # {{{ canvasOperator(self, f, idx)
     @GuiCommandListDecorator(0, "Flip", "&Flip", None, None, None)
     @GuiCommandListDecorator(1, "Flip horizontally", "Flip &horizontally", None, None, None)
+    @GuiCommandListDecorator(2, "Invert", "&Invert", None, None, None)
     def canvasOperator(self, f, idx):
         def canvasOperator_(event):
-            applyOperator = [OperatorFlipVertical, OperatorFlipHorizontal][idx]()
+            applyOperator = [OperatorFlipVertical, OperatorFlipHorizontal, OperatorInvert][idx]()
             if  (self.currentTool.__class__ == ToolObject)  \
             and (self.currentTool.toolState >= self.currentTool.TS_SELECT):
                 region = self.currentTool.getRegion(self.parentCanvas.canvas)
@@ -56,7 +58,7 @@ class RoarCanvasCommandsOperators():
     def __init__(self):
         self.menus = (
             ("&Operators",
-                self.canvasOperator(self.canvasOperator, 0), self.canvasOperator(self.canvasOperator, 1),
+                self.canvasOperator(self.canvasOperator, 0), self.canvasOperator(self.canvasOperator, 1), self.canvasOperator(self.canvasOperator, 2),
             ),
         )
         self.toolBars = ()
