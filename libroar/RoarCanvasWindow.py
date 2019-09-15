@@ -201,7 +201,8 @@ class RoarCanvasWindow(GuiWindow):
     #
     # __init__(self, backend, canvas, cellSize, commands, parent, parentFrame, pos, scrollStep, size): initialisation method
     def __init__(self, backend, canvas, cellSize, commands, parent, parentFrame, pos, scrollStep, size):
-        super().__init__(parent, pos, scrollStep, [w * h for w, h in zip(cellSize, size)])
+        super().__init__(parent, pos, scrollStep)
+        self.size = size
         self.backend, self.canvas, self.cellSize, self.commands, self.parentFrame = backend(self.size, cellSize), canvas, cellSize, commands(self, parentFrame), parentFrame
         self.brushColours, self.brushPos, self.brushSize, self.dirty, self.lastCellState = [4, 1], [0, 0], [1, 1], False, None
         self.popupEventDc = None

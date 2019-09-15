@@ -88,10 +88,16 @@ class RoarAssetsWindow(GuiMiniFrame):
     # {{{ _updateScrollBars(self)
     def _updateScrollBars(self):
         clientSize = self.panelCanvas.GetClientSize()
-        if (self.panelCanvas.size[0] > clientSize[0]) or (self.panelCanvas.size[1] > clientSize[1]):
-            self.scrollFlag = True; super(wx.ScrolledWindow, self.panelCanvas).SetVirtualSize(self.panelCanvas.size);
+        if self.currentIndex != None:
+            panelSize = [a * b for a, b in zip(self.canvasList[self.currentIndex][0].size, self.backend.cellSize)]
+        elif self.panelCanvas.size != None:
+            panelSize = list(self.panelCanvas.size)
+        else:
+            return
+        if (panelSize[0] > clientSize[0]) or (panelSize[1] > clientSize[1]):
+            self.scrollFlag = True; super(wx.ScrolledWindow, self.panelCanvas).SetVirtualSize(panelSize);
         elif self.scrollFlag    \
-        and  ((self.panelCanvas.size[0] <= clientSize[0]) or (self.panelCanvas.size[1] <= clientSize[1])):
+        and  ((panelSize[0] <= clientSize[0]) or (panelSize[1] <= clientSize[1])):
             self.scrollFlag = False; super(wx.ScrolledWindow, self.panelCanvas).SetVirtualSize((0, 0));
     # }}}
 
@@ -324,15 +330,16 @@ class RoarAssetsWindow(GuiMiniFrame):
         self.listView.Bind(wx.EVT_LIST_ITEM_SELECTED, self.onListViewItemSelected)
         self.listView.Bind(wx.EVT_RIGHT_DOWN, self.onListViewRightDown)
 
-        self.panelCanvas = GuiWindow(self, (0, 0), cellSize, (int(size[0] / 2), int(size[1] / 2)), wx.BORDER_SUNKEN)
+        self.panelCanvas = GuiWindow(self, (0, 0), cellSize, wx.BORDER_SUNKEN)
         self.panelCanvas.Bind(wx.EVT_LEFT_DOWN, self.onPanelLeftDown)
         self.panelCanvas.Bind(wx.EVT_PAINT, self.onPanelPaint)
         self.panelCanvas.Bind(wx.EVT_SIZE, self.onPanelSize)
-        self._updateScrollBars()
 
         self.sizer = wx.BoxSizer(wx.VERTICAL)
         self.sizer.AddMany(((self.listView, 0, wx.ALL | wx.EXPAND, 4), (self.panelCanvas, 1, wx.ALL | wx.EXPAND, 4),))
+        self.panelCanvas.SetMinSize((int(size[0] / 2), int(size[1] / 2)))
         self.SetSizerAndFit(self.sizer)
+        self._updateScrollBars()
         self.Show(True)
 
 # vim:expandtab foldmethod=marker sw=4 ts=4 tw=120
