@@ -62,12 +62,18 @@ class RoarCanvasCommands(RoarCanvasCommandsFile, RoarCanvasCommandsEdit, RoarCan
                 self.parentFrame.SetTitle("roar")
         if "toolName" in self.lastPanelState:
             textItems.append("Current tool: {}".format(self.lastPanelState["toolName"]))
-        if  "dirty" in self.lastPanelState  \
+        if  "dirty" in self.lastPanelState              \
         and self.lastPanelState["dirty"]:
             textItems.append("*")
         self.parentFrame.statusBar.SetStatusText(" | ".join(textItems))
-        if "undoLevel" in self.lastPanelState:
-            if  (self.lastPanelState["undoLevel"] >= 0)  \
+        if  ("undoInhibit" in self.lastPanelState)      \
+        and (self.lastPanelState["undoInhibit"]):
+            for item in (self.canvasRedo, self.canvasUndo):
+                self.parentFrame.menuItemsById[item.attrDict["id"]].Enable(False)
+                toolBar = self.parentFrame.toolBarItemsById[item.attrDict["id"]].GetToolBar()
+                toolBar.EnableTool(item.attrDict["id"], False)
+        elif "undoLevel" in self.lastPanelState:
+            if  (self.lastPanelState["undoLevel"] >= 0) \
             and (self.lastPanelState["undoLevel"] < (len(self.parentCanvas.canvas.journal.patchesUndo) - 1)):
                 self.parentFrame.menuItemsById[self.canvasUndo.attrDict["id"]].Enable(True)
                 toolBar = self.parentFrame.toolBarItemsById[self.canvasUndo.attrDict["id"]].GetToolBar()

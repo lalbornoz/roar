@@ -17,7 +17,9 @@ class RoarCanvasWindowDropTarget(wx.TextDropTarget):
     # {{{ OnDropText(self, x, y, data)
     def OnDropText(self, x, y, data):
         rc = False
-        if not self.inProgress:
+        if  ((self.parent.commands.currentTool.__class__ != ToolObject)                                 \
+        or   (self.parent.commands.currentTool.toolState == self.parent.commands.currentTool.TS_NONE))  \
+        and (not self.inProgress):
             try:
                 dropMap, dropSize = json.loads(data)
                 viewRect = self.parent.GetViewStart()
@@ -73,13 +75,17 @@ class RoarCanvasWindow(GuiWindow):
         else:
             self.commands.update(cellPos=mapPoint if mapPoint else self.brushPos)
         self.canvas.journal.end()
-        if  rc and (tool.__class__ == ToolObject)       \
-        and (tool.toolState == tool.TS_NONE)            \
-        and tool.external:
-            self.commands.currentTool, self.commands.lastTool = self.commands.lastTool, self.commands.currentTool
-            self.commands.update(toolName=self.commands.currentTool.name)
-            self.dropTarget.done()
-        return rc
+        if rc and (tool.__class__ == ToolObject):
+            if tool.toolState > tool.TS_NONE:
+                self.commands.update(undoInhibit=True)
+            elif tool.toolState == tool.TS_NONE:
+                if tool.external:
+                    self.commands.currentTool, self.commands.lastTool = self.commands.lastTool, self.commands.currentTool
+                    self.commands.update(toolName=self.commands.currentTool.name, undoInhibit=False)
+                    self.dropTarget.done()
+                else:
+                    self.commands.update(undoInhibit=False)
+            return rc
     # }}}
     # {{{ dispatchDeltaPatches(self, deltaPatches)
     def dispatchDeltaPatches(self, deltaPatches):
