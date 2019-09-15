@@ -19,7 +19,8 @@ class RoarCanvasWindowDropTarget(wx.TextDropTarget):
             rectX, rectY = x - (x % self.parent.backend.cellSize[0]), y - (y % self.parent.backend.cellSize[1])
             mapX, mapY = int(rectX / self.parent.backend.cellSize[0] if rectX else 0), int(rectY / self.parent.backend.cellSize[1] if rectY else 0)
             mapPoint = [m + n for m, n in zip((mapX, mapY), viewRect)]
-            self.parent.commands.lastTool, self.parent.commands.currentTool = self.parent.commands.currentTool, ToolObject(self.parent.canvas, mapPoint, dropMap, dropSize)
+            self.parent.commands.lastTool, self.parent.commands.currentTool = self.parent.commands.currentTool, ToolObject()
+            self.parent.commands.currentTool.setRegion(self.parent.canvas, mapPoint, dropMap, dropSize, external=True)
             self.parent.commands.update(toolName=self.parent.commands.currentTool.name)
             eventDc = self.parent.backend.getDeviceContext(self.parent.GetClientSize(), self.parent, viewRect)
             self.parent.applyTool(eventDc, True, None, None, self.parent.brushPos, False, False, False, self.parent.commands.currentTool, viewRect)
@@ -58,7 +59,7 @@ class RoarCanvasWindow(GuiWindow):
             or   (self.lastCellState != [list(mapPoint), mouseDragging, mouseLeftDown, mouseRightDown, list(viewRect)])):
                 self.brushPos = list(mapPoint)
                 self.lastCellState = [list(mapPoint), mouseDragging, mouseLeftDown, mouseRightDown, list(viewRect)]
-                rc, dirty = tool.onMouseEvent(self.brushColours, self.brushSize, self.canvas, self.dispatchPatchSingle, eventDc, self.brushPos, mouseDragging, mouseLeftDown, mouseRightDown, viewRect)
+                rc, dirty = tool.onMouseEvent(self.brushColours, self.brushSize, self.canvas, self.dispatchPatchSingle, eventDc, keyModifiers, self.brushPos, mouseDragging, mouseLeftDown, mouseRightDown, viewRect)
         else:
             rc, dirty = tool.onKeyboardEvent(self.brushColours, self.brushSize, self.canvas, self.dispatchPatchSingle, eventDc, keyChar, keyModifiers, self.brushPos, viewRect)
         if dirty:
@@ -67,7 +68,9 @@ class RoarCanvasWindow(GuiWindow):
         else:
             self.commands.update(cellPos=mapPoint if mapPoint else self.brushPos)
         self.canvas.journal.end()
-        if rc and (tool.__class__ == ToolObject) and (tool.toolState == tool.TS_NONE):
+        if  rc and (tool.__class__ == ToolObject)       \
+        and (tool.toolState == tool.TS_NONE)            \
+        and tool.external:
             self.commands.currentTool, self.commands.lastTool = self.commands.lastTool, self.commands.currentTool
             self.commands.update(toolName=self.commands.currentTool.name)
         return rc
@@ -138,8 +141,9 @@ class RoarCanvasWindow(GuiWindow):
     # }}}
     # {{{ onLeaveWindow(self, event)
     def onLeaveWindow(self, event):
-        eventDc = self.backend.getDeviceContext(self.GetClientSize(), self, self.GetViewStart())
-        self.backend.drawCursorMaskWithJournal(self.canvas.journal, eventDc, self.GetViewStart())
+        if False:
+            eventDc = self.backend.getDeviceContext(self.GetClientSize(), self, self.GetViewStart())
+            self.backend.drawCursorMaskWithJournal(self.canvas.journal, eventDc, self.GetViewStart())
         self.lastCellState = None
     # }}}
     # {{{ onMouseInput(self, event)
@@ -147,7 +151,7 @@ class RoarCanvasWindow(GuiWindow):
         viewRect = self.GetViewStart(); eventDc = self.backend.getDeviceContext(self.GetClientSize(), self, viewRect);
         mouseDragging, mouseLeftDown, mouseRightDown = event.Dragging(), event.LeftIsDown(), event.RightIsDown()
         mapPoint = self.backend.xlateEventPoint(event, eventDc, viewRect)
-        if not self.applyTool(eventDc, True, None, None, mapPoint, mouseDragging, mouseLeftDown, mouseRightDown, self.commands.currentTool, viewRect):
+        if not self.applyTool(eventDc, True, None, event.GetModifiers(), mapPoint, mouseDragging, mouseLeftDown, mouseRightDown, self.commands.currentTool, viewRect):
             event.Skip()
     # }}}
     # {{{ onMouseWheel(self, event)

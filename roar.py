@@ -6,7 +6,7 @@
 
 import os, sys
 [sys.path.append(os.path.join(os.getcwd(), path)) for path in   \
-    ["libcanvas", "libgui", "libroar", "librtl", "libtools"]]
+    ["libcanvas", "libgui", "libroar", "librtl", "liboperators", "libtools"]]
 
 from RoarClient import RoarClient
 from RtlPlatform import getLocalConfPathName

@@ -9,10 +9,11 @@ from GuiFrame import NID_TOOLBAR_HSEP
 from RoarCanvasCommandsEdit import RoarCanvasCommandsEdit
 from RoarCanvasCommandsFile import RoarCanvasCommandsFile
 from RoarCanvasCommandsHelp import RoarCanvasCommandsHelp
+from RoarCanvasCommandsOperators import RoarCanvasCommandsOperators
 from RoarCanvasCommandsTools import RoarCanvasCommandsTools
 import os, wx
 
-class RoarCanvasCommands(RoarCanvasCommandsFile, RoarCanvasCommandsEdit, RoarCanvasCommandsTools, RoarCanvasCommandsHelp):
+class RoarCanvasCommands(RoarCanvasCommandsFile, RoarCanvasCommandsEdit, RoarCanvasCommandsTools, RoarCanvasCommandsOperators, RoarCanvasCommandsHelp):
     # {{{ _initColourBitmaps(self)
     def _initColourBitmaps(self):
         for numColour in range(len(RoarCanvasCommandsEdit.canvasColour.attrList)):
@@ -104,7 +105,7 @@ class RoarCanvasCommands(RoarCanvasCommandsFile, RoarCanvasCommandsEdit, RoarCan
              self.canvasCut, self.canvasCopy, self.canvasPaste, self.canvasDelete, NID_TOOLBAR_HSEP,
              self.canvasCanvasSize(self.canvasCanvasSize, 1, True), self.canvasCanvasSize(self.canvasCanvasSize, 1, False), self.canvasCanvasSize(self.canvasCanvasSize, 0, True), self.canvasCanvasSize(self.canvasCanvasSize, 0, False), NID_TOOLBAR_HSEP,
              self.canvasCanvasSize(self.canvasCanvasSize, 2, True), self.canvasCanvasSize(self.canvasCanvasSize, 2, False), NID_TOOLBAR_HSEP,
-             self.canvasTool(self.canvasTool, 5), self.canvasTool(self.canvasTool, 0), self.canvasTool(self.canvasTool, 2), self.canvasTool(self.canvasTool, 3), self.canvasTool(self.canvasTool, 6), self.canvasTool(self.canvasTool, 1), self.canvasTool(self.canvasTool, 4),
+             self.canvasTool(self.canvasTool, 4), self.canvasTool(self.canvasTool, 0), self.canvasTool(self.canvasTool, 1), self.canvasTool(self.canvasTool, 2), self.canvasTool(self.canvasTool, 5), self.canvasTool(self.canvasTool, 3),
             ])
         # XXX
         toolBars.append(

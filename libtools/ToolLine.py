@@ -51,8 +51,8 @@ class ToolLine(Tool):
     # }}}
 
     #
-    # onMouseEvent(self, brushColours, brushSize, canvas, dispatchFn, eventDc, mapPoint, mouseDragging, mouseLeftDown, mouseRightDown, viewRect)
-    def onMouseEvent(self, brushColours, brushSize, canvas, dispatchFn, eventDc, mapPoint, mouseDragging, mouseLeftDown, mouseRightDown, viewRect):
+    # onMouseEvent(self, brushColours, brushSize, canvas, dispatchFn, eventDc, keyModifiers, mapPoint, mouseDragging, mouseLeftDown, mouseRightDown, viewRect)
+    def onMouseEvent(self, brushColours, brushSize, canvas, dispatchFn, eventDc, keyModifiers, mapPoint, mouseDragging, mouseLeftDown, mouseRightDown, viewRect):
         brushColours, dirty = brushColours.copy(), False
         if mouseLeftDown:
             brushColours[1] = brushColours[0]
