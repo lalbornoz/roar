@@ -103,8 +103,9 @@ class RoarCanvasCommandsFile():
         if self._promptSaveChanges():
             self.parentFrame.Close(True)
     # }}}
+
     # {{{ canvasExportAsAnsi(self, event)
-    @GuiCommandDecorator("Export as ANSI...", "Export as ANSI...", None, None, None)
+    @GuiCommandDecorator("Export as ANSI...", "Export as &ANSI...", None, None, None)
     def canvasExportAsAnsi(self, event):
         with wx.FileDialog(self.parentFrame, "Save As...", os.getcwd(), "", "ANSI files (*.ans;*.txt)|*.ans;*.txt|All Files (*.*)|*.*", wx.FD_SAVE|wx.FD_OVERWRITE_PROMPT) as dialog:
             if self.lastDir != None:
@@ -163,7 +164,7 @@ class RoarCanvasCommandsFile():
             wx.MessageBox("Failed to export to Pastebin: " + pasteResult, "Export to Pastebin", wx.OK|wx.ICON_EXCLAMATION)
     # }}}
     # {{{ canvasExportToClipboard(self, event)
-    @GuiCommandDecorator("Export to clipboard", "&Export to clipboard", None, None, None)
+    @GuiCommandDecorator("Export to clipboard", "Export to &clipboard", None, None, None)
     def canvasExportToClipboard(self, event):
         self.parentCanvas.SetCursor(wx.Cursor(wx.CURSOR_WAIT))
         rc, outBuffer = self.parentCanvas.canvas.exportStore.exportTextBuffer(self.parentCanvas.canvas.map, self.parentCanvas.canvas.size)
@@ -173,8 +174,9 @@ class RoarCanvasCommandsFile():
         self.parentCanvas.SetCursor(wx.Cursor(wx.NullCursor))
         return True
     # }}}
+
     # {{{ canvasImportAnsi(self, event)
-    @GuiCommandDecorator("Import ANSI...", "Import ANSI...", None, None, None)
+    @GuiCommandDecorator("Import ANSI...", "Import &ANSI...", None, None, None)
     def canvasImportAnsi(self, event):
         def canvasImportAnsi_(pathName):
             rc, error = self.parentCanvas.canvas.importStore.importAnsiFile(pathName)
@@ -182,7 +184,7 @@ class RoarCanvasCommandsFile():
         self._importFile(canvasImportAnsi_, True, "ANSI files (*.ans;*.txt)|*.ans;*.txt|All Files (*.*)|*.*")
     # }}}
     # {{{ canvasImportFromClipboard(self, event)
-    @GuiCommandDecorator("Import from clipboard", "&Import from clipboard", None, None, None)
+    @GuiCommandDecorator("Import from clipboard", "Import from &clipboard", None, None, None)
     def canvasImportFromClipboard(self, event):
         def canvasImportFromClipboard_(pathName):
             if  wx.TheClipboard.IsSupported(wx.DataFormat(wx.DF_TEXT))  \
@@ -199,13 +201,14 @@ class RoarCanvasCommandsFile():
             self._import(canvasImportFromClipboard_, True, None)
     # }}}
     # {{{ canvasImportSauce(self, event)
-    @GuiCommandDecorator("Import SAUCE...", "Import SAUCE...", None, None, None)
+    @GuiCommandDecorator("Import SAUCE...", "Import &SAUCE...", None, None, None)
     def canvasImportSauce(self, event):
         def canvasImportSauce_(pathName):
             rc, error = self.parentCanvas.canvas.importStore.importSauceFile(pathName)
             return (rc, error, self.parentCanvas.canvas.importStore.outMap, pathName, self.parentCanvas.canvas.importStore.inSize)
         self._importFile(canvasImportSauce_, True, "SAUCE files (*.ans;*.txt)|*.ans;*.txt|All Files (*.*)|*.*")
     # }}}
+
     # {{{ canvasNew(self, event, newCanvasSize=None)
     @GuiCommandDecorator("New", "&New", ["", wx.ART_NEW], [wx.ACCEL_CTRL, ord("N")], None)
     def canvasNew(self, event, newCanvasSize=None):
@@ -275,8 +278,9 @@ class RoarCanvasCommandsFile():
         self.menus = (
             ("&File",
                 self.canvasNew, self.canvasOpen, self.canvasOpenRecent, self.canvasSave, self.canvasSaveAs, NID_MENU_SEP,
-                self.canvasExportAsAnsi, self.canvasExportToClipboard, self.canvasExportImgur, self.canvasExportPastebin, self.canvasExportAsPng, NID_MENU_SEP,
-                self.canvasImportAnsi, self.canvasImportFromClipboard, self.canvasImportSauce, NID_MENU_SEP,
+                ("&Export...", self.canvasExportAsAnsi, self.canvasExportToClipboard, self.canvasExportImgur, self.canvasExportPastebin, self.canvasExportAsPng,),
+                ("&Import...", self.canvasImportAnsi, self.canvasImportFromClipboard, self.canvasImportSauce,),
+                NID_MENU_SEP,
                 self.canvasExit,
             ),
         )
