@@ -12,7 +12,7 @@ from RoarCanvasCommands import RoarCanvasCommands
 from RoarCanvasWindow import RoarCanvasWindow
 
 from glob import glob
-import os, random, sys
+import os, random, sys, wx
 
 class RoarClient(GuiFrame):
     # {{{ _getIconPathName(self)
@@ -54,5 +54,11 @@ class RoarClient(GuiFrame):
         self.addWindow(self.canvasPanel, expand=True)
         self.assetsWindow = RoarAssetsWindow(GuiCanvasWxBackend, defaultCellSize, self)
         self.canvasPanel.commands.canvasAssetsWindowShow(None)
+
+        # XXX
+        self.canvasPanel.operatorsMenu = wx.Menu()
+        for menuItem in self.canvasPanel.commands.menus[3][1:]:
+            menuItemWindow = self.canvasPanel.operatorsMenu.Append(menuItem.attrDict["id"], menuItem.attrDict["label"], menuItem.attrDict["caption"])
+            self.Bind(wx.EVT_MENU, self.onMenu, menuItemWindow)
 
 # vim:expandtab foldmethod=marker sw=4 ts=4 tw=120

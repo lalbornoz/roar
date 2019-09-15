@@ -129,7 +129,7 @@ class GuiFrame(wx.Frame):
     # }}}
     # {{{ loadMenus(self, menus)
     def loadMenus(self, menus):
-        menuBar = wx.MenuBar()
+        self.menuBar = wx.MenuBar()
         for menu in menus:
             menuWindow = wx.Menu()
             for menuItem in menu[1:]:
@@ -140,8 +140,8 @@ class GuiFrame(wx.Frame):
                     menuWindow.AppendSubMenu(menuSubWindow, menuItem[0], menuItem[0])
                 else:
                     self._initMenu(menuItem, menuWindow)
-            menuBar.Append(menuWindow, menu[0])
-        self.SetMenuBar(menuBar)
+            self.menuBar.Append(menuWindow, menu[0])
+        self.SetMenuBar(self.menuBar)
     # }}}
     # {{{ loadToolBars(self, toolBars)
     def loadToolBars(self, toolBars):
