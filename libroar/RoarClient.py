@@ -49,7 +49,7 @@ class RoarClient(GuiFrame):
         self.loadToolBars(self.canvasPanel.commands.toolBars)
 
         self.canvasPanel.commands.canvasNew(None)
-        self.canvasPanel.commands.canvasTool(self.canvasPanel.commands.canvasTool, 5)(None)
+        self.canvasPanel.commands.canvasTool(self.canvasPanel.commands.canvasTool, 4)(None)
         self.canvasPanel.commands.update(brushSize=self.canvasPanel.brushSize, colours=self.canvasPanel.brushColours)
         self.addWindow(self.canvasPanel, expand=True)
         self.assetsWindow = RoarAssetsWindow(GuiCanvasWxBackend, defaultCellSize, self)

@@ -8,24 +8,22 @@ from GuiFrame import GuiSelectDecorator
 from ToolCircle import ToolCircle
 from ToolFill import ToolFill
 from ToolLine import ToolLine
+from ToolObject import ToolObject
 from ToolRect import ToolRect
-from ToolSelectClone import ToolSelectClone
-from ToolSelectMove import ToolSelectMove
 from ToolText import ToolText
 import wx
 
 class RoarCanvasCommandsTools():
     # {{{ canvasTool(self, f, idx)
     @GuiSelectDecorator(0, "Circle", "&Circle", ["toolCircle.png"], [wx.ACCEL_CTRL, ord("C")], False)
-    @GuiSelectDecorator(1, "Clone", "Cl&one", ["toolClone.png"], [wx.ACCEL_CTRL, ord("E")], False)
-    @GuiSelectDecorator(2, "Fill", "&Fill", ["toolFill.png"], [wx.ACCEL_CTRL, ord("F")], False)
-    @GuiSelectDecorator(3, "Line", "&Line", ["toolLine.png"], [wx.ACCEL_CTRL, ord("L")], False)
-    @GuiSelectDecorator(4, "Move", "&Move", ["toolMove.png"], [wx.ACCEL_CTRL, ord("M")], False)
-    @GuiSelectDecorator(5, "Rectangle", "&Rectangle", ["toolRect.png"], [wx.ACCEL_CTRL, ord("R")], True)
-    @GuiSelectDecorator(6, "Text", "&Text", ["toolText.png"], [wx.ACCEL_CTRL, ord("T")], False)
+    @GuiSelectDecorator(1, "Fill", "&Fill", ["toolFill.png"], [wx.ACCEL_CTRL, ord("F")], False)
+    @GuiSelectDecorator(2, "Line", "&Line", ["toolLine.png"], [wx.ACCEL_CTRL, ord("L")], False)
+    @GuiSelectDecorator(3, "Object", "&Object", ["toolObject.png"], [wx.ACCEL_CTRL, ord("E")], False)
+    @GuiSelectDecorator(4, "Rectangle", "&Rectangle", ["toolRect.png"], [wx.ACCEL_CTRL, ord("R")], True)
+    @GuiSelectDecorator(5, "Text", "&Text", ["toolText.png"], [wx.ACCEL_CTRL, ord("T")], False)
     def canvasTool(self, f, idx):
         def canvasTool_(event):
-            self.lastTool, self.currentTool = self.currentTool, [ToolCircle, ToolSelectClone, ToolFill, ToolLine, ToolSelectMove, ToolRect, ToolText][idx]()
+            self.lastTool, self.currentTool = self.currentTool, [ToolCircle, ToolFill, ToolLine, ToolObject, ToolRect, ToolText][idx]()
             self.parentFrame.menuItemsById[self.canvasTool.attrList[idx]["id"]].Check(True)
             toolBar = self.parentFrame.toolBarItemsById[self.canvasTool.attrList[idx]["id"]].GetToolBar()
             toolBar.ToggleTool(self.canvasTool.attrList[idx]["id"], True)
@@ -43,7 +41,7 @@ class RoarCanvasCommandsTools():
     def __init__(self):
         self.menus = (
             ("&Tools",
-                self.canvasTool(self.canvasTool, 5), self.canvasTool(self.canvasTool, 0), self.canvasTool(self.canvasTool, 2), self.canvasTool(self.canvasTool, 3), self.canvasTool(self.canvasTool, 6), self.canvasTool(self.canvasTool, 1), self.canvasTool(self.canvasTool, 4),
+                self.canvasTool(self.canvasTool, 4), self.canvasTool(self.canvasTool, 0), self.canvasTool(self.canvasTool, 1), self.canvasTool(self.canvasTool, 2), self.canvasTool(self.canvasTool, 5), self.canvasTool(self.canvasTool, 3),
             ),
         )
         self.toolBars = ()
