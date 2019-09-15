@@ -66,9 +66,15 @@ class RoarCanvasWindow(GuiWindow):
             or   (self.lastCellState != [list(mapPoint), mouseDragging, mouseLeftDown, mouseRightDown, list(viewRect)])):
                 self.brushPos = list(mapPoint)
                 self.lastCellState = [list(mapPoint), mouseDragging, mouseLeftDown, mouseRightDown, list(viewRect)]
-                rc, dirty = tool.onMouseEvent(self.brushColours, self.brushSize, self.canvas, self.dispatchPatchSingle, eventDc, keyModifiers, self.brushPos, mouseDragging, mouseLeftDown, mouseRightDown, viewRect)
+                if tool != None:
+                    rc, dirty = tool.onMouseEvent(self.brushColours, self.brushSize, self.canvas, self.dispatchPatchSingle, eventDc, keyModifiers, self.brushPos, mouseDragging, mouseLeftDown, mouseRightDown, viewRect)
+                else:
+                    self.dispatchPatchSingle(eventDc, True, [*mapPoint, self.brushColours[0], self.brushColours[0], 0, " "] , viewRect)
         else:
-            rc, dirty = tool.onKeyboardEvent(self.brushColours, self.brushSize, self.canvas, self.dispatchPatchSingle, eventDc, keyChar, keyModifiers, self.brushPos, viewRect)
+            if tool != None:
+                rc, dirty = tool.onKeyboardEvent(self.brushColours, self.brushSize, self.canvas, self.dispatchPatchSingle, eventDc, keyChar, keyModifiers, self.brushPos, viewRect)
+            else:
+                self.dispatchPatchSingle(eventDc, True, [*mapPoint, self.brushColours[0], self.brushColours[0], 0, " "] , viewRect)
         if dirty:
             self.dirty = True
             self.commands.update(dirty=self.dirty, cellPos=self.brushPos, undoLevel=self.canvas.journal.patchesUndoLevel)
@@ -142,13 +148,24 @@ class RoarCanvasWindow(GuiWindow):
 
     # {{{ onKeyboardInput(self, event)
     def onKeyboardInput(self, event):
-        if  (event.GetKeyCode() == wx.WXK_PAUSE)    \
-        and (event.GetModifiers() == wx.MOD_SHIFT):
+        keyCode, keyModifiers = event.GetKeyCode(), event.GetModifiers()
+        viewRect = self.GetViewStart(); eventDc = self.backend.getDeviceContext(self.GetClientSize(), self, viewRect);
+        if  (keyCode == wx.WXK_PAUSE)   \
+        and (keyModifiers == wx.MOD_SHIFT):
             import pdb; pdb.set_trace()
+        elif keyCode in (wx.WXK_DOWN, wx.WXK_LEFT, wx.WXK_RIGHT, wx.WXK_UP):
+            if (keyCode == wx.WXK_DOWN) and (self.brushPos[1] < (self.canvas.size[1] - 1)):
+                self.brushPos = [self.brushPos[0], self.brushPos[1] + 1]
+            elif (keyCode == wx.WXK_LEFT) and (self.brushPos[0] > 0):
+                self.brushPos = [self.brushPos[0] - 1, self.brushPos[1]]
+            elif (keyCode == wx.WXK_RIGHT) and (self.brushPos[0] < (self.canvas.size[0] - 1)):
+                self.brushPos = [self.brushPos[0] + 1, self.brushPos[1]]
+            elif (keyCode == wx.WXK_UP) and (self.brushPos[1] > 0):
+                self.brushPos = [self.brushPos[0], self.brushPos[1] - 1]
+            self.commands.update(cellPos=self.brushPos)
+            self.applyTool(eventDc, True, None, None, self.brushPos, False, False, False, self.commands.currentTool, viewRect)
         else:
-            viewRect = self.GetViewStart(); eventDc = self.backend.getDeviceContext(self.GetClientSize(), self, viewRect);
-            keyChar, keyModifiers = chr(event.GetUnicodeKey()), event.GetModifiers()
-            if not self.applyTool(eventDc, False, keyChar, keyModifiers, None, None, None, None, self.commands.currentTool, viewRect):
+            if not self.applyTool(eventDc, False, chr(event.GetUnicodeKey()), keyModifiers, None, None, None, None, self.commands.currentTool, viewRect):
                 event.Skip()
     # }}}
     # {{{ onEnterWindow(self, event)
