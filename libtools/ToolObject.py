@@ -87,7 +87,7 @@ class ToolObject(Tool):
             else:
                 dirty = self.onSelectEvent(canvas, (0, 0), dispatchFn, eventDc, False, keyModifiers, self.targetRect.copy(), self.targetRect, viewRect)
                 self._drawSelectRect(self.targetRect, dispatchFn, eventDc, viewRect)
-                self.targetRect, self.toolState = None, self.TS_NONE
+                self.objectMap, self.objectSize, self.targetRect, self.toolState = None, None, None, self.TS_NONE
         else:
             dirty = self._dispatchSelectEvent(canvas, dispatchFn, eventDc, keyModifiers, mapPoint, mouseLeftDown, self.targetRect, viewRect)
         return dirty
