@@ -63,13 +63,44 @@ class GuiFrame(wx.Frame):
         icon.CopyFromBitmap(wx.Bitmap(iconPathName, wx.BITMAP_TYPE_ANY))
         self.SetIcon(icon)
     # }}}
+    # {{{ _initMenu(self, menuItem, menuWindow)
+    def _initMenu(self, menuItem, menuWindow):
+        if menuItem == NID_MENU_SEP:
+            menuWindow.AppendSeparator()
+        else:
+            if menuItem.attrDict["id"] == None:
+                menuItem.attrDict["id"] = wx.NewId()
+            self.itemsById[menuItem.attrDict["id"]] = menuItem
+            if hasattr(menuItem, "isSelect"):
+                menuItemWindow = menuWindow.AppendRadioItem(menuItem.attrDict["id"], menuItem.attrDict["label"], menuItem.attrDict["caption"])
+            elif hasattr(menuItem, "isSubMenu"):
+                menuItem.attrDict["menu"] = wx.Menu()
+                menuItemWindow = menuWindow.AppendSubMenu(menuItem.attrDict["menu"], menuItem.attrDict["label"], menuItem.attrDict["caption"])
+            else:
+                menuItemWindow = menuWindow.Append(menuItem.attrDict["id"], menuItem.attrDict["label"], menuItem.attrDict["caption"])
+            if menuItem.attrDict["accel"] != None:
+                menuItemWindow.SetAccel(menuItem.attrDict["accelEntry"])
+            self.menuItemsById[menuItem.attrDict["id"]] = menuItemWindow
+            self.Bind(wx.EVT_MENU, self.onMenu, menuItemWindow)
+            if menuItem.attrDict["initialState"] != None:
+                if hasattr(menuItem, "isSelect"):
+                    menuItemWindow.Check(menuItem.attrDict["initialState"])
+                else:
+                    menuItemWindow.Enable(menuItem.attrDict["initialState"])
+    # }}}
 
     # {{{ loadAccels(self, menus, toolBars)
     def loadAccels(self, menus, toolBars):
         def loadAccels_(accels):
             nonlocal accelTableEntries
+            accels_ = []
             for accel in accels:
-                if (not accel in [NID_MENU_SEP, NID_TOOLBAR_HSEP])  \
+                if type(accel) == tuple:
+                    accels_ += accel[1:]
+                else:
+                    accels_ += [accel]
+            for accel in accels_:
+                if  (not accel in [NID_MENU_SEP, NID_TOOLBAR_HSEP]) \
                 and (accel.attrDict["accel"] != None):
                     accelTableEntries += [wx.AcceleratorEntry()]
                     if accel.attrDict["id"] == None:
@@ -102,28 +133,13 @@ class GuiFrame(wx.Frame):
         for menu in menus:
             menuWindow = wx.Menu()
             for menuItem in menu[1:]:
-                if menuItem == NID_MENU_SEP:
-                    menuWindow.AppendSeparator()
+                if type(menuItem) == tuple:
+                    menuSubWindow = wx.Menu()
+                    for menuSubItem in menuItem[1:]:
+                        self._initMenu(menuSubItem, menuSubWindow)
+                    menuWindow.AppendSubMenu(menuSubWindow, menuItem[0], menuItem[0])
                 else:
-                    if menuItem.attrDict["id"] == None:
-                        menuItem.attrDict["id"] = wx.NewId()
-                    self.itemsById[menuItem.attrDict["id"]] = menuItem
-                    if hasattr(menuItem, "isSelect"):
-                        menuItemWindow = menuWindow.AppendRadioItem(menuItem.attrDict["id"], menuItem.attrDict["label"], menuItem.attrDict["caption"])
-                    elif hasattr(menuItem, "isSubMenu"):
-                        menuItem.attrDict["menu"] = wx.Menu()
-                        menuItemWindow = menuWindow.AppendSubMenu(menuItem.attrDict["menu"], menuItem.attrDict["label"], menuItem.attrDict["caption"])
-                    else:
-                        menuItemWindow = menuWindow.Append(menuItem.attrDict["id"], menuItem.attrDict["label"], menuItem.attrDict["caption"])
-                    if menuItem.attrDict["accel"] != None:
-                        menuItemWindow.SetAccel(menuItem.attrDict["accelEntry"])
-                    self.menuItemsById[menuItem.attrDict["id"]] = menuItemWindow
-                    self.Bind(wx.EVT_MENU, self.onMenu, menuItemWindow)
-                    if menuItem.attrDict["initialState"] != None:
-                        if hasattr(menuItem, "isSelect"):
-                            menuItemWindow.Check(menuItem.attrDict["initialState"])
-                        else:
-                            menuItemWindow.Enable(menuItem.attrDict["initialState"])
+                    self._initMenu(menuItem, menuWindow)
             menuBar.Append(menuWindow, menu[0])
         self.SetMenuBar(menuBar)
     # }}}

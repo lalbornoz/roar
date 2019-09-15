@@ -15,8 +15,9 @@ High-priority list:
 4)  GUI:
     a) switch to GTK
     b) replace logo w/ canvas panel in About dialogue
-    c) replace resize buttons w/ {-,edit box,+} buttons & lock button re: ratio (ty lol3)
-    d) {copy,cut,insert from,paste}, {edit asset in new canvas,import from {canvas,object}}
+    c) Settings/Settings window (e.g. autosave, hide cursor on leaving window, ...)
+    d) replace resize buttons w/ {-,edit box,+} buttons & lock button re: ratio (ty lol3)
+    e) {copy,cut,insert from,paste}, {edit asset in new canvas,import from {canvas,object}}
 5)  cleanup & refactor
 6)  object tool: reset {clone,move} state on each transition to target state
 
