@@ -26,12 +26,18 @@ class RoarCanvasCommandsOperators():
             if  (self.currentTool.__class__ == ToolObject)  \
             and (self.currentTool.toolState >= self.currentTool.TS_SELECT):
                 viewRect = self.parentCanvas.GetViewStart()
-                eventDc = self.parentCanvas.backend.getDeviceContext(self.parentCanvas.GetClientSize(), self.parentCanvas, viewRect)
+                if self.parentCanvas.popupEventDc == None:
+                    eventDc = self.parentCanvas.backend.getDeviceContext(self.parentCanvas.GetClientSize(), self.parentCanvas, viewRect)
+                else:
+                    eventDc = self.parentCanvas.popupEventDc
                 self.currentTool.setRegion(self.parentCanvas.canvas, None, region, [len(region[0]), len(region)], self.currentTool.external)
                 self.currentTool.onSelectEvent(self.parentCanvas.canvas, (0, 0), self.parentCanvas.dispatchPatchSingle, eventDc, True, wx.MOD_NONE, None, self.currentTool.targetRect, viewRect)
             else:
                 viewRect = self.parentCanvas.GetViewStart()
-                eventDc = self.parentCanvas.backend.getDeviceContext(self.parentCanvas.GetClientSize(), self.parentCanvas, viewRect)
+                if self.parentCanvas.popupEventDc == None:
+                    eventDc = self.parentCanvas.backend.getDeviceContext(self.parentCanvas.GetClientSize(), self.parentCanvas, viewRect)
+                else:
+                    eventDc = self.parentCanvas.popupEventDc
                 self.parentCanvas.canvas.journal.begin()
                 dirty = False
                 for numRow in range(len(region)):

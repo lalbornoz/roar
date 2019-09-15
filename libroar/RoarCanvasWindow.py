@@ -151,7 +151,11 @@ class RoarCanvasWindow(GuiWindow):
         viewRect = self.GetViewStart(); eventDc = self.backend.getDeviceContext(self.GetClientSize(), self, viewRect);
         mouseDragging, mouseLeftDown, mouseRightDown = event.Dragging(), event.LeftIsDown(), event.RightIsDown()
         mapPoint = self.backend.xlateEventPoint(event, eventDc, viewRect)
-        if not self.applyTool(eventDc, True, None, event.GetModifiers(), mapPoint, mouseDragging, mouseLeftDown, mouseRightDown, self.commands.currentTool, viewRect):
+        if  mouseRightDown                                      \
+        and (self.commands.currentTool.__class__ == ToolObject) \
+        and (self.commands.currentTool.toolState >= self.commands.currentTool.TS_SELECT):
+            self.popupEventDc = eventDc; self.PopupMenu(self.operatorsMenu); self.popupEventDc = None;
+        elif not self.applyTool(eventDc, True, None, event.GetModifiers(), mapPoint, mouseDragging, mouseLeftDown, mouseRightDown, self.commands.currentTool, viewRect):
             event.Skip()
     # }}}
     # {{{ onMouseWheel(self, event)
@@ -184,6 +188,7 @@ class RoarCanvasWindow(GuiWindow):
         super().__init__(parent, pos, scrollStep, [w * h for w, h in zip(cellSize, size)])
         self.backend, self.canvas, self.cellSize, self.commands, self.parentFrame = backend(self.size, cellSize), canvas, cellSize, commands(self, parentFrame), parentFrame
         self.brushColours, self.brushPos, self.brushSize, self.dirty, self.lastCellState = [4, 1], [0, 0], [1, 1], False, None
+        self.popupEventDc = None
         self.dropTarget = RoarCanvasWindowDropTarget(self)
         self.SetDropTarget(self.dropTarget)
         self.Bind(wx.EVT_MOUSEWHEEL, self.onMouseWheel)
