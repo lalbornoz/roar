@@ -172,14 +172,10 @@ class RoarCanvasWindow(GuiWindow):
     # }}}
     # {{{ onPaint(self, event)
     def onPaint(self, event):
-        self.backend.onPaint(self.GetClientSize(), self, self.GetViewStart())
-    # }}}
-    # {{{ onScroll(self, event)
-    def onScroll(self, event):
         viewRect = self.GetViewStart()
         eventDc = self.backend.getDeviceContext(self.GetClientSize(), self, viewRect)
         self.backend.drawCursorMaskWithJournal(self.canvas.journal, eventDc, viewRect)
-        event.Skip()
+        self.backend.onPaint(self.GetClientSize(), self, self.GetViewStart())
     # }}}
 
     #
