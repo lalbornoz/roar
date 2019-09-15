@@ -16,21 +16,27 @@ import wx
 class RoarCanvasCommandsTools():
     # {{{ canvasTool(self, f, idx)
     @GuiSelectDecorator(0, "Circle", "&Circle", ["toolCircle.png"], [wx.ACCEL_CTRL, ord("C")], False)
-    @GuiSelectDecorator(1, "Fill", "&Fill", ["toolFill.png"], [wx.ACCEL_CTRL, ord("F")], False)
-    @GuiSelectDecorator(2, "Line", "&Line", ["toolLine.png"], [wx.ACCEL_CTRL, ord("L")], False)
-    @GuiSelectDecorator(3, "Object", "&Object", ["toolObject.png"], [wx.ACCEL_CTRL, ord("E")], False)
-    @GuiSelectDecorator(4, "Rectangle", "&Rectangle", ["toolRect.png"], [wx.ACCEL_CTRL, ord("R")], True)
-    @GuiSelectDecorator(5, "Text", "&Text", ["toolText.png"], [wx.ACCEL_CTRL, ord("T")], False)
+    @GuiSelectDecorator(1, "Cursor", "C&ursor", ["toolCursor.png"], [wx.ACCEL_CTRL, ord("U")], False)
+    @GuiSelectDecorator(2, "Fill", "&Fill", ["toolFill.png"], [wx.ACCEL_CTRL, ord("F")], False)
+    @GuiSelectDecorator(3, "Line", "&Line", ["toolLine.png"], [wx.ACCEL_CTRL, ord("L")], False)
+    @GuiSelectDecorator(4, "Object", "&Object", ["toolObject.png"], [wx.ACCEL_CTRL, ord("E")], False)
+    @GuiSelectDecorator(5, "Rectangle", "&Rectangle", ["toolRect.png"], [wx.ACCEL_CTRL, ord("R")], True)
+    @GuiSelectDecorator(6, "Text", "&Text", ["toolText.png"], [wx.ACCEL_CTRL, ord("T")], False)
     def canvasTool(self, f, idx):
         def canvasTool_(event):
-            self.lastTool, self.currentTool = self.currentTool, [ToolCircle, ToolFill, ToolLine, ToolObject, ToolRect, ToolText][idx]()
+            self.lastTool, self.currentTool = self.currentTool, [ToolCircle, None, ToolFill, ToolLine, ToolObject, ToolRect, ToolText][idx]
+            if self.currentTool != None:
+                self.currentTool = self.currentTool()
             self.parentFrame.menuItemsById[self.canvasTool.attrList[idx]["id"]].Check(True)
             toolBar = self.parentFrame.toolBarItemsById[self.canvasTool.attrList[idx]["id"]].GetToolBar()
             toolBar.ToggleTool(self.canvasTool.attrList[idx]["id"], True)
-            self.update(toolName=self.currentTool.name)
-            viewRect = self.parentCanvas.GetViewStart()
-            eventDc = self.parentCanvas.backend.getDeviceContext(self.parentCanvas.GetClientSize(), self.parentCanvas, viewRect)
-            self.parentCanvas.applyTool(eventDc, True, None, None, self.parentCanvas.brushPos, False, False, False, self.currentTool, viewRect)
+            if self.currentTool != None:
+                self.update(toolName=self.currentTool.name)
+                viewRect = self.parentCanvas.GetViewStart()
+                eventDc = self.parentCanvas.backend.getDeviceContext(self.parentCanvas.GetClientSize(), self.parentCanvas, viewRect)
+                self.parentCanvas.applyTool(eventDc, True, None, None, self.parentCanvas.brushPos, False, False, False, self.currentTool, viewRect)
+            else:
+                self.update(toolName="Cursor")
         setattr(canvasTool_, "attrDict", f.attrList[idx])
         setattr(canvasTool_, "isSelect", True)
         return canvasTool_
@@ -41,7 +47,7 @@ class RoarCanvasCommandsTools():
     def __init__(self):
         self.menus = (
             ("&Tools",
-                self.canvasTool(self.canvasTool, 4), self.canvasTool(self.canvasTool, 0), self.canvasTool(self.canvasTool, 1), self.canvasTool(self.canvasTool, 2), self.canvasTool(self.canvasTool, 5), self.canvasTool(self.canvasTool, 3),
+                self.canvasTool(self.canvasTool, 1), self.canvasTool(self.canvasTool, 5), self.canvasTool(self.canvasTool, 0), self.canvasTool(self.canvasTool, 2), self.canvasTool(self.canvasTool, 3), self.canvasTool(self.canvasTool, 6), self.canvasTool(self.canvasTool, 4),
             ),
         )
         self.toolBars = ()
