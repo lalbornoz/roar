@@ -27,28 +27,30 @@ class RoarCanvasCommandsOperators():
             region = applyOperator.apply(copy.deepcopy(region))
             if  (self.currentTool.__class__ == ToolObject)  \
             and (self.currentTool.toolState >= self.currentTool.TS_SELECT):
-                viewRect = self.parentCanvas.GetViewStart()
                 if self.parentCanvas.popupEventDc == None:
-                    eventDc = self.parentCanvas.backend.getDeviceContext(self.parentCanvas.GetClientSize(), self.parentCanvas, viewRect)
+                    eventDc = self.parentCanvas.backend.getDeviceContext(self.parentCanvas.GetClientSize(), self.parentCanvas)
                 else:
                     eventDc = self.parentCanvas.popupEventDc
+                eventDcOrigin = eventDc.GetDeviceOrigin(); eventDc.SetDeviceOrigin(0, 0);
                 self.currentTool.setRegion(self.parentCanvas.canvas, None, region, [len(region[0]), len(region)], self.currentTool.external)
-                self.currentTool.onSelectEvent(self.parentCanvas.canvas, (0, 0), self.parentCanvas.dispatchPatchSingle, eventDc, True, wx.MOD_NONE, None, self.currentTool.targetRect, viewRect)
+                self.currentTool.onSelectEvent(self.parentCanvas.canvas, (0, 0), self.parentCanvas.dispatchPatchSingle, eventDc, True, wx.MOD_NONE, None, self.currentTool.targetRect)
+                eventDc.SetDeviceOrigin(*eventDcOrigin)
             else:
-                viewRect = self.parentCanvas.GetViewStart()
                 if self.parentCanvas.popupEventDc == None:
-                    eventDc = self.parentCanvas.backend.getDeviceContext(self.parentCanvas.GetClientSize(), self.parentCanvas, viewRect)
+                    eventDc = self.parentCanvas.backend.getDeviceContext(self.parentCanvas.GetClientSize(), self.parentCanvas)
                 else:
                     eventDc = self.parentCanvas.popupEventDc
+                eventDcOrigin = eventDc.GetDeviceOrigin(); eventDc.SetDeviceOrigin(0, 0);
                 self.parentCanvas.canvas.journal.begin()
                 dirty = False
                 for numRow in range(len(region)):
                     for numCol in range(len(region[numRow])):
                         if not dirty:
                             self.parentCanvas.dirty = True
-                        self.parentCanvas.dispatchPatchSingle(eventDc, False, [numCol, numRow, *region[numRow][numCol]], viewRect)
+                        self.parentCanvas.dispatchPatchSingle(eventDc, False, [numCol, numRow, *region[numRow][numCol]])
                 self.parentCanvas.canvas.journal.end()
                 self.parentCanvas.commands.update(dirty=self.parentCanvas.dirty, undoLevel=self.parentCanvas.canvas.journal.patchesUndoLevel)
+                eventDc.SetDeviceOrigin(*eventDcOrigin)
         setattr(canvasOperator_, "attrDict", f.attrList[idx])
         return canvasOperator_
     # }}}
