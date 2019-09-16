@@ -15,15 +15,15 @@ High-priority list:
 3)  cleanup & refactor, switch to GTK
 4)  GUI:
     a) replace logo w/ canvas panel in About dialogue
-    b) Settings/Settings window (e.g. autosave, hide cursor on leaving window, ...)
-    c) replace resize buttons w/ {-,edit box,+} buttons & lock button re: ratio (ty lol3)
-    d) {copy,cut,delete,insert from,paste}, {edit asset in new canvas,import from {canvas,object}}
+    b) purge MRU list menu item, remove files from MRU list if inaccessible
+    c) Settings/Settings window (e.g. autosave, hide cursor on leaving window, ...)
+    d) replace resize buttons w/ {-,edit box,+} buttons & lock button re: ratio (ty lol3)
+    e) {copy,cut,delete,insert from,paste}, {edit asset in new canvas,import from {canvas,object}}
 
 Queue:
 1)  scrolling bug: start @ top, down key til cursor below visible canvas, scroll down, cursor gone GRRRR
 2)  scrolling bug: scroll down, apply operator to entire canvas, scroll up
 3)  select-related {re,un}do bugs
-4)  text tool: pasting text
-5)  clone selection lag
+4)  clone selection lag
 
 vim:ff=dos tw=0
