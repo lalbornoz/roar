@@ -12,14 +12,12 @@ class ToolFill(Tool):
     #
     # onMouseEvent(self, brushColours, brushSize, canvas, dispatchFn, eventDc, keyModifiers, mapPoint, mouseDragging, mouseLeftDown, mouseRightDown, viewRect)
     def onMouseEvent(self, brushColours, brushSize, canvas, dispatchFn, eventDc, keyModifiers, mapPoint, mouseDragging, mouseLeftDown, mouseRightDown, viewRect):
-        dirty, pointsDone, pointStack, testColour, = False, [], [list(mapPoint)], canvas.map[mapPoint[1]][mapPoint[0]][0:2]
+        dirty, pointsDone, pointStack, testChar, testColour = False, [], [list(mapPoint)], canvas.map[mapPoint[1]][mapPoint[0]][3], canvas.map[mapPoint[1]][mapPoint[0]][0:2]
         if mouseLeftDown or mouseRightDown:
-            if mouseRightDown:
-                brushColours = [brushColours[1], brushColours[0]]
             while len(pointStack) > 0:
                 point = pointStack.pop()
                 pointCell = canvas.map[point[1]][point[0]]
-                if (pointCell[0:2] == testColour)   \
+                if ((pointCell[1] == testColour[1]) and ((pointCell[3] == testChar) or mouseRightDown)) \
                 or ((pointCell[3] == " ") and (pointCell[1] == testColour[1])):
                     if not point in pointsDone:
                         if not dirty:
