@@ -10,10 +10,10 @@ from GuiWindow import GuiWindow
 import json, os, sys, wx
 
 class RoarAssetsWindow(GuiMiniFrame):
-    # {{{ _drawPatch(self, eventDc, isCursor, patch, viewRect)
-    def _drawPatch(self, eventDc, isCursor, patch, viewRect):
+    # {{{ _drawPatch(self, canvas, eventDc, isCursor, patch, viewRect)
+    def _drawPatch(self, canvas, eventDc, isCursor, patch, viewRect):
         if not isCursor:
-            self.backend.drawPatch(eventDc, patch, viewRect)
+            self.backend.drawPatch(canvas, eventDc, patch, viewRect)
     # }}}
     # {{{ _import(self, f, pathName)
     def _import(self, f, pathName):
@@ -113,7 +113,7 @@ class RoarAssetsWindow(GuiMiniFrame):
         eventDc = self.backend.getDeviceContext(self.panelCanvas.GetClientSize(), self.panelCanvas, viewRect)
         for numRow in range(canvas.size[1]):
             for numCol in range(canvas.size[0]):
-                self.backend.drawPatch(eventDc, [numCol, numRow, *canvas.map[numRow][numCol]], viewRect)
+                self.backend.drawPatch(canvas, eventDc, [numCol, numRow, *canvas.map[numRow][numCol]], viewRect)
     # }}}
     # {{{ onPaint(self, event)
     def onPaint(self, event):
@@ -153,11 +153,11 @@ class RoarAssetsWindow(GuiMiniFrame):
             if deltaSize[0] > 0:
                 for numRow in range(oldSize[1]):
                     for numNewCol in range(oldSize[0], newSize[0]):
-                        self._drawPatch(eventDc, False, [numNewCol, numRow, 1, 1, 0, " "], viewRect)
+                        self._drawPatch(canvas, eventDc, False, [numNewCol, numRow, 1, 1, 0, " "], viewRect)
             if deltaSize[1] > 1:
                 for numNewRow in range(oldSize[1], newSize[1]):
                     for numNewCol in range(newSize[0]):
-                        self._drawPatch(eventDc, False, [numNewCol, numNewRow, 1, 1, 0, " "], viewRect)
+                        self._drawPatch(canvas, eventDc, False, [numNewCol, numNewRow, 1, 1, 0, " "], viewRect)
     # }}}
     # {{{ update(self, canvas, newSize, newCanvas=None)
     def update(self, canvas, newSize, newCanvas=None):
@@ -167,7 +167,7 @@ class RoarAssetsWindow(GuiMiniFrame):
         eventDc = self.backend.getDeviceContext(self.panelCanvas.GetClientSize(), self.panelCanvas, viewRect)
         for numRow in range(canvas.size[1]):
             for numCol in range(canvas.size[0]):
-                self.backend.drawPatch(eventDc, [numCol, numRow, *canvas.map[numRow][numCol]], viewRect)
+                self.backend.drawPatch(canvas, eventDc, [numCol, numRow, *canvas.map[numRow][numCol]], viewRect)
     # }}}
 
     # {{{ onImportAnsi(self, event)
