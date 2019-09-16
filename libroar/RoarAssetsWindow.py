@@ -10,10 +10,10 @@ from GuiWindow import GuiWindow
 import json, os, sys, wx
 
 class RoarAssetsWindow(GuiMiniFrame):
-    # {{{ _drawPatch(self, canvas, eventDc, isCursor, patch, viewRect)
-    def _drawPatch(self, canvas, eventDc, isCursor, patch, viewRect):
+    # {{{ _drawPatch(self, canvas, eventDc, isCursor, patch)
+    def _drawPatch(self, canvas, eventDc, isCursor, patch):
         if not isCursor:
-            self.backend.drawPatch(canvas, eventDc, patch, viewRect)
+            self.backend.drawPatch(canvas, eventDc, patch)
     # }}}
     # {{{ _import(self, f, pathName)
     def _import(self, f, pathName):
@@ -109,11 +109,12 @@ class RoarAssetsWindow(GuiMiniFrame):
         while curWindow != None:
             curWindow.Layout(); curWindow = curWindow.GetParent();
         self.backend.resize(canvas.size, self.cellSize)
-        viewRect = self.panelCanvas.GetViewStart();
-        eventDc = self.backend.getDeviceContext(self.panelCanvas.GetClientSize(), self.panelCanvas, viewRect)
+        eventDc = self.backend.getDeviceContext(self.panelCanvas.GetClientSize(), self.panelCanvas)
+        eventDcOrigin = eventDc.GetDeviceOrigin(); eventDc.SetDeviceOrigin(0, 0);
         for numRow in range(canvas.size[1]):
             for numCol in range(canvas.size[0]):
-                self.backend.drawPatch(canvas, eventDc, [numCol, numRow, *canvas.map[numRow][numCol]], viewRect)
+                self.backend.drawPatch(canvas, eventDc, [numCol, numRow, *canvas.map[numRow][numCol]])
+        eventDc.SetDeviceOrigin(*eventDcOrigin)
     # }}}
     # {{{ onPaint(self, event)
     def onPaint(self, event):
@@ -149,25 +150,28 @@ class RoarAssetsWindow(GuiMiniFrame):
             while curWindow != None:
                 curWindow.Layout(); curWindow = curWindow.GetParent();
             self.backend.resize(newSize, self.cellSize)
-            viewRect = self.panelCanvas.GetViewStart(); eventDc = self.backend.getDeviceContext(self.panelCanvas.GetClientSize(), self.panelCanvas, viewRect);
+            eventDc = self.backend.getDeviceContext(self.panelCanvas.GetClientSize(), self.panelCanvas)
+            eventDcOrigin = eventDc.GetDeviceOrigin(); eventDc.SetDeviceOrigin(0, 0);
             if deltaSize[0] > 0:
                 for numRow in range(oldSize[1]):
                     for numNewCol in range(oldSize[0], newSize[0]):
-                        self._drawPatch(canvas, eventDc, False, [numNewCol, numRow, 1, 1, 0, " "], viewRect)
+                        self._drawPatch(canvas, eventDc, False, [numNewCol, numRow, 1, 1, 0, " "])
             if deltaSize[1] > 1:
                 for numNewRow in range(oldSize[1], newSize[1]):
                     for numNewCol in range(newSize[0]):
-                        self._drawPatch(canvas, eventDc, False, [numNewCol, numNewRow, 1, 1, 0, " "], viewRect)
+                        self._drawPatch(canvas, eventDc, False, [numNewCol, numNewRow, 1, 1, 0, " "])
+            eventDc.SetDeviceOrigin(*eventDcOrigin)
     # }}}
     # {{{ update(self, canvas, newSize, newCanvas=None)
     def update(self, canvas, newSize, newCanvas=None):
         self.resize(canvas, newSize);
-        canvas.update(newSize, newCanvas); viewRect = self.panelCanvas.GetViewStart();
-        viewRect = self.panelCanvas.GetViewStart();
-        eventDc = self.backend.getDeviceContext(self.panelCanvas.GetClientSize(), self.panelCanvas, viewRect)
+        canvas.update(newSize, newCanvas);
+        eventDc = self.backend.getDeviceContext(self.panelCanvas.GetClientSize(), self.panelCanvas)
+        eventDcOrigin = eventDc.GetDeviceOrigin(); eventDc.SetDeviceOrigin(0, 0);
         for numRow in range(canvas.size[1]):
             for numCol in range(canvas.size[0]):
-                self.backend.drawPatch(canvas, eventDc, [numCol, numRow, *canvas.map[numRow][numCol]], viewRect)
+                self.backend.drawPatch(canvas, eventDc, [numCol, numRow, *canvas.map[numRow][numCol]])
+        eventDc.SetDeviceOrigin(*eventDcOrigin)
     # }}}
 
     # {{{ onImportAnsi(self, event)

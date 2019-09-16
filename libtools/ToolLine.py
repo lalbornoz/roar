@@ -11,8 +11,8 @@ class ToolLine(Tool):
     TS_NONE     = 0
     TS_ORIGIN   = 1
 
-    # {{{ _getLine(self, brushColours, brushSize, dispatchFn, eventDc, isCursor, originPoint, targetPoint, viewRect)
-    def _getLine(self, brushColours, brushSize, dispatchFn, eventDc, isCursor, originPoint, targetPoint, viewRect):
+    # {{{ _getLine(self, brushColours, brushSize, dispatchFn, eventDc, isCursor, originPoint, targetPoint)
+    def _getLine(self, brushColours, brushSize, dispatchFn, eventDc, isCursor, originPoint, targetPoint):
         dirty = False
         originPoint, targetPoint = originPoint.copy(), targetPoint.copy()
         pointDelta = self._pointDelta(originPoint, targetPoint)
@@ -31,11 +31,11 @@ class ToolLine(Tool):
                         originPoint[1] + lineX * lineXY + lineY * lineYY,               \
                         *brushColours, 0, " "]
                 if isCursor:
-                    dispatchFn(eventDc, False, patch, viewRect); dispatchFn(eventDc, True, patch, viewRect);
+                    dispatchFn(eventDc, False, patch); dispatchFn(eventDc, True, patch);
                 else:
                     if not dirty:
                         dirty = True
-                    dispatchFn(eventDc, True, patch, viewRect)
+                    dispatchFn(eventDc, True, patch)
             if lineD > 0:
                 lineD -= pointDelta[0]; lineY += 1;
             lineD += pointDelta[1]
@@ -51,8 +51,8 @@ class ToolLine(Tool):
     # }}}
 
     #
-    # onMouseEvent(self, atPoint, brushColours, brushPos, brushSize, canvas, dispatchFn, eventDc, keyModifiers, mapPoint, mouseDragging, mouseLeftDown, mouseRightDown, viewRect)
-    def onMouseEvent(self, atPoint, brushColours, brushPos, brushSize, canvas, dispatchFn, eventDc, keyModifiers, mapPoint, mouseDragging, mouseLeftDown, mouseRightDown, viewRect):
+    # onMouseEvent(self, atPoint, brushColours, brushPos, brushSize, canvas, dispatchFn, eventDc, keyModifiers, mapPoint, mouseDragging, mouseLeftDown, mouseRightDown)
+    def onMouseEvent(self, atPoint, brushColours, brushPos, brushSize, canvas, dispatchFn, eventDc, keyModifiers, mapPoint, mouseDragging, mouseLeftDown, mouseRightDown):
         brushColours, dirty = brushColours.copy(), False
         if mouseLeftDown:
             brushColours[1] = brushColours[0]
@@ -63,10 +63,10 @@ class ToolLine(Tool):
         if self.toolState == self.TS_NONE:
             if mouseLeftDown or mouseRightDown:
                 self.toolColours, self.toolOriginPoint, self.toolState = brushColours, list(mapPoint), self.TS_ORIGIN
-            dispatchFn(eventDc, True, [*mapPoint, *brushColours, 0, " "], viewRect)
+            dispatchFn(eventDc, True, [*mapPoint, *brushColours, 0, " "])
         elif self.toolState == self.TS_ORIGIN:
             originPoint, targetPoint = self.toolOriginPoint, list(mapPoint)
-            dirty = self._getLine(self.toolColours, brushSize, dispatchFn, eventDc, mouseLeftDown or mouseRightDown, originPoint, targetPoint, viewRect)
+            dirty = self._getLine(self.toolColours, brushSize, dispatchFn, eventDc, mouseLeftDown or mouseRightDown, originPoint, targetPoint)
             if mouseLeftDown or mouseRightDown:
                 self.toolColours, self.toolOriginPoint, self.toolState = None, None, self.TS_NONE
         else:

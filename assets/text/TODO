@@ -19,13 +19,6 @@ High-priority list:
     c) Settings/Settings window (e.g. autosave, hide cursor on leaving window, ...)
     d) replace resize buttons w/ {-,edit box,+} buttons & lock button re: ratio (ty lol3)
     e) {copy,cut,delete,insert from,paste}, {edit asset in new canvas,import from {canvas,object}}
-
-Queue:
-1)  scrolling bug: start @ top, down key til cursor below visible canvas, scroll down, cursor gone GRRRR
-2)  scrolling bug: scroll down, apply operator to entire canvas, scroll up
-3)  scrolling bug: scroll down, text tool, move cursor w/ arrow keys
-4)  object tool: object size wrong occasionally w/ external objects
-5)  scrolling bug: scroll down, un/redo, scroll up
-6)  clone selection lag
+5)  finish Arabic/RTL text implementation
 
 vim:ff=dos tw=0
