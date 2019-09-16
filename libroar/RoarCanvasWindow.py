@@ -47,9 +47,9 @@ class RoarCanvasWindow(GuiWindow):
     # {{{ _drawPatch(self, eventDc, isCursor, patch, viewRect)
     def _drawPatch(self, eventDc, isCursor, patch, viewRect):
         if not self.canvas.dirtyCursor:
-            self.backend.drawCursorMaskWithJournal(self.canvas.journal, eventDc, viewRect)
+            self.backend.drawCursorMaskWithJournal(self.canvas, self.canvas.journal, eventDc, viewRect)
             self.canvas.dirtyCursor = True
-        if self.backend.drawPatch(eventDc, patch, viewRect) and isCursor:
+        if self.backend.drawPatch(self.canvas, eventDc, patch, viewRect) and isCursor:
             patchDeltaCell = self.canvas.map[patch[1]][patch[0]]; patchDelta = [*patch[0:2], *patchDeltaCell];
             self.canvas.journal.pushCursor(patchDelta)
     # }}}
@@ -103,7 +103,7 @@ class RoarCanvasWindow(GuiWindow):
         viewRect = self.GetViewStart()
         eventDc = self.backend.getDeviceContext(self.GetClientSize(), self, viewRect)
         if self.canvas.dirtyCursor:
-            self.backend.drawCursorMaskWithJournal(self.canvas.journal, eventDc, viewRect)
+            self.backend.drawCursorMaskWithJournal(self.canvas, self.canvas.journal, eventDc, viewRect)
             self.canvas.dirtyCursor = False
         for patch in deltaPatches:
             if patch == None:
@@ -111,7 +111,7 @@ class RoarCanvasWindow(GuiWindow):
             elif patch[0] == "resize":
                 del eventDc; self.resize(patch[1:], False); eventDc = self.backend.getDeviceContext(self.GetClientSize(), self, self.GetViewStart());
             else:
-                self.canvas._commitPatch(patch); self.backend.drawPatch(eventDc, patch, self.GetViewStart());
+                self.canvas._commitPatch(patch); self.backend.drawPatch(self.canvas, eventDc, patch, self.GetViewStart());
     # }}}
     # {{{ dispatchPatch(self, eventDc, isCursor, patch, viewRect)
     def dispatchPatch(self, eventDc, isCursor, patch, viewRect):
@@ -148,7 +148,7 @@ class RoarCanvasWindow(GuiWindow):
         eventDc = self.backend.getDeviceContext(self.GetClientSize(), self, self.GetViewStart())
         for numRow in range(newSize[1]):
             for numCol in range(newSize[0]):
-                self.backend.drawPatch(eventDc, [numCol, numRow, *self.canvas.map[numRow][numCol]], self.GetViewStart())
+                self.backend.drawPatch(self.canvas, eventDc, [numCol, numRow, *self.canvas.map[numRow][numCol]], self.GetViewStart())
     # }}}
 
     # {{{ onKeyboardInput(self, event)
@@ -193,7 +193,7 @@ class RoarCanvasWindow(GuiWindow):
     def onLeaveWindow(self, event):
         if False:
             eventDc = self.backend.getDeviceContext(self.GetClientSize(), self, self.GetViewStart())
-            self.backend.drawCursorMaskWithJournal(self.canvas.journal, eventDc, self.GetViewStart())
+            self.backend.drawCursorMaskWithJournal(self.canvas, self.canvas.journal, eventDc, self.GetViewStart())
         self.lastCellState = None
     # }}}
     # {{{ onMouseInput(self, event)
@@ -228,7 +228,7 @@ class RoarCanvasWindow(GuiWindow):
     def onPaint(self, event):
         viewRect = self.GetViewStart()
         eventDc = self.backend.getDeviceContext(self.GetClientSize(), self, viewRect)
-        self.backend.drawCursorMaskWithJournal(self.canvas.journal, eventDc, viewRect)
+        self.backend.drawCursorMaskWithJournal(self.canvas, self.canvas.journal, eventDc, viewRect)
         self.backend.onPaint(self.GetClientSize(), self, self.GetViewStart())
     # }}}
 

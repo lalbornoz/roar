@@ -5,12 +5,42 @@
 #
 
 from Tool import Tool
-import re, string, wx
+import re, string, time, wx
 
 class ToolText(Tool):
     name = "Text"
+    arabicRegEx = r'^[\u0621-\u063A\u0640-\u064A]+$'
     rtlRegEx = r'^[\u0591-\u07FF\uFB1D-\uFDFD\uFE70-\uFEFC]+$'
 
+    # {{{ _checkRtl(self, canvas, brushPos, keyChar)
+    def _checkRtl(self, canvas, brushPos, keyChar):
+        rtlFlag = False
+        if (keyChar != None) and re.match(self.rtlRegEx, keyChar):
+            rtlFlag = True
+        else:
+            lastX, lastY = brushPos[0], brushPos[1]
+            while True:
+                if canvas.map[lastY][lastX][3] == " ":
+                    if (lastX + 1) >= canvas.size[0]:
+                        if lastY == 0:
+                            break
+                        else:
+                            lastX, lastY = 0, lastY - 1
+                    else:
+                        lastX += 1
+                elif re.match(self.arabicRegEx, canvas.map[lastY][lastX][3]):
+                    rtlFlag = True
+                    if (lastX + 1) >= canvas.size[0]:
+                        if lastY == 0:
+                            break
+                        else:
+                            lastX, lastY = 0, lastY - 1
+                    else:
+                        lastX += 1
+                else:
+                    break
+        return rtlFlag
+    # }}}
     # {{{ _processKeyChar(self, brushColours, brushPos, canvas, dispatchFn, eventDc, keyChar, keyModifiers, viewRect)
     def _processKeyChar(self, brushColours, brushPos, canvas, dispatchFn, eventDc, keyChar, keyModifiers, viewRect):
         if (ord(keyChar) != wx.WXK_NONE)                            \
@@ -18,7 +48,7 @@ class ToolText(Tool):
         and  ((ord(keyChar) >= 32) if ord(keyChar) < 127 else True) \
         and  (keyModifiers in (wx.MOD_NONE, wx.MOD_SHIFT)):
             dispatchFn(eventDc, False, [*brushPos, *brushColours, 0, keyChar], viewRect);
-            if not re.match(self.rtlRegEx, keyChar):
+            if not self._checkRtl(canvas, brushPos, keyChar):
                 if brushPos[0] < (canvas.size[0] - 1):
                     brushPos[0] += 1
                 elif brushPos[1] < (canvas.size[1] - 1):
@@ -56,13 +86,29 @@ class ToolText(Tool):
             else:
                 rc, error = False, "Clipboard does not contain text data and/or cannot be opened"
         elif keyCode == wx.WXK_BACK:
-            if brushPos[0] > 0:
-                brushPos[0] -= 1
-            elif brushPos[1] > 0:
-                brushPos[0], brushPos[1] = canvas.size[0] - 1, brushPos[1] - 1
+            if ((brushPos[0] + 1) >= canvas.size[0]):
+                if brushPos[1] > 0:
+                    lastBrushPos = [0, brushPos[1] - 1]
+                else:
+                    lastBrushPos = [0, 0]
             else:
-                brushPos[0], brushPos[1] = canvas.size[0] - 1, canvas.size[1] - 1
-            rc, dirty = True, False; dispatchFn(eventDc, True, [*brushPos, *brushColours, 0, "_"], viewRect);
+                lastBrushPos = [brushPos[0] + 1, brushPos[1]]
+            if not self._checkRtl(canvas, lastBrushPos, None):
+                if brushPos[0] > 0:
+                    brushPos[0] -= 1
+                elif brushPos[1] > 0:
+                    brushPos[0], brushPos[1] = canvas.size[0] - 1, brushPos[1] - 1
+                else:
+                    brushPos[0], brushPos[1] = canvas.size[0] - 1, canvas.size[1] - 1
+            else:
+                if brushPos[0] < (canvas.size[0] - 1):
+                    brushPos[0] += 1
+                elif brushPos[1] > 0:
+                    brushPos[0], brushPos[1] = 0, brushPos[1] - 1
+                else:
+                    brushPos[0], brushPos[1] = canvas.size[0] - 1, 0
+            rc, dirty = True, False; dispatchFn(eventDc, False, [*brushPos, *brushColours, 0, " "], viewRect);
+            dispatchFn(eventDc, True, [*brushPos, *brushColours, 0, "_"], viewRect);
         elif keyCode == wx.WXK_RETURN:
             if brushPos[1] < (canvas.size[1] - 1):
                 brushPos[0], brushPos[1] = 0, brushPos[1] + 1

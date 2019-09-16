@@ -27,6 +27,47 @@ class GuiBufferedDC(wx.MemoryDC):
     # }}}
 
 class GuiCanvasWxBackend():
+    # {{{ arabicShapes{}
+    arabicShapes = {
+        u'\u0621': (u'\uFE80'),
+        u'\u0622': (u'\uFE81', None, None, u'\uFE82'),
+        u'\u0623': (u'\uFE83', None, None, u'\uFE84'),
+        u'\u0624': (u'\uFE85', None, None, u'\uFE86'),
+        u'\u0625': (u'\uFE87', None, None, u'\uFE88'),
+        u'\u0626': (u'\uFE89', u'\uFE8B', u'\uFE8C', u'\uFE8A'),
+        u'\u0627': (u'\uFE8D', None, None, u'\uFE8E'),
+        u'\u0628': (u'\uFE8F', u'\uFE91', u'\uFE92', u'\uFE90'),
+        u'\u0629': (u'\uFE93', None, None, u'\uFE94'),
+        u'\u062A': (u'\uFE95', u'\uFE97', u'\uFE98', u'\uFE96'),
+        u'\u062B': (u'\uFE99', u'\uFE9B', u'\uFE9C', u'\uFE9A'),
+        u'\u062C': (u'\uFE9D', u'\uFE9F', u'\uFEA0', u'\uFE9E'),
+        u'\u062D': (u'\uFEA1', u'\uFEA3', u'\uFEA4', u'\uFEA2'),
+        u'\u062E': (u'\uFEA5', u'\uFEA7', u'\uFEA8', u'\uFEA6'),
+        u'\u062F': (u'\uFEA9', None, None, u'\uFEAA'),
+        u'\u0630': (u'\uFEAB', None, None, u'\uFEAC'),
+        u'\u0631': (u'\uFEAD', None, None, u'\uFEAE'),
+        u'\u0632': (u'\uFEAF', None, None, u'\uFEB0'),
+        u'\u0633': (u'\uFEB1', u'\uFEB3', u'\uFEB4', u'\uFEB2'),
+        u'\u0634': (u'\uFEB5', u'\uFEB7', u'\uFEB8', u'\uFEB6'),
+        u'\u0635': (u'\uFEB9', u'\uFEBB', u'\uFEBC', u'\uFEBA'),
+        u'\u0636': (u'\uFEBD', u'\uFEBF', u'\uFEC0', u'\uFEBE'),
+        u'\u0637': (u'\uFEC1', u'\uFEC3', u'\uFEC4', u'\uFEC2'),
+        u'\u0638': (u'\uFEC5', u'\uFEC7', u'\uFEC8', u'\uFEC6'),
+        u'\u0639': (u'\uFEC9', u'\uFECB', u'\uFECC', u'\uFECA'),
+        u'\u063A': (u'\uFECD', u'\uFECF', u'\uFED0', u'\uFECE'),
+        u'\u0640': (u'\u0640', None, None, None),
+        u'\u0641': (u'\uFED1', u'\uFED3', u'\uFED4', u'\uFED2'),
+        u'\u0642': (u'\uFED5', u'\uFED7', u'\uFED8', u'\uFED6'),
+        u'\u0643': (u'\uFED9', u'\uFEDB', u'\uFEDC', u'\uFEDA'),
+        u'\u0644': (u'\uFEDD', u'\uFEDF', u'\uFEE0', u'\uFEDE'),
+        u'\u0645': (u'\uFEE1', u'\uFEE3', u'\uFEE4', u'\uFEE2'),
+        u'\u0646': (u'\uFEE5', u'\uFEE7', u'\uFEE8', u'\uFEE6'),
+        u'\u0647': (u'\uFEE9', u'\uFEEB', u'\uFEEC', u'\uFEEA'),
+        u'\u0648': (u'\uFEED', None, None, u'\uFEEE'),
+        u'\u0649': (u'\uFEEF', None, None, u'\uFEF0'),
+        u'\u064A': (u'\uFEF1', u'\uFEF3', u'\uFEF4', u'\uFEF2'),
+    }
+    # }}}
     # {{{ _CellState(): Cell state
     class _CellState():
         CS_NONE             = 0x00
@@ -99,6 +140,40 @@ class GuiCanvasWxBackend():
         self._penAlpha = wx.Pen(wx.Colour(Colours[14][:4]), 1)
         self._lastBrushBg, self._lastBrushFg, self._lastPen = None, None, None
     # }}}
+    # {{{ _reshapeArabic(self, canvas, eventDc, patch, point)
+    def _reshapeArabic(self, canvas, eventDc, patch, point):
+        lastCell = point[0]
+        while True:
+            if  ((lastCell + 1) >= (canvas.size[0] - 1))    \
+            or  (not canvas.map[point[1]][lastCell + 1][3] in self.arabicShapes):
+                break
+            else:
+                lastCell += 1
+        connect = False
+        for runX in range(lastCell, point[0], -1):
+            runCell = list(canvas.map[point[1]][runX])
+            if runX == lastCell:
+                if self.arabicShapes[runCell[3]][1] != None:
+                    runCell[3] = self.arabicShapes[runCell[3]][1]; connect = True;
+                else:
+                    runCell[3] = self.arabicShapes[runCell[3]][0]; connect = False;
+            else:
+                if connect and (self.arabicShapes[runCell[3]][2] != None):
+                    runCell[3] = self.arabicShapes[runCell[3]][2]; connect = True;
+                elif connect and (self.arabicShapes[runCell[3]][3] != None):
+                    runCell[3] = self.arabicShapes[runCell[3]][3]; connect = False;
+                elif not connect and (self.arabicShapes[runCell[3]][1] != None):
+                    runCell[3] = self.arabicShapes[runCell[3]][1]; connect = True;
+                else:
+                    runCell[3] = self.arabicShapes[runCell[3]][0]; connect = False;
+            self._drawCharPatch(eventDc, runCell, [runX, point[1]])
+        runCell = list(patch[2:])
+        if connect and (self.arabicShapes[patch[5]][3] != None):
+            runCell[3] = self.arabicShapes[patch[5]][3]
+        else:
+            runCell[3] = self.arabicShapes[patch[5]][0]
+        self._drawCharPatch(eventDc, runCell, [point[0], point[1]])
+    # }}}
     # {{{ _setBrushDc(self, brushBg, brushFg, dc, pen)
     def _setBrushDc(self, brushBg, brushFg, dc, pen):
         if self._lastBrushBg != brushBg:
@@ -113,12 +188,12 @@ class GuiCanvasWxBackend():
         return [a * b for a, b in zip(point, self.cellSize)]
     # }}}
 
-    # {{{ drawCursorMaskWithJournal(self, canvasJournal, eventDc, viewRect)
-    def drawCursorMaskWithJournal(self, canvasJournal, eventDc, viewRect):
-        [self.drawPatch(eventDc, patch, viewRect) for patch in canvasJournal.popCursor()]
+    # {{{ drawCursorMaskWithJournal(self, canvas, canvasJournal, eventDc, viewRect)
+    def drawCursorMaskWithJournal(self, canvas, canvasJournal, eventDc, viewRect):
+        [self.drawPatch(canvas, eventDc, patch, viewRect) for patch in canvasJournal.popCursor()]
     # }}}
-    # {{{ drawPatch(self, eventDc, patch, viewRect)
-    def drawPatch(self, eventDc, patch, viewRect):
+    # {{{ drawPatch(self, canvas, eventDc, patch, viewRect)
+    def drawPatch(self, canvas, eventDc, patch, viewRect):
         point = [m - n for m, n in zip(patch[:2], viewRect)]
         if [(c >= 0) and (c < s) for c, s in zip(point, self.canvasSize)] == [True, True]:
             if patch[5] == " ":
@@ -128,6 +203,8 @@ class GuiCanvasWxBackend():
                     self._drawCharPatch(eventDc, patch[2:], point)
                 else:
                     self._drawBrushPatch(eventDc, patch[2:], point)
+            elif patch[5] in self.arabicShapes:
+                self._reshapeArabic(canvas, eventDc, patch, point)
             else:
                 self._drawCharPatch(eventDc, patch[2:], point)
             return True
