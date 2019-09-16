@@ -164,7 +164,7 @@ class RoarCanvasWindow(GuiWindow):
     def onKeyboardInput(self, event):
         keyCode, keyModifiers = event.GetKeyCode(), event.GetModifiers()
         viewRect = self.GetViewStart(); eventDc = self.backend.getDeviceContext(self.GetClientSize(), self, viewRect);
-        if  (keyCode == wx.WXK_PAUSE)   \
+        if  (keyCode == wx.WXK_PAUSE)               \
         and (keyModifiers == wx.MOD_SHIFT):
             import pdb; pdb.set_trace()
         elif keyCode in (wx.WXK_DOWN, wx.WXK_LEFT, wx.WXK_RIGHT, wx.WXK_UP):
@@ -188,6 +188,17 @@ class RoarCanvasWindow(GuiWindow):
                     self.brushPos = [self.brushPos[0], self.brushPos[1] - 1]
                 else:
                     self.brushPos = [self.brushPos[0], self.canvas.size[1] - 1]
+            self.commands.update(cellPos=self.brushPos)
+            self.applyTool(eventDc, True, None, None, None, self.brushPos, False, False, False, self.commands.currentTool, viewRect)
+        elif (chr(event.GetUnicodeKey()) == " ")    \
+        and  (self.commands.currentTool.__class__ != ToolText):
+            if not self.applyTool(eventDc, True, None, None, event.GetModifiers(), self.brushPos, False, True, False, self.commands.currentTool, viewRect):
+                event.Skip()
+            else:
+                if self.brushPos[0] < (self.canvas.size[0] - 1):
+                    self.brushPos = [self.brushPos[0] + 1, self.brushPos[1]]
+                else:
+                    self.brushPos = [0, self.brushPos[1]]
             self.commands.update(cellPos=self.brushPos)
             self.applyTool(eventDc, True, None, None, None, self.brushPos, False, False, False, self.commands.currentTool, viewRect)
         else:
