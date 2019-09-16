@@ -9,6 +9,7 @@ import re, string, time, wx
 
 class ToolText(Tool):
     name = "Text"
+    arabicCombiningRegEx = r'^[\u064B-\u065F\uFE70-\uFE72\uFE74\uFE76-\uFE7F]+$'
     arabicRegEx = r'^[\u0621-\u063A\u0640-\u064A]+$'
     rtlRegEx = r'^[\u0591-\u07FF\uFB1D-\uFDFD\uFE70-\uFEFC]+$'
 
@@ -71,15 +72,18 @@ class ToolText(Tool):
     #
     # onKeyboardEvent(self, atPoint, brushColours, brushPos, brushSize, canvas, dispatchFn, eventDc, keyChar, keyCode, keyModifiers, mapPoint, viewRect)
     def onKeyboardEvent(self, atPoint, brushColours, brushPos, brushSize, canvas, dispatchFn, eventDc, keyChar, keyCode, keyModifiers, mapPoint, viewRect):
-        if keyCode == wx.WXK_CONTROL_V:
+        if re.match(self.arabicCombiningRegEx, keyChar):
+            rc, dirty = True, False
+        elif keyCode == wx.WXK_CONTROL_V:
             rc, dirty = True, False
             if  wx.TheClipboard.IsSupported(wx.DataFormat(wx.DF_TEXT))  \
             and wx.TheClipboard.Open():
                 inBuffer = wx.TextDataObject()
                 if wx.TheClipboard.GetData(inBuffer):
                     for inBufferChar in list(inBuffer.GetText()):
-                        rc_, dirty_ = self._processKeyChar(brushColours, brushPos, canvas, dispatchFn, eventDc, inBufferChar, 0, viewRect)
-                        rc = True if rc_ else rc; dirty = True if dirty_ else dirty;
+                        if not re.match(self.arabicCombiningRegEx, inBufferChar):
+                            rc_, dirty_ = self._processKeyChar(brushColours, brushPos, canvas, dispatchFn, eventDc, inBufferChar, 0, viewRect)
+                            rc = True if rc_ else rc; dirty = True if dirty_ else dirty;
                     if rc:
                         dispatchFn(eventDc, True, [*brushPos, *brushColours, 0, "_"], viewRect)
                 wx.TheClipboard.Close()
