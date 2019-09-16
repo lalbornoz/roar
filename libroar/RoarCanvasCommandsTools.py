@@ -24,6 +24,10 @@ class RoarCanvasCommandsTools():
     @GuiSelectDecorator(6, "Text", "&Text", ["toolText.png"], [wx.ACCEL_CTRL, ord("T")], False)
     def canvasTool(self, f, idx):
         def canvasTool_(event):
+            if  (self.currentTool.__class__ == ToolObject)                  \
+            and (self.currentTool.toolState >  self.currentTool.TS_NONE)    \
+            and self.currentTool.external:
+                self.parentCanvas.dropTarget.done()
             self.lastTool, self.currentTool = self.currentTool, [ToolCircle, None, ToolFill, ToolLine, ToolObject, ToolRect, ToolText][idx]
             if self.currentTool != None:
                 self.currentTool = self.currentTool()
