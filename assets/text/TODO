@@ -22,8 +22,8 @@ High-priority list:
 Queue:
 1)  scrolling bug: start @ top, down key til cursor below visible canvas, scroll down, cursor gone GRRRR
 2)  scrolling bug: scroll down, apply operator to entire canvas, scroll up
-3)  text tool: a) honour RTL text flow b) pasting text
-4)  select-related {re,un}do bugs
+3)  select-related {re,un}do bugs
+4)  text tool: pasting text
 5)  clone selection lag
 
 vim:ff=dos tw=0

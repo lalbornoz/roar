@@ -5,10 +5,11 @@
 #
 
 from Tool import Tool
-import string, wx
+import re, string, wx
 
 class ToolText(Tool):
     name = "Text"
+    rtlRegEx = r'^[\u0591-\u07FF\uFB1D-\uFDFD\uFE70-\uFEFC]+$'
 
     #
     # onKeyboardEvent(self, atPoint, brushColours, brushPos, brushSize, canvas, dispatchFn, eventDc, keyChar, keyCode, keyModifiers, mapPoint, viewRect)
@@ -32,12 +33,20 @@ class ToolText(Tool):
         and  ((ord(keyChar) >= 32) if ord(keyChar) < 127 else True) \
         and  (keyModifiers in (wx.MOD_NONE, wx.MOD_SHIFT)):
             dispatchFn(eventDc, False, [*brushPos, *brushColours, 0, keyChar], viewRect);
-            if brushPos[0] < (canvas.size[0] - 1):
-                brushPos[0] += 1
-            elif brushPos[1] < (canvas.size[1] - 1):
-                brushPos[0], brushPos[1] = 0, brushPos[1] + 1
+            if not re.match(self.rtlRegEx, keyChar):
+                if brushPos[0] < (canvas.size[0] - 1):
+                    brushPos[0] += 1
+                elif brushPos[1] < (canvas.size[1] - 1):
+                    brushPos[0], brushPos[1] = 0, brushPos[1] + 1
+                else:
+                    brushPos[0], brushPos[1] = 0, 0
             else:
-                brushPos[0], brushPos[1] = 0, 0
+                if brushPos[0] > 0:
+                    brushPos[0] -= 1
+                elif brushPos[1] > 0:
+                    brushPos[0], brushPos[1] = canvas.size[0] - 1, brushPos[1] - 1
+                else:
+                    brushPos[0], brushPos[1] = canvas.size[0] - 1, canvas.size[1] - 1
             dispatchFn(eventDc, True, [*brushPos, *brushColours, 0, "_"], viewRect)
             rc, dirty = True, True
         else:
