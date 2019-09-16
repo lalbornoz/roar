@@ -145,7 +145,7 @@ class RoarCanvasWindow(GuiWindow):
                 for numNewRow in range(oldSize[1], newSize[1]):
                     for numNewCol in range(newSize[0]):
                         self._drawPatch(eventDc, False, [numNewCol, numNewRow, 1, 1, 0, " "])
-            eventDc.SetDeviceOrigin(*eventDcOrigin) 
+            eventDc.SetDeviceOrigin(*eventDcOrigin)
             self.commands.update(size=newSize, undoLevel=self.canvas.journal.patchesUndoLevel)
     # }}}
     # {{{ update(self, newSize, commitUndo=True, newCanvas=None)
