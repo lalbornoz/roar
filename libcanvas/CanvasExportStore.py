@@ -166,15 +166,28 @@ class CanvasExportStore():
     def exportTextBuffer(self, canvasMap, canvasSize):
         outBuffer = ""
         for canvasRow in range(canvasSize[1]):
-            canvasLastColours = [15, -1]
+            canvasLastAttrs, canvasLastColours = self._CellState.CS_NONE, [15, -1]
             for canvasCol in range(canvasSize[0]):
+                canvasColAttrs = canvasMap[canvasRow][canvasCol][2]
                 canvasColColours = canvasMap[canvasRow][canvasCol][0:2]
                 canvasColText = canvasMap[canvasRow][canvasCol][3]
+                if  (canvasColAttrs & self._CellState.CS_BOLD)              \
+                and (not (canvasLastAttrs & self._CellState.CS_BOLD)):
+                    outBuffer += "\u0002"; canvasLastAttrs = canvasLastAttrs | self._CellState.CS_BOLD;
+                if  (not (canvasColAttrs & self._CellState.CS_BOLD))        \
+                and (canvasLastAttrs & self._CellState.CS_BOLD):
+                    outBuffer += "\u0002"; canvasLastAttrs = canvasLastAttrs & ~self._CellState.CS_BOLD;
+                if  (canvasColAttrs & self._CellState.CS_UNDERLINE)         \
+                and (not (canvasLastAttrs & self._CellState.CS_UNDERLINE)):
+                    outBuffer += "\u001f"; canvasLastAttrs = canvasLastAttrs | self._CellState.CS_UNDERLINE;
+                if  (not (canvasColAttrs & self._CellState.CS_UNDERLINE))   \
+                and (canvasLastAttrs & self._CellState.CS_UNDERLINE):
+                    outBuffer += "\u001f"; canvasLastAttrs = canvasLastAttrs & ~self._CellState.CS_UNDERLINE;
                 if canvasColColours[0] == -1:
                     canvasColColours[0] = canvasColColours[1]
-                if   (canvasColColours[0] != canvasLastColours[0])      \
+                if   (canvasColColours[0] != canvasLastColours[0])          \
                 and  (canvasColColours[1] != canvasLastColours[1]):
-                    if   (canvasColColours[0] == -1)                    \
+                    if   (canvasColColours[0] == -1)                        \
                     and  (canvasColColours[1] == -1):
                         outBuffer += "\u000f"
                     elif canvasColColours[1] == -1:
