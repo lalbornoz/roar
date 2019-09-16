@@ -45,10 +45,10 @@ class RoarCanvasCommandsOperators():
                 for numRow in range(len(region)):
                     for numCol in range(len(region[numRow])):
                         if not dirty:
-                            dirty = True
+                            self.parentCanvas.dirty = True
                         self.parentCanvas.dispatchPatchSingle(eventDc, False, [numCol, numRow, *region[numRow][numCol]], viewRect)
                 self.parentCanvas.canvas.journal.end()
-                self.parentCanvas.commands.update(dirty=dirty, undoLevel=self.parentCanvas.canvas.journal.patchesUndoLevel)
+                self.parentCanvas.commands.update(dirty=self.parentCanvas.dirty, undoLevel=self.parentCanvas.canvas.journal.patchesUndoLevel)
         setattr(canvasOperator_, "attrDict", f.attrList[idx])
         return canvasOperator_
     # }}}
