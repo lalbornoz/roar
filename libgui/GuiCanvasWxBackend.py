@@ -188,13 +188,13 @@ class GuiCanvasWxBackend():
         return [a * b for a, b in zip(point, self.cellSize)]
     # }}}
 
-    # {{{ drawCursorMaskWithJournal(self, canvas, canvasJournal, eventDc, viewRect)
-    def drawCursorMaskWithJournal(self, canvas, canvasJournal, eventDc, viewRect):
-        [self.drawPatch(canvas, eventDc, patch, viewRect) for patch in canvasJournal.popCursor()]
+    # {{{ drawCursorMaskWithJournal(self, canvas, canvasJournal, eventDc)
+    def drawCursorMaskWithJournal(self, canvas, canvasJournal, eventDc):
+        [self.drawPatch(canvas, eventDc, patch) for patch in canvasJournal.popCursor()]
     # }}}
-    # {{{ drawPatch(self, canvas, eventDc, patch, viewRect)
-    def drawPatch(self, canvas, eventDc, patch, viewRect):
-        point = [m - n for m, n in zip(patch[:2], viewRect)]
+    # {{{ drawPatch(self, canvas, eventDc, patch)
+    def drawPatch(self, canvas, eventDc, patch):
+        point = patch[:2]
         if [(c >= 0) and (c < s) for c, s in zip(point, self.canvasSize)] == [True, True]:
             if patch[5] == " ":
                 if patch[3] == -1:
@@ -211,8 +211,10 @@ class GuiCanvasWxBackend():
         else:
             return False
     # }}}
-    # {{{ getDeviceContext(self, clientSize, parentWindow, viewRect)
-    def getDeviceContext(self, clientSize, parentWindow, viewRect):
+    # {{{ getDeviceContext(self, clientSize, parentWindow, viewRect=None)
+    def getDeviceContext(self, clientSize, parentWindow, viewRect=None):
+        if viewRect == None:
+            viewRect = parentWindow.GetViewStart()
         if viewRect == (0, 0):
             eventDc = wx.BufferedDC(wx.ClientDC(parentWindow), self.canvasBitmap)
         else:

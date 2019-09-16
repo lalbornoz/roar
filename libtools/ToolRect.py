@@ -10,8 +10,8 @@ class ToolRect(Tool):
     name = "Rectangle"
 
     #
-    # onMouseEvent(self, atPoint, brushColours, brushPos, brushSize, canvas, dispatchFn, eventDc, keyModifiers, mapPoint, mouseDragging, mouseLeftDown, mouseRightDown, viewRect)
-    def onMouseEvent(self, atPoint, brushColours, brushPos, brushSize, canvas, dispatchFn, eventDc, keyModifiers, mapPoint, mouseDragging, mouseLeftDown, mouseRightDown, viewRect):
+    # onMouseEvent(self, atPoint, brushColours, brushPos, brushSize, canvas, dispatchFn, eventDc, keyModifiers, mapPoint, mouseDragging, mouseLeftDown, mouseRightDown)
+    def onMouseEvent(self, atPoint, brushColours, brushPos, brushSize, canvas, dispatchFn, eventDc, keyModifiers, mapPoint, mouseDragging, mouseLeftDown, mouseRightDown):
         brushColours, dirty = brushColours.copy(), False
         if mouseLeftDown:
             brushColours[1] = brushColours[0]
@@ -28,9 +28,9 @@ class ToolRect(Tool):
                 if mouseLeftDown or mouseRightDown:
                     if not dirty:
                         dirty = True
-                    dispatchFn(eventDc, False, patch, viewRect); dispatchFn(eventDc, True, patch, viewRect);
+                    dispatchFn(eventDc, False, patch); dispatchFn(eventDc, True, patch);
                 else:
-                    dispatchFn(eventDc, True, patch, viewRect)
+                    dispatchFn(eventDc, True, patch)
         return True, dirty
 
 # vim:expandtab foldmethod=marker sw=4 ts=4 tw=120
