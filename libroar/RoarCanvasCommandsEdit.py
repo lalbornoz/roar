@@ -79,22 +79,22 @@ class RoarCanvasCommandsEdit():
         return canvasCanvasSize_
     # }}}
     # {{{ canvasColour(self, f, idx)
-    @GuiSelectDecorator(0, "Colour #00", "Colour #00 (Bright White)", None, None, False)
-    @GuiSelectDecorator(1, "Colour #01", "Colour #01 (Black)", None, None, False)
-    @GuiSelectDecorator(2, "Colour #02", "Colour #02 (Blue)", None, None, False)
-    @GuiSelectDecorator(3, "Colour #03", "Colour #03 (Green)", None, None, False)
-    @GuiSelectDecorator(4, "Colour #04", "Colour #04 (Red)", None, None, False)
-    @GuiSelectDecorator(5, "Colour #05", "Colour #05 (Light Red)", None, None, False)
-    @GuiSelectDecorator(6, "Colour #06", "Colour #06 (Pink)", None, None, False)
-    @GuiSelectDecorator(7, "Colour #07", "Colour #07 (Yellow)", None, None, False)
-    @GuiSelectDecorator(8, "Colour #08", "Colour #08 (Light Yellow)", None, None, False)
-    @GuiSelectDecorator(9, "Colour #09", "Colour #09 (Light Green)", None, None, False)
-    @GuiSelectDecorator(10, "Colour #10", "Colour #10 (Cyan)", None, None, False)
-    @GuiSelectDecorator(11, "Colour #11", "Colour #11 (Light Cyan)", None, None, False)
-    @GuiSelectDecorator(12, "Colour #12", "Colour #12 (Light Blue)", None, None, False)
-    @GuiSelectDecorator(13, "Colour #13", "Colour #13 (Light Pink)", None, None, False)
-    @GuiSelectDecorator(14, "Colour #14", "Colour #14 (Grey)", None, None, False)
-    @GuiSelectDecorator(15, "Colour #15", "Colour #15 (Light Grey)", None, None, False)
+    @GuiSelectDecorator(0, "Colour #00", "Colour #00 (Bright White)", None, [wx.ACCEL_CTRL, ord("0")], False)
+    @GuiSelectDecorator(1, "Colour #01", "Colour #01 (Black)", None, [wx.ACCEL_CTRL, ord("1")], False)
+    @GuiSelectDecorator(2, "Colour #02", "Colour #02 (Blue)", None, [wx.ACCEL_CTRL, ord("2")], False)
+    @GuiSelectDecorator(3, "Colour #03", "Colour #03 (Green)", None, [wx.ACCEL_CTRL, ord("3")], False)
+    @GuiSelectDecorator(4, "Colour #04", "Colour #04 (Red)", None, [wx.ACCEL_CTRL, ord("4")], False)
+    @GuiSelectDecorator(5, "Colour #05", "Colour #05 (Light Red)", None, [wx.ACCEL_CTRL, ord("5")], False)
+    @GuiSelectDecorator(6, "Colour #06", "Colour #06 (Pink)", None, [wx.ACCEL_CTRL, ord("6")], False)
+    @GuiSelectDecorator(7, "Colour #07", "Colour #07 (Yellow)", None, [wx.ACCEL_CTRL, ord("7")], False)
+    @GuiSelectDecorator(8, "Colour #08", "Colour #08 (Light Yellow)", None, [wx.ACCEL_CTRL, ord("8")], False)
+    @GuiSelectDecorator(9, "Colour #09", "Colour #09 (Light Green)", None, [wx.ACCEL_CTRL, ord("9")], False)
+    @GuiSelectDecorator(10, "Colour #10", "Colour #10 (Cyan)", None, [wx.ACCEL_CTRL | wx.ACCEL_SHIFT, ord("0")], False)
+    @GuiSelectDecorator(11, "Colour #11", "Colour #11 (Light Cyan)", None, [wx.ACCEL_CTRL | wx.ACCEL_SHIFT, ord("1")], False)
+    @GuiSelectDecorator(12, "Colour #12", "Colour #12 (Light Blue)", None, [wx.ACCEL_CTRL | wx.ACCEL_SHIFT, ord("2")], False)
+    @GuiSelectDecorator(13, "Colour #13", "Colour #13 (Light Pink)", None, [wx.ACCEL_CTRL | wx.ACCEL_SHIFT, ord("3")], False)
+    @GuiSelectDecorator(14, "Colour #14", "Colour #14 (Grey)", None, [wx.ACCEL_CTRL | wx.ACCEL_SHIFT, ord("4")], False)
+    @GuiSelectDecorator(15, "Colour #15", "Colour #15 (Light Grey)", None, [wx.ACCEL_CTRL | wx.ACCEL_SHIFT, ord("5")], False)
     def canvasColour(self, f, idx):
         def canvasColour_(event):
             if event.GetEventType() == wx.wxEVT_TOOL:
@@ -107,7 +107,7 @@ class RoarCanvasCommandsEdit():
         return canvasColour_
     # }}}
     # {{{ canvasColourAlpha(self, f, idx)
-    @GuiSelectDecorator(0, "Transparent colour", "Transparent colour", None, None, False)
+    @GuiSelectDecorator(0, "Transparent colour", "Transparent colour", None, [wx.ACCEL_CTRL | wx.ACCEL_SHIFT, ord("6")], False)
     def canvasColourAlpha(self, f, idx):
         def canvasColourAlpha_(event):
             if event.GetEventType() == wx.wxEVT_TOOL:

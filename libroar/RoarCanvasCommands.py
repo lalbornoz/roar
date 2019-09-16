@@ -53,6 +53,8 @@ class RoarCanvasCommands(RoarCanvasCommandsFile, RoarCanvasCommandsEdit, RoarCan
             textItems.append("{} on {}".format(
                 Colours[self.lastPanelState["colours"][0]][4] if self.lastPanelState["colours"][0] != -1 else "Transparent",
                 Colours[self.lastPanelState["colours"][1]][4] if self.lastPanelState["colours"][1] != -1 else "Transparent"))
+            toolBar = self.parentFrame.toolBarItemsById[self.canvasColour(self.canvasColour, self.lastPanelState["colours"][0]).attrDict["id"]].GetToolBar()
+            toolBar.ToggleTool(self.canvasColour(self.canvasColour, self.lastPanelState["colours"][0]).attrDict["id"], True)
         if "pathName" in self.lastPanelState:
             if self.lastPanelState["pathName"] != None:
                 basePathName = os.path.basename(self.lastPanelState["pathName"])
