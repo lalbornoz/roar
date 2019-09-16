@@ -268,7 +268,7 @@ class RoarCanvasCommandsFile():
             else:
                 self.canvasPathName = dialog.GetPath(); self.lastDir = os.path.dirname(self.canvasPathName);
                 if self.canvasSave(event, newDirty=True):
-                    self._pushRecent(pathName)
+                    self._pushRecent(self.canvasPathName)
     # }}}
 
     #
