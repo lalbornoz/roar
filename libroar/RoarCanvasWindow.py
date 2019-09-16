@@ -73,7 +73,7 @@ class RoarCanvasWindow(GuiWindow):
         else:
             if tool != None:
                 rc, dirty = tool.onKeyboardEvent(self.brushColours, self.brushSize, self.canvas, self.dispatchPatchSingle, eventDc, keyChar, keyModifiers, self.brushPos, viewRect)
-            else:
+            elif mapPoint != None:
                 self.dispatchPatchSingle(eventDc, True, [*mapPoint, self.brushColours[0], self.brushColours[0], 0, " "] , viewRect)
         if dirty:
             self.dirty = True
@@ -86,9 +86,12 @@ class RoarCanvasWindow(GuiWindow):
                 self.commands.update(undoInhibit=True)
             elif tool.toolState == tool.TS_NONE:
                 if tool.external:
-                    self.commands.currentTool, self.commands.lastTool = self.commands.lastTool, self.commands.currentTool
-                    self.commands.update(toolName=self.commands.currentTool.name, undoInhibit=False)
                     self.dropTarget.done()
+                    self.commands.currentTool, self.commands.lastTool = self.commands.lastTool, self.commands.currentTool
+                    if self.commands.currentTool != None:
+                        self.commands.update(toolName=self.commands.currentTool.name, undoInhibit=False)
+                    else:
+                        self.commands.update(toolName="Cursor", undoInhibit=False)
                 else:
                     self.commands.update(undoInhibit=False)
             return rc
