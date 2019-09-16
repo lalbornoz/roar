@@ -101,7 +101,7 @@ class ToolObject(Tool):
             dirty = self._dispatchSelectEvent(canvas, dispatchFn, eventDc, keyModifiers, mapPoint, mouseLeftDown, self.targetRect, viewRect)
         else:
             self.toolState = self.TS_SELECT
-        return True, dirty
+        return dirty
     # }}}
 
     # {{{ getRegion(self, canvas)
