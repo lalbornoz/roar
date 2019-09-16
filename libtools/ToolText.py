@@ -11,37 +11,45 @@ class ToolText(Tool):
     name = "Text"
 
     #
-    # onKeyboardEvent(self, brushColours, brushSize, canvas, dispatchFn, eventDc, keyChar, keyModifiers, mapPoint, viewRect)
-    def onKeyboardEvent(self, brushColours, brushSize, canvas, dispatchFn, eventDc, keyChar, keyModifiers, mapPoint, viewRect):
-        if  (ord(keyChar) != wx.WXK_NONE)                           \
-        and (not keyChar in set("\t\n\v\f\r"))                      \
-        and ((ord(keyChar) >= 32) if ord(keyChar) < 127 else True)  \
-        and (keyModifiers in (wx.MOD_NONE, wx.MOD_SHIFT)):
-            rc, dirty = True, True
-            if self.textPos == None:
-                self.textPos = list(mapPoint)
-            dispatchFn(eventDc, False, [*self.textPos, *brushColours, 0, keyChar], viewRect)
-            if self.textPos[0] < (canvas.size[0] - 1):
-                self.textPos[0] += 1
-            elif self.textPos[1] < (canvas.size[1] - 1):
-                self.textPos[0] = 0; self.textPos[1] += 1;
+    # onKeyboardEvent(self, atPoint, brushColours, brushPos, brushSize, canvas, dispatchFn, eventDc, keyChar, keyCode, keyModifiers, mapPoint, viewRect)
+    def onKeyboardEvent(self, atPoint, brushColours, brushPos, brushSize, canvas, dispatchFn, eventDc, keyChar, keyCode, keyModifiers, mapPoint, viewRect):
+        if keyCode == wx.WXK_BACK:
+            if brushPos[0] > 0:
+                brushPos[0] -= 1
+            elif brushPos[1] > 0:
+                brushPos[0], brushPos[1] = canvas.size[0] - 1, brushPos[1] - 1
             else:
-                self.textPos = [0, 0]
+                brushPos[0], brushPos[1] = canvas.size[0] - 1, canvas.size[1] - 1
+            rc, dirty = True, False; dispatchFn(eventDc, True, [*brushPos, *brushColours, 0, "_"], viewRect);
+        elif keyCode == wx.WXK_RETURN:
+            if brushPos[1] < (canvas.size[1] - 1):
+                brushPos[0], brushPos[1] = 0, brushPos[1] + 1
+            else:
+                brushPos[0], brushPos[1] = 0, 0
+            rc, dirty = True, False; dispatchFn(eventDc, True, [*brushPos, *brushColours, 0, "_"], viewRect);
+        elif (ord(keyChar) != wx.WXK_NONE)                          \
+        and  (not keyChar in set("\t\n\v\f\r"))                     \
+        and  ((ord(keyChar) >= 32) if ord(keyChar) < 127 else True) \
+        and  (keyModifiers in (wx.MOD_NONE, wx.MOD_SHIFT)):
+            dispatchFn(eventDc, False, [*brushPos, *brushColours, 0, keyChar], viewRect);
+            if brushPos[0] < (canvas.size[0] - 1):
+                brushPos[0] += 1
+            elif brushPos[1] < (canvas.size[1] - 1):
+                brushPos[0], brushPos[1] = 0, brushPos[1] + 1
+            else:
+                brushPos[0], brushPos[1] = 0, 0
+            dispatchFn(eventDc, True, [*brushPos, *brushColours, 0, "_"], viewRect)
+            rc, dirty = True, True
         else:
             rc, dirty = False, False
         return rc, dirty
 
     #
-    # onMouseEvent(self, brushColours, brushSize, canvas, dispatchFn, eventDc, keyModifiers, mapPoint, mouseDragging, mouseLeftDown, mouseRightDown, viewRect)
-    def onMouseEvent(self, brushColours, brushSize, canvas, dispatchFn, eventDc, keyModifiers, mapPoint, mouseDragging, mouseLeftDown, mouseRightDown, viewRect):
+    # onMouseEvent(self, atPoint, brushColours, brushPos, brushSize, canvas, dispatchFn, eventDc, keyModifiers, mapPoint, mouseDragging, mouseLeftDown, mouseRightDown, viewRect)
+    def onMouseEvent(self, atPoint, brushColours, brushPos, brushSize, canvas, dispatchFn, eventDc, keyModifiers, mapPoint, mouseDragging, mouseLeftDown, mouseRightDown, viewRect):
         if mouseLeftDown or mouseRightDown:
-            self.textPos = list(mapPoint)
-        dispatchFn(eventDc, True, [*mapPoint, *brushColours, 0, "_"], viewRect)
+            brushPos[0], brushPos[1] = atPoint[0], atPoint[1]
+        dispatchFn(eventDc, True, [*brushPos, *brushColours, 0, "_"], viewRect)
         return True, False
-
-    # __init__(self, *args): initialisation method
-    def __init__(self, *args):
-        super().__init__(*args)
-        self.textColours = self.textPos = None
 
 # vim:expandtab foldmethod=marker sw=4 ts=4 tw=120

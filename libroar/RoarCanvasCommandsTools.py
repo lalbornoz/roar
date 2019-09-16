@@ -34,7 +34,7 @@ class RoarCanvasCommandsTools():
                 self.update(toolName=self.currentTool.name)
                 viewRect = self.parentCanvas.GetViewStart()
                 eventDc = self.parentCanvas.backend.getDeviceContext(self.parentCanvas.GetClientSize(), self.parentCanvas, viewRect)
-                self.parentCanvas.applyTool(eventDc, True, None, None, self.parentCanvas.brushPos, False, False, False, self.currentTool, viewRect)
+                self.parentCanvas.applyTool(eventDc, True, None, None, None, self.parentCanvas.brushPos, False, False, False, self.currentTool, viewRect)
             else:
                 self.update(toolName="Cursor")
         setattr(canvasTool_, "attrDict", f.attrList[idx])
