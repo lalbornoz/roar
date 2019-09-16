@@ -20,11 +20,10 @@ High-priority list:
     d) {copy,cut,delete,insert from,paste}, {edit asset in new canvas,import from {canvas,object}}
 
 Queue:
-1)  start @ top, down key til cursor below visible canvas, scroll down, cursor gone GRRRR
-2)  text tool: impl. backspace & enter, update internal brushPos if updated w/ arrow keys
-3)  text tool: a) honour RTL text flow b) navigating w/ cursor keys c) pasting text
-4)  scroll down, apply operator to entire canvas, scroll up
-5)  select-related {re,un}do bugs
-6)  clone selection lag
+1)  scrolling bug: start @ top, down key til cursor below visible canvas, scroll down, cursor gone GRRRR
+2)  scrolling bug: scroll down, apply operator to entire canvas, scroll up
+3)  text tool: a) honour RTL text flow b) pasting text
+4)  select-related {re,un}do bugs
+5)  clone selection lag
 
 vim:ff=dos tw=0
