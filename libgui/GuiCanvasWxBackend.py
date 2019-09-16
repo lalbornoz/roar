@@ -27,6 +27,14 @@ class GuiBufferedDC(wx.MemoryDC):
     # }}}
 
 class GuiCanvasWxBackend():
+    # {{{ _CellState(): Cell state
+    class _CellState():
+        CS_NONE             = 0x00
+        CS_BOLD             = 0x01
+        CS_ITALIC           = 0x02
+        CS_UNDERLINE        = 0x04
+    # }}}
+
     # {{{ _drawBrushPatch(self, eventDc, patch, point)
     def _drawBrushPatch(self, eventDc, patch, point):
         absPoint = self._xlatePoint(point)
@@ -43,10 +51,11 @@ class GuiCanvasWxBackend():
         fontDc.SetTextForeground(wx.Colour(Colours[patch[0]][:4]))
         fontDc.SetTextBackground(wx.Colour(Colours[patch[1]][:4]))
         fontDc.DrawRectangle(0, 0, *self.cellSize)
-        if patch[3] == "_":
-            fontDc.SetPen(self._pens[patch[0]])
+        fontDc.SetPen(self._pens[patch[0]])
+        if (patch[2] & self._CellState.CS_UNDERLINE)    \
+        or (patch[3] == "_"):
             fontDc.DrawLine(0, self.cellSize[1] - 1, self.cellSize[0], self.cellSize[1] - 1)
-        else:
+        if patch[3] != "_":
             fontDc.DrawText(patch[3], 0, 0)
         eventDc.Blit(*absPoint, *self.cellSize, fontDc, 0, 0)
     # }}}
@@ -115,6 +124,8 @@ class GuiCanvasWxBackend():
             if patch[5] == " ":
                 if patch[3] == -1:
                     self._drawCharPatch(eventDc, [*patch[2:-1], "░"], point)
+                elif patch[4] & self._CellState.CS_UNDERLINE:
+                    self._drawCharPatch(eventDc, patch[2:], point)
                 else:
                     self._drawBrushPatch(eventDc, patch[2:], point)
             else:
