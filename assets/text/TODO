@@ -24,9 +24,8 @@ Queue:
 2)  text tool: impl. backspace & enter, update internal brushPos if updated w/ arrow keys
 3)  text tool: a) honour RTL text flow b) navigating w/ cursor keys c) pasting text
 4)  scroll down, apply operator to entire canvas, scroll up
-5)  flip tool: correctly flip chars e.g. \ -> /, etc.
-6)  underline FUCKING BROKEN _AGAIN_
-7)  select-related {re,un}do bugs
-8)  clone selection lag
+5)  underline FUCKING BROKEN _AGAIN_
+6)  select-related {re,un}do bugs
+7)  clone selection lag
 
 vim:ff=dos tw=0
