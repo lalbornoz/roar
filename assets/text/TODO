@@ -1,3 +1,4 @@
+Low-priority list:
 1)  Implement ANSI CSI CU[BDPU] sequences & italic
 2)  Layers & layout (e.g. for comics, zines, etc.)
 3)  Implement instrumentation & unit tests, document
@@ -10,13 +11,22 @@
 
 High-priority list:
 1)  unit tools: arrow, {cloud,speech bubble}, curve, measure, pick, polygon, triangle, unicode
-2)  text tool: a) honour RTL text flow b) navigating w/ cursor keys c) pasting text
-3)  operators: rotate, scale, shift, slice, tile
-4)  cleanup & refactor, switch to GTK
-5)  GUI:
+2)  operators: rotate, scale, shift, slice, tile
+3)  cleanup & refactor, switch to GTK
+4)  GUI:
     a) replace logo w/ canvas panel in About dialogue
     b) Settings/Settings window (e.g. autosave, hide cursor on leaving window, ...)
     c) replace resize buttons w/ {-,edit box,+} buttons & lock button re: ratio (ty lol3)
     d) {copy,cut,delete,insert from,paste}, {edit asset in new canvas,import from {canvas,object}}
+
+Queue:
+1)  start @ top, down key til cursor below visible canvas, scroll down, cursor gone GRRRR
+2)  text tool: impl. backspace & enter, update internal brushPos if updated w/ arrow keys
+3)  text tool: a) honour RTL text flow b) navigating w/ cursor keys c) pasting text
+4)  scroll down, apply operator to entire canvas, scroll up
+5)  flip tool: correctly flip chars e.g. \ -> /, etc.
+6)  underline FUCKING BROKEN _AGAIN_
+7)  select-related {re,un}do bugs
+8)  clone selection lag
 
 vim:ff=dos tw=0
