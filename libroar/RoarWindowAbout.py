@@ -39,7 +39,7 @@ class RoarWindowAbout(wx.Dialog):
         self.SetTitle(title)
 
         soundBitePathNames = glob(os.path.join("assets", "audio", "roar*.wav"))
-        soundBitePathName = soundBitePathNames[random.randint(0, len(logoPathNames) - 1)]
+        soundBitePathName = soundBitePathNames[random.randint(0, len(soundBitePathNames) - 1)]
         self.soundBite = wx.adv.Sound(soundBitePathName)
         if self.soundBite.IsOk():
             self.soundBite.Play(wx.adv.SOUND_ASYNC)
