@@ -5,9 +5,10 @@ Low-priority list:
 4)  Open and toggle a reference image in the background
 5)  Client-Server or Peer-to-Peer realtime collaboration
 6)  Arbitrary {format,palette}s ({4,8} bit ANSI/mIRC, etc.)
-7)  Incremental auto{load,save} & {backup,restore} (needs Settings window)
-8)  Composition, parametrisation & keying of tools from higher-order operators (brushes, functions, filters, outlines, patterns & shaders) and unit tools
-9)  Sprites & scripted (Python?) animation on the basis of asset traits and {composable,parametrised} patterns (metric flow, particle system, rigging, ...)
+7)  {record,replay} {keyboard,mouse,...} events in debugging builds
+8)  Incremental auto{load,save} & {backup,restore} (needs Settings window)
+9)  Composition, parametrisation & keying of tools from higher-order operators (brushes, functions, filters, outlines, patterns & shaders) and unit tools
+10) Sprites & scripted (Python?) animation on the basis of asset traits and {composable,parametrised} patterns (metric flow, particle system, rigging, ...)
 
 High-priority list:
 1)  unit tools: arrow, {cloud,speech bubble}, curve, measure, pick, polygon, triangle, unicode
