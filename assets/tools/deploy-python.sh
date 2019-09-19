@@ -27,13 +27,12 @@ deploy() {
 		-mindepth 1				\
 		-not -path "./${RELEASES_DNAME}/*"	\
 		-not -path "./${RELEASES_DNAME}"	\
-		-not -path "./.git/*"			\
-		-not -path "./.git"			\
+		-not -path './.*/*'			\
+		-not -path './.*'			\
 		-not -path '*/__pycache__/*'		\
 		-not -path '*/__pycache__'		\
 		-not -path './librtl/ImgurApiKey.py'	\
 		-not -name '*.sw*'			\
-		-not -name '.gitignore'			\
 		-not -name "${0##*/}"			|\
 			cpio --quiet -dLmp "${_release_dname}";
 	sed -i"" "s/__ROAR_RELEASE_VERSION__/${_release_version_long}/" "${_release_dname}/libroar/RoarWindowAbout.py";
