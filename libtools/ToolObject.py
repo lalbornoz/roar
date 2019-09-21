@@ -162,7 +162,7 @@ class ToolObject(Tool):
         elif self.objectSize != objectSize:
             if self.objectSize == None:
                 self.objectSize = objectSize
-            self.targetRect[1] = [t + d for t, d in zip(self.targetRect[1], (a - b for a, b in zip(self.objectSize, objectSize)))]
+            self.targetRect[1] = [t + d for t, d in zip(self.targetRect[1], (b - a for a, b in zip(self.objectSize, objectSize)))]
         if self.srcRect == None:
             self.srcRect = self.targetRect
         self.objectMap, self.objectSize = objectMap, objectSize

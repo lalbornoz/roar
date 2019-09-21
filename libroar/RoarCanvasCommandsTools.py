@@ -31,6 +31,7 @@ class RoarCanvasCommandsTools():
             self.lastTool, self.currentTool = self.currentTool, [ToolCircle, None, ToolFill, ToolLine, ToolObject, ToolRect, ToolText][idx]
             if self.currentTool != None:
                 self.currentTool = self.currentTool()
+            self.currentOperator, self.operatorState = None, None
             self.parentFrame.menuItemsById[self.canvasTool.attrList[idx]["id"]].Check(True)
             toolBar = self.parentFrame.toolBarItemsById[self.canvasTool.attrList[idx]["id"]].GetToolBar()
             toolBar.ToggleTool(self.canvasTool.attrList[idx]["id"], True)

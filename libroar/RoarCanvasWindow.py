@@ -7,7 +7,7 @@
 from GuiWindow import GuiWindow
 from ToolObject import ToolObject
 from ToolText import ToolText
-import json, wx, sys
+import copy, json, wx, sys
 
 class RoarCanvasWindowDropTarget(wx.TextDropTarget):
     # {{{ done(self)
@@ -54,6 +54,47 @@ class RoarCanvasWindow(GuiWindow):
             self.canvas.journal.pushCursor(patchDelta)
     # }}}
 
+    # {{{ applyOperator(self, currentTool, mapPoint, mouseLeftDown, mousePoint, operator, viewRect)
+    def applyOperator(self, currentTool, mapPoint, mouseLeftDown, mousePoint, operator, viewRect):
+        self.canvas.dirtyCursor = False
+        if  (currentTool.__class__ == ToolObject)  \
+        and (currentTool.toolState >= currentTool.TS_SELECT):
+            region = currentTool.getRegion(self.canvas)
+        else:
+            region = self.canvas.map
+        if hasattr(operator, "apply2"):
+            if mouseLeftDown:
+                if self.commands.operatorState == None:
+                    self.commands.operatorState = True
+                region = operator.apply2(mapPoint, mousePoint, region, copy.deepcopy(region))
+                self.commands.update(operator=self.commands.currentOperator.name)
+            elif self.commands.operatorState != None:
+                self.commands.currentOperator = None
+                self.commands.update(operator=None)
+                return
+        else:
+            region = operator.apply(copy.deepcopy(region))
+            self.commands.currentOperator = None
+        if  (currentTool.__class__ == ToolObject)  \
+        and (currentTool.toolState >= currentTool.TS_SELECT):
+            eventDc = self.backend.getDeviceContext(self.GetClientSize(), self) if self.popupEventDc == None else self.popupEventDc
+            eventDcOrigin = eventDc.GetDeviceOrigin(); eventDc.SetDeviceOrigin(0, 0);
+            currentTool.setRegion(self.canvas, None, region, [len(region[0]), len(region)], currentTool.external)
+            currentTool.onSelectEvent(self.canvas, (0, 0), self.dispatchPatchSingle, eventDc, True, wx.MOD_NONE, None, currentTool.targetRect)
+            currentTool._drawSelectRect(currentTool.targetRect, self.dispatchPatchSingle, eventDc)
+            eventDc.SetDeviceOrigin(*eventDcOrigin)
+        else:
+            eventDc = self.backend.getDeviceContext(self.GetClientSize(), self) if self.popupEventDc == None else self.popupEventDc
+            eventDcOrigin = eventDc.GetDeviceOrigin(); eventDc.SetDeviceOrigin(0, 0);
+            self.canvas.journal.begin()
+            for numRow in range(len(region)):
+                for numCol in range(len(region[numRow])):
+                    self.dirty = True if not self.dirty else self.dirty
+                    self.dispatchPatchSingle(eventDc, False, [numCol, numRow, *region[numRow][numCol]])
+            self.canvas.journal.end()
+            self.commands.update(dirty=self.dirty, undoLevel=self.canvas.journal.patchesUndoLevel)
+            eventDc.SetDeviceOrigin(*eventDcOrigin)
+    # }}}
     # {{{ applyTool(self, eventDc, eventMouse, keyChar, keyCode, keyModifiers, mapPoint, mouseDragging, mouseLeftDown, mouseRightDown, tool, viewRect)
     def applyTool(self, eventDc, eventMouse, keyChar, keyCode, keyModifiers, mapPoint, mouseDragging, mouseLeftDown, mouseRightDown, tool, viewRect):
         eventDcOrigin = eventDc.GetDeviceOrigin(); eventDc.SetDeviceOrigin(0, 0);
@@ -223,7 +264,9 @@ class RoarCanvasWindow(GuiWindow):
         viewRect = self.GetViewStart(); eventDc = self.backend.getDeviceContext(self.GetClientSize(), self, viewRect);
         mouseDragging, mouseLeftDown, mouseRightDown = event.Dragging(), event.LeftIsDown(), event.RightIsDown()
         mapPoint = self.backend.xlateEventPoint(event, eventDc, viewRect)
-        if  mouseRightDown                                      \
+        if self.commands.currentOperator != None:
+            self.applyOperator(self.commands.currentTool, mapPoint, mouseLeftDown, event.GetLogicalPosition(eventDc), self.commands.currentOperator, viewRect)
+        elif  mouseRightDown                                    \
         and (self.commands.currentTool.__class__ == ToolObject) \
         and (self.commands.currentTool.toolState >= self.commands.currentTool.TS_SELECT):
             self.popupEventDc = eventDc; self.PopupMenu(self.operatorsMenu); self.popupEventDc = None;

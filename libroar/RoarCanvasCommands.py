@@ -64,6 +64,9 @@ class RoarCanvasCommands(RoarCanvasCommandsFile, RoarCanvasCommandsEdit, RoarCan
                 self.parentFrame.SetTitle("roar")
         if "toolName" in self.lastPanelState:
             textItems.append("Current tool: {}".format(self.lastPanelState["toolName"]))
+        if  ("operator" in self.lastPanelState)         \
+        and (self.lastPanelState["operator"] != None):
+            textItems.append("Current operator: {}".format(self.lastPanelState["operator"]))
         if  "dirty" in self.lastPanelState              \
         and self.lastPanelState["dirty"]:
             textItems.append("*")
