@@ -9,6 +9,7 @@ Low-priority list:
 8)  Incremental auto{load,save} & {backup,restore} (needs Settings window)
 9)  Composition, parametrisation & keying of tools from higher-order operators (brushes, functions, filters, outlines, patterns & shaders) and unit tools
 10) Sprites & scripted (Python?) animation on the basis of asset traits and {composable,parametrised} patterns (metric flow, particle system, rigging, ...)
+11) Integrate ENNTool code in the form of OpenGL-based animation window (see 9) and 10))
 
 High-priority list:
 1)  unit tools: arrow, {cloud,speech bubble}, curve, measure, pick, polygon, triangle, unicode
