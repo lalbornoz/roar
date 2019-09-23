@@ -19,17 +19,14 @@ class IrcMiRCARTBot(IrcClient):
     """IRC<->MiRC2png bot"""
     imgurApiKey = ImgurApiKey.imgurApiKey
 
-    # {{{ ContentTooLargeException(Exception): Raised by _urlretrieveReportHook() given download size > 1 MB
     class ContentTooLargeException(Exception):
         pass
-    # }}}
-    # {{{ _dispatch001(self, message): Dispatch single 001 (RPL_WELCOME)
+
     def _dispatch001(self, message):
         self._log("Registered on {}:{} as {}, {}, {}.".format(self.serverHname, self.serverPort, self.clientNick, self.clientIdent, self.clientGecos))
         self._log("Attempting to join {} on {}:{}...".format(self.clientChannel, self.serverHname, self.serverPort))
         self.queue("JOIN", self.clientChannel)
-    # }}}
-    # {{{ _dispatch353(self, message): Dispatch single 353 (RPL_NAMREPLY)
+
     def _dispatch353(self, message):
         if message[4].lower() == self.clientChannel.lower():
             for channelNickSpec in message[5].split(" "):
@@ -38,20 +35,17 @@ class IrcMiRCARTBot(IrcClient):
                 and len(channelNickSpec[1:]):
                     self.clientChannelOps.append(channelNickSpec[1:].lower())
                     self._log("Authorising {} on {}".format(channelNickSpec[1:].lower(), message[4].lower()))
-    # }}}
-    # {{{ _dispatchJoin(self, message): Dispatch single JOIN message from server
+
     def _dispatchJoin(self, message):
         self._log("Joined {} on {}:{}.".format(message[2].lower(), self.serverHname, self.serverPort))
         self.clientNextTimeout = None; self.clientChannelRejoin = False;
-    # }}}
-    # {{{ _dispatchKick(self, message): Dispatch single KICK message from server
+
     def _dispatchKick(self, message):
         if  message[2].lower() == self.clientChannel.lower()                    \
         and message[3].lower() == self.clientNick.lower():
             self._log("Kicked from {} by {}, rejoining in 15 seconds".format(message[2].lower(), message[0]))
             self.clientNextTimeout = time.time() + 15; self.clientChannelRejoin = True;
-    # }}}
-    # {{{ _dispatchMode(self, message): Dispatch single MODE message from server
+
     def _dispatchMode(self, message):
         if message[2].lower() == self.clientChannel.lower():
             channelModeType = "+"; channelModeArg = 4;
@@ -78,17 +72,14 @@ class IrcMiRCARTBot(IrcClient):
                 channelAuthDel = channelAuthDel.lower()
                 self._log("Deauthorising {} on {}".format(channelAuthDel, message[2].lower()))
                 self.clientChannelOps.remove(channelAuthDel)
-    # }}}
-    # {{{ _dispatchNone(self): Dispatch None message from server
+
     def _dispatchNone(self):
         self._log("Disconnected from {}:{}.".format(self.serverHname, self.serverPort))
         self.close()
-    # }}}
-    # {{{ _dispatchPing(self, message): Dispatch single PING message from server
+
     def _dispatchPing(self, message):
         self.queue("PONG", message[2])
-    # }}}
-    # {{{ _dispatchPrivmsg(self, message): Dispatch single PRIVMSG message from server
+
     def _dispatchPrivmsg(self, message):
         if  message[2].lower() == self.clientChannel.lower()           \
         and message[3].startswith("!pngbot "):
@@ -155,19 +146,16 @@ class IrcMiRCARTBot(IrcClient):
                 os.remove(asciiTmpFilePath)
             if os.path.isfile(imgTmpFilePath):
                 os.remove(imgTmpFilePath)
-    # }}}
-    # {{{ _dispatchTimer(self): Dispatch single client timer expiration
+
     def _dispatchTimer(self):
         if self.clientChannelRejoin:
             self._log("Attempting to join {} on {}:{}...".format(self.clientChannel, self.serverHname, self.serverPort))
             self.queue("JOIN", self.clientChannel)
             self.clientNextTimeout = time.time() + 15; self.clientChannelRejoin = True;
-    # }}}
-    # {{{ _log(self, msg): Log single message to stdout w/ timestamp
+
     def _log(self, msg):
         print(time.strftime("%Y/%m/%d %H:%M:%S") + " " + msg)
-    # }}}
-    # {{{ _uploadToImgur(self, imgFilePath, imgName, imgTitle, apiKey): Upload single file to Imgur
+
     def _uploadToImgur(self, imgFilePath, imgName, imgTitle, apiKey):
         with open(imgFilePath, "rb") as requestImage:
             requestImageData = requestImage.read()
@@ -188,13 +176,11 @@ class IrcMiRCARTBot(IrcClient):
                 return [200, responseDict.get("data").get("link")]
         else:
                 return [responseHttp.status_code, responseHttp.text]
-    # }}}
-    # {{{ _urlretrieveReportHook(count, blockSize, totalSize): Limit downloads to 1 MB
+
     def _urlretrieveReportHook(count, blockSize, totalSize):
         if (totalSize > pow(2,20)):
             raise IrcMiRCARTBot.ContentTooLargeException
-    # }}}
-    # {{{ connect(self, localAddr=None, preferFamily=0, timeout=None): Connect to server and (re)initialise w/ optional timeout
+
     def connect(self, localAddr=None, preferFamily=0, timeout=None):
         self._log("Connecting to {}:{}...".format(self.serverHname, self.serverPort))
         if super().connect(localAddr=localAddr, preferFamily=preferFamily, timeout=timeout):
@@ -206,8 +192,7 @@ class IrcMiRCARTBot(IrcClient):
                 return True
         else:
                 return False
-    # }}}
-    # {{{ dispatch(self): Read, parse, and dispatch single line from server
+
     def dispatch(self):
         while True:
             if self.clientNextTimeout:
@@ -245,7 +230,7 @@ class IrcMiRCARTBot(IrcClient):
                 self.clientHasPing = False
             elif serverMessage[1] == "PRIVMSG":
                 self._dispatchPrivmsg(serverMessage)
-    # }}}
+
 
     #
     # __init__(self, serverHname, serverPort="6667", clientNick="pngbot", clientIdent="pngbot", clientGecos="pngbot", clientChannel="#MiRCART"): initialisation method

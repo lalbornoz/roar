@@ -14,7 +14,6 @@ class ToolObject(Tool):
     TS_SELECT   = 2
     TS_TARGET   = 3
 
-    # {{{ _dispatchSelectEvent(self, canvas, dispatchFn, eventDc, keyModifiers, mapPoint, mouseLeftDown, selectRect)
     def _dispatchSelectEvent(self, canvas, dispatchFn, eventDc, keyModifiers, mapPoint, mouseLeftDown, selectRect):
         if mouseLeftDown:
             disp, isCursor = [mapPoint[m] - self.lastAtPoint[m] for m in [0, 1]], True
@@ -26,8 +25,7 @@ class ToolObject(Tool):
         self._drawSelectRect(newTargetRect, dispatchFn, eventDc)
         self.targetRect = newTargetRect
         return dirty
-    # }}}
-    # {{{ _drawSelectRect(self, rect, dispatchFn, eventDc)
+
     def _drawSelectRect(self, rect, dispatchFn, eventDc):
         rectFrame = [[rect[m][n] for n in [0, 1]] for m in (0, 1)]
         if rectFrame[0][0] > rectFrame[1][0]:
@@ -43,8 +41,7 @@ class ToolObject(Tool):
             curColours = [1, 1] if curColours == [0, 0] else [0, 0]
             dispatchFn(eventDc, True, [rectFrame[0][0], rectY, *curColours, 0, " "])
             dispatchFn(eventDc, True, [rectFrame[1][0], rectY, *curColours, 0, " "])
-    # }}}
-    # {{{ _mouseEventTsNone(self, brushColours, canvas, dispatchFn, eventDc, keyModifiers, mapPoint, mouseDragging, mouseLeftDown)
+
     def _mouseEventTsNone(self, brushColours, canvas, dispatchFn, eventDc, keyModifiers, mapPoint, mouseDragging, mouseLeftDown):
         self.substract = False
         if self.external:
@@ -55,11 +52,10 @@ class ToolObject(Tool):
             else:
                 dispatchFn(eventDc, True, [*mapPoint, *brushColours, 0, " "])
         return False
-    # }}}
-    # {{{ _mouseEventTsOrigin(self, brushColours, canvas, dispatchFn, eventDc, keyModifiers, mapPoint, mouseDragging, mouseLeftDown)
+
     def _mouseEventTsOrigin(self, brushColours, canvas, dispatchFn, eventDc, keyModifiers, mapPoint, mouseDragging, mouseLeftDown):
         self.targetRect[1] = list(mapPoint)
-        if mouseLeftDown:
+        if not mouseLeftDown:
             if self.targetRect[0][0] > self.targetRect[1][0]:
                 self.targetRect[0][0], self.targetRect[1][0] = self.targetRect[1][0], self.targetRect[0][0]
             if self.targetRect[0][1] > self.targetRect[1][1]:
@@ -74,8 +70,7 @@ class ToolObject(Tool):
         else:
             self._drawSelectRect(self.targetRect, dispatchFn, eventDc)
         return False
-    # }}}
-    # {{{ _mouseEventTsSelect(self, brushColours, canvas, dispatchFn, eventDc, keyModifiers, mapPoint, mouseDragging, mouseLeftDown)
+
     def _mouseEventTsSelect(self, brushColours, canvas, dispatchFn, eventDc, keyModifiers, mapPoint, mouseDragging, mouseLeftDown):
         dirty = False
         if mouseLeftDown:
@@ -91,8 +86,7 @@ class ToolObject(Tool):
         else:
             dirty = self._dispatchSelectEvent(canvas, dispatchFn, eventDc, keyModifiers, mapPoint, mouseLeftDown, self.targetRect)
         return dirty
-    # }}}
-    # {{{ _mouseEventTsTarget(self, brushColours, canvas, dispatchFn, eventDc, keyModifiers, mapPoint, mouseDragging, mouseLeftDown)
+
     def _mouseEventTsTarget(self, brushColours, canvas, dispatchFn, eventDc, keyModifiers, mapPoint, mouseDragging, mouseLeftDown):
         if (keyModifiers == wx.MOD_CONTROL) and (self.srcRect == self.targetRect):
             self.substract = True
@@ -102,13 +96,11 @@ class ToolObject(Tool):
         else:
             self.toolState = self.TS_SELECT
         return dirty
-    # }}}
 
-    # {{{ getRegion(self, canvas)
+
     def getRegion(self, canvas):
         return self.objectMap
-    # }}}
-    # {{{ onMouseEvent(self, atPoint, brushColours, brushPos, brushSize, canvas, dispatchFn, eventDc, keyModifiers, mapPoint, mouseDragging, mouseLeftDown, mouseRightDown)
+
     def onMouseEvent(self, atPoint, brushColours, brushPos, brushSize, canvas, dispatchFn, eventDc, keyModifiers, mapPoint, mouseDragging, mouseLeftDown, mouseRightDown):
         dirty = False
         if self.toolState == self.TS_NONE:
@@ -122,8 +114,7 @@ class ToolObject(Tool):
         else:
             return False, dirty
         return True, dirty
-    # }}}
-    # {{{ onSelectEvent(self, canvas, disp, dispatchFn, eventDc, isCursor, keyModifiers, newTargetRect, selectRect)
+
     def onSelectEvent(self, canvas, disp, dispatchFn, eventDc, isCursor, keyModifiers, newTargetRect, selectRect):
         dirty = False
         if self.external:
@@ -149,10 +140,13 @@ class ToolObject(Tool):
                     cellOld = self.objectMap[numRow][numCol]
                     rectX, rectY = selectRect[0][0] + numCol, selectRect[0][1] + numRow
                     dirty = False if isCursor else True
-                    dispatchFn(eventDc, isCursor, [rectX + disp[0], rectY + disp[1], *cellOld])
+                    cellNew = self.objectMap[numRow][numCol]
+                    if (cellNew[1] == -1) and (cellNew[3] == " "):
+                        if ((rectY + disp[1]) < canvas.size[1]) and ((rectX + disp[0]) < canvas.size[0]):
+                            cellNew = canvas.map[rectY + disp[1]][rectX + disp[0]]
+                    dispatchFn(eventDc, isCursor, [rectX + disp[0], rectY + disp[1], *cellNew])
         return dirty
-    # }}}
-    # {{{ setRegion(self, canvas, mapPoint, objectMap, objectSize, external=True)
+
     def setRegion(self, canvas, mapPoint, objectMap, objectSize, external=True):
         self.external, self.toolState = external, self.TS_SELECT
         if mapPoint != None:
@@ -166,7 +160,7 @@ class ToolObject(Tool):
         if self.srcRect == None:
             self.srcRect = self.targetRect
         self.objectMap, self.objectSize = objectMap, objectSize
-    # }}}
+
 
     # __init__(self, *args): initialisation method
     def __init__(self, *args):

@@ -10,12 +10,10 @@ from GuiWindow import GuiWindow
 import json, os, sys, wx
 
 class RoarAssetsWindow(GuiMiniFrame):
-    # {{{ _drawPatch(self, canvas, eventDc, isCursor, patch)
     def _drawPatch(self, canvas, eventDc, isCursor, patch):
         if not isCursor:
             self.backend.drawPatch(canvas, eventDc, patch)
-    # }}}
-    # {{{ _import(self, f, pathName)
+
     def _import(self, f, pathName):
         rc = False
         self.SetCursor(wx.Cursor(wx.CURSOR_WAIT))
@@ -28,8 +26,7 @@ class RoarAssetsWindow(GuiMiniFrame):
             rc, error, newMap, newPathName, newSize = False, str(e), None, None, None
         self.SetCursor(wx.Cursor(wx.NullCursor))
         return rc, error, canvas, newMap, newPathName, newSize
-    # }}}
-    # {{{ _importFiles(self, f, wildcard)
+
     def _importFiles(self, f, wildcard):
         resultList = []
         with wx.FileDialog(self, "Load...", os.getcwd(), "", wildcard, wx.FD_MULTIPLE | wx.FD_OPEN) as dialog:
@@ -42,8 +39,7 @@ class RoarAssetsWindow(GuiMiniFrame):
                     resultList += [self._import(f, pathName)]
                     self.lastDir = os.path.dirname(pathName)
         return resultList
-    # }}}
-    # {{{ _load_list(self, pathName)
+
     def _load_list(self, pathName):
         try:
             with open(pathName, "r") as fileObject:
@@ -84,8 +80,7 @@ class RoarAssetsWindow(GuiMiniFrame):
             self.SetCursor(wx.Cursor(wx.NullCursor))
             with wx.MessageDialog(self, "Error: {}".format(str(e)), "", wx.OK | wx.OK_DEFAULT) as dialog:
                 dialogChoice = dialog.ShowModal()
-    # }}}
-    # {{{ _updateScrollBars(self)
+
     def _updateScrollBars(self):
         clientSize = self.panelCanvas.GetClientSize()
         if self.currentIndex != None:
@@ -99,9 +94,8 @@ class RoarAssetsWindow(GuiMiniFrame):
         elif self.scrollFlag    \
         and  ((panelSize[0] <= clientSize[0]) or (panelSize[1] <= clientSize[1])):
             self.scrollFlag = False; super(wx.ScrolledWindow, self.panelCanvas).SetVirtualSize((0, 0));
-    # }}}
 
-    # {{{ drawCanvas(self, canvas)
+
     def drawCanvas(self, canvas):
         panelSize = [a * b for a, b in zip(canvas.size, self.cellSize)]
         self.panelCanvas.SetMinSize(panelSize); self.panelCanvas.SetSize(wx.DefaultCoord, wx.DefaultCoord, *panelSize);
@@ -115,12 +109,10 @@ class RoarAssetsWindow(GuiMiniFrame):
             for numCol in range(canvas.size[0]):
                 self.backend.drawPatch(canvas, eventDc, [numCol, numRow, *canvas.map[numRow][numCol]])
         eventDc.SetDeviceOrigin(*eventDcOrigin)
-    # }}}
-    # {{{ onPaint(self, event)
+
     def onPaint(self, event):
         self.backend.onPaint(self.panelCanvas.GetClientSize(), self.panelCanvas, self.panelCanvas.GetViewStart())
-    # }}}
-    # {{{ onPanelLeftDown(self, event)
+
     def onPanelLeftDown(self, event):
         self.panelCanvas.SetFocus()
         if (self.currentIndex != None):
@@ -130,16 +122,13 @@ class RoarAssetsWindow(GuiMiniFrame):
             dropSource.SetData(textDataObject)
             result = dropSource.DoDragDrop(True)
         event.Skip()
-    # }}}
-    # {{{ onPanelPaint(self, event)
+
     def onPanelPaint(self, event):
         self.backend.onPaint(self.panelCanvas.GetClientSize(), self.panelCanvas, self.panelCanvas.GetViewStart())
-    # }}}
-    # {{{ onPanelSize(self, event)
+
     def onPanelSize(self, event):
         self._updateScrollBars(); event.Skip();
-    # }}}
-    # {{{ resize(self, canvas, newSize)
+
     def resize(self, canvas, newSize):
         oldSize = [0, 0] if canvas.map == None else canvas.size
         deltaSize = [b - a for a, b in zip(oldSize, newSize)]
@@ -161,8 +150,7 @@ class RoarAssetsWindow(GuiMiniFrame):
                     for numNewCol in range(newSize[0]):
                         self._drawPatch(canvas, eventDc, False, [numNewCol, numNewRow, 1, 1, 0, " "])
             eventDc.SetDeviceOrigin(*eventDcOrigin)
-    # }}}
-    # {{{ update(self, canvas, newSize, newCanvas=None)
+
     def update(self, canvas, newSize, newCanvas=None):
         self.resize(canvas, newSize);
         canvas.update(newSize, newCanvas);
@@ -172,21 +160,17 @@ class RoarAssetsWindow(GuiMiniFrame):
             for numCol in range(canvas.size[0]):
                 self.backend.drawPatch(canvas, eventDc, [numCol, numRow, *canvas.map[numRow][numCol]])
         eventDc.SetDeviceOrigin(*eventDcOrigin)
-    # }}}
 
-    # {{{ onImportAnsi(self, event)
+
     def onImportAnsi(self, event):
         event.Skip()
-    # }}}
-    # {{{ onImportFromClipboard(self, event)
+
     def onImportFromClipboard(self, event):
         event.Skip()
-    # }}}
-    # {{{ onImportSauce(self, event)
+
     def onImportSauce(self, event):
         event.Skip()
-    # }}}
-    # {{{ onChar(self, event)
+
     def onChar(self, event):
         if  (event.GetModifiers() == wx.MOD_NONE)   \
         and (event.GetKeyCode() in (wx.WXK_DOWN, wx.WXK_UP)):
@@ -194,8 +178,7 @@ class RoarAssetsWindow(GuiMiniFrame):
             return wx.PostEvent(self.listView, event)
         else:
             event.Skip()
-    # }}}
-    # {{{ onListViewChar(self, event)
+
     def onListViewChar(self, event):
         index, rc = self.listView.GetFirstSelected(), False
         if index != -1:
@@ -204,14 +187,12 @@ class RoarAssetsWindow(GuiMiniFrame):
                 self.currentIndex, rc = index, True; self.onRemove(None);
         if not rc:
             event.Skip()
-    # }}}
-    # {{{ onListViewItemSelected(self, event)
+
     def onListViewItemSelected(self, event):
         self.currentIndex = event.GetItem().GetId()
         item = [self.listView.GetItem(self.currentIndex, col).GetText() for col in (0, 1)]
         self.drawCanvas(self.canvasList[self.currentIndex][0])
-    # }}}
-    # {{{ onListViewRightDown(self, event)
+
     def onListViewRightDown(self, event):
         eventPoint = event.GetPosition()
         if self.currentIndex == None:
@@ -223,8 +204,7 @@ class RoarAssetsWindow(GuiMiniFrame):
         else:
             self.contextMenuItems[4].Enable(True)
         self.PopupMenu(self.contextMenu, eventPoint)
-    # }}}
-    # {{{ onLoad(self, event)
+
     def onLoad(self, event):
         def importmIRC(canvas, pathName):
             rc, error = canvas.importStore.importTextFile(pathName)
@@ -250,7 +230,7 @@ class RoarAssetsWindow(GuiMiniFrame):
                     dialogChoice = dialog.ShowModal()
                     if dialogChoice == wx.ID_CANCEL:
                         break
-    # }}}
+
     #  {{{ onLoadList(self, event)
     def onLoadList(self, event):
         rc = True
@@ -260,8 +240,7 @@ class RoarAssetsWindow(GuiMiniFrame):
             if dialog.ShowModal() != wx.ID_CANCEL:
                 pathName = dialog.GetPath(); self.lastDir = os.path.dirname(pathName);
                 self._load_list(pathName)
-    # }}}
-    # {{{ onRemove(self, event)
+
     def onRemove(self, event):
         del self.canvasList[self.currentIndex]; self.listView.DeleteItem(self.currentIndex);
         itemCount = self.listView.GetItemCount()
@@ -280,8 +259,7 @@ class RoarAssetsWindow(GuiMiniFrame):
             self.currentIndex = None
             [self.listView.SetColumnWidth(col, wx.LIST_AUTOSIZE_USEHEADER) for col in (0, 1)]
             self.drawCanvas(Canvas((0, 0)))
-    # }}}
-    # {{{ onSaveList(self, event)
+
     def onSaveList(self, event):
         rc = True
         if len(self.canvasList):
@@ -299,7 +277,7 @@ class RoarAssetsWindow(GuiMiniFrame):
         if not rc:
             with wx.MessageDialog(self, "Error: {}".format(error), "", wx.OK | wx.OK_DEFAULT) as dialog:
                 dialogChoice = dialog.ShowModal()
-    # }}}
+
 
     #
     # __init__(self, backend, cellSize, parent, pos=None, size=(400, 400), title="Assets"): initialisation method

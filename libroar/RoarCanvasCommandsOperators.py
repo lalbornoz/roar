@@ -14,10 +14,9 @@ from ToolObject import ToolObject
 import copy, wx
 
 class RoarCanvasCommandsOperators():
-    # {{{ canvasOperator(self, f, idx)
     @GuiCommandListDecorator(0, "Flip", "&Flip", None, None, None)
     @GuiCommandListDecorator(1, "Flip horizontally", "Flip &horizontally", None, None, None)
-    @GuiCommandListDecorator(2, "Invert", "&Invert", None, None, None)
+    @GuiCommandListDecorator(2, "Invert colours", "&Invert colours", None, None, None)
     @GuiCommandListDecorator(3, "Rotate", "&Rotate", None, None, None)
     @GuiCommandListDecorator(4, "Tile", "&Tile", None, None, None)
     def canvasOperator(self, f, idx):
@@ -27,11 +26,12 @@ class RoarCanvasCommandsOperators():
             self.parentCanvas.applyOperator(self.currentTool, self.parentCanvas.brushPos, None, False, self.currentOperator, self.parentCanvas.GetViewStart())
         setattr(canvasOperator_, "attrDict", f.attrList[idx])
         return canvasOperator_
-    # }}}
+
 
     #
     # __init__(self)
     def __init__(self):
+        self.accels = ()
         self.menus = (
             ("&Operators",
                 self.canvasOperator(self.canvasOperator, 0), self.canvasOperator(self.canvasOperator, 1), self.canvasOperator(self.canvasOperator, 2), self.canvasOperator(self.canvasOperator, 3), self.canvasOperator(self.canvasOperator, 4),

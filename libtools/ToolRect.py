@@ -12,19 +12,26 @@ class ToolRect(Tool):
     #
     # onMouseEvent(self, atPoint, brushColours, brushPos, brushSize, canvas, dispatchFn, eventDc, keyModifiers, mapPoint, mouseDragging, mouseLeftDown, mouseRightDown)
     def onMouseEvent(self, atPoint, brushColours, brushPos, brushSize, canvas, dispatchFn, eventDc, keyModifiers, mapPoint, mouseDragging, mouseLeftDown, mouseRightDown):
-        brushColours, dirty = brushColours.copy(), False
-        if mouseLeftDown:
-            brushColours[1] = brushColours[0]
-        elif mouseRightDown:
-            brushColours[0] = brushColours[1]
-        else:
-            brushColours[1] = brushColours[0]
-        brushSize = brushSize.copy()
+        brushColours, brushSize, dirty = list(brushColours), list(brushSize), False
+        if mouseRightDown:
+            brushColours = [brushColours[1], brushColours[0]]
         if brushSize[0] > 1:
             brushSize[0] *= 2
         for brushRow in range(brushSize[1]):
             for brushCol in range(brushSize[0]):
-                patch = [mapPoint[0] + brushCol, mapPoint[1] + brushRow, *brushColours, 0, " "]
+                if (brushCol in [0, brushSize[0] - 1])              \
+                or (brushRow in [0, brushSize[1] - 1]):
+                    patchColours = [brushColours[0]] * 2
+                    patch = [mapPoint[0] + brushCol, mapPoint[1] + brushRow, *patchColours, 0, " "]
+                elif brushColours[1] == -1:
+                    if  ((mapPoint[0] + brushCol) < canvas.size[0]) \
+                    and ((mapPoint[1] + brushRow) < canvas.size[1]):
+                        patch = [mapPoint[0] + brushCol, mapPoint[1] + brushRow, *canvas.map[mapPoint[1] + brushRow][mapPoint[0] + brushCol]]
+                    else:
+                        patch = [mapPoint[0] + brushCol, mapPoint[1] + brushRow, -1, -1, 0, " "]
+                else:
+                    patchColours = [brushColours[1]] * 2
+                    patch = [mapPoint[0] + brushCol, mapPoint[1] + brushRow, *patchColours, 0, " "]
                 if mouseLeftDown or mouseRightDown:
                     if not dirty:
                         dirty = True

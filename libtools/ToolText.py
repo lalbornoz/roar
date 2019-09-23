@@ -13,7 +13,6 @@ class ToolText(Tool):
     arabicRegEx = r'^[\u0621-\u063A\u0640-\u064A]+$'
     rtlRegEx = r'^[\u0591-\u07FF\uFB1D-\uFDFD\uFE70-\uFEFC]+$'
 
-    # {{{ _checkRtl(self, canvas, brushPos, keyChar)
     def _checkRtl(self, canvas, brushPos, keyChar):
         rtlFlag = False
         if (keyChar != None) and re.match(self.rtlRegEx, keyChar):
@@ -41,13 +40,11 @@ class ToolText(Tool):
                 else:
                     break
         return rtlFlag
-    # }}}
-    # {{{ _processKeyChar(self, brushColours, brushPos, canvas, dispatchFn, eventDc, keyChar, keyModifiers)
+
     def _processKeyChar(self, brushColours, brushPos, canvas, dispatchFn, eventDc, keyChar, keyModifiers):
-        if (ord(keyChar) != wx.WXK_NONE)                            \
+        if   (ord(keyChar) != wx.WXK_NONE)                          \
         and  (not keyChar in set("\t\n\v\f\r"))                     \
-        and  ((ord(keyChar) >= 32) if ord(keyChar) < 127 else True) \
-        and  (keyModifiers in (wx.MOD_NONE, wx.MOD_SHIFT)):
+        and  ((ord(keyChar) >= 32) if ord(keyChar) < 127 else True):
             dispatchFn(eventDc, False, [*brushPos, *brushColours, 0, keyChar]);
             if not self._checkRtl(canvas, brushPos, keyChar):
                 if brushPos[0] < (canvas.size[0] - 1):
@@ -67,7 +64,7 @@ class ToolText(Tool):
         else:
             rc, dirty = False, False
         return rc, dirty
-    # }}}
+
 
     #
     # onKeyboardEvent(self, atPoint, brushColours, brushPos, brushSize, canvas, dispatchFn, eventDc, keyChar, keyCode, keyModifiers, mapPoint)

@@ -8,10 +8,9 @@ from glob import glob
 import os, random, wx, wx.adv
 
 class RoarWindowAbout(wx.Dialog):
-    # {{{ onButtonRoar(self, event)
     def onButtonRoar(self, event):
         self.Destroy()
-    # }}}
+
 
     #
     # __init__(self, parent, minSize=(320, 300), title="About roar")
