@@ -115,6 +115,10 @@ class CanvasImportStore():
                         inCurColours = (inCurColours[1], inCurColours[0]); inCurCol += 1;
                     elif inChar == "\u001f":
                         inCellState = self._flipCellStateBit(self._CellState.CS_UNDERLINE, inCellState); inCurCol += 1;
+                    elif inChar == "\t":
+                        for tabChar in range(8 - len(outMap[-1]) % 8):
+                            outMap[-1].append([*inCurColours, inCellState, inChar])
+                        inCurCol += 1
                     else:
                         outMap[-1].append([*inCurColours, inCellState, inChar]); inCurCol += 1;
                 inLine, outMaxCols = inFile.readline(), max(outMaxCols, len(outMap[-1]))
