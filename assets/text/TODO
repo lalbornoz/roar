@@ -1,31 +1,32 @@
-1)  Finish Arabic/RTL text tool support
-2)  ANSI CSI CU[BDPU] sequences & italic
-3)  Operators: crop, scale, shift, slice
-4)  Documentation, instrumentation & unit tests
-5)  Layers & layout (e.g. for comics, zines, etc.)
-6)  Open and toggle a reference image in the background
-7)  Client-Server or Peer-to-Peer realtime collaboration
-8)  Arbitrary {format,palette}s ({4,8} bit ANSI/mIRC, etc.)
-9)  {record,replay} {keyboard,mouse,...} events in debugging builds
-10) Incremental auto{load,save} & {backup,restore} (needs Settings window)
-11) Unit tools: arrow, {cloud,speech bubble}, curve, measure, polygon, triangle
-12) Integrate ENNTool code in the form of OpenGL-based animation window (see 13) and 14))
-13) Composition, parametrisation & keying of tools from higher-order operators (brushes, functions, filters, outlines, patterns & shaders) and unit tools
-14) Sprites & scripted (Python?) animation on the basis of asset traits and {composable,parametrised} patterns (metric flow, particle system, rigging, ...)
-15) GUI TODO list:
-    a) {load,store} LRU {open,save} directory
+1)  ANSI CSI CU[BDPU] sequences & italic
+2)  Documentation, instrumentation & unit tests
+3)  Layers & layout (e.g. for comics, zines, etc.)
+4)  Open and toggle a reference image in the background
+5)  Client-Server or Peer-to-Peer realtime collaboration
+6)  Arbitrary {format,palette}s ({4,8} bit ANSI/mIRC, etc.)
+7)  {record,replay} {keyboard,mouse,...} events in debugging builds
+8)  Unit tools: arrow, {cloud,speech bubble}, curve, measure, polygon, triangle
+9)  Integrate ENNTool code in the form of OpenGL-based animation window (see 13) and 14))
+10) Composition, parametrisation & keying of tools from higher-order operators (brushes, functions, filters, outlines, patterns & shaders) and unit tools
+11) Sprites & scripted (Python?) animation on the basis of asset traits and {composable,parametrised} patterns (metric flow, particle system, rigging, ...)
+12) GUI TODO list:
+    a) switch to Gtk
     b) replace logo w/ canvas panel in About dialogue
     c) Settings/Settings window (e.g. autosave, hide cursor on leaving window, ...)
     d) replace resize buttons w/ {-,edit box,+} buttons & lock button re: ratio (ty lol3)
-    e) {copy,cut,delete,insert from,paste}, {edit asset in new canvas,import from {canvas,object}}
 
-High-priority list:
-1) bug: a) select line tool b) set origin point c) move mouse about d) incr brush size e) set target point d) undo
-2) bug: a) new canvas/startup b) place rect c) move mouse d) undo status changes
-3) bug: a) start w/ spoke-vxplion.txt b) scroll down c) fix w/ canvas resize 
-4) add hotkeys.txt mIRC art canvas to help menu
-5) bug: a) text tool b) paste text c) undo
-6) bug: a) tile once b) tile twice
-7) tools: unicode block elements
+Release roadmap:
+1)  BUG: a) select line tool b) set origin point c) move mouse about d) incr brush size e) set target point d) undo
+2)  BUG: a) new canvas/startup b) place rect c) move mouse d) undo status changes
+3)  BUG: a) start w/ spoke-vxplion.txt b) scroll down c) fix w/ canvas resize 
+4)  BUG: fix & finish Arabic/RTL text tool support
+5)  BUG: a) text tool b) paste text c) undo
+6)  BUG: a) tile once b) tile twice
+7)  {copy,cut,delete,insert from,paste}, edit asset in new canvas, import from {canvas,object}
+8)  add hotkeys.txt mIRC art canvas to help menu
+9)  {load,store} LRU {open,save} directory
+10) operators: crop, scale, shift, slice
+11) auto{load,save} & {backup,restore}
+12) tools: unicode block elements
 
 vim:ff=dos tw=0
