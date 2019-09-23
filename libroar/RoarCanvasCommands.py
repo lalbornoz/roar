@@ -129,7 +129,7 @@ class RoarCanvasCommands(RoarCanvasCommandsFile, RoarCanvasCommandsEdit, RoarCan
              self.canvasUndo, self.canvasRedo, NID_TOOLBAR_HSEP,
              self.canvasCut, self.canvasCopy, self.canvasPaste, self.canvasDelete, NID_TOOLBAR_HSEP,
              self.canvasAssetsWindowHide, self.canvasAssetsWindowShow, NID_TOOLBAR_HSEP,
-             self.canvasTool(self.canvasTool, 1), self.canvasTool(self.canvasTool, 6), self.canvasTool(self.canvasTool, 0), self.canvasTool(self.canvasTool, 3), self.canvasTool(self.canvasTool, 4), self.canvasTool(self.canvasTool, 7), self.canvasTool(self.canvasTool, 5), self.canvasTool(self.canvasTool, 2),
+             self.canvasTool(self.canvasTool, 1), self.canvasTool(self.canvasTool, 7), self.canvasTool(self.canvasTool, 0), self.canvasTool(self.canvasTool, 3), self.canvasTool(self.canvasTool, 4), self.canvasTool(self.canvasTool, 8), self.canvasTool(self.canvasTool, 5), self.canvasTool(self.canvasTool, 2), self.canvasTool(self.canvasTool, 6),
             ])
         toolBars.append(
             [self.canvasColour(self.canvasColour, 0), self.canvasColour(self.canvasColour, 1), self.canvasColour(self.canvasColour, 2), self.canvasColour(self.canvasColour, 3),
