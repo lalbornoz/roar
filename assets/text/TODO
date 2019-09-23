@@ -24,8 +24,8 @@ High-priority list:
 2) bug: a) new canvas/startup b) place rect c) move mouse d) undo status changes
 3) bug: a) start w/ spoke-vxplion.txt b) scroll down c) fix w/ canvas resize 
 4) add hotkeys.txt mIRC art canvas to help menu
-5) tools: pick colour, unicode block elements
-6) bug: a) text tool b) paste text c) undo
-7) bug: a) tile once b) tile twice
+5) bug: a) text tool b) paste text c) undo
+6) bug: a) tile once b) tile twice
+7) tools: unicode block elements
 
 vim:ff=dos tw=0
