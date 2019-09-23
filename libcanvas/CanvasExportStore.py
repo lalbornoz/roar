@@ -46,9 +46,12 @@ class CanvasExportStore():
                         outBuffer += "\u001b[1m"
                     if inCurCell[2] & self._CellState.CS_UNDERLINE:
                         outBuffer += "\u001b[4m"
+                    elif (lastAttribs & self._CellState.CS_UNDERLINE)       \
+                    and  ((inCurCell[2] & self._CellState.CS_UNDERLINE) == 0):
+                        outBuffer += "\u001b[24m"
                     lastAttribs = inCurCell[2]
                 if lastColours == None or lastColours != inCurCell[:2]:
-                    if  (inCurCell[0] == -1)    \
+                    if  (inCurCell[0] == -1)                                \
                     and (inCurCell[1] == -1):
                         outBuffer += "\u001b[39;49m{}".format(" ")
                     elif inCurCell[1] == -1:
