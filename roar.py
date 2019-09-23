@@ -27,7 +27,7 @@ def main(*argv):
         roarClient.canvasPanel.commands.canvasPathName = argv[0]
         rc, error = roarClient.canvasPanel.canvas.importStore.importTextFile(argv[0])
         if rc:
-            roarClient.canvasPanel.update(roarClient.canvasPanel.canvas.importStore.inSize, False, roarClient.canvasPanel.canvas.importStore.outMap)
+            roarClient.canvasPanel.update(roarClient.canvasPanel.canvas.importStore.inSize, False, roarClient.canvasPanel.canvas.importStore.outMap, dirty=False)
             roarClient.canvasPanel.commands.update(pathName=argv[0], undoLevel=-1)
             roarClient.canvasPanel.commands._pushRecent(argv[0])
         else:

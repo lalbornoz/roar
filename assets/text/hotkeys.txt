@@ -1,15 +1,15 @@
-<Ctrl> 0-9, <Ctrl> <Shift> 0-5, <Ctrl> <Shift> 6                     Set foreground colour to #0-9, #10-15, transparent colour, resp.
-<Ctrl> <Alt> 0-9, <Ctrl> <Alt> <Shift> 0-5, <Ctrl> <Alt> <Shift> 6   Set background colour to #0-9, #10-15, transparent colour, resp.
-<Ctrl> C U F L R E T                                                 Switch to circle, cursor, fill, line, rectangle, object, text tool
-<Ctrl> I                                                             Flip colours
-<Ctrl> N                                                             New canvas
-<Ctrl> O                                                             Open mIRC art file
-<Ctrl> S                                                             Save canvas as mIRC art file
-<Ctrl> X                                                             Exit
-<Ctrl> Y, Z                                                          Redo, undo, resp.
-<Shift> <Pause>                                                      Break into Python debugger
-(Canvas) <Down>, <Left>, <Right>, <Up>                               Move canvas cursor
-(Canvas) <Left mouse button>, <Space>                                Apply current tool with foreground colour or initiate tool action (line and object tool)
-(Canvas) <Right mouse button>                                        Apply current tool with background colour
-(Fill tool) <Ctrl> <Left mouse button>, <Right mouse button>         Fill entire region ignoring character cells
-(Object tool) <Ctrl> <Left mouse button>                             Move selection instead of cloning
+<Ctrl> 0-9, <Ctrl> <Shift> 0-5, <Ctrl> <Shift> 6			Set foreground colour to #0-9, #10-15, transparent colour, resp.
+<Ctrl> <Alt> 0-9, <Ctrl> <Alt> <Shift> 0-5, <Ctrl> <Alt> <Shift> 6	Set background colour to #0-9, #10-15, transparent colour, resp.
+<Ctrl> C, U, F, L, R, E, T						Switch to circle, cursor, fill, line, rectangle, object, text tool
+<Ctrl> I								Flip colours
+<Ctrl> N								New canvas
+<Ctrl> O								Open mIRC art file
+<Ctrl> S								Save canvas as mIRC art file
+<Ctrl> X								Exit
+<Ctrl> Y, Z								Redo, undo, resp.
+<Shift> <Pause>								Break into Python debugger
+(Canvas) <Down>, <Left>, <Right>, <Up>					Move canvas cursor
+(Canvas) <Left mouse button>, <Space>					Apply current tool with foreground colour or initiate tool action (line and object tool)
+(Canvas) <Right mouse button>						Apply current tool with background colour
+(Fill tool) <Ctrl> <Left mouse button>, <Right mouse button>		Fill entire region ignoring character cells
+(Object tool) <Ctrl> <Left mouse button>				Move selection instead of cloning

@@ -27,8 +27,8 @@ class RoarCanvasCommandsFile():
         try:
             rc, error, newMap, newPathName, newSize = f(pathName)
             if rc:
+                self.parentCanvas.update(newSize, False, newMap, dirty=newDirty)
                 self.parentCanvas.dirty = newDirty
-                self.parentCanvas.update(newSize, False, newMap)
                 self.canvasPathName = newPathName
                 self.update(dirty=self.parentCanvas.dirty, pathName=self.canvasPathName, undoLevel=-1)
                 self.parentCanvas.canvas.journal.resetCursor()
@@ -216,7 +216,8 @@ class RoarCanvasCommandsFile():
         def canvasImportmIRC(pathName):
             rc, error = self.parentCanvas.canvas.importStore.importTextFile(pathName)
             return (rc, error, self.parentCanvas.canvas.importStore.outMap, pathName, self.parentCanvas.canvas.importStore.inSize)
-        self._import(canvasImportmIRC, False, pathName)
+        if self._promptSaveChanges():
+            self._import(canvasImportmIRC, False, pathName)
 
     @GuiCommandDecorator("Save", "&Save", ["", wx.ART_FILE_SAVE], [wx.ACCEL_CTRL, ord("S")], None)
     def canvasSave(self, event, newDirty=False):

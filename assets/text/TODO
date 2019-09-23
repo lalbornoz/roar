@@ -25,6 +25,6 @@ High-priority list:
    a) new canvas/startup b) place rect c) move mouse d) undo status changes
    a) text tool b) paste text c) undo
 2) add hotkeys.txt mIRC art canvas to help menu
-2) tools: erase, pick, unicode block elements
+3) tools: erase, pick, unicode block elements
 
 vim:ff=dos tw=0
