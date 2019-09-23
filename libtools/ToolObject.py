@@ -97,7 +97,6 @@ class ToolObject(Tool):
             self.toolState = self.TS_SELECT
         return dirty
 
-
     def getRegion(self, canvas):
         return self.objectMap
 
@@ -168,7 +167,6 @@ class ToolObject(Tool):
         if self.srcRect == None:
             self.srcRect = self.targetRect
         self.objectMap, self.objectSize = objectMap, objectSize
-
 
     # __init__(self, *args): initialisation method
     def __init__(self, *args):

@@ -25,13 +25,11 @@ class RoarClient(GuiFrame):
             for toolBarItem in [i for i in toolBar if i != NID_TOOLBAR_HSEP]:
                 toolBarItem.attrDict["icon"] = self.loadBitmap(basePathName, toolBarItem.attrDict["icon"])
 
-
     def onChar(self, event):
         self.canvasPanel.onKeyboardInput(event)
 
     def onMouseWheel(self, event):
         self.canvasPanel.GetEventHandler().ProcessEvent(event)
-
 
     #
     # __init__(self, parent, defaultCanvasPos=(0, 75), defaultCanvasSize=(100, 30), defaultCellSize=(7, 14), size=(840, 630), title=""): initialisation method

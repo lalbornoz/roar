@@ -11,7 +11,6 @@ class RoarWindowAbout(wx.Dialog):
     def onButtonRoar(self, event):
         self.Destroy()
 
-
     #
     # __init__(self, parent, minSize=(320, 300), title="About roar")
     def __init__(self, parent, minSize=(320, 300), title="About roar"):

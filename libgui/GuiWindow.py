@@ -16,7 +16,6 @@ class GuiWindow(wx.ScrolledWindow):
             and  ((self.size[0] <= clientSize[0]) or (self.size[1] <= clientSize[1])):
                 self.scrollFlag = False; super().SetVirtualSize((0, 0));
 
-
     def onClose(self, event):
         self.Destroy()
 
@@ -47,7 +46,6 @@ class GuiWindow(wx.ScrolledWindow):
         curWindow = self
         while curWindow != None:
             curWindow.Layout(); curWindow = curWindow.GetParent();
-
 
     #
     # __init__(self, parent, pos, scrollStep, style=0): initialisation method

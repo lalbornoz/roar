@@ -91,12 +91,10 @@ class RoarCanvasCommandsFile():
                     for lastFile in [l["pathName"] for l in self.lastFiles]:
                         print(lastFile, file=outFile)
 
-
     @GuiCommandDecorator("Exit", "E&xit", None, [wx.ACCEL_CTRL, ord("X")], None)
     def canvasExit(self, event):
         if self._promptSaveChanges():
             self.parentFrame.Close(True)
-
 
     @GuiCommandDecorator("Export as ANSI...", "Export as &ANSI...", None, None, None)
     def canvasExportAsAnsi(self, event):
@@ -163,7 +161,6 @@ class RoarCanvasCommandsFile():
         self.parentCanvas.SetCursor(wx.Cursor(wx.NullCursor))
         return True
 
-
     @GuiCommandDecorator("Import ANSI...", "Import &ANSI...", None, None, None)
     def canvasImportAnsi(self, event):
         def canvasImportAnsi_(pathName):
@@ -193,7 +190,6 @@ class RoarCanvasCommandsFile():
             rc, error = self.parentCanvas.canvas.importStore.importSauceFile(pathName)
             return (rc, error, self.parentCanvas.canvas.importStore.outMap, pathName, self.parentCanvas.canvas.importStore.inSize)
         self._importFile(canvasImportSauce_, True, "SAUCE files (*.ans;*.txt)|*.ans;*.txt|All Files (*.*)|*.*")
-
 
     @GuiCommandDecorator("New", "&New", ["", wx.ART_NEW], [wx.ACCEL_CTRL, ord("N")], None)
     def canvasNew(self, event, newCanvasSize=None):
@@ -250,7 +246,6 @@ class RoarCanvasCommandsFile():
                 self.canvasPathName = dialog.GetPath(); self.lastDir = os.path.dirname(self.canvasPathName);
                 if self.canvasSave(event, newDirty=True):
                     self._pushRecent(self.canvasPathName)
-
 
     #
     # __init__(self)

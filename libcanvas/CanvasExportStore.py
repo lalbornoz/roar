@@ -35,7 +35,6 @@ class CanvasExportStore():
                 curPos[0] + fontSize[0], curPos[1] + (fontSize[1] - 2)),    \
                 fill=fillColour)
 
-
     def exportAnsiFile(self, canvasMap, canvasSize, outFile):
         outBuffer = ""
         for inCurRow in range(len(canvasMap)):
@@ -209,6 +208,5 @@ class CanvasExportStore():
     def exportTextFile(self, canvasMap, canvasSize, outFile):
         rc, outBuffer = self.exportTextBuffer(canvasMap, canvasSize)
         return outFile.write(outBuffer) if rc else (rc, outBuffer)
-
 
 # vim:expandtab foldmethod=marker sw=4 ts=4 tw=120

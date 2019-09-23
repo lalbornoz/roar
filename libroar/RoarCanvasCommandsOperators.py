@@ -27,7 +27,6 @@ class RoarCanvasCommandsOperators():
         setattr(canvasOperator_, "attrDict", f.attrList[idx])
         return canvasOperator_
 
-
     #
     # __init__(self)
     def __init__(self):
