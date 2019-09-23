@@ -15,10 +15,8 @@ class CanvasImportStore():
         CS_ITALIC           = 0x02
         CS_UNDERLINE        = 0x04
 
-
     def _flipCellStateBit(self, bit, cellState):
         return cellState & ~bit if cellState & bit else cellState | bit
-
 
     def importAnsiBuffer(self, inBuffer, encoding="cp437", width=None):
         curBg, curBgAnsi, curBoldAnsi, curFg, curFgAnsi = -1, 30, False, 15, 37
@@ -135,7 +133,6 @@ class CanvasImportStore():
     def importTextFile(self, pathName):
         with open(pathName, "r", encoding="utf-8-sig") as inFile:
             return self.importTextBuffer(inFile)
-
 
     #
     # __init__(self, inFile=None): initialisation method

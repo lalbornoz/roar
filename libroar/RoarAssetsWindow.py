@@ -95,7 +95,6 @@ class RoarAssetsWindow(GuiMiniFrame):
         and  ((panelSize[0] <= clientSize[0]) or (panelSize[1] <= clientSize[1])):
             self.scrollFlag = False; super(wx.ScrolledWindow, self.panelCanvas).SetVirtualSize((0, 0));
 
-
     def drawCanvas(self, canvas):
         panelSize = [a * b for a, b in zip(canvas.size, self.cellSize)]
         self.panelCanvas.SetMinSize(panelSize); self.panelCanvas.SetSize(wx.DefaultCoord, wx.DefaultCoord, *panelSize);
@@ -160,7 +159,6 @@ class RoarAssetsWindow(GuiMiniFrame):
             for numCol in range(canvas.size[0]):
                 self.backend.drawPatch(canvas, eventDc, [numCol, numRow, *canvas.map[numRow][numCol]])
         eventDc.SetDeviceOrigin(*eventDcOrigin)
-
 
     def onImportAnsi(self, event):
         event.Skip()
@@ -231,7 +229,6 @@ class RoarAssetsWindow(GuiMiniFrame):
                     if dialogChoice == wx.ID_CANCEL:
                         break
 
-    #  {{{ onLoadList(self, event)
     def onLoadList(self, event):
         rc = True
         with wx.FileDialog(self, "Load from list...", os.getcwd(), "", "List files (*.lst)|*.lst|Text files (*.txt)|*.txt|All Files (*.*)|*.*", wx.FD_OPEN) as dialog:
@@ -277,7 +274,6 @@ class RoarAssetsWindow(GuiMiniFrame):
         if not rc:
             with wx.MessageDialog(self, "Error: {}".format(error), "", wx.OK | wx.OK_DEFAULT) as dialog:
                 dialogChoice = dialog.ShowModal()
-
 
     #
     # __init__(self, backend, cellSize, parent, pos=None, size=(400, 400), title="Assets"): initialisation method

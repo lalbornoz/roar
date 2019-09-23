@@ -12,7 +12,6 @@ class Canvas():
     def _commitPatch(self, patch):
         self.map[patch[1]][patch[0]] = patch[2:]
 
-
     def dispatchPatch(self, isCursor, patch, commitUndo=True):
         if (patch[0] >= self.size[0]) or (patch[1] >= self.size[1]):
             return False
@@ -91,7 +90,6 @@ class Canvas():
                 and (numRow < len(newCanvas))   \
                 and (numCol < len(newCanvas[numRow])):
                     self._commitPatch([numCol, numRow, *newCanvas[numRow][numCol]])
-
 
     #
     # __init__(self, size): initialisation method

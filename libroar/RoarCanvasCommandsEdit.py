@@ -176,8 +176,6 @@ class RoarCanvasCommandsEdit():
         eventDc = self.parentCanvas.backend.getDeviceContext(self.parentCanvas.GetClientSize(), self.parentCanvas, viewRect)
         self.parentCanvas.applyTool(eventDc, True, None, None, None, self.parentCanvas.brushPos, False, False, False, self.currentTool, viewRect, force=True)
 
-
-
     @GuiCommandDecorator("Copy", "&Copy", ["", wx.ART_COPY], None, False)
     def canvasCopy(self, event):
         pass
@@ -203,7 +201,6 @@ class RoarCanvasCommandsEdit():
     def canvasUndo(self, event):
         self.parentCanvas.dispatchDeltaPatches(self.parentCanvas.canvas.journal.popUndo())
         self.update(size=self.parentCanvas.canvas.size, undoLevel=self.parentCanvas.canvas.journal.patchesUndoLevel)
-
 
     #
     # __init__(self)

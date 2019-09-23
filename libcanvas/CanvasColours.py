@@ -118,5 +118,4 @@ MiRCARTToAnsiColours = [
     37,  # Light Grey
 ];
 
-
 # vim:expandtab foldmethod=marker sw=4 ts=4 tw=120

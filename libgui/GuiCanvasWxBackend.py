@@ -23,7 +23,6 @@ class GuiBufferedDC(wx.MemoryDC):
         self.SelectObject(buffer); self.SetDeviceOrigin(*viewRect);
         self.dc, self.viewRect, self.viewSize = dc, viewRect, viewSize
 
-
 class GuiCanvasWxBackend():
     arabicShapes = {
         u'\u0621': (u'\uFE80'),
@@ -70,7 +69,6 @@ class GuiCanvasWxBackend():
         CS_BOLD             = 0x01
         CS_ITALIC           = 0x02
         CS_UNDERLINE        = 0x04
-
 
     def _drawBrushPatch(self, eventDc, patch, point):
         absPoint = self._xlatePoint(point)
@@ -174,7 +172,6 @@ class GuiCanvasWxBackend():
     def _xlatePoint(self, point):
         return [a * b for a, b in zip(point, self.cellSize)]
 
-
     def drawCursorMaskWithJournal(self, canvas, canvasJournal, eventDc):
         [self.drawPatch(canvas, eventDc, patch) for patch in canvasJournal.popCursor()]
 
@@ -235,12 +232,10 @@ class GuiCanvasWxBackend():
         mapX, mapY = int(rectX / self.cellSize[0] if rectX else 0), int(rectY / self.cellSize[1] if rectY else 0)
         return [m + n for m, n in zip((mapX, mapY), viewRect)]
 
-
     def __del__(self):
         if self.canvasBitmap != None:
             self.canvasBitmap.Destroy(); self.canvasBitmap = None;
         self._finiBrushesAndPens()
-
 
     #
     # __init__(self, canvasSize, cellSize, fontName="Dejavu Sans Mono", fontPathName=os.path.join("assets", "fonts", "DejaVuSansMono.ttf")): initialisation method

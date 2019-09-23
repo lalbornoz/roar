@@ -12,7 +12,6 @@ class RoarCanvasCommandsHelp():
     def canvasAbout(self, event):
         RoarWindowAbout(self.parentFrame)
 
-
     #
     # __init__(self)
     def __init__(self):

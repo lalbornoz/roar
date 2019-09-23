@@ -40,7 +40,6 @@ class RoarCanvasCommands(RoarCanvasCommandsFile, RoarCanvasCommandsEdit, RoarCan
         _initColourBitmaps_(RoarCanvasCommandsEdit.canvasColour, RoarCanvasCommandsEdit.canvasColourAlpha, 1.0)
         _initColourBitmaps_(RoarCanvasCommandsEdit.canvasColourBackground, RoarCanvasCommandsEdit.canvasColourAlphaBackground, 0.5)
 
-
     def update(self, **kwargs):
         self.lastPanelState.update(kwargs); textItems = [];
         if "cellPos" in self.lastPanelState:
@@ -108,7 +107,6 @@ class RoarCanvasCommands(RoarCanvasCommandsFile, RoarCanvasCommandsEdit, RoarCan
                 self.parentFrame.menuItemsById[self.canvasRedo.attrDict["id"]].Enable(False)
                 toolBar = self.parentFrame.toolBarItemsById[self.canvasRedo.attrDict["id"]][0]
                 toolBar.EnableTool(self.canvasRedo.attrDict["id"], False); toolBar.Refresh();
-
 
     #
     # __init__(self, parentCanvas, parentFrame):

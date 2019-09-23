@@ -46,7 +46,6 @@ def GuiSubMenuDecorator(caption, label, icon, accel, initialState):
             return targetObject
     return GuiSubMenuDecoratorOuter
 
-
 class GuiToolBarArtProvider(wx.lib.agw.aui.AuiDefaultToolBarArt):
     def DrawBackground(self, dc, wnd, _rect, horizontal=True):
         dc.SetBrush(wx.Brush(wx.Colour(240, 240, 240, 0), wx.BRUSHSTYLE_SOLID)); dc.SetPen(wx.Pen(wx.Colour(240, 240, 240, 0), 1));
@@ -93,7 +92,6 @@ class GuiFrame(wx.Frame):
                     menuItemWindow.Check(menuItem.attrDict["initialState"])
                 else:
                     menuItemWindow.Enable(menuItem.attrDict["initialState"])
-
 
     def loadAccels(self, accelsIn, menus, toolBars):
         def loadAccels_(accels):
@@ -192,7 +190,6 @@ class GuiFrame(wx.Frame):
 
     def onMouseWheel(self, event):
         event.Skip()
-
 
     #
     # __init__(self, iconPathName, size, parent=None, title=""): initialisation method

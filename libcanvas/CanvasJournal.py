@@ -53,10 +53,8 @@ class CanvasJournal():
         self.patchesUndo[self.patchesUndoLevel][0].append(undoPatches)
         self.patchesUndo[self.patchesUndoLevel][1].append(redoPatches)
 
-
     def __del__(self):
         self.resetCursor(); self.resetUndo();
-
 
     #
     # __init__(self): initialisation method

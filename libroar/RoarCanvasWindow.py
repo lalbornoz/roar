@@ -39,7 +39,6 @@ class RoarCanvasWindowDropTarget(wx.TextDropTarget):
     def __init__(self, parent):
         super().__init__(); self.inProgress, self.parent = False, parent;
 
-
 class RoarCanvasWindow(GuiWindow):
     def _drawPatch(self, eventDc, isCursor, patch):
         if not self.canvas.dirtyCursor:
@@ -48,7 +47,6 @@ class RoarCanvasWindow(GuiWindow):
         if self.backend.drawPatch(self.canvas, eventDc, patch) and isCursor:
             patchDeltaCell = self.canvas.map[patch[1]][patch[0]]; patchDelta = [*patch[0:2], *patchDeltaCell];
             self.canvas.journal.pushCursor(patchDelta)
-
 
     def applyOperator(self, currentTool, mapPoint, mouseLeftDown, mousePoint, operator, viewRect):
         self.canvas.dirtyCursor = False
@@ -191,7 +189,6 @@ class RoarCanvasWindow(GuiWindow):
                 self.backend.drawPatch(self.canvas, eventDc, [numCol, numRow, *self.canvas.map[numRow][numCol]])
         eventDc.SetDeviceOrigin(*eventDcOrigin)
 
-
     def onKeyboardInput(self, event):
         keyCode, keyModifiers = event.GetKeyCode(), event.GetModifiers()
         viewRect = self.GetViewStart(); eventDc = self.backend.getDeviceContext(self.GetClientSize(), self, viewRect);
@@ -285,7 +282,6 @@ class RoarCanvasWindow(GuiWindow):
         self.backend.drawCursorMaskWithJournal(self.canvas, self.canvas.journal, eventDc)
         eventDc.SetDeviceOrigin(*eventDcOrigin)
         self.backend.onPaint(self.GetClientSize(), self, self.GetViewStart())
-
 
     #
     # __init__(self, backend, canvas, cellSize, commands, parent, parentFrame, pos, scrollStep, size): initialisation method
