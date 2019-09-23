@@ -1,6 +1,6 @@
 <Ctrl> 0-9, <Ctrl> <Shift> 0-5, <Ctrl> <Shift> 6			Set foreground colour to #0-9, #10-15, transparent colour, resp.
 <Ctrl> <Alt> 0-9, <Ctrl> <Alt> <Shift> 0-5, <Ctrl> <Alt> <Shift> 6	Set background colour to #0-9, #10-15, transparent colour, resp.
-<Ctrl> C, U, E, F, L, R, E, T						Switch to circle, cursor, erase, fill, line, rectangle, object, text tool
+<Ctrl> C, U, E, F, L, P, R, E, T					Switch to circle, cursor, erase, fill, line, pick colour, rectangle, object, text tool
 <Ctrl> I								Flip colours
 <Ctrl> N								New canvas
 <Ctrl> O								Open mIRC art file
