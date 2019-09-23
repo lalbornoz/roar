@@ -6,6 +6,7 @@
 
 from GuiFrame import GuiSelectDecorator
 from ToolCircle import ToolCircle
+from ToolErase import ToolErase
 from ToolFill import ToolFill
 from ToolLine import ToolLine
 from ToolObject import ToolObject
@@ -16,18 +17,19 @@ import wx
 class RoarCanvasCommandsTools():
     @GuiSelectDecorator(0, "Circle", "&Circle", ["toolCircle.png"], [wx.ACCEL_CTRL, ord("C")], False)
     @GuiSelectDecorator(1, "Cursor", "C&ursor", ["toolCursor.png"], [wx.ACCEL_CTRL, ord("U")], False)
-    @GuiSelectDecorator(2, "Fill", "&Fill", ["toolFill.png"], [wx.ACCEL_CTRL, ord("F")], False)
-    @GuiSelectDecorator(3, "Line", "&Line", ["toolLine.png"], [wx.ACCEL_CTRL, ord("L")], False)
-    @GuiSelectDecorator(4, "Object", "&Object", ["toolObject.png"], [wx.ACCEL_CTRL, ord("E")], False)
-    @GuiSelectDecorator(5, "Rectangle", "&Rectangle", ["toolRect.png"], [wx.ACCEL_CTRL, ord("R")], True)
-    @GuiSelectDecorator(6, "Text", "&Text", ["toolText.png"], [wx.ACCEL_CTRL, ord("T")], False)
+    @GuiSelectDecorator(2, "Erase", "&Erase", ["toolErase.png"], [wx.ACCEL_CTRL, ord("A")], False)
+    @GuiSelectDecorator(3, "Fill", "&Fill", ["toolFill.png"], [wx.ACCEL_CTRL, ord("F")], False)
+    @GuiSelectDecorator(4, "Line", "&Line", ["toolLine.png"], [wx.ACCEL_CTRL, ord("L")], False)
+    @GuiSelectDecorator(5, "Object", "&Object", ["toolObject.png"], [wx.ACCEL_CTRL, ord("E")], False)
+    @GuiSelectDecorator(6, "Rectangle", "&Rectangle", ["toolRect.png"], [wx.ACCEL_CTRL, ord("R")], True)
+    @GuiSelectDecorator(7, "Text", "&Text", ["toolText.png"], [wx.ACCEL_CTRL, ord("T")], False)
     def canvasTool(self, f, idx):
         def canvasTool_(event):
             if  (self.currentTool.__class__ == ToolObject)                  \
             and (self.currentTool.toolState >  self.currentTool.TS_NONE)    \
             and self.currentTool.external:
                 self.parentCanvas.dropTarget.done()
-            self.lastTool, self.currentTool = self.currentTool, [ToolCircle, None, ToolFill, ToolLine, ToolObject, ToolRect, ToolText][idx]
+            self.lastTool, self.currentTool = self.currentTool, [ToolCircle, None, ToolErase, ToolFill, ToolLine, ToolObject, ToolRect, ToolText][idx]
             if self.currentTool != None:
                 self.currentTool = self.currentTool()
             self.currentOperator, self.operatorState = None, None
@@ -51,7 +53,7 @@ class RoarCanvasCommandsTools():
         self.accels = ()
         self.menus = (
             ("&Tools",
-                self.canvasTool(self.canvasTool, 1), self.canvasTool(self.canvasTool, 5), self.canvasTool(self.canvasTool, 0), self.canvasTool(self.canvasTool, 2), self.canvasTool(self.canvasTool, 3), self.canvasTool(self.canvasTool, 6), self.canvasTool(self.canvasTool, 4),
+                self.canvasTool(self.canvasTool, 1), self.canvasTool(self.canvasTool, 6), self.canvasTool(self.canvasTool, 0), self.canvasTool(self.canvasTool, 3), self.canvasTool(self.canvasTool, 4), self.canvasTool(self.canvasTool, 7), self.canvasTool(self.canvasTool, 5), self.canvasTool(self.canvasTool, 2),
             ),
         )
         self.toolBars = ()
