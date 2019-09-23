@@ -101,6 +101,14 @@ class ToolObject(Tool):
     def getRegion(self, canvas):
         return self.objectMap
 
+    def onKeyboardEvent(self, atPoint, brushColours, brushPos, brushSize, canvas, dispatchFn, eventDc, keyChar, keyCode, keyModifiers, mapPoint):
+        rc, dirty = False, False
+        if ord(keyChar) == wx.WXK_ESCAPE:
+            dirty = self.onSelectEvent(canvas, (0, 0), dispatchFn, eventDc, False, keyModifiers, self.targetRect.copy(), self.targetRect)
+            self._drawSelectRect(self.targetRect, dispatchFn, eventDc)
+            self.objectMap, self.objectSize, self.targetRect, self.toolState = None, None, None, self.TS_NONE
+        return rc, dirty
+
     def onMouseEvent(self, atPoint, brushColours, brushPos, brushSize, canvas, dispatchFn, eventDc, keyModifiers, mapPoint, mouseDragging, mouseLeftDown, mouseRightDown):
         dirty = False
         if self.toolState == self.TS_NONE:
