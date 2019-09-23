@@ -158,7 +158,7 @@ class RoarCanvasWindow(GuiWindow):
         if self.canvas.dispatchPatchSingle(isCursor, patch, False if isCursor else True):
             self._drawPatch(eventDc, isCursor, patch)
 
-    def resize(self, newSize, commitUndo=True):
+    def resize(self, newSize, commitUndo=True, dirty=True):
         viewRect = self.GetViewStart()
         oldSize = [0, 0] if self.canvas.map == None else self.canvas.size
         deltaSize = [b - a for a, b in zip(oldSize, newSize)]
@@ -176,11 +176,11 @@ class RoarCanvasWindow(GuiWindow):
                     for numNewCol in range(newSize[0]):
                         self._drawPatch(eventDc, False, [numNewCol, numNewRow, 1, 1, 0, " "])
             eventDc.SetDeviceOrigin(*eventDcOrigin)
-            self.Scroll(*viewRect)
-            self.commands.update(size=newSize, undoLevel=self.canvas.journal.patchesUndoLevel)
+            self.Scroll(*viewRect); self.dirty = dirty;
+            self.commands.update(dirty=self.dirty, size=newSize, undoLevel=self.canvas.journal.patchesUndoLevel)
 
-    def update(self, newSize, commitUndo=True, newCanvas=None):
-        self.resize(newSize, commitUndo)
+    def update(self, newSize, commitUndo=True, newCanvas=None, dirty=True):
+        self.resize(newSize, commitUndo, dirty)
         self.canvas.update(newSize, newCanvas)
         eventDc = self.backend.getDeviceContext(self.GetClientSize(), self, self.GetViewStart())
         eventDcOrigin = eventDc.GetDeviceOrigin(); eventDc.SetDeviceOrigin(0, 0);
