@@ -13,11 +13,12 @@
 13) Composition, parametrisation & keying of tools from higher-order operators (brushes, functions, filters, outlines, patterns & shaders) and unit tools
 14) Sprites & scripted (Python?) animation on the basis of asset traits and {composable,parametrised} patterns (metric flow, particle system, rigging, ...)
 15) GUI TODO list:
-    a) replace logo w/ canvas panel in About dialogue
-    b) purge MRU list menu item, remove files from MRU list if inaccessible
-    c) Settings/Settings window (e.g. autosave, hide cursor on leaving window, ...)
-    d) replace resize buttons w/ {-,edit box,+} buttons & lock button re: ratio (ty lol3)
-    e) {copy,cut,delete,insert from,paste}, {edit asset in new canvas,import from {canvas,object}}
+    a) {load,store} LRU {open,save} directory
+    b) replace logo w/ canvas panel in About dialogue
+    c) purge MRU list menu item, remove files from MRU list if inaccessible
+    d) Settings/Settings window (e.g. autosave, hide cursor on leaving window, ...)
+    e) replace resize buttons w/ {-,edit box,+} buttons & lock button re: ratio (ty lol3)
+    f) {copy,cut,delete,insert from,paste}, {edit asset in new canvas,import from {canvas,object}}
 
 High-priority list:
 1) a) select line tool b) set origin point c) move mouse about d) incr brush size e) set target point d) undo

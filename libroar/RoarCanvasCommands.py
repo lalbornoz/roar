@@ -71,15 +71,15 @@ class RoarCanvasCommands(RoarCanvasCommandsFile, RoarCanvasCommandsEdit, RoarCan
         if "pathName" in self.lastPanelState:
             if self.lastPanelState["pathName"] != None:
                 basePathName = os.path.basename(self.lastPanelState["pathName"])
-                textItems.append("Current file: {}".format(basePathName))
+                textItems.append("File: {}".format(basePathName))
                 self.parentFrame.SetTitle("{} - roar".format(basePathName))
             else:
                 self.parentFrame.SetTitle("roar")
         if "toolName" in self.lastPanelState:
-            textItems.append("Current tool: {}".format(self.lastPanelState["toolName"]))
+            textItems.append("Tool: {}".format(self.lastPanelState["toolName"]))
         if  ("operator" in self.lastPanelState)         \
         and (self.lastPanelState["operator"] != None):
-            textItems.append("Current operator: {}".format(self.lastPanelState["operator"]))
+            textItems.append("Operator: {}".format(self.lastPanelState["operator"]))
         if  "dirty" in self.lastPanelState              \
         and self.lastPanelState["dirty"]:
             textItems.append("*")
