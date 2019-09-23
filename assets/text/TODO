@@ -1,26 +1,29 @@
-Low-priority list:
-1)  Implement ANSI CSI CU[BDPU] sequences & italic
-2)  Layers & layout (e.g. for comics, zines, etc.)
-3)  Implement instrumentation & unit tests, document
-4)  Open and toggle a reference image in the background
-5)  Client-Server or Peer-to-Peer realtime collaboration
-6)  Arbitrary {format,palette}s ({4,8} bit ANSI/mIRC, etc.)
-7)  {record,replay} {keyboard,mouse,...} events in debugging builds
-8)  Incremental auto{load,save} & {backup,restore} (needs Settings window)
-9)  Composition, parametrisation & keying of tools from higher-order operators (brushes, functions, filters, outlines, patterns & shaders) and unit tools
-10) Sprites & scripted (Python?) animation on the basis of asset traits and {composable,parametrised} patterns (metric flow, particle system, rigging, ...)
-11) Integrate ENNTool code in the form of OpenGL-based animation window (see 9) and 10))
-
-High-priority list:
-1)  unit tools: arrow, {cloud,speech bubble}, curve, measure, pick, polygon, triangle, unicode
-2)  operators: rotate, scale, shift, slice, tile
-3)  cleanup & refactor, switch to GTK
-4)  GUI:
+1)  Finish Arabic/RTL text tool support
+2)  ANSI CSI CU[BDPU] sequences & italic
+3)  Operators: crop, scale, shift, slice
+4)  Documentation, instrumentation & unit tests
+5)  Layers & layout (e.g. for comics, zines, etc.)
+6)  Open and toggle a reference image in the background
+7)  Client-Server or Peer-to-Peer realtime collaboration
+8)  Arbitrary {format,palette}s ({4,8} bit ANSI/mIRC, etc.)
+9)  {record,replay} {keyboard,mouse,...} events in debugging builds
+10) Incremental auto{load,save} & {backup,restore} (needs Settings window)
+11) Unit tools: arrow, {cloud,speech bubble}, curve, measure, polygon, triangle
+12) Integrate ENNTool code in the form of OpenGL-based animation window (see 13) and 14))
+13) Composition, parametrisation & keying of tools from higher-order operators (brushes, functions, filters, outlines, patterns & shaders) and unit tools
+14) Sprites & scripted (Python?) animation on the basis of asset traits and {composable,parametrised} patterns (metric flow, particle system, rigging, ...)
+15) GUI TODO list:
     a) replace logo w/ canvas panel in About dialogue
     b) purge MRU list menu item, remove files from MRU list if inaccessible
     c) Settings/Settings window (e.g. autosave, hide cursor on leaving window, ...)
     d) replace resize buttons w/ {-,edit box,+} buttons & lock button re: ratio (ty lol3)
     e) {copy,cut,delete,insert from,paste}, {edit asset in new canvas,import from {canvas,object}}
-5)  finish Arabic/RTL text implementation
+
+High-priority list:
+1) a) select line tool b) set origin point c) move mouse about d) incr brush size e) set target point d) undo
+   a) new canvas/startup b) place rect c) move mouse d) undo status changes
+   a) text tool b) paste text c) undo
+2) add hotkeys.txt mIRC art canvas to help menu
+2) tools: erase, pick, unicode block elements
 
 vim:ff=dos tw=0

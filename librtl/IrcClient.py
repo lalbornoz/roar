@@ -11,13 +11,11 @@ import select, socket, time
 class IrcClient:
     """Non-blocking abstraction over the IRC protocol"""
 
-    # {{{ close(self): Close connection to server
     def close(self):
         if self.clientSocket != None:
             self.clientSocket.close()
         self.clientSocket = self.clientSocketFile = None;
-    # }}}
-    # {{{ connect(self, localAddr=None, preferFamily=socket.AF_INET, timeout=None): Connect to server and register w/ optional timeout
+
     def connect(self, localAddr=None, preferFamily=socket.AF_INET, timeout=None):
         gaiInfo = socket.getaddrinfo(self.serverHname, self.serverPort,
                                      preferFamily, socket.SOCK_STREAM, socket.IPPROTO_TCP)
@@ -41,8 +39,7 @@ class IrcClient:
         self.queue("NICK", self.clientNick)
         self.queue("USER", self.clientIdent, "0", "0", self.clientGecos)
         return True
-    # }}}
-    # {{{ queue(self, *args): Parse and queue single line to server from list
+
     def queue(self, *args):
         msg = ""; argNumMax = len(args);
         for argNum in range(argNumMax):
@@ -51,8 +48,7 @@ class IrcClient:
             else:
                 msg += args[argNum] + " "
         self.clientQueue.append((msg + "\r\n").encode())
-    # }}}
-    # {{{ readline(self, timeout=30): Read and parse single line from server into canonicalised list, honouring timers
+
     def readline(self, timeout=30):
         if self.clientNextTimeout:
             timeNow = time.time()
@@ -85,8 +81,7 @@ class IrcClient:
         else:
             msg = [""] + msg[0:]
         return msg
-    # }}}
-    # {{{ unqueue(self, timeout=15): Send all queued lines to server, honouring timers
+
     def unqueue(self, timeout=15):
         while self.clientQueue:
             msg = self.clientQueue[0]; msgLen = len(msg); msgBytesSent = 0;
@@ -111,7 +106,7 @@ class IrcClient:
                 msg = msg[msgBytesSent:]; msgLen -= msgBytesSent;
             del self.clientQueue[0]
         return True
-    # }}}
+
 
     #
     # __init__(self, serverHname, serverPort, clientNick, clientIdent, clientGecos): initialisation method

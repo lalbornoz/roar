@@ -11,7 +11,6 @@ class ToolLine(Tool):
     TS_NONE     = 0
     TS_ORIGIN   = 1
 
-    # {{{ _getLine(self, brushColours, brushSize, dispatchFn, eventDc, isCursor, originPoint, targetPoint)
     def _getLine(self, brushColours, brushSize, dispatchFn, eventDc, isCursor, originPoint, targetPoint):
         dirty = False
         originPoint, targetPoint = originPoint.copy(), targetPoint.copy()
@@ -40,15 +39,13 @@ class ToolLine(Tool):
                 lineD -= pointDelta[0]; lineY += 1;
             lineD += pointDelta[1]
         return dirty
-    # }}}
-    # {{{ _pointDelta(self, a, b)
+
     def _pointDelta(self, a, b):
         return [a2 - a1 for a1, a2 in zip(a, b)]
-    # }}}
-    # {{{ _pointSwap(self, a, b)
+
     def _pointSwap(self, a, b):
         return [b, a]
-    # }}}
+
 
     #
     # onMouseEvent(self, atPoint, brushColours, brushPos, brushSize, canvas, dispatchFn, eventDc, keyModifiers, mapPoint, mouseDragging, mouseLeftDown, mouseRightDown)

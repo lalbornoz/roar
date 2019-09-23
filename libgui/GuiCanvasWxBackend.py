@@ -9,12 +9,10 @@ from GuiCanvasColours import Colours
 import math, os, platform, wx
 
 class GuiBufferedDC(wx.MemoryDC):
-    # {{{ __del__(self)
     def __del__(self):
         self.dc.Blit(0, 0, *self.viewSize, self, 0, 0)
         self.SelectObject(wx.NullBitmap)
-    # }}}
-    # {{{ __init__(self, backend, buffer, clientSize, dc, viewRect)
+
     def __init__(self, backend, buffer, clientSize, dc, viewRect):
         super().__init__()
         canvasSize = [a - b for a, b in zip(backend.canvasSize, viewRect)]
@@ -24,10 +22,9 @@ class GuiBufferedDC(wx.MemoryDC):
         viewSize = [m * n for m, n in zip(backend.cellSize, viewSize)]
         self.SelectObject(buffer); self.SetDeviceOrigin(*viewRect);
         self.dc, self.viewRect, self.viewSize = dc, viewRect, viewSize
-    # }}}
+
 
 class GuiCanvasWxBackend():
-    # {{{ arabicShapes{}
     arabicShapes = {
         u'\u0621': (u'\uFE80'),
         u'\u0622': (u'\uFE81', None, None, u'\uFE82'),
@@ -67,23 +64,20 @@ class GuiCanvasWxBackend():
         u'\u0649': (u'\uFEEF', None, None, u'\uFEF0'),
         u'\u064A': (u'\uFEF1', u'\uFEF3', u'\uFEF4', u'\uFEF2'),
     }
-    # }}}
-    # {{{ _CellState(): Cell state
+
     class _CellState():
         CS_NONE             = 0x00
         CS_BOLD             = 0x01
         CS_ITALIC           = 0x02
         CS_UNDERLINE        = 0x04
-    # }}}
 
-    # {{{ _drawBrushPatch(self, eventDc, patch, point)
+
     def _drawBrushPatch(self, eventDc, patch, point):
         absPoint = self._xlatePoint(point)
         brushBg, brushFg, pen = self._getBrushPatchColours(patch)
         self._setBrushDc(brushBg, brushFg, eventDc, pen)
         eventDc.DrawRectangle(*absPoint, *self.cellSize)
-    # }}}
-    # {{{ _drawCharPatch(self, eventDc, patch, point)
+
     def _drawCharPatch(self, eventDc, patch, point):
         absPoint, fontBitmap = self._xlatePoint(point), wx.Bitmap(*self.cellSize)
         brushBg, brushFg, pen = self._getCharPatchColours(patch)
@@ -99,14 +93,12 @@ class GuiCanvasWxBackend():
         if patch[3] != "_":
             fontDc.DrawText(patch[3], 0, 0)
         eventDc.Blit(*absPoint, *self.cellSize, fontDc, 0, 0)
-    # }}}
-    # {{{ _finiBrushesAndPens(self)
+
     def _finiBrushesAndPens(self):
         [brush.Destroy() for brush in self._brushes or []]
         [pen.Destroy() for pen in self._pens or []]
         self._brushes, self._lastBrushBg, self._lastBrushFg, self._lastPen, self._pens = None, None, None, None, None
-    # }}}
-    # {{{ _getBrushPatchColours(self, patch)
+
     def _getBrushPatchColours(self, patch):
         if (patch[0] != -1) and (patch[1] != -1):
             brushBg, brushFg, pen = self._brushes[patch[1]], self._brushes[patch[1]], self._pens[patch[1]]
@@ -117,8 +109,7 @@ class GuiCanvasWxBackend():
         elif patch[1] == -1:
             brushBg, brushFg, pen = self._brushAlpha, self._brushAlpha, self._penAlpha
         return (brushBg, brushFg, pen)
-    # }}}
-    # {{{ _getCharPatchColours(self, patch)
+
     def _getCharPatchColours(self, patch):
         if (patch[0] != -1) and (patch[1] != -1):
             brushBg, brushFg, pen = self._brushes[patch[1]], self._brushes[patch[1]], self._pens[patch[1]]
@@ -129,8 +120,7 @@ class GuiCanvasWxBackend():
         elif patch[1] == -1:
             brushBg, brushFg, pen = self._brushAlpha, self._brushAlpha, self._penAlpha
         return (brushBg, brushFg, pen)
-    # }}}
-    # {{{ _initBrushesAndPens(self)
+
     def _initBrushesAndPens(self):
         self._brushes, self._pens = [None for x in range(len(Colours))], [None for x in range(len(Colours))]
         for mircColour in range(len(Colours)):
@@ -139,8 +129,7 @@ class GuiCanvasWxBackend():
         self._brushAlpha = wx.Brush(wx.Colour(Colours[14][:4]), wx.BRUSHSTYLE_SOLID)
         self._penAlpha = wx.Pen(wx.Colour(Colours[14][:4]), 1)
         self._lastBrushBg, self._lastBrushFg, self._lastPen = None, None, None
-    # }}}
-    # {{{ _reshapeArabic(self, canvas, eventDc, patch, point)
+
     def _reshapeArabic(self, canvas, eventDc, patch, point):
         lastCell = point[0]
         while True:
@@ -173,8 +162,7 @@ class GuiCanvasWxBackend():
         else:
             runCell[3] = self.arabicShapes[patch[5]][0]
         self._drawCharPatch(eventDc, runCell, [point[0], point[1]])
-    # }}}
-    # {{{ _setBrushDc(self, brushBg, brushFg, dc, pen)
+
     def _setBrushDc(self, brushBg, brushFg, dc, pen):
         if self._lastBrushBg != brushBg:
             dc.SetBackground(brushBg); self._lastBrushBg = brushBg;
@@ -182,17 +170,14 @@ class GuiCanvasWxBackend():
             dc.SetBrush(brushFg); self._lastBrushFg = brushFg;
         if self._lastPen != pen:
             dc.SetPen(pen); self._lastPen = pen;
-    # }}}
-    # {{{ _xlatePoint(self, point)
+
     def _xlatePoint(self, point):
         return [a * b for a, b in zip(point, self.cellSize)]
-    # }}}
 
-    # {{{ drawCursorMaskWithJournal(self, canvas, canvasJournal, eventDc)
+
     def drawCursorMaskWithJournal(self, canvas, canvasJournal, eventDc):
         [self.drawPatch(canvas, eventDc, patch) for patch in canvasJournal.popCursor()]
-    # }}}
-    # {{{ drawPatch(self, canvas, eventDc, patch)
+
     def drawPatch(self, canvas, eventDc, patch):
         point = patch[:2]
         if [(c >= 0) and (c < s) for c, s in zip(point, self.canvasSize)] == [True, True]:
@@ -210,8 +195,7 @@ class GuiCanvasWxBackend():
             return True
         else:
             return False
-    # }}}
-    # {{{ getDeviceContext(self, clientSize, parentWindow, viewRect=None)
+
     def getDeviceContext(self, clientSize, parentWindow, viewRect=None):
         if viewRect == None:
             viewRect = parentWindow.GetViewStart()
@@ -221,16 +205,14 @@ class GuiCanvasWxBackend():
             eventDc = GuiBufferedDC(self, self.canvasBitmap, clientSize, wx.ClientDC(parentWindow), viewRect)
         self._lastBrushBg, self._lastBrushFg, self._lastPen = None, None, None
         return eventDc
-    # }}}
-    # {{{ onPaint(self, clientSize, panelWindow, viewRect)
+
     def onPaint(self, clientSize, panelWindow, viewRect):
         if self.canvasBitmap != None:
             if viewRect == (0, 0):
                 eventDc = wx.BufferedPaintDC(panelWindow, self.canvasBitmap)
             else:
                 eventDc = GuiBufferedDC(self, self.canvasBitmap, clientSize, wx.PaintDC(panelWindow), viewRect)
-    # }}}
-    # {{{ resize(self, canvasSize, cellSize):
+
     def resize(self, canvasSize, cellSize):
         winSize = [a * b for a, b in zip(canvasSize, cellSize)]
         if self.canvasBitmap == None:
@@ -246,21 +228,19 @@ class GuiCanvasWxBackend():
             self._font = wx.TheFontList.FindOrCreateFont(cellSize[0] + 1, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, False, self.fontName)
         else:
             self._font = wx.Font(cellSize[0] + 1, wx.FONTFAMILY_TELETYPE, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL)
-    # }}}
-    # {{{ xlateEventPoint(self, event, eventDc, viewRect)
+
     def xlateEventPoint(self, event, eventDc, viewRect):
         eventPoint = event.GetLogicalPosition(eventDc)
         rectX, rectY = eventPoint.x - (eventPoint.x % self.cellSize[0]), eventPoint.y - (eventPoint.y % self.cellSize[1])
         mapX, mapY = int(rectX / self.cellSize[0] if rectX else 0), int(rectY / self.cellSize[1] if rectY else 0)
         return [m + n for m, n in zip((mapX, mapY), viewRect)]
-    # }}}
 
-    # {{{ __del__(self): destructor method
+
     def __del__(self):
         if self.canvasBitmap != None:
             self.canvasBitmap.Destroy(); self.canvasBitmap = None;
         self._finiBrushesAndPens()
-    # }}}
+
 
     #
     # __init__(self, canvasSize, cellSize, fontName="Dejavu Sans Mono", fontPathName=os.path.join("assets", "fonts", "DejaVuSansMono.ttf")): initialisation method

@@ -9,20 +9,17 @@ from CanvasColours import AnsiBgToMiRCARTColours, AnsiFgToMiRCARTColours, AnsiFg
 import io, os, re, struct, sys
 
 class CanvasImportStore():
-    # {{{ _CellState(): Cell state
     class _CellState():
         CS_NONE             = 0x00
         CS_BOLD             = 0x01
         CS_ITALIC           = 0x02
         CS_UNDERLINE        = 0x04
-    # }}}
 
-    # {{{ _flipCellStateBit(self, bit, cellState)
+
     def _flipCellStateBit(self, bit, cellState):
         return cellState & ~bit if cellState & bit else cellState | bit
-    # }}}
 
-    # {{{ importAnsiBuffer(self, inBuffer, encoding="cp437", width=None)
+
     def importAnsiBuffer(self, inBuffer, encoding="cp437", width=None):
         curBg, curBgAnsi, curBoldAnsi, curFg, curFgAnsi = -1, 30, False, 15, 37
         done, outMap, outMaxCols = False, [[]], 0
@@ -74,12 +71,10 @@ class CanvasImportStore():
             return (True, None)
         else:
             return (False, "empty output map")
-    # }}}
-    # {{{ importAnsiFile(self, inPathName, encoding="cp437")
+
     def importAnsiFile(self, inPathName, encoding="cp437"):
         return self.importAnsiBuffer(open(inPathName, "rb").read(), encoding)
-    # }}}
-    # {{{ importSauceFile(self, inPathName, encoding="cp437")
+
     def importSauceFile(self, inPathName, encoding="cp437"):
         with open(inPathName, "rb") as inFile:
             inFileStat = os.stat(inPathName)
@@ -90,8 +85,7 @@ class CanvasImportStore():
                 return self.importAnsiBuffer(inFileData, encoding, width)
             else:
                 return (False, "only character based ANSi SAUCE files are supported")
-    # }}}
-    # {{{ importTextBuffer(self, inFile)
+
     def importTextBuffer(self, inFile):
         try:
             inLine, outMap, outMaxCols = inFile.readline(), [], 0
@@ -137,12 +131,11 @@ class CanvasImportStore():
                 return (False, "empty output map")
         except:
             return (False, sys.exc_info()[1])
-    # }}}
-    # {{{ importTextFile(self, pathName)
+
     def importTextFile(self, pathName):
         with open(pathName, "r", encoding="utf-8-sig") as inFile:
             return self.importTextBuffer(inFile)
-    # }}}
+
 
     #
     # __init__(self, inFile=None): initialisation method

@@ -7,7 +7,6 @@
 import wx
 
 class GuiWindow(wx.ScrolledWindow):
-    # {{{ _updateScrollBars(self)
     def _updateScrollBars(self):
         if self.size != None:
             clientSize = self.GetClientSize()
@@ -16,48 +15,39 @@ class GuiWindow(wx.ScrolledWindow):
             elif self.scrollFlag    \
             and  ((self.size[0] <= clientSize[0]) or (self.size[1] <= clientSize[1])):
                 self.scrollFlag = False; super().SetVirtualSize((0, 0));
-    # }}}
 
-    # {{{ onClose(self, event)
+
     def onClose(self, event):
         self.Destroy()
-    # }}}
-    # {{{ onEnterWindow(self, event)
+
     def onEnterWindow(self, event):
         event.Skip()
-    # }}}
-    # {{{ onKeyboardInput(self, event)
+
     def onKeyboardInput(self, event):
         return False
-    # }}}
-    # {{{ onLeaveWindow(self, event)
+
     def onLeaveWindow(self, event):
         event.Skip()
-    # }}}
-    # {{{ onMouseInput(self, event)
+
     def onMouseInput(self, event):
         return False
-    # }}}
-    # {{{ onPaint(self, event)
+
     def onPaint(self, event):
         event.Skip()
-    # }}}
-    # {{{ onScroll(self, event)
+
     def onScroll(self, event):
         event.Skip()
-    # }}}
-    # {{{ onSize(self, event)
+
     def onSize(self, event):
         self._updateScrollBars(); event.Skip();
-    # }}}
-    # {{{ resize(self, newSize)
+
     def resize(self, newSize):
         self.size = newSize; self._updateScrollBars();
         self.SetMinSize(self.size); self.SetSize(wx.DefaultCoord, wx.DefaultCoord, *self.size);
         curWindow = self
         while curWindow != None:
             curWindow.Layout(); curWindow = curWindow.GetParent();
-    # }}}
+
 
     #
     # __init__(self, parent, pos, scrollStep, style=0): initialisation method
