@@ -7,7 +7,7 @@
 AnsiBgToMiRCARTColours = {
     107: 0,  # Bright White
     40:  1,  # Black
-    104: 2,  # Blue
+    44:  2,  # Blue
     42:  3,  # Green
     101: 4,  # Red
     41:  5,  # Light Red
@@ -17,7 +17,7 @@ AnsiBgToMiRCARTColours = {
     102: 9,  # Light Green
     46:  10, # Cyan
     106: 11, # Light Cyan
-    44:  12, # Light Blue
+    104: 12, # Light Blue
     105: 13, # Light Pink
     100: 14, # Grey
     47:  15, # Light Grey
@@ -36,7 +36,7 @@ AnsiFgBoldToMiRCARTColours = {
     92: 9,   # Light Green
     36: 11,  # Light Cyan
     96: 11,  # Light Cyan
-    34: 12,  # Light Blue
+    94: 12,  # Light Blue
     95: 13,  # Light Pink
     90: 14,  # Grey
     37: 0,   # Bright White
@@ -45,7 +45,7 @@ AnsiFgBoldToMiRCARTColours = {
 AnsiFgToMiRCARTColours = {
     97: 0,   # Bright White
     30: 1,   # Black
-    94: 2,   # Blue
+    34: 2,   # Blue
     32: 3,   # Green
     91: 4,   # Red
     31: 5,   # Light Red
@@ -55,7 +55,7 @@ AnsiFgToMiRCARTColours = {
     92: 9,   # Light Green
     36: 10,  # Cyan
     96: 11,  # Light Cyan
-    34: 12,  # Light Blue
+    94: 12,  # Light Blue
     95: 13,  # Light Pink
     90: 14,  # Grey
     37: 15,  # Light Grey
@@ -102,7 +102,7 @@ ColourMapNormal = [
 MiRCARTToAnsiColours = [
     97,  # Bright White
     30,  # Black
-    94,  # Light Blue
+    34,  # Blue
     32,  # Green
     91,  # Red
     31,  # Light Red
@@ -112,7 +112,7 @@ MiRCARTToAnsiColours = [
     92,  # Light Green
     36,  # Cyan
     96,  # Light Cyan
-    34,  # Blue
+    94,  # Light Blue
     95,  # Light Pink
     90,  # Grey
     37,  # Light Grey
