@@ -9,12 +9,10 @@ from CanvasImportStore import CanvasImportStore
 from CanvasJournal import CanvasJournal
 
 class Canvas():
-    # {{{ _commitPatch(self, patch)
     def _commitPatch(self, patch):
         self.map[patch[1]][patch[0]] = patch[2:]
-    # }}}
 
-    # {{{ dispatchPatch(self, isCursor, patch, commitUndo=True)
+
     def dispatchPatch(self, isCursor, patch, commitUndo=True):
         if (patch[0] >= self.size[0]) or (patch[1] >= self.size[1]):
             return False
@@ -27,8 +25,7 @@ class Canvas():
                     self.journal.begin(); self.journal.updateCurrentDeltas(patch, patchDelta); self.journal.end();
                 self._commitPatch(patch)
             return True
-    # }}}
-    # {{{ dispatchPatchSingle(self, isCursor, patch, commitUndo=True)
+
     def dispatchPatchSingle(self, isCursor, patch, commitUndo=True):
         if (patch[0] >= self.size[0]) or (patch[1] >= self.size[1]):
             return False
@@ -41,8 +38,7 @@ class Canvas():
                     self.journal.updateCurrentDeltas(patch, patchDelta)
                 self._commitPatch(patch)
             return True
-    # }}}
-    # {{{ resize(self, newSize, commitUndo=True)
+
     def resize(self, newSize, commitUndo=True):
         if newSize != self.size:
             if self.map == None:
@@ -87,8 +83,7 @@ class Canvas():
             return True
         else:
             return False
-    # }}}
-    # {{{ update(self, newSize, newCanvas=None)
+
     def update(self, newSize, newCanvas=None):
         for numRow in range(self.size[1]):
             for numCol in range(self.size[0]):
@@ -96,7 +91,7 @@ class Canvas():
                 and (numRow < len(newCanvas))   \
                 and (numCol < len(newCanvas[numRow])):
                     self._commitPatch([numCol, numRow, *newCanvas[numRow][numCol]])
-    # }}}
+
 
     #
     # __init__(self, size): initialisation method

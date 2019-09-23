@@ -14,7 +14,6 @@ from ToolText import ToolText
 import wx
 
 class RoarCanvasCommandsTools():
-    # {{{ canvasTool(self, f, idx)
     @GuiSelectDecorator(0, "Circle", "&Circle", ["toolCircle.png"], [wx.ACCEL_CTRL, ord("C")], False)
     @GuiSelectDecorator(1, "Cursor", "C&ursor", ["toolCursor.png"], [wx.ACCEL_CTRL, ord("U")], False)
     @GuiSelectDecorator(2, "Fill", "&Fill", ["toolFill.png"], [wx.ACCEL_CTRL, ord("F")], False)
@@ -33,23 +32,24 @@ class RoarCanvasCommandsTools():
                 self.currentTool = self.currentTool()
             self.currentOperator, self.operatorState = None, None
             self.parentFrame.menuItemsById[self.canvasTool.attrList[idx]["id"]].Check(True)
-            toolBar = self.parentFrame.toolBarItemsById[self.canvasTool.attrList[idx]["id"]].GetToolBar()
-            toolBar.ToggleTool(self.canvasTool.attrList[idx]["id"], True)
+            toolBar = self.parentFrame.toolBarItemsById[self.canvasTool.attrList[idx]["id"]][0]
+            toolBar.ToggleTool(self.canvasTool.attrList[idx]["id"], True); toolBar.Refresh();
             if self.currentTool != None:
                 self.update(toolName=self.currentTool.name)
-                viewRect = self.parentCanvas.GetViewStart()
-                eventDc = self.parentCanvas.backend.getDeviceContext(self.parentCanvas.GetClientSize(), self.parentCanvas, viewRect)
-                self.parentCanvas.applyTool(eventDc, True, None, None, None, self.parentCanvas.brushPos, False, False, False, self.currentTool, viewRect)
             else:
                 self.update(toolName="Cursor")
+            viewRect = self.parentCanvas.GetViewStart()
+            eventDc = self.parentCanvas.backend.getDeviceContext(self.parentCanvas.GetClientSize(), self.parentCanvas, viewRect)
+            self.parentCanvas.applyTool(eventDc, True, None, None, None, self.parentCanvas.brushPos, False, False, False, self.currentTool, viewRect, force=True)
         setattr(canvasTool_, "attrDict", f.attrList[idx])
         setattr(canvasTool_, "isSelect", True)
         return canvasTool_
-    # }}}
+
 
     #
     # __init__(self)
     def __init__(self):
+        self.accels = ()
         self.menus = (
             ("&Tools",
                 self.canvasTool(self.canvasTool, 1), self.canvasTool(self.canvasTool, 5), self.canvasTool(self.canvasTool, 0), self.canvasTool(self.canvasTool, 2), self.canvasTool(self.canvasTool, 3), self.canvasTool(self.canvasTool, 6), self.canvasTool(self.canvasTool, 4),

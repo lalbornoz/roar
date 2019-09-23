@@ -4,7 +4,6 @@
 # Copyright (c) 2018, 2019 Lucio Andrés Illanes Albornoz <lucio@lucioillanes.de>
 #
 
-# {{{ AnsiBgToMiRCARTColours
 AnsiBgToMiRCARTColours = {
     107: 0,  # Bright White
     40:  1,  # Black
@@ -23,8 +22,7 @@ AnsiBgToMiRCARTColours = {
     100: 14, # Grey
     47:  15, # Light Grey
 };
-# }}}
-# {{{ AnsiFgBoldToMiRCARTColours
+
 AnsiFgBoldToMiRCARTColours = {
     97: 0,   # Bright White
     30: 14,  # Grey
@@ -43,8 +41,7 @@ AnsiFgBoldToMiRCARTColours = {
     90: 14,  # Grey
     37: 0,   # Bright White
 };
-# }}}
-# {{{ AnsiFgToMiRCARTColours
+
 AnsiFgToMiRCARTColours = {
     97: 0,   # Bright White
     30: 1,   # Black
@@ -63,8 +60,7 @@ AnsiFgToMiRCARTColours = {
     90: 14,  # Grey
     37: 15,  # Light Grey
 };
-# }}}
-# {{{ ColourMapBold: mIRC colour number to RGBA map given ^B (bold)
+
 ColourMapBold = [
     [255, 255, 255],    # Bright White
     [85,  85,  85],     # Black
@@ -83,8 +79,7 @@ ColourMapBold = [
     [85,  85,  85],     # Grey
     [255, 255, 255],    # Light Grey
 ]
-# }}}
-# {{{ ColourMapNormal: mIRC colour number to RGBA map given none of ^[BFV_] (bold, italic, reverse, underline)
+
 ColourMapNormal = [
     [255, 255, 255],    # Bright White
     [0,   0,   0],      # Black
@@ -103,8 +98,7 @@ ColourMapNormal = [
     [85,  85,  85],     # Grey
     [187, 187, 187],    # Light Grey
 ]
-# }}}
-# {{{ MiRCARTToAnsiColours
+
 MiRCARTToAnsiColours = [
     97,  # Bright White
     30,  # Black
@@ -123,6 +117,6 @@ MiRCARTToAnsiColours = [
     90,  # Grey
     37,  # Light Grey
 ];
-# }}}
+
 
 # vim:expandtab foldmethod=marker sw=4 ts=4 tw=120

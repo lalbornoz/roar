@@ -20,25 +20,22 @@ except ImportError:
     haveUrllib = False
 
 class CanvasExportStore():
-    # {{{ _CellState(): Cell state
     class _CellState():
         CS_NONE             = 0x00
         CS_BOLD             = 0x01
         CS_ITALIC           = 0x02
         CS_UNDERLINE        = 0x04
-    # }}}
+
     ImgurUploadUrl = "https://api.imgur.com/3/upload.json"
     PastebinPostUrl = "https://pastebin.com/api/api_post.php"
 
-    # {{{ _drawUnderline(self, curPos, fillColour, fontSize, imgDraw)
     def _drawUnderLine(self, curPos, fillColour, fontSize, imgDraw):
         imgDraw.line(                                                       \
             xy=(curPos[0], curPos[1] + (fontSize[1] - 2),                   \
                 curPos[0] + fontSize[0], curPos[1] + (fontSize[1] - 2)),    \
                 fill=fillColour)
-    # }}}
 
-    # {{{ exportAnsiFile(self, canvasMap, canvasSize, outFile)
+
     def exportAnsiFile(self, canvasMap, canvasSize, outFile):
         outBuffer = ""
         for inCurRow in range(len(canvasMap)):
@@ -71,8 +68,7 @@ class CanvasExportStore():
             return (True, None)
         else:
             return (False, "empty buffer generated")
-    # }}}
-    # {{{ exportBitmapToImgur(self, apiKey, canvasBitmap, imgName, imgTitle, imgType)
+
     def exportBitmapToImgur(self, apiKey, canvasBitmap, imgName, imgTitle, imgType):
         tmpPathName = tempfile.mkstemp()
         os.close(tmpPathName[0])
@@ -94,12 +90,10 @@ class CanvasExportStore():
                 imgurResult = (False, responseHttp.status_code, responseDict.get("data"))
         os.remove(tmpPathName[1])
         return imgurResult
-    # }}}
-    # {{{ exportBitmapToPngFile(self, canvasBitmap, outPathName, outType)
+
     def exportBitmapToPngFile(self, canvasBitmap, outPathName, outType):
         return canvasBitmap.ConvertToImage().SaveFile(outPathName, outType)
-    # }}}
-    # {{{ exportPastebin(self, apiDevKey, canvasMap, canvasSize, pasteName="", pastePrivate=0)
+
     def exportPastebin(self, apiDevKey, canvasMap, canvasSize, pasteName="", pastePrivate=0):
         if haveUrllib:
             outFile = io.StringIO()
@@ -117,8 +111,7 @@ class CanvasExportStore():
                 return (False, str(responseHttp.status_code))
         else:
             return (False, "missing requests and/or urllib3 module(s)")
-    # }}}
-    # {{{ exportPngFile(self, canvasMap, fontFilePath, fontSize, outPathName)
+
     def exportPngFile(self, canvasMap, fontFilePath, fontSize, outPathName):
         if havePIL:
             inSize = (len(canvasMap[0]), len(canvasMap))
@@ -161,8 +154,7 @@ class CanvasExportStore():
             return (True, None)
         else:
             return (False, "missing PIL modules")
-    # }}}
-    # {{{ exportTextBuffer(self, canvasMap, canvasSize)
+
     def exportTextBuffer(self, canvasMap, canvasSize):
         outBuffer = ""
         for canvasRow in range(canvasSize[1]):
@@ -213,11 +205,10 @@ class CanvasExportStore():
             return (True, outBuffer)
         else:
             return (False, "empty buffer generated")
-    # }}}
-    # {{{ exportTextFile(self, canvasMap, canvasSize, outFile)
+
     def exportTextFile(self, canvasMap, canvasSize, outFile):
         rc, outBuffer = self.exportTextBuffer(canvasMap, canvasSize)
         return outFile.write(outBuffer) if rc else (rc, outBuffer)
-    # }}}
+
 
 # vim:expandtab foldmethod=marker sw=4 ts=4 tw=120

@@ -21,7 +21,6 @@ from RtlPlatform import getLocalConfPathName
 import io, os, wx
 
 class RoarCanvasCommandsFile():
-    # {{{ _import(self, f, newDirty, pathName)
     def _import(self, f, newDirty, pathName):
         rc = False
         self.parentCanvas.SetCursor(wx.Cursor(wx.CURSOR_WAIT))
@@ -41,10 +40,9 @@ class RoarCanvasCommandsFile():
                 dialogChoice = dialog.ShowModal()
         self.parentCanvas.SetCursor(wx.Cursor(wx.NullCursor))
         return rc, newPathName
-    # }}}
-    # {{{ _importFile(self, f, newDirty, wildcard)
+
     def _importFile(self, f, newDirty, wildcard):
-        with wx.FileDialog(self.parentCanvas, "Open", os.getcwd(), "", wildcard, wx.FD_OPEN) as dialog:
+        with wx.FileDialog(self.parentCanvas, "Open...", os.getcwd(), "", wildcard, wx.FD_OPEN) as dialog:
             if self.lastDir != None:
                 dialog.SetDirectory(self.lastDir)
             if dialog.ShowModal() == wx.ID_CANCEL:
@@ -52,16 +50,14 @@ class RoarCanvasCommandsFile():
             elif self._promptSaveChanges():
                 pathName = dialog.GetPath(); self.lastDir = os.path.dirname(pathName);
                 return self._import(f, newDirty, pathName)
-    # }}}
-    # {{{ _loadRecent(self)
+
     def _loadRecent(self):
         localConfFileName = getLocalConfPathName("Recent.lst")
         if os.path.exists(localConfFileName):
             with open(localConfFileName, "r", encoding="utf-8") as inFile:
                 for lastFile in inFile.readlines():
                     self._pushRecent(lastFile.rstrip("\r\n"), False)
-    # }}}
-    # {{{ _promptSaveChanges(self)
+
     def _promptSaveChanges(self):
         if self.parentCanvas.dirty:
             message = "Do you want to save changes to {}?".format(self.canvasPathName if self.canvasPathName != None else "(Untitled)")
@@ -77,8 +73,7 @@ class RoarCanvasCommandsFile():
                     return False
         else:
             return True
-    # }}}
-    # {{{ _pushRecent(self, pathName, serialise=True)
+
     def _pushRecent(self, pathName, serialise=True):
         menuItemId = wx.NewId()
         if not pathName in [l["pathName"] for l in self.lastFiles]:
@@ -95,16 +90,14 @@ class RoarCanvasCommandsFile():
                 with open(localConfFileName, "w", encoding="utf-8") as outFile:
                     for lastFile in [l["pathName"] for l in self.lastFiles]:
                         print(lastFile, file=outFile)
-    # }}}
 
-    # {{{ canvasExit(self, event)
+
     @GuiCommandDecorator("Exit", "E&xit", None, [wx.ACCEL_CTRL, ord("X")], None)
     def canvasExit(self, event):
         if self._promptSaveChanges():
             self.parentFrame.Close(True)
-    # }}}
 
-    # {{{ canvasExportAsAnsi(self, event)
+
     @GuiCommandDecorator("Export as ANSI...", "Export as &ANSI...", None, None, None)
     def canvasExportAsAnsi(self, event):
         with wx.FileDialog(self.parentFrame, "Save As...", os.getcwd(), "", "ANSI files (*.ans;*.txt)|*.ans;*.txt|All Files (*.*)|*.*", wx.FD_SAVE|wx.FD_OVERWRITE_PROMPT) as dialog:
@@ -119,8 +112,7 @@ class RoarCanvasCommandsFile():
                     self.parentCanvas.canvas.exportStore.exportAnsiFile(self.parentCanvas.canvas.map, self.parentCanvas.canvas.size, outFile)
                 self.parentCanvas.SetCursor(wx.Cursor(wx.NullCursor))
                 return True
-    # }}}
-    # {{{ canvasExportAsPng(self, event)
+
     @GuiCommandDecorator("Export as PNG...", "Export as PN&G...", None, None, None)
     def canvasExportAsPng(self, event):
         with wx.FileDialog(self.parentFrame, "Save As...", os.getcwd(), "", "PNG (*.png)|*.png|All Files (*.*)|*.*", wx.FD_SAVE|wx.FD_OVERWRITE_PROMPT) as dialog:
@@ -134,8 +126,7 @@ class RoarCanvasCommandsFile():
                 self.parentCanvas.canvas.exportStore.exportBitmapToPngFile(self.parentCanvas.backend.canvasBitmap, outPathName, wx.BITMAP_TYPE_PNG)
                 self.parentCanvas.SetCursor(wx.Cursor(wx.NullCursor))
                 return True
-    # }}}
-    # {{{ canvasExportImgur(self, event)
+
     @GuiCommandDecorator("Export to Imgur...", "Export to I&mgur...", None, None, haveImgurApiKey and haveUrllib)
     def canvasExportImgur(self, event):
         self.parentCanvas.SetCursor(wx.Cursor(wx.CURSOR_WAIT))
@@ -147,8 +138,7 @@ class RoarCanvasCommandsFile():
             wx.MessageBox("Exported to Imgur: {}".format(result), "Export to Imgur", wx.ICON_INFORMATION | wx.OK)
         else:
             wx.MessageBox("Failed to export to Imgur: {}".format(result), "Export to Imgur", wx.ICON_EXCLAMATION | wx.OK)
-    # }}}
-    # {{{ canvasExportPastebin(self, event)
+
     @GuiCommandDecorator("Export to Pastebin...", "Export to Pasteb&in...", None, None, haveUrllib)
     def canvasExportPastebin(self, event):
         self.parentCanvas.SetCursor(wx.Cursor(wx.CURSOR_WAIT))
@@ -162,8 +152,7 @@ class RoarCanvasCommandsFile():
             wx.MessageBox("Exported to Pastebin: " + pasteResult, "Export to Pastebin", wx.OK|wx.ICON_INFORMATION)
         else:
             wx.MessageBox("Failed to export to Pastebin: " + pasteResult, "Export to Pastebin", wx.OK|wx.ICON_EXCLAMATION)
-    # }}}
-    # {{{ canvasExportToClipboard(self, event)
+
     @GuiCommandDecorator("Export to clipboard", "Export to &clipboard", None, None, None)
     def canvasExportToClipboard(self, event):
         self.parentCanvas.SetCursor(wx.Cursor(wx.CURSOR_WAIT))
@@ -173,17 +162,15 @@ class RoarCanvasCommandsFile():
             wx.TheClipboard.Close()
         self.parentCanvas.SetCursor(wx.Cursor(wx.NullCursor))
         return True
-    # }}}
 
-    # {{{ canvasImportAnsi(self, event)
+
     @GuiCommandDecorator("Import ANSI...", "Import &ANSI...", None, None, None)
     def canvasImportAnsi(self, event):
         def canvasImportAnsi_(pathName):
             rc, error = self.parentCanvas.canvas.importStore.importAnsiFile(pathName)
             return (rc, error, self.parentCanvas.canvas.importStore.outMap, pathName, self.parentCanvas.canvas.importStore.inSize)
         self._importFile(canvasImportAnsi_, True, "ANSI files (*.ans;*.txt)|*.ans;*.txt|All Files (*.*)|*.*")
-    # }}}
-    # {{{ canvasImportFromClipboard(self, event)
+
     @GuiCommandDecorator("Import from clipboard", "Import from &clipboard", None, None, None)
     def canvasImportFromClipboard(self, event):
         def canvasImportFromClipboard_(pathName):
@@ -199,17 +186,15 @@ class RoarCanvasCommandsFile():
             return (rc, error, self.parentCanvas.canvas.importStore.outMap, None, self.parentCanvas.canvas.importStore.inSize)
         if self._promptSaveChanges():
             self._import(canvasImportFromClipboard_, True, None)
-    # }}}
-    # {{{ canvasImportSauce(self, event)
+
     @GuiCommandDecorator("Import SAUCE...", "Import &SAUCE...", None, None, None)
     def canvasImportSauce(self, event):
         def canvasImportSauce_(pathName):
             rc, error = self.parentCanvas.canvas.importStore.importSauceFile(pathName)
             return (rc, error, self.parentCanvas.canvas.importStore.outMap, pathName, self.parentCanvas.canvas.importStore.inSize)
         self._importFile(canvasImportSauce_, True, "SAUCE files (*.ans;*.txt)|*.ans;*.txt|All Files (*.*)|*.*")
-    # }}}
 
-    # {{{ canvasNew(self, event, newCanvasSize=None)
+
     @GuiCommandDecorator("New", "&New", ["", wx.ART_NEW], [wx.ACCEL_CTRL, ord("N")], None)
     def canvasNew(self, event, newCanvasSize=None):
         def canvasImportEmpty(pathName):
@@ -220,8 +205,7 @@ class RoarCanvasCommandsFile():
             return (True, "", newMap, None, newCanvasSize)
         if self._promptSaveChanges():
             self._import(canvasImportEmpty, False, None)
-    # }}}
-    # {{{ canvasOpen(self, event)
+
     @GuiCommandDecorator("Open", "&Open", ["", wx.ART_FILE_OPEN], [wx.ACCEL_CTRL, ord("O")], None)
     def canvasOpen(self, event):
         def canvasImportmIRC(pathName):
@@ -230,16 +214,14 @@ class RoarCanvasCommandsFile():
         rc, newPathName = self._importFile(canvasImportmIRC, False, "mIRC art files (*.txt)|*.txt|All Files (*.*)|*.*")
         if rc:
             self._pushRecent(newPathName)
-    # }}}
-    # {{{ canvasOpenRecent(self, event, pathName=None)
+
     @GuiSubMenuDecorator("Open Recent", "Open &Recent", None, None, False)
     def canvasOpenRecent(self, event, pathName=None):
         def canvasImportmIRC(pathName):
             rc, error = self.parentCanvas.canvas.importStore.importTextFile(pathName)
             return (rc, error, self.parentCanvas.canvas.importStore.outMap, pathName, self.parentCanvas.canvas.importStore.inSize)
         self._import(canvasImportmIRC, False, pathName)
-    # }}}
-    # {{{ canvasSave(self, event)
+
     @GuiCommandDecorator("Save", "&Save", ["", wx.ART_FILE_SAVE], [wx.ACCEL_CTRL, ord("S")], None)
     def canvasSave(self, event, newDirty=False):
         if self.canvasPathName == None:
@@ -256,8 +238,7 @@ class RoarCanvasCommandsFile():
             return True
         except IOError as error:
             return False
-    # }}}
-    # {{{ canvasSaveAs(self, event)
+
     @GuiCommandDecorator("Save As...", "Save &As...", ["", wx.ART_FILE_SAVE_AS], None, None)
     def canvasSaveAs(self, event):
         with wx.FileDialog(self.parentCanvas, "Save As", os.getcwd(), "", "mIRC art files (*.txt)|*.txt|All Files (*.*)|*.*", wx.FD_SAVE|wx.FD_OVERWRITE_PROMPT) as dialog:
@@ -269,12 +250,13 @@ class RoarCanvasCommandsFile():
                 self.canvasPathName = dialog.GetPath(); self.lastDir = os.path.dirname(self.canvasPathName);
                 if self.canvasSave(event, newDirty=True):
                     self._pushRecent(self.canvasPathName)
-    # }}}
+
 
     #
     # __init__(self)
     def __init__(self):
         self.imgurApiKey, self.lastFiles, self.lastDir = ImgurApiKey.imgurApiKey if haveImgurApiKey else None, [], None
+        self.accels = ()
         self.menus = (
             ("&File",
                 self.canvasNew, self.canvasOpen, self.canvasOpenRecent, self.canvasSave, self.canvasSaveAs, NID_MENU_SEP,
