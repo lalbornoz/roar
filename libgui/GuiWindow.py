@@ -43,6 +43,7 @@ class GuiWindow(wx.ScrolledWindow):
     def resize(self, newSize):
         self.size = newSize; self._updateScrollBars();
         self.SetMinSize(self.size); self.SetSize(wx.DefaultCoord, wx.DefaultCoord, *self.size);
+        self.SetMinSize(self.parent.GetSize()); self.SetSize(wx.DefaultCoord, wx.DefaultCoord, *self.parent.GetSize())
         curWindow = self
         while curWindow != None:
             curWindow.Layout(); curWindow = curWindow.GetParent();
@@ -51,6 +52,7 @@ class GuiWindow(wx.ScrolledWindow):
     # __init__(self, parent, pos, scrollStep, style=0): initialisation method
     def __init__(self, parent, pos, scrollStep, style=0):
         super().__init__(parent, pos=pos, style=style) if style != 0 else super().__init__(parent, pos=pos)
+        self.parent = parent
         self.pos, self.scrollFlag, self.scrollStep, self.size = pos, False, scrollStep, None
         for eventType, f in (
                 (wx.EVT_CHAR, self.onKeyboardInput), (wx.EVT_CLOSE, self.onClose), (wx.EVT_ENTER_WINDOW, self.onEnterWindow),
