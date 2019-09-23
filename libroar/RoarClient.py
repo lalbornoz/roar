@@ -54,5 +54,9 @@ class RoarClient(GuiFrame):
         for menuItem in self.canvasPanel.commands.menus[3][1:]:
             menuItemWindow = self.canvasPanel.operatorsMenu.Append(menuItem.attrDict["id"], menuItem.attrDict["label"], menuItem.attrDict["caption"])
             self.Bind(wx.EVT_MENU, self.onMenu, menuItemWindow)
+        self.canvasPanel.commands.canvasOpenRecent.attrDict["menu"].AppendSeparator()
+        self.canvasPanel.commands.canvasClearRecent.attrDict["id"] = wx.NewId()
+        menuItemWindow = self.canvasPanel.commands.canvasOpenRecent.attrDict["menu"].Append(self.canvasPanel.commands.canvasClearRecent.attrDict["id"], self.canvasPanel.commands.canvasClearRecent.attrDict["label"], self.canvasPanel.commands.canvasClearRecent.attrDict["caption"])
+        self.canvasPanel.commands.canvasOpenRecent.attrDict["menu"].Bind(wx.EVT_MENU, self.canvasPanel.commands.canvasClearRecent, menuItemWindow)
 
 # vim:expandtab foldmethod=marker sw=4 ts=4 tw=120
