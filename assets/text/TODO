@@ -21,10 +21,11 @@
 
 High-priority list:
 1) bug: a) select line tool b) set origin point c) move mouse about d) incr brush size e) set target point d) undo
-   bug: a) new canvas/startup b) place rect c) move mouse d) undo status changes
-   bug: a) text tool b) paste text c) undo
-2) bug: a) start w/ spoke-vxplion.txt b) scroll down c) fix w/ canvas resize 
-3) add hotkeys.txt mIRC art canvas to help menu
-4) tools: erase, pick, unicode block elements
+2) bug: a) new canvas/startup b) place rect c) move mouse d) undo status changes
+3) bug: a) start w/ spoke-vxplion.txt b) scroll down c) fix w/ canvas resize 
+4) add hotkeys.txt mIRC art canvas to help menu
+5) tools: pick colour, unicode block elements
+6) bug: a) text tool b) paste text c) undo
+7) bug: a) tile once b) tile twice
 
 vim:ff=dos tw=0
