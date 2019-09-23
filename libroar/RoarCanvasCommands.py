@@ -47,12 +47,9 @@ class RoarCanvasCommands(RoarCanvasCommandsFile, RoarCanvasCommandsEdit, RoarCan
         if "size" in self.lastPanelState:
             textItems.append("W: {:03d} H: {:03d}".format(*self.lastPanelState["size"]))
         if "brushSize" in self.lastPanelState:
-            textItems.append("Brush: {:02d}x{:02d}".format(*self.lastPanelState["brushSize"]))
+            textItems.append("B: {:02d}x{:02d}".format(*self.lastPanelState["brushSize"]))
         if "colours" in self.lastPanelState:
-            textItems.append("FG: {:02d}, BG: {:02d}".format(*self.lastPanelState["colours"]))
-            textItems.append("{} on {}".format(
-                Colours[self.lastPanelState["colours"][0]][4] if self.lastPanelState["colours"][0] != -1 else "Transparent",
-                Colours[self.lastPanelState["colours"][1]][4] if self.lastPanelState["colours"][1] != -1 else "Transparent"))
+            textItems.append("FG: {:02d} ({}), BG: {:02d} ({})".format(self.lastPanelState["colours"][0], Colours[self.lastPanelState["colours"][0]][4] if self.lastPanelState["colours"][0] != -1 else "Transparent", self.lastPanelState["colours"][1], Colours[self.lastPanelState["colours"][1]][4] if self.lastPanelState["colours"][1] != -1 else "Transparent"))
             toolBar = self.parentFrame.toolBarItemsById[self.canvasColour(self.canvasColour, self.lastPanelState["colours"][0]).attrDict["id"]][0]
             toolBarBg = self.parentFrame.toolBarItemsById[self.canvasColourBackground(self.canvasColourBackground, self.lastPanelState["colours"][1]).attrDict["id"]][0]
             if self.lastPanelState["colours"][0] != -1:
@@ -70,15 +67,15 @@ class RoarCanvasCommands(RoarCanvasCommandsFile, RoarCanvasCommandsEdit, RoarCan
         if "pathName" in self.lastPanelState:
             if self.lastPanelState["pathName"] != None:
                 basePathName = os.path.basename(self.lastPanelState["pathName"])
-                textItems.append("File: {}".format(basePathName))
+                textItems.append("F: {}".format(basePathName))
                 self.parentFrame.SetTitle("{} - roar".format(basePathName))
             else:
                 self.parentFrame.SetTitle("roar")
         if "toolName" in self.lastPanelState:
-            textItems.append("Tool: {}".format(self.lastPanelState["toolName"]))
+            textItems.append("T: {}".format(self.lastPanelState["toolName"]))
         if  ("operator" in self.lastPanelState)         \
         and (self.lastPanelState["operator"] != None):
-            textItems.append("Operator: {}".format(self.lastPanelState["operator"]))
+            textItems.append("O: {}".format(self.lastPanelState["operator"]))
         if  "dirty" in self.lastPanelState              \
         and self.lastPanelState["dirty"]:
             textItems.append("*")
