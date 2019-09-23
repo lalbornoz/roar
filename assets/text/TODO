@@ -15,16 +15,16 @@
 15) GUI TODO list:
     a) {load,store} LRU {open,save} directory
     b) replace logo w/ canvas panel in About dialogue
-    c) purge MRU list menu item, remove files from MRU list if inaccessible
-    d) Settings/Settings window (e.g. autosave, hide cursor on leaving window, ...)
-    e) replace resize buttons w/ {-,edit box,+} buttons & lock button re: ratio (ty lol3)
-    f) {copy,cut,delete,insert from,paste}, {edit asset in new canvas,import from {canvas,object}}
+    c) Settings/Settings window (e.g. autosave, hide cursor on leaving window, ...)
+    d) replace resize buttons w/ {-,edit box,+} buttons & lock button re: ratio (ty lol3)
+    e) {copy,cut,delete,insert from,paste}, {edit asset in new canvas,import from {canvas,object}}
 
 High-priority list:
-1) a) select line tool b) set origin point c) move mouse about d) incr brush size e) set target point d) undo
-   a) new canvas/startup b) place rect c) move mouse d) undo status changes
-   a) text tool b) paste text c) undo
-2) add hotkeys.txt mIRC art canvas to help menu
-3) tools: erase, pick, unicode block elements
+1) bug: a) select line tool b) set origin point c) move mouse about d) incr brush size e) set target point d) undo
+   bug: a) new canvas/startup b) place rect c) move mouse d) undo status changes
+   bug: a) text tool b) paste text c) undo
+2) bug: a) start w/ spoke-vxplion.txt b) scroll down c) fix w/ canvas resize 
+3) add hotkeys.txt mIRC art canvas to help menu
+4) tools: erase, pick, unicode block elements
 
 vim:ff=dos tw=0

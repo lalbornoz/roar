@@ -81,7 +81,7 @@ class RoarCanvasCommandsFile():
             if (numLastFiles + 1) > 8:
                 self.canvasOpenRecent.attrDict["menu"].Delete(self.lastFiles[0]["menuItemId"])
                 del self.lastFiles[0]
-            menuItemWindow = self.canvasOpenRecent.attrDict["menu"].Append(menuItemId, "{}".format(pathName), pathName)
+            menuItemWindow = self.canvasOpenRecent.attrDict["menu"].Insert(self.canvasOpenRecent.attrDict["menu"].GetMenuItemCount() - 2, menuItemId, "{}".format(pathName), pathName)
             self.parentFrame.menuItemsById[self.canvasOpenRecent.attrDict["id"]].Enable(True)
             self.parentFrame.Bind(wx.EVT_MENU, lambda event: self.canvasOpenRecent(event, pathName), menuItemWindow)
             self.lastFiles += [{"menuItemId":menuItemId, "menuItemWindow":menuItemWindow, "pathName":pathName}]
@@ -90,6 +90,17 @@ class RoarCanvasCommandsFile():
                 with open(localConfFileName, "w", encoding="utf-8") as outFile:
                     for lastFile in [l["pathName"] for l in self.lastFiles]:
                         print(lastFile, file=outFile)
+
+    @GuiCommandDecorator("Clear list", "&Clear list", None, None, False)
+    def canvasClearRecent(self, event):
+        if self.lastFiles != None:
+            for lastFile in self.lastFiles:
+                self.canvasOpenRecent.attrDict["menu"].Delete(lastFile["menuItemId"])
+            self.lastFiles = []
+            localConfFileName = getLocalConfPathName("Recent.lst")
+            if os.path.exists(localConfFileName):
+                os.unlink(localConfFileName)
+            self.parentFrame.menuItemsById[self.canvasOpenRecent.attrDict["id"]].Enable(False)
 
     @GuiCommandDecorator("Exit", "E&xit", None, [wx.ACCEL_CTRL, ord("X")], None)
     def canvasExit(self, event):
@@ -213,11 +224,14 @@ class RoarCanvasCommandsFile():
 
     @GuiSubMenuDecorator("Open Recent", "Open &Recent", None, None, False)
     def canvasOpenRecent(self, event, pathName=None):
-        def canvasImportmIRC(pathName):
-            rc, error = self.parentCanvas.canvas.importStore.importTextFile(pathName)
-            return (rc, error, self.parentCanvas.canvas.importStore.outMap, pathName, self.parentCanvas.canvas.importStore.inSize)
+        def canvasImportmIRC(pathName_):
+            rc, error = self.parentCanvas.canvas.importStore.importTextFile(pathName_)
+            return (rc, error, self.parentCanvas.canvas.importStore.outMap, pathName_, self.parentCanvas.canvas.importStore.inSize)
         if self._promptSaveChanges():
-            self._import(canvasImportmIRC, False, pathName)
+            rc, newPathName = self._import(canvasImportmIRC, False, pathName)
+            if not rc:
+                numLastFile = [i for i in range(len(self.lastFiles)) if self.lastFiles[i]["pathName"] == pathName][0]
+                self.canvasOpenRecent.attrDict["menu"].Delete(self.lastFiles[numLastFile]["menuItemId"]); del self.lastFiles[numLastFile];
 
     @GuiCommandDecorator("Save", "&Save", ["", wx.ART_FILE_SAVE], [wx.ACCEL_CTRL, ord("S")], None)
     def canvasSave(self, event, newDirty=False):
