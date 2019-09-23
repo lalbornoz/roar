@@ -11,5 +11,4 @@ def getLocalConfPathName(*args):
     vname = "LOCALAPPDATA" if platform.system() == "Windows" else "HOME"
     return os.path.join(os.getenv(vname), "roar", *args)
 
-
 # vim:expandtab foldmethod=marker sw=4 ts=4 tw=120

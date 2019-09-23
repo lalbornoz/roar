@@ -231,7 +231,6 @@ class IrcMiRCARTBot(IrcClient):
             elif serverMessage[1] == "PRIVMSG":
                 self._dispatchPrivmsg(serverMessage)
 
-
     #
     # __init__(self, serverHname, serverPort="6667", clientNick="pngbot", clientIdent="pngbot", clientGecos="pngbot", clientChannel="#MiRCART"): initialisation method
     def __init__(self, serverHname, serverPort="6667", clientNick="pngbot", clientIdent="pngbot", clientGecos="pngbot", clientChannel="#MiRCART"):
@@ -262,12 +261,12 @@ if __name__ == "__main__":
     optlist, argv = getopt(sys.argv[1:], "46l:")
     optdict = dict(optlist)
     if len(argv) < 1 or len(argv) > 6:
-        print("usage: {} [-4|-6] [-l <local hostname>] "                    \
-            "<IRC server hostname> "                                        \
-            "[<IRC server port; defaults to 6667>] "                        \
-            "[<IRC bot nick name; defaults to pngbot>] "                    \
-            "[<IRC bot user name; defaults to pngbot>] "                    \
-            "[<IRC bot real name; defaults to pngbot>] "                    \
+        print("usage: {} [-4|-6] [-l <local hostname>] "    \
+            "<IRC server hostname> "                        \
+            "[<IRC server port; defaults to 6667>] "        \
+            "[<IRC bot nick name; defaults to pngbot>] "    \
+            "[<IRC bot user name; defaults to pngbot>] "    \
+            "[<IRC bot real name; defaults to pngbot>] "    \
             "[<IRC bot channel name; defaults to #MiRCART>] ".format(sys.argv[0]), file=sys.stderr)
     else:
         main(optdict, *argv)

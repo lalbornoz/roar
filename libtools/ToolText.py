@@ -65,7 +65,6 @@ class ToolText(Tool):
             rc, dirty = False, False
         return rc, dirty
 
-
     #
     # onKeyboardEvent(self, atPoint, brushColours, brushPos, brushSize, canvas, dispatchFn, eventDc, keyChar, keyCode, keyModifiers, mapPoint)
     def onKeyboardEvent(self, atPoint, brushColours, brushPos, brushSize, canvas, dispatchFn, eventDc, keyChar, keyCode, keyModifiers, mapPoint):
