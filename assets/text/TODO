@@ -12,17 +12,16 @@
 12) Sprites & scripted (Python?) animation on the basis of asset traits and {composable,parametrised} patterns (metric flow, particle system, rigging, ...)
 13) GUI TODO list:
     a) switch to Gtk
-    b) replace logo w/ canvas panel in About dialogue
+    b) replace logo w/ canvas panel in About dialogue, revisit melp? dialogue
     c) Settings/Settings window (e.g. autosave, hide cursor on leaving window, ...)
     d) replace resize buttons w/ {-,edit box,+} buttons & lock button re: ratio (ty lol3)
 
 Release roadmap:
 1)  {copy,cut,delete,insert from,paste}, edit asset in new canvas, import from {canvas,object}
 2)  BUG: a) apply tool b) move cursor c) undo d) cursor artifacts
-3)  add hotkeys.txt mIRC art canvas to help menu
-4)  operators: crop, scale, shift, slice
-5)  auto{load,save} & {backup,restore}
-6)  tools: unicode block elements
-7)  floating/dockable toolbar
+3)  operators: crop, scale, shift, slice
+4)  auto{load,save} & {backup,restore}
+5)  tools: unicode block elements
+6)  floating/dockable toolbar
 
 vim:ff=dos tw=0
