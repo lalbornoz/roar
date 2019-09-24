@@ -20,7 +20,7 @@ def main(*argv):
         os.makedirs(localConfirName)
     wxApp, roarClient = wx.App(False), RoarClient(None)
     argv0, argv = argv[0], argv[1:]
-    roarClient.canvasPanel.commands._loadRecent()
+    roarClient.canvasPanel.commands._loadLastDir(); roarClient.canvasPanel.commands._loadRecent();
     if len(argv) >= 1:
         if (len(argv) >= 2) and (argv[1].endswith(".lst")):
             roarClient.assetsWindow._load_list(argv[1])

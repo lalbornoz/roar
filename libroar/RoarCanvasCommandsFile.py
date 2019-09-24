@@ -48,8 +48,14 @@ class RoarCanvasCommandsFile():
             if dialog.ShowModal() == wx.ID_CANCEL:
                 return False, None
             elif self._promptSaveChanges():
-                pathName = dialog.GetPath(); self.lastDir = os.path.dirname(pathName);
+                pathName = dialog.GetPath(); self.lastDir = os.path.dirname(pathName); self._storeLastDir(self.lastDir);
                 return self._import(f, newDirty, pathName)
+
+    def _loadLastDir(self):
+        localConfFileName = getLocalConfPathName("RecentDir.txt")
+        if os.path.exists(localConfFileName):
+            with open(localConfFileName, "r", encoding="utf-8") as inFile:
+                self.lastDir = inFile.read().rstrip("\r\n")
 
     def _loadRecent(self):
         localConfFileName = getLocalConfPathName("Recent.lst")
@@ -91,6 +97,11 @@ class RoarCanvasCommandsFile():
                     for lastFile in [l["pathName"] for l in self.lastFiles]:
                         print(lastFile, file=outFile)
 
+    def _storeLastDir(self, pathName):
+        localConfFileName = getLocalConfPathName("RecentDir.txt")
+        with open(localConfFileName, "w", encoding="utf-8") as outFile:
+            print(pathName, file=outFile)
+
     @GuiCommandDecorator("Clear list", "&Clear list", None, None, False)
     def canvasClearRecent(self, event):
         if self.lastFiles != None:
@@ -115,7 +126,7 @@ class RoarCanvasCommandsFile():
             if dialog.ShowModal() == wx.ID_CANCEL:
                 return False
             else:
-                outPathName = dialog.GetPath(); self.lastDir = os.path.dirname(outPathName);
+                outPathName = dialog.GetPath(); self.lastDir = os.path.dirname(outPathName); self._storeLastDir(self.lastDir);
                 self.parentCanvas.SetCursor(wx.Cursor(wx.CURSOR_WAIT))
                 with open(outPathName, "w", encoding="utf-8") as outFile:
                     self.parentCanvas.canvas.exportStore.exportAnsiFile(self.parentCanvas.canvas.map, self.parentCanvas.canvas.size, outFile)
@@ -130,7 +141,7 @@ class RoarCanvasCommandsFile():
             if dialog.ShowModal() == wx.ID_CANCEL:
                 return False
             else:
-                outPathName = dialog.GetPath(); self.lastDir = os.path.dirname(outPathName);
+                outPathName = dialog.GetPath(); self.lastDir = os.path.dirname(outPathName); self._storeLastDir(self.lastDir);
                 self.parentCanvas.SetCursor(wx.Cursor(wx.CURSOR_WAIT))
                 self.parentCanvas.canvas.exportStore.exportBitmapToPngFile(self.parentCanvas.backend.canvasBitmap, outPathName, wx.BITMAP_TYPE_PNG)
                 self.parentCanvas.SetCursor(wx.Cursor(wx.NullCursor))
@@ -258,7 +269,7 @@ class RoarCanvasCommandsFile():
             if dialog.ShowModal() == wx.ID_CANCEL:
                 return False
             else:
-                self.canvasPathName = dialog.GetPath(); self.lastDir = os.path.dirname(self.canvasPathName);
+                self.canvasPathName = dialog.GetPath(); self.lastDir = os.path.dirname(self.canvasPathName); self._storeLastDir(self.lastDir);
                 if self.canvasSave(event, newDirty=True):
                     self._pushRecent(self.canvasPathName)
 

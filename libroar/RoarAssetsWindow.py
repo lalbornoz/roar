@@ -7,6 +7,7 @@
 from Canvas import Canvas
 from GuiFrame import GuiMiniFrame
 from GuiWindow import GuiWindow
+from RtlPlatform import getLocalConfPathName
 import json, os, sys, wx
 
 class RoarAssetsWindow(GuiMiniFrame):
@@ -37,7 +38,9 @@ class RoarAssetsWindow(GuiMiniFrame):
             else:
                 for pathName in dialog.GetPaths():
                     resultList += [self._import(f, pathName)]
-                    self.lastDir = os.path.dirname(pathName)
+                    lastDir = os.path.dirname(pathName)
+                    if self.lastDir != lastDir:
+                        self.lastDir = lastDir; self._storeLastDir(self.lastDir);
         return resultList
 
     def _load_list(self, pathName):
@@ -80,6 +83,17 @@ class RoarAssetsWindow(GuiMiniFrame):
             self.SetCursor(wx.Cursor(wx.NullCursor))
             with wx.MessageDialog(self, "Error: {}".format(str(e)), "", wx.OK | wx.OK_DEFAULT) as dialog:
                 dialogChoice = dialog.ShowModal()
+
+    def _loadLastDir(self):
+        localConfFileName = getLocalConfPathName("RecentAssetsDir.txt")
+        if os.path.exists(localConfFileName):
+            with open(localConfFileName, "r", encoding="utf-8") as inFile:
+                self.lastDir = inFile.read().rstrip("\r\n")
+
+    def _storeLastDir(self, pathName):
+        localConfFileName = getLocalConfPathName("RecentAssetsDir.txt")
+        with open(localConfFileName, "w", encoding="utf-8") as outFile:
+            print(pathName, file=outFile)
 
     def _updateScrollBars(self):
         clientSize = self.panelCanvas.GetClientSize()
@@ -235,7 +249,8 @@ class RoarAssetsWindow(GuiMiniFrame):
             if self.lastDir != None:
                 dialog.SetDirectory(self.lastDir)
             if dialog.ShowModal() != wx.ID_CANCEL:
-                pathName = dialog.GetPath(); self.lastDir = os.path.dirname(pathName);
+                pathName = dialog.GetPath()
+                self.lastDir = os.path.dirname(pathName); self._storeLastDir(self.lastDir);
                 self._load_list(pathName)
 
     def onRemove(self, event):
@@ -264,7 +279,8 @@ class RoarAssetsWindow(GuiMiniFrame):
                 if self.lastDir != None:
                     dialog.SetDirectory(self.lastDir)
                 if dialog.ShowModal() != wx.ID_CANCEL:
-                    pathName = dialog.GetPath(); self.lastDir = os.path.dirname(pathName);
+                    pathName = dialog.GetPath()
+                    self.lastDir = os.path.dirname(pathName); self._storeLastDir(self.lastDir);
                     with open(pathName, "w") as fileObject:
                         for pathName in [self.canvasList[k][1] for k in self.canvasList.keys()]:
                             print(pathName, file=fileObject)
@@ -284,6 +300,7 @@ class RoarAssetsWindow(GuiMiniFrame):
         self.backend, self.canvasList, self.lastDir = backend((0, 0), cellSize), {}, None
         self.cellSize, self.currentIndex, self.leftDown, self.parent, self.scrollFlag = cellSize, None, False, parent, False
         self.Bind(wx.EVT_CHAR, self.onChar)
+        self._loadLastDir()
 
         self.contextMenu, self.contextMenuItems = wx.Menu(), []
         for text, f in (
