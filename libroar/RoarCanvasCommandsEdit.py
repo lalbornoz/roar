@@ -194,11 +194,15 @@ class RoarCanvasCommandsEdit():
 
     @GuiCommandDecorator("Redo", "&Redo", ["", wx.ART_REDO], [wx.ACCEL_CTRL, ord("Y")], False)
     def canvasRedo(self, event):
+        eventDc = self.parentCanvas.backend.getDeviceContext(self.parentCanvas.GetClientSize(), self.parentCanvas, self.parentCanvas.GetViewStart())
+        self.parentCanvas.backend.drawCursorMaskWithJournal(self.parentCanvas.canvas, self.parentCanvas.canvas.journal, eventDc)
         self.parentCanvas.dispatchDeltaPatches(self.parentCanvas.canvas.journal.popRedo())
         self.update(size=self.parentCanvas.canvas.size, undoLevel=self.parentCanvas.canvas.journal.patchesUndoLevel)
 
     @GuiCommandDecorator("Undo", "&Undo", ["", wx.ART_UNDO], [wx.ACCEL_CTRL, ord("Z")], False)
     def canvasUndo(self, event):
+        eventDc = self.parentCanvas.backend.getDeviceContext(self.parentCanvas.GetClientSize(), self.parentCanvas, self.parentCanvas.GetViewStart())
+        self.parentCanvas.backend.drawCursorMaskWithJournal(self.parentCanvas.canvas, self.parentCanvas.canvas.journal, eventDc)
         self.parentCanvas.dispatchDeltaPatches(self.parentCanvas.canvas.journal.popUndo())
         self.update(size=self.parentCanvas.canvas.size, undoLevel=self.parentCanvas.canvas.journal.patchesUndoLevel)
 
