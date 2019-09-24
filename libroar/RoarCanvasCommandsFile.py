@@ -50,6 +50,7 @@ class RoarCanvasCommandsFile():
             elif self._promptSaveChanges():
                 pathName = dialog.GetPath(); self.lastDir = os.path.dirname(pathName); self._storeLastDir(self.lastDir);
                 return self._import(f, newDirty, pathName)
+        return False, None
 
     def _loadLastDir(self):
         localConfFileName = getLocalConfPathName("RecentDir.txt")
@@ -270,8 +271,12 @@ class RoarCanvasCommandsFile():
                 return False
             else:
                 self.canvasPathName = dialog.GetPath(); self.lastDir = os.path.dirname(self.canvasPathName); self._storeLastDir(self.lastDir);
-                if self.canvasSave(event, newDirty=True):
+                if self.canvasSave(event, newDirty=False):
+                    self.update(pathName=self.canvasPathName)
                     self._pushRecent(self.canvasPathName)
+                    return True
+                else:
+                    return False
 
     def __init__(self):
         self.imgurApiKey, self.lastFiles, self.lastDir = ImgurApiKey.imgurApiKey if haveImgurApiKey else None, [], None
