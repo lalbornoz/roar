@@ -20,7 +20,7 @@ class RoarWindowMelp(wx.Dialog):
             helpLabel = "".join(fileObject.readlines())
         self.title = wx.StaticText(self.panel, label=helpLabel, style=wx.ALIGN_LEFT)
         self.title.SetFont(wx.Font(8, wx.MODERN, wx.NORMAL, wx.NORMAL, underline=False))
-        self.buttonRoar = wx.Button(self.panel, label="explodes.")
+        self.buttonRoar = wx.Button(self.panel, label="&explodes.")
         self.buttonRoar.Bind(wx.EVT_BUTTON, self.onButtonRoar)
         self.sizer.AddMany(((self.title, 1, wx.ALL | wx.CENTER | wx.EXPAND, 4), (self.buttonRoar, 0, wx.ALL | wx.CENTER, 4),))
         self.panel.SetSizerAndFit(self.sizer)
