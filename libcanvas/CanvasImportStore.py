@@ -138,8 +138,6 @@ class CanvasImportStore():
         with open(pathName, "r", encoding="utf-8-sig") as inFile:
             return self.importTextBuffer(inFile)
 
-    #
-    # __init__(self, inFile=None): initialisation method
     def __init__(self, inFile=None):
         self.inSize, self.outMap = None, None
         if inFile != None:

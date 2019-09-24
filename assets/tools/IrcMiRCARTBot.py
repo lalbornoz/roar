@@ -231,8 +231,6 @@ class IrcMiRCARTBot(IrcClient):
             elif serverMessage[1] == "PRIVMSG":
                 self._dispatchPrivmsg(serverMessage)
 
-    #
-    # __init__(self, serverHname, serverPort="6667", clientNick="pngbot", clientIdent="pngbot", clientGecos="pngbot", clientChannel="#MiRCART"): initialisation method
     def __init__(self, serverHname, serverPort="6667", clientNick="pngbot", clientIdent="pngbot", clientGecos="pngbot", clientChannel="#MiRCART"):
         super().__init__(serverHname, serverPort, clientNick, clientIdent, clientGecos)
         self.clientChannel = clientChannel

@@ -65,8 +65,6 @@ class ToolText(Tool):
             rc, dirty = False, False
         return rc, dirty
 
-    #
-    # onKeyboardEvent(self, atPoint, brushColours, brushPos, brushSize, canvas, dispatchFn, eventDc, keyChar, keyCode, keyModifiers, mapPoint)
     def onKeyboardEvent(self, atPoint, brushColours, brushPos, brushSize, canvas, dispatchFn, eventDc, keyChar, keyCode, keyModifiers, mapPoint):
         if re.match(self.arabicCombiningRegEx, keyChar):
             rc, dirty = True, False
@@ -121,8 +119,6 @@ class ToolText(Tool):
                 dispatchFn(eventDc, True, [*brushPos, *brushColours, 0, "_"])
         return rc, dirty
 
-    #
-    # onMouseEvent(self, atPoint, brushColours, brushPos, brushSize, canvas, dispatchFn, eventDc, keyModifiers, mapPoint, mouseDragging, mouseLeftDown, mouseRightDown)
     def onMouseEvent(self, atPoint, brushColours, brushPos, brushSize, canvas, dispatchFn, eventDc, keyModifiers, mapPoint, mouseDragging, mouseLeftDown, mouseRightDown):
         if mouseLeftDown or mouseRightDown:
             brushPos[0], brushPos[1] = atPoint[0], atPoint[1]

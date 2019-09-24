@@ -17,8 +17,6 @@ class OperatorFlipVertical(Operator):
         "`":"'",
     }
 
-    #
-    # apply(self, region)
     def apply(self, region):
         for numRow in range(len(region)):
             region[numRow].reverse()
@@ -27,7 +25,6 @@ class OperatorFlipVertical(Operator):
                     region[numRow][numCol][3] = self.flipPairs[region[numRow][numCol][3]]
         return region
 
-    # __init__(self, *args): initialisation method
     def __init__(self, *args):
         pass
 

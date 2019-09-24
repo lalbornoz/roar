@@ -9,8 +9,6 @@ from Tool import Tool
 class ToolPickColour(Tool):
     name = "Pick colour"
 
-    #
-    # onMouseEvent(self, atPoint, brushColours, brushPos, brushSize, canvas, dispatchFn, eventDc, keyModifiers, mapPoint, mouseDragging, mouseLeftDown, mouseRightDown)
     def onMouseEvent(self, atPoint, brushColours, brushPos, brushSize, canvas, dispatchFn, eventDc, keyModifiers, mapPoint, mouseDragging, mouseLeftDown, mouseRightDown):
         if  (mapPoint[0] < canvas.size[0])  \
         and (mapPoint[1] < canvas.size[1]):

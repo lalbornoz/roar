@@ -273,8 +273,6 @@ class RoarCanvasCommandsFile():
                 if self.canvasSave(event, newDirty=True):
                     self._pushRecent(self.canvasPathName)
 
-    #
-    # __init__(self)
     def __init__(self):
         self.imgurApiKey, self.lastFiles, self.lastDir = ImgurApiKey.imgurApiKey if haveImgurApiKey else None, [], None
         self.accels = ()

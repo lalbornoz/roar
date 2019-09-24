@@ -34,9 +34,7 @@ class RoarClient(GuiFrame):
     def onSize(self, event):
         self.canvasPanel.SetMinSize(self.GetSize()); self.canvasPanel.SetSize(wx.DefaultCoord, wx.DefaultCoord, *self.GetSize()); event.Skip();
 
-    #
-    # __init__(self, parent, defaultCanvasPos=(0, 75), defaultCanvasSize=(100, 30), defaultCellSize=(7, 14), size=(840, 630), title=""): initialisation method
-    def __init__(self, parent, defaultCanvasPos=(0, 75), defaultCanvasSize=(100, 30), defaultCellSize=(7, 14), size=(840, 630), title=""):
+    def __init__(self, parent, defaultCanvasPos=(0, 75), defaultCanvasSize=(100, 30), defaultCellSize=(7, 14), size=(840, 640), title=""):
         super().__init__(self._getIconPathName(), size, parent, title)
         self.canvas = Canvas(defaultCanvasSize)
         self.canvasPanel = RoarCanvasWindow(GuiCanvasWxBackend, self.canvas, defaultCellSize, RoarCanvasCommands, self.panelSkin, self, defaultCanvasPos, defaultCellSize, defaultCanvasSize)
@@ -52,7 +50,6 @@ class RoarClient(GuiFrame):
         self.assetsWindow = RoarAssetsWindow(GuiCanvasWxBackend, defaultCellSize, self)
         self.canvasPanel.commands.canvasAssetsWindowShow(None)
 
-        # XXX
         self.canvasPanel.operatorsMenu = wx.Menu()
         for menuItem in self.canvasPanel.commands.menus[3][1:]:
             menuItemWindow = self.canvasPanel.operatorsMenu.Append(menuItem.attrDict["id"], menuItem.attrDict["label"], menuItem.attrDict["caption"])

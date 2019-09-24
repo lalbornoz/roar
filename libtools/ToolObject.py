@@ -168,7 +168,6 @@ class ToolObject(Tool):
             self.srcRect = self.targetRect
         self.objectMap, self.objectSize = objectMap, objectSize
 
-    # __init__(self, *args): initialisation method
     def __init__(self, *args):
         super().__init__(*args)
         self.external, self.lastAtPoint, self.srcRect, self.substract,          \

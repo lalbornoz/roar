@@ -10,8 +10,6 @@ class RoarWindowMelp(wx.Dialog):
     def onButtonRoar(self, event):
         self.Destroy()
 
-    #
-    # __init__(self, parent, minSize=(320, 300), title="melp?")
     def __init__(self, parent, minSize=(320, 300), title="melp?"):
         super().__init__(parent, size=minSize, title=title)
         self.panel, self.sizer = wx.Panel(self), wx.BoxSizer(wx.VERTICAL)

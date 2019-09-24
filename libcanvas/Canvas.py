@@ -91,8 +91,6 @@ class Canvas():
                 and (numCol < len(newCanvas[numRow])):
                     self._commitPatch([numCol, numRow, *newCanvas[numRow][numCol]])
 
-    #
-    # __init__(self, size): initialisation method
     def __init__(self, size):
         self.dirtyCursor, self.map, self.size = False, None, size
         self.exportStore, self.importStore, self.journal = CanvasExportStore(), CanvasImportStore(), CanvasJournal()

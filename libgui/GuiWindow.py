@@ -48,8 +48,6 @@ class GuiWindow(wx.ScrolledWindow):
         while curWindow != None:
             curWindow.Layout(); curWindow = curWindow.GetParent();
 
-    #
-    # __init__(self, parent, pos, scrollStep, style=0): initialisation method
     def __init__(self, parent, pos, scrollStep, style=0):
         super().__init__(parent, pos=pos, style=style) if style != 0 else super().__init__(parent, pos=pos)
         self.parent = parent

@@ -191,8 +191,6 @@ class GuiFrame(wx.Frame):
     def onMouseWheel(self, event):
         event.Skip()
 
-    #
-    # __init__(self, iconPathName, size, parent=None, title=""): initialisation method
     def __init__(self, iconPathName, size, parent=None, title=""):
         super().__init__(parent, wx.ID_ANY, title, size=size)
         self.itemsById, self.menuItemsById, self.toolBarItemsById = {}, {}, {}
@@ -204,8 +202,6 @@ class GuiFrame(wx.Frame):
             self.Bind(event, f)
 
 class GuiMiniFrame(wx.MiniFrame):
-    #
-    # __init__(self, parent, size, title, pos=wx.DefaultPosition): initialisation method
     def __init__(self, parent, size, title, pos=wx.DefaultPosition):
         super().__init__(parent, id=wx.ID_ANY, pos=pos, size=size, title=title)
 

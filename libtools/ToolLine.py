@@ -49,8 +49,6 @@ class ToolLine(Tool):
     def _pointSwap(self, a, b):
         return [b, a]
 
-    #
-    # onMouseEvent(self, atPoint, brushColours, brushPos, brushSize, canvas, dispatchFn, eventDc, keyModifiers, mapPoint, mouseDragging, mouseLeftDown, mouseRightDown)
     def onMouseEvent(self, atPoint, brushColours, brushPos, brushSize, canvas, dispatchFn, eventDc, keyModifiers, mapPoint, mouseDragging, mouseLeftDown, mouseRightDown):
         brushColours, dirty = brushColours.copy(), False
         if mouseLeftDown:
@@ -74,7 +72,6 @@ class ToolLine(Tool):
             return False, dirty
         return True, dirty
 
-    # __init__(self, *args): initialisation method
     def __init__(self, *args):
         super().__init__(*args)
         self.toolOriginPoint, self.toolState = None, self.TS_NONE

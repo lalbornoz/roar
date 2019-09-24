@@ -291,8 +291,6 @@ class RoarAssetsWindow(GuiMiniFrame):
             with wx.MessageDialog(self, "Error: {}".format(error), "", wx.OK | wx.OK_DEFAULT) as dialog:
                 dialogChoice = dialog.ShowModal()
 
-    #
-    # __init__(self, backend, cellSize, parent, pos=None, size=(400, 400), title="Assets"): initialisation method
     def __init__(self, backend, cellSize, parent, pos=None, size=(400, 400), title="Assets"):
         if pos == None:
             parentRect = parent.GetScreenRect(); pos = (parentRect.x + parentRect.width, parentRect.y);

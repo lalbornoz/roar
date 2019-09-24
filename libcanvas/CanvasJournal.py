@@ -56,8 +56,6 @@ class CanvasJournal():
     def __del__(self):
         self.resetCursor(); self.resetUndo();
 
-    #
-    # __init__(self): initialisation method
     def __init__(self):
         self.patchesCursor, self.patchesUndo, self. patchesUndoLevel = None, None, None
         self.resetCursor(); self.resetUndo();
