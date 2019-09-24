@@ -102,7 +102,8 @@ class ToolObject(Tool):
 
     def onKeyboardEvent(self, atPoint, brushColours, brushPos, brushSize, canvas, dispatchFn, eventDc, keyChar, keyCode, keyModifiers, mapPoint):
         rc, dirty = False, False
-        if ord(keyChar) == wx.WXK_ESCAPE:
+        if  (ord(keyChar) == wx.WXK_ESCAPE) \
+        and (self.toolState >= self.TS_SELECT):
             dirty = self.onSelectEvent(canvas, (0, 0), dispatchFn, eventDc, False, keyModifiers, self.targetRect.copy(), self.targetRect)
             self._drawSelectRect(self.targetRect, dispatchFn, eventDc)
             self.objectMap, self.objectSize, self.targetRect, self.toolState = None, None, None, self.TS_NONE
