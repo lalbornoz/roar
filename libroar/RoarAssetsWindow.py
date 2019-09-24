@@ -34,7 +34,7 @@ class RoarAssetsWindow(GuiMiniFrame):
             if self.lastDir != None:
                 dialog.SetDirectory(self.lastDir)
             if dialog.ShowModal() == wx.ID_CANCEL:
-                resultList += [[False, "(cancelled)", None, None, None, None]]
+                resultList += [[None, "(cancelled)", None, None, None, None]]
             else:
                 for pathName in dialog.GetPaths():
                     resultList += [self._import(f, pathName)]
@@ -222,7 +222,7 @@ class RoarAssetsWindow(GuiMiniFrame):
             rc, error = canvas.importStore.importTextFile(pathName)
             return (rc, error, canvas.importStore.outMap, pathName, canvas.importStore.inSize)
         for rc, error, canvas, newMap, newPathName, newSize in self._importFiles(importmIRC, "mIRC art files (*.txt)|*.txt|All Files (*.*)|*.*"):
-            if rc:
+            if rc == True:
                 self.currentIndex = self.listView.GetItemCount()
                 self.canvasList[self.currentIndex] = [canvas, newPathName]
                 self.listView.InsertItem(self.currentIndex, "")
@@ -237,7 +237,7 @@ class RoarAssetsWindow(GuiMiniFrame):
                 self.listView.SetFocus()
                 [self.listView.SetItem(self.currentIndex, col, label) for col, label in zip((0, 1), (os.path.basename(newPathName), "{}x{}".format(*newSize)))]
                 [self.listView.SetColumnWidth(col, wx.LIST_AUTOSIZE) for col in (0, 1)]
-            else:
+            elif rc == False:
                 with wx.MessageDialog(self, "Error: {}".format(error), "", wx.CANCEL | wx.OK | wx.OK_DEFAULT) as dialog:
                     dialogChoice = dialog.ShowModal()
                     if dialogChoice == wx.ID_CANCEL:
