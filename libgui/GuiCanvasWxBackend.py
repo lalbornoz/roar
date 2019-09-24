@@ -82,9 +82,9 @@ class GuiCanvasWxBackend():
         if (patch[2] & self._CellState.CS_UNDERLINE) or (patch[3] == "_"):
             dc.SetPen(self._pens[patch[0]]);
             if not isCursor:
-                dc.DrawLine(absPoint[0], absPoint[1] + self.cellSize[1] - 1, absPoint[0] + self.cellSize[0] - 1, absPoint[1] + self.cellSize[1] - 1)
+                dc.DrawLine(absPoint[0], absPoint[1] + self.cellSize[1] - 1, absPoint[0] + self.cellSize[0], absPoint[1] + self.cellSize[1] - 1)
             else:
-                dc.DrawLines((wx.Point2D(absPoint[0], absPoint[1] + self.cellSize[1] - 1), wx.Point2D(absPoint[0] + self.cellSize[0] - 1, absPoint[1] + self.cellSize[1] - 1),))
+                dc.DrawLines((wx.Point2D(absPoint[0], absPoint[1] + self.cellSize[1] - 1), wx.Point2D(absPoint[0] + self.cellSize[0], absPoint[1] + self.cellSize[1] - 1),))
             dc.SetPen(pen)
         if patch[3] != "_":
             if not isCursor:
