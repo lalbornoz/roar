@@ -24,7 +24,7 @@ class RoarCanvasCommands(RoarCanvasCommandsFile, RoarCanvasCommandsEdit, RoarCan
                     toolBitmapBrush = wx.Brush(wx.Colour([*[int(c / div) for c in toolBitmapColour[:3]], 255]), wx.BRUSHSTYLE_SOLID)
                     toolBitmapDc.SetBrush(toolBitmapBrush)
                     toolBitmapDc.SetBackground(toolBitmapBrush)
-                    toolBitmapDc.SetPen(wx.Pen(wx.Colour(toolBitmapColour), 1))
+                    toolBitmapDc.SetPen(wx.Pen(toolBitmapColour, 1))
                     toolBitmapDc.DrawRectangle(0, 0, 16, 16)
                 cmd.attrList[numColour]["icon"] = ["", None, toolBitmap]
             toolBitmapColours = ((0, 0, 0, 255), (255, 255, 255, 255))
@@ -38,7 +38,7 @@ class RoarCanvasCommands(RoarCanvasCommandsFile, RoarCanvasCommandsEdit, RoarCan
             toolBitmapDc.DrawRectangle(8, 8, 16, 16)
             cmdAlpha.attrList[0]["icon"] = ["", None, toolBitmap]
         _initColourBitmaps_(RoarCanvasCommandsEdit.canvasColour, RoarCanvasCommandsEdit.canvasColourAlpha, 1.0)
-        _initColourBitmaps_(RoarCanvasCommandsEdit.canvasColourBackground, RoarCanvasCommandsEdit.canvasColourAlphaBackground, 0.5)
+        _initColourBitmaps_(RoarCanvasCommandsEdit.canvasColourBackground, RoarCanvasCommandsEdit.canvasColourAlphaBackground, 1.5)
 
     def update(self, **kwargs):
         self.lastPanelState.update(kwargs); textItems = [];

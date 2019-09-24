@@ -16,17 +16,16 @@
     d) replace resize buttons w/ {-,edit box,+} buttons & lock button re: ratio (ty lol3)
 
 Release roadmap:
-1)  BUG: a) select line tool b) set origin point c) move mouse about d) incr brush size e) set target point d) undo
-2)  BUG: a) new canvas/startup b) place rect c) move mouse d) undo status changes
-3)  BUG: a) start w/ spoke-vxplion.txt b) scroll down c) fix w/ canvas resize 
-4)  BUG: fix & finish Arabic/RTL text tool support
-5)  BUG: a) text tool b) paste text c) undo
-6)  BUG: a) tile once b) tile twice
-7)  {copy,cut,delete,insert from,paste}, edit asset in new canvas, import from {canvas,object}
-8)  add hotkeys.txt mIRC art canvas to help menu
-9)  {load,store} LRU {open,save} directory
-10) operators: crop, scale, shift, slice
-11) auto{load,save} & {backup,restore}
-12) tools: unicode block elements
+1)  BUG: a) start w/ spoke-vxplion.txt b) scroll down c) fix w/ canvas resize 
+2)  BUG: fix & finish Arabic/RTL text tool support
+3)  BUG: a) text tool b) paste text c) undo
+4)  BUG: a) tile once b) tile twice
+5)  {copy,cut,delete,insert from,paste}, edit asset in new canvas, import from {canvas,object}
+6)  add hotkeys.txt mIRC art canvas to help menu
+7)  {load,store} LRU {open,save} directory
+8)  operators: crop, scale, shift, slice
+9)  auto{load,save} & {backup,restore}
+10) tools: unicode block elements
+11) floating/dockable toolbar
 
 vim:ff=dos tw=0
