@@ -23,18 +23,21 @@ class ToolLine(Tool):
             lineXX, lineXY, lineYX, lineYY = 0, lineYSign, lineXSign, 0
             pointDelta = [pointDelta[1], pointDelta[0]]
         lineD = 2 * pointDelta[1] - pointDelta[0]; lineY = 0;
+        pointsDone = []
         for lineX in range(pointDelta[0] + 1):
             for brushStep in range(brushSize[0]):
-                patch = [                                                               \
-                        originPoint[0] + lineX * lineXX + lineY * lineYX + brushStep,   \
-                        originPoint[1] + lineX * lineXY + lineY * lineYY,               \
-                        *brushColours, 0, " "]
-                if isCursor:
-                    dispatchFn(eventDc, False, patch); dispatchFn(eventDc, True, patch);
-                else:
-                    if not dirty:
-                        dirty = True
-                    dispatchFn(eventDc, True, patch)
+                if not ([originPoint[0] + lineX * lineXX + lineY * lineYX + brushStep, originPoint[1] + lineX * lineXY + lineY * lineYY] in pointsDone):
+                    patch = [                                                               \
+                            originPoint[0] + lineX * lineXX + lineY * lineYX + brushStep,   \
+                            originPoint[1] + lineX * lineXY + lineY * lineYY,               \
+                            *brushColours, 0, " "]
+                    if not isCursor:
+                        if not dirty:
+                            dirty = True
+                        dispatchFn(eventDc, False, patch)
+                    else:
+                        dispatchFn(eventDc, True, patch)
+                    pointsDone += [[originPoint[0] + lineX * lineXX + lineY * lineYX + brushStep, originPoint[1] + lineX * lineXY + lineY * lineYY]]
             if lineD > 0:
                 lineD -= pointDelta[0]; lineY += 1;
             lineD += pointDelta[1]
@@ -58,13 +61,15 @@ class ToolLine(Tool):
             brushColours[1] = brushColours[0]
         if self.toolState == self.TS_NONE:
             if mouseLeftDown or mouseRightDown:
-                self.toolColours, self.toolOriginPoint, self.toolState = brushColours, list(mapPoint), self.TS_ORIGIN
+                self.toolOriginPoint, self.toolState = list(mapPoint), self.TS_ORIGIN
             dispatchFn(eventDc, True, [*mapPoint, *brushColours, 0, " "])
         elif self.toolState == self.TS_ORIGIN:
             originPoint, targetPoint = self.toolOriginPoint, list(mapPoint)
-            dirty = self._getLine(self.toolColours, brushSize, dispatchFn, eventDc, mouseLeftDown or mouseRightDown, originPoint, targetPoint)
             if mouseLeftDown or mouseRightDown:
-                self.toolColours, self.toolOriginPoint, self.toolState = None, None, self.TS_NONE
+                dirty = self._getLine(brushColours, brushSize, dispatchFn, eventDc, False, originPoint, targetPoint)
+                self.toolOriginPoint, self.toolState = None, self.TS_NONE
+            else:
+                dirty = self._getLine(brushColours, brushSize, dispatchFn, eventDc, True, originPoint, targetPoint)
         else:
             return False, dirty
         return True, dirty
@@ -72,6 +77,6 @@ class ToolLine(Tool):
     # __init__(self, *args): initialisation method
     def __init__(self, *args):
         super().__init__(*args)
-        self.toolColours, self.toolOriginPoint, self.toolState = None, None, self.TS_NONE
+        self.toolOriginPoint, self.toolState = None, self.TS_NONE
 
 # vim:expandtab foldmethod=marker sw=4 ts=4 tw=120
