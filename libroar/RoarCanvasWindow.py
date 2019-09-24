@@ -283,8 +283,6 @@ class RoarCanvasWindow(GuiWindow):
         eventDc.SetDeviceOrigin(*eventDcOrigin)
         self.backend.onPaint(self.GetClientSize(), self, self.GetViewStart())
 
-    #
-    # __init__(self, backend, canvas, cellSize, commands, parent, parentFrame, pos, scrollStep, size): initialisation method
     def __init__(self, backend, canvas, cellSize, commands, parent, parentFrame, pos, scrollStep, size):
         super().__init__(parent, pos, scrollStep)
         self.size = size

@@ -105,8 +105,6 @@ class RoarCanvasCommands(RoarCanvasCommandsFile, RoarCanvasCommandsEdit, RoarCan
                 toolBar = self.parentFrame.toolBarItemsById[self.canvasRedo.attrDict["id"]][0]
                 toolBar.EnableTool(self.canvasRedo.attrDict["id"], False); toolBar.Refresh();
 
-    #
-    # __init__(self, parentCanvas, parentFrame):
     def __init__(self, parentCanvas, parentFrame):
         accels, menus, toolBars = [], [], []
         self.canvasPathName, self.lastPanelState, self.parentCanvas, self.parentFrame = None, {}, parentCanvas, parentFrame
@@ -120,7 +118,6 @@ class RoarCanvasCommands(RoarCanvasCommandsFile, RoarCanvasCommandsEdit, RoarCan
                 toolBars += self.toolBars
         self._initColourBitmaps()
 
-        # XXX
         toolBars.append(
             [self.canvasNew, self.canvasOpen, self.canvasSave, self.canvasSaveAs, NID_TOOLBAR_HSEP,
              self.canvasUndo, self.canvasRedo, NID_TOOLBAR_HSEP,

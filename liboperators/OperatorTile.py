@@ -10,8 +10,6 @@ import copy
 class OperatorTile(Operator):
     name = "Tile"
 
-    #
-    # apply2(self, mapPoint, mousePoint, regionOld, region)
     def apply2(self, mapPoint, mousePoint, regionOld, region):
         if self.lastPoint == None:
             self.lastPoint = list(mapPoint)
@@ -32,7 +30,6 @@ class OperatorTile(Operator):
         self.lastPoint = list(mapPoint)
         return region
 
-    # __init__(self, *args): initialisation method
     def __init__(self, *args):
         self.lastPoint, self.tileObject = None, None
 

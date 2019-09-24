@@ -9,12 +9,9 @@ from Operator import Operator
 class OperatorFlipHorizontal(Operator):
     name = "Flip horizontally"
 
-    #
-    # apply(self, region)
     def apply(self, region):
         region.reverse(); return region;
 
-    # __init__(self, *args): initialisation method
     def __init__(self, *args):
         pass
 

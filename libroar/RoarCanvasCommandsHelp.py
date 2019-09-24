@@ -26,8 +26,6 @@ class RoarCanvasCommandsHelp():
     def canvasVisitGitHub(self, event):
         webbrowser.open("https://www.github.com/lalbornoz/roar")
 
-    #
-    # __init__(self)
     def __init__(self):
         self.accels = ()
         self.menus, self.toolBars = (("&Help", self.canvasMelp, NID_MENU_SEP, self.canvasNewIssueGitHub, self.canvasVisitGitHub, NID_MENU_SEP, self.canvasAbout,),), ()

@@ -265,8 +265,6 @@ class GuiCanvasWxBackend():
             self.canvasBitmap.Destroy(); self.canvasBitmap = None;
         self._finiBrushesAndPens()
 
-    #
-    # __init__(self, canvasSize, cellSize, fontName="Dejavu Sans Mono", fontPathName=os.path.join("assets", "fonts", "DejaVuSansMono.ttf")): initialisation method
     def __init__(self, canvasSize, cellSize, fontName="Dejavu Sans Mono", fontPathName=os.path.join("assets", "fonts", "DejaVuSansMono.ttf")):
         self._brushes, self._font, self._lastBrush, self._lastPen, self._pens = None, None, None, None, None
         self.canvasBitmap, self.cellSize, self.fontName, self.fontPathName = None, None, fontName, fontPathName

@@ -9,8 +9,6 @@ from Tool import Tool
 class ToolRect(Tool):
     name = "Rectangle"
 
-    #
-    # onMouseEvent(self, atPoint, brushColours, brushPos, brushSize, canvas, dispatchFn, eventDc, keyModifiers, mapPoint, mouseDragging, mouseLeftDown, mouseRightDown)
     def onMouseEvent(self, atPoint, brushColours, brushPos, brushSize, canvas, dispatchFn, eventDc, keyModifiers, mapPoint, mouseDragging, mouseLeftDown, mouseRightDown):
         brushColours, brushSize, dirty = list(brushColours), list(brushSize), False
         if mouseRightDown:

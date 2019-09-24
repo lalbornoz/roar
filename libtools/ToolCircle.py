@@ -9,8 +9,6 @@ from Tool import Tool
 class ToolCircle(Tool):
     name = "Circle"
 
-    #
-    # onMouseEvent(self, atPoint, brushColours, brushPos, brushSize, canvas, dispatchFn, eventDc, keyModifiers, mapPoint, mouseDragging, mouseLeftDown, mouseRightDown)
     def onMouseEvent(self, atPoint, brushColours, brushPos, brushSize, canvas, dispatchFn, eventDc, keyModifiers, mapPoint, mouseDragging, mouseLeftDown, mouseRightDown):
         brushColours, brushSize, dirty = list(brushColours), [brushSize[0] * 2, brushSize[1]], False
         originPoint, radius = (brushSize[0] / 2, brushSize[0] / 2), brushSize[0]
