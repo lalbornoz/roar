@@ -31,6 +31,9 @@ class RoarClient(GuiFrame):
     def onMouseWheel(self, event):
         self.canvasPanel.GetEventHandler().ProcessEvent(event)
 
+    def onSize(self, event):
+        self.canvasPanel.SetMinSize(self.GetSize()); self.canvasPanel.SetSize(wx.DefaultCoord, wx.DefaultCoord, *self.GetSize()); event.Skip();
+
     #
     # __init__(self, parent, defaultCanvasPos=(0, 75), defaultCanvasSize=(100, 30), defaultCellSize=(7, 14), size=(840, 630), title=""): initialisation method
     def __init__(self, parent, defaultCanvasPos=(0, 75), defaultCanvasSize=(100, 30), defaultCellSize=(7, 14), size=(840, 630), title=""):
@@ -58,5 +61,6 @@ class RoarClient(GuiFrame):
         self.canvasPanel.commands.canvasClearRecent.attrDict["id"] = wx.NewId()
         menuItemWindow = self.canvasPanel.commands.canvasOpenRecent.attrDict["menu"].Append(self.canvasPanel.commands.canvasClearRecent.attrDict["id"], self.canvasPanel.commands.canvasClearRecent.attrDict["label"], self.canvasPanel.commands.canvasClearRecent.attrDict["caption"])
         self.canvasPanel.commands.canvasOpenRecent.attrDict["menu"].Bind(wx.EVT_MENU, self.canvasPanel.commands.canvasClearRecent, menuItemWindow)
+        self.Bind(wx.EVT_SIZE, self.onSize)
 
 # vim:expandtab foldmethod=marker sw=4 ts=4 tw=120
