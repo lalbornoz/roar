@@ -5,7 +5,7 @@
 #
 
 from Tool import Tool
-import re, string, time, wx
+import re, string, wx
 
 class ToolText(Tool):
     name = "Text"
