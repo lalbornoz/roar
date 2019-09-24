@@ -1,16 +1,31 @@
-<Ctrl> 0-9, <Ctrl> <Shift> 0-5, <Ctrl> <Shift> 6			Set foreground colour to #0-9, #10-15, transparent colour, resp.
-<Ctrl> <Alt> 0-9, <Ctrl> <Alt> <Shift> 0-5, <Ctrl> <Alt> <Shift> 6	Set background colour to #0-9, #10-15, transparent colour, resp.
-<Ctrl> C, U, E, F, L, P, R, E, T					Switch to circle, cursor, erase, fill, line, pick colour, rectangle, object, text tool
-<Ctrl> I								Flip colours
-<Ctrl> N								New canvas
-<Ctrl> O								Open mIRC art file
-<Ctrl> S								Save canvas as mIRC art file
-<Ctrl> X								Exit
-<Ctrl> Y, Z								Redo, undo, resp.
-<Shift> <Pause>								Break into Python debugger
-(Canvas) <Down>, <Left>, <Right>, <Up>					Move canvas cursor
-(Canvas) <Left mouse button>, <Space>					Apply current tool with foreground colour or initiate tool action (line and object tool)
-(Canvas) <Right mouse button>						Apply current tool with background colour
-(Erase tool) <Right mouse button>					Erase background colour with foreground colour
-(Fill tool) <Ctrl> <Left mouse button>, <Right mouse button>		Fill entire region ignoring character cells
-(Object tool) <Ctrl> <Left mouse button>				Move selection instead of cloning
+Global hotkeys:
+<Ctrl> -/+				Decrease/increase brush size height and width
+<Ctrl> <Shift> -/+			Decrease/increase canvas size height and width
+<Ctrl> 0-9				Set foreground colour to #0-9
+<Ctrl> <Shift> 0-5, 6			Set foreground colour to #10-15 or transparent colour, resp.
+<Ctrl> <Alt> 0-9			Set background colour to #0-9
+<Ctrl> <Alt> <Shift> 0-5, 6		Set background colour to #10-15 or transparent colour, resp.
+<Ctrl> C, U, E, F, L, P, R, E, T	Switch to circle, cursor, erase, fill, line, pick colour, rectangle, object, text tool
+<Ctrl> I				Flip colours
+<Ctrl> N				New canvas
+<Ctrl> O				Open mIRC art file
+<Ctrl> S				Save canvas as mIRC art file
+<Ctrl> X				Exit
+<Ctrl> Y, Z				Redo, undo last action
+<Shift> <Pause>				Break into Python debugger
+
+Canvas hotkeys:
+<Down>, <Left>, <Right>, <Up>		Move canvas cursor
+<LMB>/<Space>				Apply current tool with foreground colour (with exceptions)
+<RMB>					Apply current tool with background colour (with exceptions)
+
+Tool-specific hotkeys:
+(Erase) <RMB>				Erase background colour with foreground colour
+(Fill) <Ctrl> <LMB>/<Space>/<RMB>	Fill entire region with foreground/background colour ignoring character cells
+(Line, object) <LMB>/<Space>		Initiate line drawing/selection
+(Object) <Ctrl> <LMB>			Move selection instead of cloning
+(Pick colour) <LMB>/<Space>		Pick current cell's foreground colour
+(Pick colour) <RMB>			Pick current cell's background colour
+(Text) <Backspace>			Erase last cell and move backwards w/ wraparound
+(Text) <Ctrl> V				Paste text from clipboard
+(Text) <Enter>				Move to leftmost cell on next row w/ wraparound
