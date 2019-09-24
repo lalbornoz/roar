@@ -44,7 +44,7 @@ class RoarCanvasWindow(GuiWindow):
         if not self.canvas.dirtyCursor:
             self.backend.drawCursorMaskWithJournal(self.canvas, self.canvas.journal, eventDc)
             self.canvas.dirtyCursor = True
-        if self.backend.drawPatch(self.canvas, eventDc, patch) and isCursor:
+        if self.backend.drawPatch(self.canvas, eventDc, patch, isCursor=isCursor) and isCursor:
             patchDeltaCell = self.canvas.map[patch[1]][patch[0]]; patchDelta = [*patch[0:2], *patchDeltaCell];
             self.canvas.journal.pushCursor(patchDelta)
 
