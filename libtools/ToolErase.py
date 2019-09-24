@@ -13,21 +13,25 @@ class ToolErase(Tool):
     # onMouseEvent(self, atPoint, brushColours, brushPos, brushSize, canvas, dispatchFn, eventDc, keyModifiers, mapPoint, mouseDragging, mouseLeftDown, mouseRightDown)
     def onMouseEvent(self, atPoint, brushColours, brushPos, brushSize, canvas, dispatchFn, eventDc, keyModifiers, mapPoint, mouseDragging, mouseLeftDown, mouseRightDown):
         brushColours, brushSize, dirty = list(brushColours), list(brushSize), False
-        if mouseRightDown:
-            brushColours = [brushColours[0], brushColours[0]]
-        else:
-            brushColours = [brushColours[1], brushColours[1]]
         if brushSize[0] > 1:
             brushSize[0] *= 2
         for brushRow in range(brushSize[1]):
             for brushCol in range(brushSize[0]):
-                patchColours = [brushColours[1]] * 2
-                patch = [mapPoint[0] + brushCol, mapPoint[1] + brushRow, *patchColours, 0, " "]
-                if mouseLeftDown or mouseRightDown:
+                if mouseLeftDown:
+                    patch = [mapPoint[0] + brushCol, mapPoint[1] + brushRow, brushColours[1], brushColours[1], 0, " "]
+                    if not dirty:
+                        dirty = True
+                    dispatchFn(eventDc, False, patch); dispatchFn(eventDc, True, patch);
+                elif mouseRightDown                                 \
+                and  ((mapPoint[0] + brushCol) < canvas.size[0])    \
+                and  ((mapPoint[1] + brushRow) < canvas.size[1])    \
+                and  (canvas.map[mapPoint[1] + brushRow][mapPoint[0] + brushCol][1] == brushColours[1]):
+                    patch = [mapPoint[0] + brushCol, mapPoint[1] + brushRow, canvas.map[mapPoint[1] + brushRow][mapPoint[0] + brushCol][0], brushColours[0], *canvas.map[mapPoint[1] + brushRow][mapPoint[0] + brushCol][2:]]
                     if not dirty:
                         dirty = True
                     dispatchFn(eventDc, False, patch); dispatchFn(eventDc, True, patch);
                 else:
+                    patch = [mapPoint[0] + brushCol, mapPoint[1] + brushRow, brushColours[1], brushColours[1], 0, " "]
                     dispatchFn(eventDc, True, patch)
         return True, dirty
 

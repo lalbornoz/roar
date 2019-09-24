@@ -11,5 +11,6 @@
 (Canvas) <Down>, <Left>, <Right>, <Up>					Move canvas cursor
 (Canvas) <Left mouse button>, <Space>					Apply current tool with foreground colour or initiate tool action (line and object tool)
 (Canvas) <Right mouse button>						Apply current tool with background colour
+(Erase tool) <Right mouse button>					Erase background colour with foreground colour
 (Fill tool) <Ctrl> <Left mouse button>, <Right mouse button>		Fill entire region ignoring character cells
 (Object tool) <Ctrl> <Left mouse button>				Move selection instead of cloning
