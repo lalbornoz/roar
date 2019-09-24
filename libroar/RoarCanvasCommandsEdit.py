@@ -202,8 +202,6 @@ class RoarCanvasCommandsEdit():
         self.parentCanvas.dispatchDeltaPatches(self.parentCanvas.canvas.journal.popUndo())
         self.update(size=self.parentCanvas.canvas.size, undoLevel=self.parentCanvas.canvas.journal.patchesUndoLevel)
 
-    #
-    # __init__(self)
     def __init__(self):
         self.accels = (
             (self.canvasColourBackground(self.canvasColourBackground, 0), self.canvasColourBackground(self.canvasColourBackground, 1), self.canvasColourBackground(self.canvasColourBackground, 2), self.canvasColourBackground(self.canvasColourBackground, 3), self.canvasColourBackground(self.canvasColourBackground, 4), self.canvasColourBackground(self.canvasColourBackground, 5), self.canvasColourBackground(self.canvasColourBackground, 6), self.canvasColourBackground(self.canvasColourBackground, 7), self.canvasColourBackground(self.canvasColourBackground, 8), self.canvasColourBackground(self.canvasColourBackground, 9), self.canvasColourBackground(self.canvasColourBackground, 10), self.canvasColourBackground(self.canvasColourBackground, 11), self.canvasColourBackground(self.canvasColourBackground, 12), self.canvasColourBackground(self.canvasColourBackground, 13), self.canvasColourBackground(self.canvasColourBackground, 14), self.canvasColourBackground(self.canvasColourBackground, 15), self.canvasColourAlphaBackground(self.canvasColourAlphaBackground, 0),),

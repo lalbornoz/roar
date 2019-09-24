@@ -10,8 +10,6 @@ import wx
 class ToolFill(Tool):
     name = "Fill"
 
-    #
-    # onMouseEvent(self, atPoint, brushColours, brushPos, brushSize, canvas, dispatchFn, eventDc, keyModifiers, mapPoint, mouseDragging, mouseLeftDown, mouseRightDown)
     def onMouseEvent(self, atPoint, brushColours, brushPos, brushSize, canvas, dispatchFn, eventDc, keyModifiers, mapPoint, mouseDragging, mouseLeftDown, mouseRightDown):
         dirty, pointsDone, pointStack, testChar, testColour = False, [], [list(mapPoint)], canvas.map[mapPoint[1]][mapPoint[0]][3], canvas.map[mapPoint[1]][mapPoint[0]][0:2]
         if mouseLeftDown or mouseRightDown:

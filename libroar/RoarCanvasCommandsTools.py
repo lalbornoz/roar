@@ -49,8 +49,6 @@ class RoarCanvasCommandsTools():
         setattr(canvasTool_, "isSelect", True)
         return canvasTool_
 
-    #
-    # __init__(self)
     def __init__(self):
         self.accels = ()
         self.menus = (

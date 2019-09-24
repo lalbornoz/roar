@@ -10,8 +10,6 @@ import math
 class OperatorRotate(Operator):
     name = "Rotate"
 
-    #
-    # apply2(self, mapPoint, mousePoint, regionOld, region)
     def apply2(self, mapPoint, mousePoint, regionOld, region):
         if self.originPoint == None:
             self.originPoint = list(mousePoint)
@@ -31,7 +29,6 @@ class OperatorRotate(Operator):
         else:
             return region
 
-    # __init__(self, *args): initialisation method
     def __init__(self, *args):
         self.originPoint = None
 

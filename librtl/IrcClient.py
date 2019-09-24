@@ -107,8 +107,6 @@ class IrcClient:
             del self.clientQueue[0]
         return True
 
-    #
-    # __init__(self, serverHname, serverPort, clientNick, clientIdent, clientGecos): initialisation method
     def __init__(self, serverHname, serverPort, clientNick, clientIdent, clientGecos):
         self.clientGecos, self.clientIdent, self.clientNick = clientGecos, clientIdent, clientNick
         self.clientNextTimeout, self.clientQueue, self.clientSocket, self.clientSocketFile = None, None, None, None

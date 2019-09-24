@@ -5,12 +5,9 @@
 #
 
 class Operator(object):
-    #
-    # apply(self, region)
     def apply(self, region):
         pass
 
-    # __init__(self, *args): initialisation method
     def __init__(self, *args):
         pass
 
