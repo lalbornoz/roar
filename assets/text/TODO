@@ -12,15 +12,16 @@
 12) Sprites & scripted (Python?) animation on the basis of asset traits and {composable,parametrised} patterns (metric flow, particle system, rigging, ...)
 13) GUI TODO list:
     a) switch to Gtk
-    b) replace logo w/ canvas panel in About dialogue, revisit melp? dialogue
-    c) Settings/Settings window (e.g. autosave, hide cursor on leaving window, ...)
-    d) replace resize buttons w/ {-,edit box,+} buttons & lock button re: ratio (ty lol3)
+    b) https://material.io/resources/icons/?style=baseline
+    c) replace logo w/ canvas panel in About dialogue, revisit melp? dialogue
+    d) Settings/Settings window (e.g. autosave, hide cursor on leaving window, ...)
+    e) replace resize buttons w/ {-,edit box,+} buttons & lock button re: ratio (ty lol3)
 
 Release roadmap:
 1)  {copy,cut,delete,insert from,paste}, edit asset in new canvas, import from {canvas,object}
 2)  operators: crop, scale, shift, slice
 3)  auto{load,save} & {backup,restore}
 4)  tools: unicode block elements
-5)  floating/dockable toolbar
+5)  floating/dockable toolbar https://wxpython.org/Phoenix/docs/html/wx.aui.AuiManager.html
 
 vim:ff=dos tw=0
