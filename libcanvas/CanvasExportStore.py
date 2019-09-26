@@ -23,8 +23,7 @@ class CanvasExportStore():
     class _CellState():
         CS_NONE             = 0x00
         CS_BOLD             = 0x01
-        CS_ITALIC           = 0x02
-        CS_UNDERLINE        = 0x04
+        CS_UNDERLINE        = 0x02
 
     ImgurUploadUrl = "https://api.imgur.com/3/upload.json"
     PastebinPostUrl = "https://pastebin.com/api/api_post.php"

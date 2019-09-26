@@ -111,12 +111,12 @@ class RoarCanvasWindow(GuiWindow):
                 rc, dirty = tool.onKeyboardEvent(mapPoint, self.brushColours, self.brushPos, self.brushSize, self.canvas, self.dispatchPatchSingle, eventDc, keyChar, keyCode, keyModifiers, self.brushPos)
             elif mapPoint != None:
                 self.dispatchPatchSingle(eventDc, True, [*mapPoint, self.brushColours[0], self.brushColours[0], 0, " "])
+        self.canvas.journal.end()
         if dirty:
             self.dirty = True
             self.commands.update(dirty=self.dirty, cellPos=self.brushPos, undoLevel=self.canvas.journal.patchesUndoLevel)
         else:
             self.commands.update(cellPos=self.brushPos)
-        self.canvas.journal.end()
         if rc and (tool.__class__ == ToolObject):
             if tool.toolState > tool.TS_NONE:
                 self.commands.update(undoInhibit=True)
@@ -133,10 +133,11 @@ class RoarCanvasWindow(GuiWindow):
         eventDc.SetDeviceOrigin(*eventDcOrigin)
         return rc
 
-    def dispatchDeltaPatches(self, deltaPatches):
-        eventDc = self.backend.getDeviceContext(self.GetClientSize(), self)
+    def dispatchDeltaPatches(self, deltaPatches, eventDc=None, forceDirtyCursor=True):
+        if eventDc == None:
+            eventDc = self.backend.getDeviceContext(self.GetClientSize(), self)
         eventDcOrigin = eventDc.GetDeviceOrigin(); eventDc.SetDeviceOrigin(0, 0);
-        if self.canvas.dirtyCursor:
+        if self.canvas.dirtyCursor or forceDirtyCursor:
             self.backend.drawCursorMaskWithJournal(self.canvas, self.canvas.journal, eventDc)
             self.canvas.dirtyCursor = False
         for patch in deltaPatches:
@@ -239,9 +240,7 @@ class RoarCanvasWindow(GuiWindow):
     def onLeaveWindow(self, event):
         if False:
             eventDc = self.backend.getDeviceContext(self.GetClientSize(), self, self.GetViewStart())
-            eventDcOrigin = eventDc.GetDeviceOrigin(); eventDc.SetDeviceOrigin(0, 0);
             self.backend.drawCursorMaskWithJournal(self.canvas, self.canvas.journal, eventDc)
-            eventDc.SetDeviceOrigin(*eventDcOrigin)
         self.lastCellState = None
 
     def onMouseInput(self, event):
@@ -278,9 +277,7 @@ class RoarCanvasWindow(GuiWindow):
 
     def onPaint(self, event):
         eventDc = self.backend.getDeviceContext(self.GetClientSize(), self)
-        eventDcOrigin = eventDc.GetDeviceOrigin(); eventDc.SetDeviceOrigin(0, 0);
         self.backend.drawCursorMaskWithJournal(self.canvas, self.canvas.journal, eventDc)
-        eventDc.SetDeviceOrigin(*eventDcOrigin)
         self.backend.onPaint(self.GetClientSize(), self, self.GetViewStart())
 
     def __init__(self, backend, canvas, cellSize, commands, parent, parentFrame, pos, scrollStep, size):

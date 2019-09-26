@@ -5,7 +5,7 @@
 #
 
 #
-# Colours: mIRC colour number to RGBA map given none of ^[BFV_] (bold, italic, reverse, underline)
+# Colours: mIRC colour number to RGBA map given none of ^[BV_] (bold, reverse, underline)
 #
 Colours = [
     [255, 255, 255, 255, "White"],
