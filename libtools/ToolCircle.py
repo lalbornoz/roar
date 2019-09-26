@@ -9,8 +9,8 @@ from Tool import Tool
 class ToolCircle(Tool):
     name = "Circle"
 
-    def onMouseEvent(self, atPoint, brushColours, brushPos, brushSize, canvas, dispatchFn, eventDc, keyModifiers, mapPoint, mouseDragging, mouseLeftDown, mouseRightDown):
-        brushColours, brushSize, dirty = list(brushColours), [brushSize[0] * 2, brushSize[1]], False
+    def onMouseEvent(self, atPoint, brushColours, brushPos, brushSize, canvas, keyModifiers, mapPoint, mouseDragging, mouseLeftDown, mouseRightDown):
+        brushColours, brushSize, isCursor = list(brushColours), [brushSize[0] * 2, brushSize[1]], not (mouseLeftDown or mouseRightDown)
         originPoint, radius = (brushSize[0] / 2, brushSize[0] / 2), brushSize[0]
         if mouseRightDown:
             brushColours = [brushColours[1], brushColours[0]]
@@ -22,6 +22,7 @@ class ToolCircle(Tool):
                     cells[-1] += [[mapPoint[i] + int(originPoint[i] + o) for i, o in zip((0, 1,), (brushX, brushY,))]]
             if cells[-1] == []:
                 del cells[-1]
+        patches = []
         for numRow in range(len(cells)):
             for numCol in range(len(cells[numRow])):
                 if ((numRow == 0) or (numRow == (len(cells) - 1)))                              \
@@ -41,12 +42,7 @@ class ToolCircle(Tool):
                         patch = [*cells[numRow][numCol], brushColours[1], brushColours[1], 0, " "]
                 else:
                     patch = [*cells[numRow][numCol], brushColours[1], brushColours[1], 0, " "]
-                if mouseLeftDown or mouseRightDown:
-                    if not dirty:
-                        dirty = True
-                    dispatchFn(eventDc, False, patch); dispatchFn(eventDc, True, patch);
-                else:
-                    dispatchFn(eventDc, True, patch)
-        return True, dirty
+                patches += [patch]
+        return True, patches if not isCursor else None, patches if isCursor else None
 
 # vim:expandtab foldmethod=marker sw=4 ts=4 tw=120
