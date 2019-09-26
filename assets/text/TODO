@@ -1,4 +1,4 @@
-1)  ANSI CSI CU[BDPU] sequences & italic
+1)  ANSI CSI CU[BDPU] sequences
 2)  Fix & finish Arabic/RTL text tool support
 3)  Documentation, instrumentation & unit tests
 4)  Layers & layout (e.g. for comics, zines, etc.)

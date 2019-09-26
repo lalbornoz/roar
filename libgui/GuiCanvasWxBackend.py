@@ -67,62 +67,64 @@ class GuiCanvasWxBackend():
     class _CellState():
         CS_NONE             = 0x00
         CS_BOLD             = 0x01
-        CS_ITALIC           = 0x02
-        CS_UNDERLINE        = 0x04
+        CS_UNDERLINE        = 0x02
 
-    def _drawBrushPatch(self, eventDc, isCursor, patch, point):
-        absPoint = self._xlatePoint(point)
-        dc = self._setBrushPatchColours(eventDc, isCursor, patch)
-        dc.DrawRectangle(*absPoint, *self.cellSize)
+    def _blendColours(self, bg, fg):
+        return [int((fg * 0.75) + (bg * (1.0 - 0.75))) for bg, fg in zip(Colours[bg][:3], Colours[fg][:3])]
 
-    def _drawCharPatch(self, eventDc, isCursor, patch, point):
-        absPoint = self._xlatePoint(point)
-        dc, pen = self._setCharPatchColours(eventDc, isCursor, patch)
-        dc.DrawRectangle(*absPoint, *self.cellSize)
-        if (patch[2] & self._CellState.CS_UNDERLINE) or (patch[3] == "_"):
-            dc.SetPen(self._pens[patch[0]]);
-            if not isCursor:
-                dc.DrawLine(absPoint[0], absPoint[1] + self.cellSize[1] - 1, absPoint[0] + self.cellSize[0], absPoint[1] + self.cellSize[1] - 1)
-            else:
-                dc.DrawLines((wx.Point2D(absPoint[0], absPoint[1] + self.cellSize[1] - 1), wx.Point2D(absPoint[0] + self.cellSize[0], absPoint[1] + self.cellSize[1] - 1),))
-            dc.SetPen(pen)
-        if patch[3] != "_":
-            if not isCursor:
-                oldClippingRegion = dc.GetClippingBox()
-                dc.DestroyClippingRegion(); dc.SetClippingRegion(*absPoint, *self.cellSize);
-                dc.SetTextBackground(wx.Colour(Colours[patch[1]][:4])); dc.SetTextForeground(wx.Colour(Colours[patch[0]][:4]));
-            else:
-                dc.ResetClip(); dc.Clip(wx.Region(*absPoint, *self.cellSize));
-            dc.DrawText(patch[3], *absPoint)
-            if not isCursor:
-                dc.DestroyClippingRegion()
+    def _blendColoursBrush(self, bg, fg):
+        colour = self._blendColours(bg, fg)
+        return wx.Brush(wx.Colour(colour), wx.BRUSHSTYLE_SOLID), wx.Pen(wx.Colour(colour), 1)
+
+    def _drawPatch(self, eventDc, isCursor, patch, patchBg, point):
+        absPoint, charFlag = self._xlatePoint(point), False
+        if (patch[3] == " ") and (patch[1] == -1):
+            charFlag, patch = True, [*patch[:-1], "░"]
+            textBg, textFg = wx.Colour(Colours[patch[1]][:4]), wx.Colour(Colours[patch[0]][:4])
+        if isCursor and (patch[3] == " ") and ((patchBg[3] != " ") or (patchBg[2] & self._CellState.CS_UNDERLINE)):
+            charFlag, patch = True, [*patch[:-2], *patchBg[2:]]
+            textFg = wx.Colour(self._blendColours(patchBg[0], patch[1]))
+        elif (patch[3] != " ")  or (patch[2] & self._CellState.CS_UNDERLINE):
+            charFlag = True
+            textBg, textFg = wx.Colour(Colours[patch[1]][:4]), wx.Colour(Colours[patch[0]][:4])
+        brush, pen = self._setBrushColours(eventDc, isCursor, patch, patchBg)
+        eventDc.DrawRectangle(*absPoint, *self.cellSize)
+        if charFlag:
+            if (patch[2] & self._CellState.CS_UNDERLINE) or (patch[3] == "_"):
+                eventDc.SetPen(self._pens[patch[0]]);
+                eventDc.DrawLine(absPoint[0], absPoint[1] + self.cellSize[1] - 1, absPoint[0] + self.cellSize[0], absPoint[1] + self.cellSize[1] - 1)
+                eventDc.SetPen(pen)
+            if patch[3] != "_":
+                oldClippingRegion = eventDc.GetClippingBox()
+                eventDc.SetFont(self._font)
+                eventDc.DestroyClippingRegion(); eventDc.SetClippingRegion(*absPoint, *self.cellSize);
+                eventDc.SetTextForeground(textFg)
+                eventDc.DrawText(patch[3], *absPoint)
+                eventDc.DestroyClippingRegion()
+        if isCursor:
+            brush.Destroy(); pen.Destroy();
+            if self._lastBrush != None:
+                eventDc.SetBrush(self._lastBrush)
+            if self._lastPen != None:
+                eventDc.SetPen(self._lastPen)
 
     def _finiBrushesAndPens(self):
         [brush.Destroy() for brush in self._brushes or []]
-        [brushTransp.Destroy() for brushTransp in self._brushesTransp or []]
         [pen.Destroy() for pen in self._pens or []]
-        [penTransp.Destroy() for penTransp in self._pensTransp or []]
         self._brushAlpha.Destroy(); self._penAlpha.Destroy();
-        self._brushAlphaTransp.Destroy(); self._penAlphaTransp.Destroy();
         self._brushes, self._lastBrush, self._lastPen, self._pens = None, None, None, None
-        self._brushesTransp, self._lastBrushTransp, self._lastPenTransp, self._pensTransp = None, None, None, None
 
     def _initBrushesAndPens(self):
         self._brushes, self._pens = [None for x in range(len(Colours))], [None for x in range(len(Colours))]
-        self._brushesTransp, self._pensTransp = [None for x in range(len(Colours))], [None for x in range(len(Colours))]
         for mircColour in range(len(Colours)):
             self._brushes[mircColour] = wx.Brush(wx.Colour(Colours[mircColour][:4]), wx.BRUSHSTYLE_SOLID)
-            self._brushesTransp[mircColour] = wx.Brush(wx.Colour(*Colours[mircColour][:3], 200), wx.BRUSHSTYLE_SOLID)
             self._pens[mircColour] = wx.Pen(wx.Colour(Colours[mircColour][:4]), 1)
-            self._pensTransp[mircColour] = wx.Pen(wx.Colour(*Colours[mircColour][:3], 200), 1, wx.PENSTYLE_TRANSPARENT)
         self._brushAlpha = wx.Brush(wx.Colour(Colours[14][:4]), wx.BRUSHSTYLE_SOLID)
-        self._brushAlphaTransp = wx.Brush(wx.Colour(*Colours[14][:3], 200), wx.BRUSHSTYLE_SOLID)
         self._penAlpha = wx.Pen(wx.Colour(Colours[14][:4]), 1)
-        self._penAlphaTransp = wx.Pen(wx.Colour(*Colours[14][:3], 200), 1, wx.PENSTYLE_TRANSPARENT)
         self._lastBrush, self._lastPen = None, None
-        self._lastBrushTransp, self._lastPenTransp = None, None
 
     def _reshapeArabic(self, canvas, eventDc, isCursor, patch, point):
+        patches = []
         lastCell = point[0]
         while True:
             if  ((lastCell + 1) >= (canvas.size[0] - 1))    \
@@ -147,76 +149,52 @@ class GuiCanvasWxBackend():
                     runCell[3] = self.arabicShapes[runCell[3]][1]; connect = True;
                 else:
                     runCell[3] = self.arabicShapes[runCell[3]][0]; connect = False;
-            self._drawCharPatch(eventDc, isCursor, runCell, [runX, point[1]])
+            patches += [[runX, point[1], *runCell]]
         runCell = list(patch[2:])
         if connect and (self.arabicShapes[patch[5]][3] != None):
             runCell[3] = self.arabicShapes[patch[5]][3]
         else:
             runCell[3] = self.arabicShapes[patch[5]][0]
-        self._drawCharPatch(eventDc, isCursor, runCell, [point[0], point[1]])
+        patches += [[*point, *runCell]]
+        return patches
 
-    def _setBrushPatchColours(self, dc, isCursor, patch):
-        if not isCursor:
-            brushAlpha, brushes, dc_, penAlpha, pens = self._brushAlpha, self._brushes, dc, self._penAlpha, self._pens
-        else:
-            brushAlpha, brushes, dc_, penAlpha, pens = self._brushAlphaTransp, self._brushesTransp, wx.GraphicsContext.Create(dc), self._penAlphaTransp, self._pensTransp
+    def _setBrushColours(self, dc, isCursor, patch, patchBg):
         if  ((patch[0] != -1) and (patch[1] != -1)) \
         or  ((patch[0] == -1) and (patch[1] != -1)):
-            brush, pen = brushes[patch[1]], pens[patch[1]]
+            if not isCursor:
+                brush, pen = self._brushes[patch[1]], self._pens[patch[1]]
+            else:
+                brush, pen = self._blendColoursBrush(patchBg[1], patch[1])
         else:
-            brush, pen = brushAlpha, penAlpha
+            if not isCursor:
+                brush, pen = self._brushAlpha, self._penAlpha
+            else:
+                brush, pen = self._blendColoursBrush(patchBg[1], 14)
         if not isCursor:
             if self._lastBrush != brush:
-                dc_.SetBrush(brush); self._lastBrush = brush;
+                dc.SetBrush(brush); self._lastBrush = brush;
             if self._lastPen != pen:
-                dc_.SetPen(pen); self._lastPen = pen;
+                dc.SetPen(pen); self._lastPen = pen;
         else:
-            dc_.SetBrush(brush); dc_.SetPen(pen);
-        return dc_
-
-    def _setCharPatchColours(self, dc, isCursor, patch):
-        if not isCursor:
-            brushAlpha, brushes, dc_, penAlpha, pens = self._brushAlpha, self._brushes, dc, self._penAlpha, self._pens
-            dc_.SetFont(self._font)
-        else:
-            brushAlpha, brushes, dc_, penAlpha, pens = self._brushAlphaTransp, self._brushesTransp, wx.GraphicsContext.Create(dc), self._penAlphaTransp, self._pensTransp
-        if (patch[0] != -1) and (patch[1] != -1):
-            brush, fontColour, pen = brushes[patch[1]], Colours[patch[0]][:3], pens[patch[1]]
-        elif (patch[0] == -1) and (patch[1] == -1):
-            brush, fontColour, pen = brushAlpha, Colours[14][:4], penAlpha
-        elif patch[0] == -1:
-            brush, fontColour, pen = brushes[patch[1]], Colours[14][:3], pens[patch[1]]
-        elif patch[1] == -1:
-            brush, fontColour, pen = brushAlpha, Colours[patch[0]][:3], penAlpha
-        if not isCursor:
-            if self._lastBrush != brush:
-                dc_.SetBrush(brush); self._lastBrush = brush;
-            if self._lastPen != pen:
-                dc_.SetPen(pen); self._lastPen = pen;
-        else:
-            dc_.SetBrush(brush); dc_.SetFont(self._font, wx.Colour(fontColour)); dc_.SetPen(pen);
-        return dc_, pen
+            dc.SetBrush(brush); dc.SetPen(pen);
+        return brush, pen
 
     def _xlatePoint(self, point):
         return [a * b for a, b in zip(point, self.cellSize)]
 
     def drawCursorMaskWithJournal(self, canvas, canvasJournal, eventDc):
+        eventDcOrigin = eventDc.GetDeviceOrigin(); eventDc.SetDeviceOrigin(0, 0);
         [self.drawPatch(canvas, eventDc, patch) for patch in canvasJournal.popCursor()]
+        eventDc.SetDeviceOrigin(*eventDcOrigin)
 
     def drawPatch(self, canvas, eventDc, patch, isCursor=False):
         point = patch[:2]
         if [(c >= 0) and (c < s) for c, s in zip(point, self.canvasSize)] == [True, True]:
-            if patch[5] == " ":
-                if patch[3] == -1:
-                    self._drawCharPatch(eventDc, isCursor, [*patch[2:-1], "░"], point)
-                elif patch[4] & self._CellState.CS_UNDERLINE:
-                    self._drawCharPatch(eventDc, isCursor, patch[2:], point)
-                else:
-                    self._drawBrushPatch(eventDc, isCursor, patch[2:], point)
-            elif patch[5] in self.arabicShapes:
-                self._reshapeArabic(canvas, eventDc, isCursor, patch, point)
+            if patch[5] in self.arabicShapes:
+                for patchReshaped in self._reshapeArabic(canvas, eventDc, isCursor, patch, point):
+                    self._drawPatch(eventDc, isCursor, patchReshaped[2:], canvas.map[patchReshaped[1]][patchReshaped[0]], patchReshaped[:2])
             else:
-                self._drawCharPatch(eventDc, isCursor, patch[2:], point)
+                self._drawPatch(eventDc, isCursor, patch[2:], canvas.map[patch[1]][patch[0]], point)
             return True
         else:
             return False

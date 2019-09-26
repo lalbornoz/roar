@@ -116,8 +116,9 @@ class RoarCanvasCommandsFile():
 
     @GuiCommandDecorator("Exit", "E&xit", None, [wx.ACCEL_CTRL, ord("X")], None)
     def canvasExit(self, event):
-        if self._promptSaveChanges():
-            self.parentFrame.Close(True)
+        if not self.exiting:
+            if self._promptSaveChanges():
+                self.exiting = True; self.parentFrame.Close(True);
 
     @GuiCommandDecorator("Export as ANSI...", "Export as &ANSI...", None, None, None)
     def canvasExportAsAnsi(self, event):
@@ -144,6 +145,8 @@ class RoarCanvasCommandsFile():
             else:
                 outPathName = dialog.GetPath(); self.lastDir = os.path.dirname(outPathName); self._storeLastDir(self.lastDir);
                 self.parentCanvas.SetCursor(wx.Cursor(wx.CURSOR_WAIT))
+                eventDc = self.parentCanvas.backend.getDeviceContext(self.parentCanvas.GetClientSize(), self.parentCanvas)
+                self.parentCanvas.backend.drawCursorMaskWithJournal(self.parentCanvas.canvas, self.parentCanvas.canvas.journal, eventDc)
                 self.parentCanvas.canvas.exportStore.exportBitmapToPngFile(self.parentCanvas.backend.canvasBitmap, outPathName, wx.BITMAP_TYPE_PNG)
                 self.parentCanvas.SetCursor(wx.Cursor(wx.NullCursor))
                 return True
@@ -151,6 +154,8 @@ class RoarCanvasCommandsFile():
     @GuiCommandDecorator("Export to Imgur...", "Export to I&mgur...", None, None, haveImgurApiKey and haveUrllib)
     def canvasExportImgur(self, event):
         self.parentCanvas.SetCursor(wx.Cursor(wx.CURSOR_WAIT))
+        eventDc = self.parentCanvas.backend.getDeviceContext(self.parentCanvas.GetClientSize(), self.parentCanvas)
+        self.parentCanvas.backend.drawCursorMaskWithJournal(self.parentCanvas.canvas, self.parentCanvas.canvas.journal, eventDc)
         rc, status, result = self.parentCanvas.canvas.exportStore.exportBitmapToImgur(self.imgurApiKey, self.parentCanvas.backend.canvasBitmap, "", "", wx.BITMAP_TYPE_PNG)
         self.parentCanvas.SetCursor(wx.Cursor(wx.NullCursor))
         if rc:
@@ -291,5 +296,6 @@ class RoarCanvasCommandsFile():
             ),
         )
         self.toolBars = ()
+        self.exiting = False
 
 # vim:expandtab foldmethod=marker sw=4 ts=4 tw=0
