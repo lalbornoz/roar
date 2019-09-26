@@ -20,6 +20,7 @@ Canvas hotkeys:
 <RMB>					Apply current tool with background colour (with exceptions)
 
 Tool-specific hotkeys:
+(Circle, rectangle) <Ctrl> <LMB>/<RMB>	Initiate circle/rectangle dragging irrespective of brush size
 (Erase) <RMB>				Erase background colour with foreground colour
 (Fill) <Ctrl> <LMB>/<Space>/<RMB>	Fill entire region with foreground/background colour ignoring character cells
 (Line, object) <LMB>/<Space>		Initiate line drawing/selection
