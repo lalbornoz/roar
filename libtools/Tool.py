@@ -5,10 +5,10 @@
 #
 
 class Tool(object):
-    def onKeyboardEvent(self, atPoint, brushColours, brushPos, brushSize, canvas, dispatchFn, eventDc, keyChar, keyCode, keyModifiers, mapPoint):
-        return False, False
+    def onKeyboardEvent(self, atPoint, brushColours, brushPos, brushSize, canvas, keyChar, keyCode, keyModifiers, mapPoint):
+        return False, None, None
 
-    def onMouseEvent(self, atPoint, brushColours, brushPos, brushSize, canvas, dispatchFn, eventDc, keyModifiers, mapPoint, mouseDragging, mouseLeftDown, mouseRightDown):
-        return False, False
+    def onMouseEvent(self, atPoint, brushColours, brushPos, brushSize, canvas, keyModifiers, mapPoint, mouseDragging, mouseLeftDown, mouseRightDown):
+        return False, None, None
 
 # vim:expandtab foldmethod=marker sw=4 ts=4 tw=120

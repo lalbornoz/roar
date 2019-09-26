@@ -9,8 +9,8 @@ from Tool import Tool
 class ToolRect(Tool):
     name = "Rectangle"
 
-    def onMouseEvent(self, atPoint, brushColours, brushPos, brushSize, canvas, dispatchFn, eventDc, keyModifiers, mapPoint, mouseDragging, mouseLeftDown, mouseRightDown):
-        brushColours, brushSize, dirty = list(brushColours), list(brushSize), False
+    def onMouseEvent(self, atPoint, brushColours, brushPos, brushSize, canvas, keyModifiers, mapPoint, mouseDragging, mouseLeftDown, mouseRightDown):
+        brushColours, brushSize, isCursor, patches = list(brushColours), list(brushSize), not (mouseLeftDown or mouseRightDown), []
         if mouseRightDown:
             brushColours = [brushColours[1], brushColours[0]]
         if brushSize[0] > 1:
@@ -30,12 +30,7 @@ class ToolRect(Tool):
                 else:
                     patchColours = [brushColours[1]] * 2
                     patch = [mapPoint[0] + brushCol, mapPoint[1] + brushRow, *patchColours, 0, " "]
-                if mouseLeftDown or mouseRightDown:
-                    if not dirty:
-                        dirty = True
-                    dispatchFn(eventDc, False, patch); dispatchFn(eventDc, True, patch);
-                else:
-                    dispatchFn(eventDc, True, patch)
-        return True, dirty
+                patches += [patch]
+        return True, patches if not isCursor else None, patches if isCursor else None
 
 # vim:expandtab foldmethod=marker sw=4 ts=4 tw=120
