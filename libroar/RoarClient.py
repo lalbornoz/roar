@@ -32,7 +32,11 @@ class RoarClient(GuiFrame):
         self.canvasPanel.GetEventHandler().ProcessEvent(event)
 
     def onClose(self, event):
-        if self.canvasPanel.commands._promptSaveChanges():
+        if not self.canvasPanel.commands.exiting:
+            closeFlag = self.canvasPanel.commands._promptSaveChanges()
+        else:
+            closeFlag = True
+        if closeFlag:
             event.Skip();
 
     def onSize(self, event):

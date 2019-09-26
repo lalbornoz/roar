@@ -12,8 +12,7 @@ class CanvasImportStore():
     class _CellState():
         CS_NONE             = 0x00
         CS_BOLD             = 0x01
-        CS_ITALIC           = 0x02
-        CS_UNDERLINE        = 0x04
+        CS_UNDERLINE        = 0x02
 
     def _flipCellStateBit(self, bit, cellState):
         return cellState & ~bit if cellState & bit else cellState | bit
@@ -108,7 +107,7 @@ class CanvasImportStore():
                         else:
                             inCurColours = (15, -1); inCurCol += 1;
                     elif inChar == "\u0006":
-                        inCellState = self._flipCellStateBit(self._CellState.CS_ITALIC, inCellState); inCurCol += 1;
+                        inCurCol += 1
                     elif inChar == "\u000f":
                         inCellState |= self._CellState.CS_NONE; inCurColours = (15, -1); inCurCol += 1;
                     elif inChar == "\u0016":
