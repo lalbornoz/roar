@@ -131,7 +131,7 @@ class RoarCanvasCommands(RoarCanvasCommandsFile, RoarCanvasCommandsEdit, RoarCan
              self.canvasColour(self.canvasColour, 8), self.canvasColour(self.canvasColour, 9), self.canvasColour(self.canvasColour, 10), self.canvasColour(self.canvasColour, 11),
              self.canvasColour(self.canvasColour, 12), self.canvasColour(self.canvasColour, 13), self.canvasColour(self.canvasColour, 14), self.canvasColour(self.canvasColour, 15),
              self.canvasColourAlpha(self.canvasColourAlpha, 0), self.canvasColoursFlip, NID_TOOLBAR_HSEP,
-             self.canvasBrushSize(self.canvasBrushSize, 1, True), self.canvasBrushSize(self.canvasBrushSize, 0, False), self.canvasBrushSize(self.canvasBrushSize, 1, True), self.canvasBrushSize(self.canvasBrushSize, 1, False), NID_TOOLBAR_HSEP,
+             self.canvasBrushSize(self.canvasBrushSize, 1, True), self.canvasBrushSize(self.canvasBrushSize, 1, False), self.canvasBrushSize(self.canvasBrushSize, 0, True), self.canvasBrushSize(self.canvasBrushSize, 0, False), NID_TOOLBAR_HSEP,
              self.canvasBrushSize(self.canvasBrushSize, 2, True), self.canvasBrushSize(self.canvasBrushSize, 2, False),
             ])
         toolBars.append(
