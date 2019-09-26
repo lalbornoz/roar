@@ -10,22 +10,17 @@ import wx
 class ToolFill(Tool):
     name = "Fill"
 
-    def onMouseEvent(self, atPoint, brushColours, brushPos, brushSize, canvas, dispatchFn, eventDc, keyModifiers, mapPoint, mouseDragging, mouseLeftDown, mouseRightDown):
-        dirty, pointsDone, pointStack, testChar, testColour = False, [], [list(mapPoint)], canvas.map[mapPoint[1]][mapPoint[0]][3], canvas.map[mapPoint[1]][mapPoint[0]][0:2]
+    def onMouseEvent(self, atPoint, brushColours, brushPos, brushSize, canvas, keyModifiers, mapPoint, mouseDragging, mouseLeftDown, mouseRightDown):
+        isCursor, patches, pointsDone, pointStack, testChar, testColour = not (mouseLeftDown or mouseRightDown), [], [], [list(mapPoint)], canvas.map[mapPoint[1]][mapPoint[0]][3], canvas.map[mapPoint[1]][mapPoint[0]][0:2]
         if mouseLeftDown or mouseRightDown:
-            if mouseLeftDown:
-                fillColour = brushColours[0]
-            else:
-                fillColour = brushColours[1]
+            fillColour = brushColours[0] if mouseLeftDown else brushColours[1]
             while len(pointStack) > 0:
                 point = pointStack.pop()
                 pointCell = canvas.map[point[1]][point[0]]
                 if ((pointCell[1] == testColour[1]) and ((pointCell[3] == testChar) or (keyModifiers == wx.MOD_CONTROL)))   \
                 or ((pointCell[3] == " ") and (pointCell[1] == testColour[1])):
                     if not point in pointsDone:
-                        if not dirty:
-                            dirty = True
-                        dispatchFn(eventDc, False, [*point, fillColour, fillColour, 0, " "])
+                        patches += [[*point, fillColour, fillColour, 0, " "]]
                         if point[0] > 0:
                             pointStack.append([point[0] - 1, point[1]])
                         if point[0] < (canvas.size[0] - 1):
@@ -36,8 +31,7 @@ class ToolFill(Tool):
                             pointStack.append([point[0], point[1] + 1])
                         pointsDone += [point]
         else:
-            patch = [mapPoint[0], mapPoint[1], brushColours[0], brushColours[0], 0, " "]
-            dispatchFn(eventDc, True, patch)
-        return True, dirty
+            patches = [[mapPoint[0], mapPoint[1], brushColours[0], brushColours[0], 0, " "]]
+        return True, patches if not isCursor else None, patches if isCursor else None
 
 # vim:expandtab foldmethod=marker sw=4 ts=4 tw=120

@@ -11,10 +11,6 @@ from RtlPlatform import getLocalConfPathName
 import json, os, sys, wx
 
 class RoarAssetsWindow(GuiMiniFrame):
-    def _drawPatch(self, canvas, eventDc, isCursor, patch):
-        if not isCursor:
-            self.backend.drawPatch(canvas, eventDc, patch)
-
     def _import(self, f, pathName):
         rc = False
         self.SetCursor(wx.Cursor(wx.CURSOR_WAIT))
@@ -118,9 +114,11 @@ class RoarAssetsWindow(GuiMiniFrame):
         self.backend.resize(canvas.size, self.cellSize)
         eventDc = self.backend.getDeviceContext(self.panelCanvas.GetClientSize(), self.panelCanvas)
         eventDcOrigin = eventDc.GetDeviceOrigin(); eventDc.SetDeviceOrigin(0, 0);
+        patches = []
         for numRow in range(canvas.size[1]):
             for numCol in range(canvas.size[0]):
-                self.backend.drawPatch(canvas, eventDc, [numCol, numRow, *canvas.map[numRow][numCol]])
+                patches += [[numCol, numRow, *canvas.map[numRow][numCol]]]
+        self.backend.drawPatches(canvas, eventDc, patches, isCursor=False)
         eventDc.SetDeviceOrigin(*eventDcOrigin)
 
     def onPaint(self, event):
@@ -154,14 +152,16 @@ class RoarAssetsWindow(GuiMiniFrame):
             self.backend.resize(newSize, self.cellSize)
             eventDc = self.backend.getDeviceContext(self.panelCanvas.GetClientSize(), self.panelCanvas)
             eventDcOrigin = eventDc.GetDeviceOrigin(); eventDc.SetDeviceOrigin(0, 0);
+            patches = []
             if deltaSize[0] > 0:
                 for numRow in range(oldSize[1]):
                     for numNewCol in range(oldSize[0], newSize[0]):
-                        self._drawPatch(canvas, eventDc, False, [numNewCol, numRow, 1, 1, 0, " "])
+                        patches += [[numNewCol, numRow, 1, 1, 0, " "]]
             if deltaSize[1] > 1:
                 for numNewRow in range(oldSize[1], newSize[1]):
                     for numNewCol in range(newSize[0]):
-                        self._drawPatch(canvas, eventDc, False, [numNewCol, numNewRow, 1, 1, 0, " "])
+                        patches += [[numNewCol, numNewRow, 1, 1, 0, " "]]
+            self.backend.drawPatches(canvas, eventDc, patches, isCursor=False)
             eventDc.SetDeviceOrigin(*eventDcOrigin)
 
     def update(self, canvas, newSize, newCanvas=None):
@@ -169,9 +169,11 @@ class RoarAssetsWindow(GuiMiniFrame):
         canvas.update(newSize, newCanvas);
         eventDc = self.backend.getDeviceContext(self.panelCanvas.GetClientSize(), self.panelCanvas)
         eventDcOrigin = eventDc.GetDeviceOrigin(); eventDc.SetDeviceOrigin(0, 0);
+        patches = []
         for numRow in range(canvas.size[1]):
             for numCol in range(canvas.size[0]):
-                self.backend.drawPatch(canvas, eventDc, [numCol, numRow, *canvas.map[numRow][numCol]])
+                patches += [[numCol, numRow, *canvas.map[numRow][numCol]]]
+        self.backend.drawPatches(canvas, eventDc, patches, isCursor=False)
         eventDc.SetDeviceOrigin(*eventDcOrigin)
 
     def onImportAnsi(self, event):

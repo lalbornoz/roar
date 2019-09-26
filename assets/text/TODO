@@ -14,14 +14,16 @@
     a) switch to Gtk
     b) https://material.io/resources/icons/?style=baseline
     c) replace logo w/ canvas panel in About dialogue, revisit melp? dialogue
-    d) Settings/Settings window (e.g. autosave, hide cursor on leaving window, ...)
-    e) replace resize buttons w/ {-,edit box,+} buttons & lock button re: ratio (ty lol3)
+    d) replace resize buttons w/ {-,edit box,+} buttons & lock button re: ratio (ty lol3)
+    e) Settings/Settings window (e.g. autosave, cursor opacity, hide cursor on leaving window, ...)
 
 Release roadmap:
 1)  {copy,cut,delete,insert from,paste}, edit asset in new canvas, import from {canvas,object}
-2)  operators: crop, scale, shift, slice
-3)  auto{load,save} & {backup,restore}
-4)  tools: unicode block elements
-5)  floating/dockable toolbar https://wxpython.org/Phoenix/docs/html/wx.aui.AuiManager.html
+2)  floating/dockable toolbar https://wxpython.org/Phoenix/docs/html/wx.aui.AuiManager.html
+3)  allow dragging {circle,rect,...} w/ <Ctrl> irrespective of current brush size
+4)  reimplement cursor unmasking w/ simple list of points
+5)  operators: crop, scale, shift, slice
+6)  auto{load,save} & {backup,restore}
+7)  tools: unicode block elements
 
 vim:ff=dos tw=0

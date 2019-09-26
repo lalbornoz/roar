@@ -41,11 +41,12 @@ class ToolText(Tool):
                     break
         return rtlFlag
 
-    def _processKeyChar(self, brushColours, brushPos, canvas, dispatchFn, eventDc, keyChar, keyModifiers):
+    def _processKeyChar(self, brushColours, brushPos, canvas, keyChar, keyModifiers):
+        patches, rc = [], False
         if   (ord(keyChar) != wx.WXK_NONE)                          \
         and  (not keyChar in set("\t\n\v\f\r"))                     \
         and  ((ord(keyChar) >= 32) if ord(keyChar) < 127 else True):
-            dispatchFn(eventDc, False, [*brushPos, *brushColours, 0, keyChar]);
+            patches += [[*brushPos, *brushColours, 0, keyChar]]
             if not self._checkRtl(canvas, brushPos, keyChar):
                 if brushPos[0] < (canvas.size[0] - 1):
                     brushPos[0] += 1
@@ -60,38 +61,36 @@ class ToolText(Tool):
                     brushPos[0], brushPos[1] = canvas.size[0] - 1, brushPos[1] - 1
                 else:
                     brushPos[0], brushPos[1] = canvas.size[0] - 1, canvas.size[1] - 1
-            rc, dirty = True, True
-        else:
-            rc, dirty = False, False
-        return rc, dirty
+            rc = True
+        return rc, patches
 
-    def onKeyboardEvent(self, atPoint, brushColours, brushPos, brushSize, canvas, dispatchFn, eventDc, keyChar, keyCode, keyModifiers, mapPoint):
+    def onKeyboardEvent(self, atPoint, brushColours, brushPos, brushSize, canvas, keyChar, keyCode, keyModifiers, mapPoint):
+        patches, patchesCursor, rc = [], [], False
         if re.match(self.arabicCombiningRegEx, keyChar):
-            rc, dirty = True, False
+            rc = True
         elif keyCode == wx.WXK_CONTROL_V:
-            rc, dirty = True, False
+            rc = True
             if  wx.TheClipboard.IsSupported(wx.DataFormat(wx.DF_TEXT))  \
             and wx.TheClipboard.Open():
                 inBuffer = wx.TextDataObject()
                 if wx.TheClipboard.GetData(inBuffer):
                     for inBufferChar in list(inBuffer.GetText()):
                         if not re.match(self.arabicCombiningRegEx, inBufferChar):
-                            rc_, dirty_ = self._processKeyChar(brushColours, brushPos, canvas, dispatchFn, eventDc, inBufferChar, 0)
-                            rc = True if rc_ else rc; dirty = True if dirty_ else dirty;
+                            rc_, patches_ = self._processKeyChar(brushColours, brushPos, canvas, inBufferChar, 0)
+                            patches += patches_
+                            rc = True if rc_ else rc
                     if rc:
-                        dispatchFn(eventDc, True, [*brushPos, *brushColours, 0, "_"])
+                        patchesCursor += [[*brushPos, *brushColours, 0, "_"]]
                 wx.TheClipboard.Close()
             else:
                 rc, error = False, "Clipboard does not contain text data and/or cannot be opened"
         elif keyCode == wx.WXK_BACK:
             if ((brushPos[0] + 1) >= canvas.size[0]):
-                if brushPos[1] > 0:
-                    lastBrushPos = [0, brushPos[1] - 1]
-                else:
-                    lastBrushPos = [0, 0]
+                lastBrushPos = [0, brushPos[1] - 1] if brushPos[1] > 0 else [0, 0]
             else:
                 lastBrushPos = [brushPos[0] + 1, brushPos[1]]
             if not self._checkRtl(canvas, lastBrushPos, None):
+                patches += [[*brushPos, *brushColours, 0, " "]]
                 if brushPos[0] > 0:
                     brushPos[0] -= 1
                 elif brushPos[1] > 0:
@@ -105,24 +104,23 @@ class ToolText(Tool):
                     brushPos[0], brushPos[1] = 0, brushPos[1] - 1
                 else:
                     brushPos[0], brushPos[1] = canvas.size[0] - 1, 0
-            rc, dirty = True, False; dispatchFn(eventDc, False, [*brushPos, *brushColours, 0, " "]);
-            dispatchFn(eventDc, True, [*brushPos, *brushColours, 0, "_"]);
+            rc = True; patchesCursor += [[*brushPos, *brushColours, 0, "_"]];
         elif keyCode == wx.WXK_RETURN:
             if brushPos[1] < (canvas.size[1] - 1):
                 brushPos[0], brushPos[1] = 0, brushPos[1] + 1
             else:
                 brushPos[0], brushPos[1] = 0, 0
-            rc, dirty = True, False; dispatchFn(eventDc, True, [*brushPos, *brushColours, 0, "_"]);
+            rc = True; patchesCursor += [[*brushPos, *brushColours, 0, "_"]];
         else:
-            rc, dirty = self._processKeyChar(brushColours, brushPos, canvas, dispatchFn, eventDc, keyChar, keyModifiers)
+            rc, patches_ = self._processKeyChar(brushColours, brushPos, canvas, keyChar, keyModifiers)
+            patches += patches_
             if rc:
-                dispatchFn(eventDc, True, [*brushPos, *brushColours, 0, "_"])
-        return rc, dirty
+                patchesCursor += [[*brushPos, *brushColours, 0, "_"]]
+        return rc, patches, patchesCursor
 
-    def onMouseEvent(self, atPoint, brushColours, brushPos, brushSize, canvas, dispatchFn, eventDc, keyModifiers, mapPoint, mouseDragging, mouseLeftDown, mouseRightDown):
+    def onMouseEvent(self, atPoint, brushColours, brushPos, brushSize, canvas, keyModifiers, mapPoint, mouseDragging, mouseLeftDown, mouseRightDown):
         if mouseLeftDown or mouseRightDown:
             brushPos[0], brushPos[1] = atPoint[0], atPoint[1]
-        dispatchFn(eventDc, True, [*brushPos, *brushColours, 0, "_"])
-        return True, False
+        return True, None, [[*brushPos, *brushColours, 0, "_"]]
 
 # vim:expandtab foldmethod=marker sw=4 ts=4 tw=120
