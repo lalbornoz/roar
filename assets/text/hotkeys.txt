@@ -12,6 +12,7 @@ Global hotkeys:
 <Ctrl> S				Save canvas as mIRC art file
 <Ctrl> X				Exit
 <Ctrl> Y, Z				Redo, undo last action
+<F1>					View melp?
 <Shift> <Pause>				Break into Python debugger
 
 Canvas hotkeys:

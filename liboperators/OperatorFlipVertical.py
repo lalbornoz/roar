@@ -6,15 +6,15 @@
 
 from Operator import Operator
 
+# TODO <https://en.wikipedia.org/wiki/Box_Drawing_(Unicode_block)>
+
 class OperatorFlipVertical(Operator):
     name = "Flip"
     flipPairs = {
-        "(":")", ")":"(",
-        "/":"\\", "\\":"/",
-        "\[":"]", "]":"\[",
-        "\{":"\}", "\}":"\{",
-        "<":">", ">":"<",
-        "`":"'",
+        "(":")", "/":"\\", "╱":"╲", "[":"]", "{":"}", "<":">", "`":"'",
+        "▌":"▐", "▏":"▕",
+        "▖":"▗", "▘":"▝",
+        "▟":"▙", "▛":"▜", "▚":"▞",
     }
 
     def apply(self, region):
@@ -26,6 +26,7 @@ class OperatorFlipVertical(Operator):
         return region
 
     def __init__(self, *args):
-        pass
+        for flipPairKey in list(self.flipPairs.keys()):
+            self.flipPairs[self.flipPairs[flipPairKey]] = flipPairKey
 
 # vim:expandtab foldmethod=marker sw=4 ts=4 tw=120

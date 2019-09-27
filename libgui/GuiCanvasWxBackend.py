@@ -83,7 +83,7 @@ class GuiCanvasWxBackend():
 
     def _initBrushesAndPens(self):
         self._brushes, self._brushesBlend, self._lastBrush, self._lastPen, self._pens, self._pensBlend = [], {}, None, None, [], {}
-        self._brushAlpha, self._penAlpha = wx.Brush(wx.Colour(Colours[14][:4]), wx.BRUSHSTYLE_SOLID), wx.Pen(wx.Colour(Colours[14][:4]), 1)
+        self._brushAlpha, self._penAlpha = wx.Brush(wx.Colour(48, 48, 48, 255), wx.BRUSHSTYLE_SOLID), wx.Pen(wx.Colour(48, 48, 48, 255), 1)
         for mircColour in range(len(Colours)):
             self._brushes += [wx.Brush(wx.Colour(Colours[mircColour][:4]), wx.BRUSHSTYLE_SOLID)]; self._brushesBlend[mircColour] = {};
             self._pens += [wx.Pen(wx.Colour(Colours[mircColour][:4]), 1)]; self._pensBlend[mircColour] = {};
@@ -148,7 +148,7 @@ class GuiCanvasWxBackend():
 
     def drawCursorMaskWithJournal(self, canvas, canvasJournal, eventDc):
         eventDcOrigin = eventDc.GetDeviceOrigin(); eventDc.SetDeviceOrigin(0, 0);
-        self.drawPatches(canvas, eventDc, canvasJournal.popCursor(), True)
+        self.drawPatches(canvas, eventDc, canvasJournal.popCursor(), False)
         eventDc.SetDeviceOrigin(*eventDcOrigin)
 
     def drawPatches(self, canvas, eventDc, patches, isCursor=False):
@@ -164,14 +164,12 @@ class GuiCanvasWxBackend():
         for patchRender in patchesRender:
             absPoint, charFlag = [a * b for a, b in zip(self.cellSize, patchRender[:2])], False
             if (patchRender[5] == " ") and (patchRender[3] == -1):
-                charFlag, patchRender = True, [*patchRender[:-1], "░"]
-                textBg, textFg = wx.Colour(Colours[patchRender[3]][:4]), wx.Colour(Colours[patchRender[2]][:4])
-            if isCursor and (patchRender[5] == " ") and ((canvas.map[patchRender[1]][patchRender[0]][3] != " ") or (canvas.map[patchRender[1]][patchRender[0]][2] & self._CellState.CS_UNDERLINE)):
+                charFlag, patchRender, textFg = True, [*patchRender[:-1], "░"], wx.Colour(0, 0, 0, 255)
+            elif isCursor and (patchRender[5] == " ") and ((canvas.map[patchRender[1]][patchRender[0]][3] != " ") or (canvas.map[patchRender[1]][patchRender[0]][2] & self._CellState.CS_UNDERLINE)):
                 charFlag, patchRender = True, [*patchRender[:-2], *canvas.map[patchRender[1]][patchRender[0]][2:]]
-                textFg = wx.Colour(self._blendColours(canvas.map[patchRender[1]][patchRender[0]][0], patchRender[2]))
+                textFg = wx.Colour(self._blendColours(canvas.map[patchRender[1]][patchRender[0]][0], patchRender[3]))
             elif (patchRender[5] != " ") or (patchRender[4] & self._CellState.CS_UNDERLINE):
-                charFlag = True
-                textBg, textFg = wx.Colour(Colours[patchRender[3]][:4]), wx.Colour(Colours[patchRender[2]][:4])
+                charFlag, textFg = True, wx.Colour(Colours[patchRender[2]][:4])
             brush, pen = self._setBrushColours(eventDc, isCursor, patchRender[2:], canvas.map[patchRender[1]][patchRender[0]])
             eventDc.DrawRectangle(*absPoint, *self.cellSize)
             if charFlag:
@@ -208,8 +206,17 @@ class GuiCanvasWxBackend():
             else:
                 eventDc = GuiBufferedDC(self, self.canvasBitmap, clientSize, wx.PaintDC(panelWindow), viewRect)
 
-    def resize(self, canvasSize, cellSize):
-        winSize = [a * b for a, b in zip(canvasSize, cellSize)]
+    def resize(self, canvasSize):
+        if platform.system() == "Windows":
+            self._font = wx.TheFontList.FindOrCreateFont(self.fontSize, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, False, self.fontName)
+            fontInfoDesc = self._font.GetNativeFontInfoDesc().split(";"); fontInfoDesc[12] = "3";
+            self._font.SetNativeFontInfo(";".join(fontInfoDesc))
+            dc = wx.MemoryDC()
+            dc.SetFont(self._font); self.cellSize = dc.GetTextExtent("_");
+            dc.Destroy()
+        else:
+            self._font = wx.Font(self.cellSize[0] + 1, wx.FONTFAMILY_TELETYPE, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL)
+        winSize = [a * b for a, b in zip(canvasSize, self.cellSize)]
         if self.canvasBitmap == None:
             self.canvasBitmap = wx.Bitmap(winSize)
         else:
@@ -218,11 +225,7 @@ class GuiCanvasWxBackend():
             newDc.Blit(0, 0, *self.canvasBitmap.GetSize(), oldDc, 0, 0)
             oldDc.SelectObject(wx.NullBitmap)
             self.canvasBitmap.Destroy(); self.canvasBitmap = newBitmap;
-        self.canvasSize, self.cellSize = canvasSize, cellSize
-        if platform.system() == "Windows":
-            self._font = wx.TheFontList.FindOrCreateFont(cellSize[0] + 1, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, False, self.fontName)
-        else:
-            self._font = wx.Font(cellSize[0] + 1, wx.FONTFAMILY_TELETYPE, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL)
+        self.canvasSize = canvasSize
 
     def xlateEventPoint(self, event, eventDc, viewRect):
         eventPoint = event.GetLogicalPosition(eventDc)
@@ -235,11 +238,11 @@ class GuiCanvasWxBackend():
             self.canvasBitmap.Destroy(); self.canvasBitmap = None;
         self._finiBrushesAndPens()
 
-    def __init__(self, canvasSize, cellSize, fontName="Dejavu Sans Mono", fontPathName=os.path.join("assets", "fonts", "DejaVuSansMono.ttf")):
+    def __init__(self, canvasSize, fontName="Dejavu Sans Mono", fontPathName=os.path.join("assets", "fonts", "DejaVuSansMono.ttf"), fontSize=8):
         self._brushes, self._font, self._lastBrush, self._lastPen, self._pens = None, None, None, None, None
-        self.canvasBitmap, self.cellSize, self.fontName, self.fontPathName = None, None, fontName, fontPathName
+        self.canvasBitmap, self.cellSize, self.fontName, self.fontPathName, self.fontSize = None, None, fontName, fontPathName, fontSize
         if platform.system() == "Windows":
             WinDLL("gdi32.dll").AddFontResourceW(self.fontPathName.encode("utf16"))
-        self._initBrushesAndPens(); self.resize(canvasSize, cellSize);
+        self._initBrushesAndPens(); self.resize(canvasSize);
 
 # vim:expandtab foldmethod=marker sw=4 ts=4 tw=120

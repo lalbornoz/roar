@@ -8,8 +8,8 @@ import wx
 
 class GuiWindow(wx.ScrolledWindow):
     def _updateScrollBars(self):
-        if self.size != None:
-            clientSize = self.GetClientSize()
+        if (self.scrollStep != None) and (self.size != None):
+            self.SetScrollRate(*self.scrollStep); clientSize = self.GetClientSize();
             if (self.size[0] > clientSize[0]) or (self.size[1] > clientSize[1]):
                 self.scrollFlag = True; super().SetVirtualSize(self.size);
             elif self.scrollFlag    \
@@ -48,16 +48,16 @@ class GuiWindow(wx.ScrolledWindow):
         while curWindow != None:
             curWindow.Layout(); curWindow = curWindow.GetParent();
 
-    def __init__(self, parent, pos, scrollStep, style=0):
+    def __init__(self, parent, pos, style=0):
         super().__init__(parent, pos=pos, style=style) if style != 0 else super().__init__(parent, pos=pos)
         self.parent = parent
-        self.pos, self.scrollFlag, self.scrollStep, self.size = pos, False, scrollStep, None
+        self.pos, self.scrollFlag, self.scrollStep, self.size = pos, False, None, None
         for eventType, f in (
                 (wx.EVT_CHAR, self.onKeyboardInput), (wx.EVT_CLOSE, self.onClose), (wx.EVT_ENTER_WINDOW, self.onEnterWindow),
                 (wx.EVT_LEAVE_WINDOW, self.onLeaveWindow), (wx.EVT_LEFT_DOWN, self.onMouseInput), (wx.EVT_MOTION, self.onMouseInput),
                 (wx.EVT_PAINT, self.onPaint), (wx.EVT_RIGHT_DOWN, self.onMouseInput), (wx.EVT_SCROLLWIN_LINEDOWN, self.onScroll),
                 (wx.EVT_SCROLLWIN_LINEUP, self.onScroll), (wx.EVT_SIZE, self.onSize)):
             self.Bind(eventType, f)
-        self.SetScrollRate(*self.scrollStep); self._updateScrollBars();
+        self._updateScrollBars()
 
 # vim:expandtab foldmethod=marker sw=4 ts=4 tw=120

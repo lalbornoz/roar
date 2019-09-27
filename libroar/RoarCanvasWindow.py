@@ -212,12 +212,12 @@ class RoarCanvasWindow(GuiWindow):
 
     def onMouseWheel(self, event):
         if event.GetModifiers() == wx.MOD_CONTROL:
-            cd = +1 if event.GetWheelRotation() >= event.GetWheelDelta() else -1
-            newCellSize = [cs + cd for cs in self.backend.cellSize]
-            if (newCellSize[0] > 0) and (newCellSize[1] > 0):
-                self.backend.cellSize = newCellSize
+            fd = +1 if event.GetWheelRotation() >= event.GetWheelDelta() else -1
+            newFontSize = self.backend.fontSize + fd
+            if newFontSize > 0:
+                self.backend.fontSize = newFontSize
+                self.backend.resize(self.canvas.size)
                 super().resize([a * b for a, b in zip(self.canvas.size, self.backend.cellSize)])
-                self.backend.resize(self.canvas.size, self.backend.cellSize)
                 eventDc = self.backend.getDeviceContext(self.GetClientSize(), self)
                 eventDcOrigin = eventDc.GetDeviceOrigin(); eventDc.SetDeviceOrigin(0, 0);
                 patches = []
@@ -239,8 +239,8 @@ class RoarCanvasWindow(GuiWindow):
         oldSize = [0, 0] if self.canvas.map == None else self.canvas.size
         deltaSize = [b - a for a, b in zip(oldSize, newSize)]
         if self.canvas.resize(newSize, commitUndo):
+            self.backend.resize(newSize); self.scrollStep = self.backend.cellSize;
             super().resize([a * b for a, b in zip(newSize, self.backend.cellSize)])
-            self.backend.resize(newSize, self.backend.cellSize)
             eventDc = self.backend.getDeviceContext(self.GetClientSize(), self)
             eventDcOrigin = eventDc.GetDeviceOrigin(); eventDc.SetDeviceOrigin(0, 0);
             patches = []
@@ -268,10 +268,10 @@ class RoarCanvasWindow(GuiWindow):
         self.backend.drawPatches(self.canvas, eventDc, patches, isCursor=False)
         eventDc.SetDeviceOrigin(*eventDcOrigin)
 
-    def __init__(self, backend, canvas, cellSize, commands, parent, parentFrame, pos, scrollStep, size):
-        super().__init__(parent, pos, scrollStep)
+    def __init__(self, backend, canvas, commands, parent, pos, size):
+        super().__init__(parent, pos)
         self.size = size
-        self.backend, self.canvas, self.cellSize, self.commands, self.parentFrame = backend(self.size, cellSize), canvas, cellSize, commands(self, parentFrame), parentFrame
+        self.backend, self.canvas, self.commands, self.parentFrame = backend(self.size), canvas, commands(self, parent), parent
         self.brushColours, self.brushPos, self.brushSize, self.dirty, self.lastCellState = [4, 1], [0, 0], [1, 1], False, None
         self.popupEventDc = None
         self.dropTarget = RoarCanvasWindowDropTarget(self)

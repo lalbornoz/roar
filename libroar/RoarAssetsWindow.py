@@ -86,6 +86,28 @@ class RoarAssetsWindow(GuiMiniFrame):
             with open(localConfFileName, "r", encoding="utf-8") as inFile:
                 self.lastDir = inFile.read().rstrip("\r\n")
 
+    def _removeAsset(self, idx):
+        del self.canvasList[idx]; self.listView.DeleteItem(idx);
+        itemCount = self.listView.GetItemCount()
+        if itemCount > 0:
+            self.listView.Select(self.currentIndex, on=0)
+            for numCanvas in [n for n in sorted(self.canvasList.keys()) if n >= idx]:
+                self.canvasList[numCanvas - 1] = self.canvasList[numCanvas]; del self.canvasList[numCanvas];
+            [self.listView.SetColumnWidth(col, wx.LIST_AUTOSIZE) for col in (0, 1)]
+            if (idx == 0) or (idx >= itemCount):
+                idx = 0 if itemCount > 0 else None
+            else:
+                idx = idx if idx < itemCount else None
+            self.currentIndex = idx
+            if self.currentIndex != None:
+                self.listView.Select(self.currentIndex, on=1)
+                self.drawCanvas(self.canvasList[self.currentIndex][0])
+        else:
+            self.currentIndex = None
+            [self.listView.SetColumnWidth(col, wx.LIST_AUTOSIZE_USEHEADER) for col in (0, 1)]
+            self.drawCanvas(Canvas((0, 0)))
+        return self.currentIndex
+
     def _storeLastDir(self, pathName):
         localConfFileName = getLocalConfPathName("RecentAssetsDir.txt")
         with open(localConfFileName, "w", encoding="utf-8") as outFile:
@@ -106,12 +128,12 @@ class RoarAssetsWindow(GuiMiniFrame):
             self.scrollFlag = False; super(wx.ScrolledWindow, self.panelCanvas).SetVirtualSize((0, 0));
 
     def drawCanvas(self, canvas):
-        panelSize = [a * b for a, b in zip(canvas.size, self.cellSize)]
+        panelSize = [a * b for a, b in zip(canvas.size, self.backend.cellSize)]
         self.panelCanvas.SetMinSize(panelSize); self.panelCanvas.SetSize(wx.DefaultCoord, wx.DefaultCoord, *panelSize);
         curWindow = self.panelCanvas
         while curWindow != None:
             curWindow.Layout(); curWindow = curWindow.GetParent();
-        self.backend.resize(canvas.size, self.cellSize)
+        self.backend.resize(canvas.size)
         eventDc = self.backend.getDeviceContext(self.panelCanvas.GetClientSize(), self.panelCanvas)
         eventDcOrigin = eventDc.GetDeviceOrigin(); eventDc.SetDeviceOrigin(0, 0);
         patches = []
@@ -144,12 +166,12 @@ class RoarAssetsWindow(GuiMiniFrame):
         oldSize = [0, 0] if canvas.map == None else canvas.size
         deltaSize = [b - a for a, b in zip(oldSize, newSize)]
         if canvas.resize(newSize, False):
-            panelSize = [a * b for a, b in zip(canvas.size, self.cellSize)]
+            panelSize = [a * b for a, b in zip(canvas.size, self.backend.cellSize)]
             self.panelCanvas.SetMinSize(panelSize); self.panelCanvas.SetSize(wx.DefaultCoord, wx.DefaultCoord, *panelSize);
             curWindow = self.panelCanvas
             while curWindow != None:
                 curWindow.Layout(); curWindow = curWindow.GetParent();
-            self.backend.resize(newSize, self.cellSize)
+            self.backend.resize(newSize)
             eventDc = self.backend.getDeviceContext(self.panelCanvas.GetClientSize(), self.panelCanvas)
             eventDcOrigin = eventDc.GetDeviceOrigin(); eventDc.SetDeviceOrigin(0, 0);
             patches = []
@@ -193,14 +215,27 @@ class RoarAssetsWindow(GuiMiniFrame):
         else:
             event.Skip()
 
+    def onClearList(self, event):
+        while len(self.canvasList):
+            self._removeAsset(list(self.canvasList.keys())[0])
+
     def onListViewChar(self, event):
-        index, rc = self.listView.GetFirstSelected(), False
-        if index != -1:
-            keyChar, keyModifiers = event.GetKeyCode(), event.GetModifiers()
-            if (keyChar, keyModifiers) == (wx.WXK_DELETE, wx.MOD_NONE):
-                self.currentIndex, rc = index, True; self.onRemove(None);
-        if not rc:
-            event.Skip()
+        keyCode = event.GetKeyCode()
+        if  (event.GetModifiers() == wx.MOD_NONE)   \
+        and (keyCode in (wx.WXK_DOWN, wx.WXK_UP))   \
+        and (self.currentIndex != None):
+            self.listView.Select(self.currentIndex, on=0)
+            id = +1 if keyCode == wx.WXK_DOWN else -1
+            self.currentIndex = (self.currentIndex + id) % len(self.canvasList)
+            self.listView.Select(self.currentIndex, on=1)
+        else:
+            index, rc = self.listView.GetFirstSelected(), False
+            if index != -1:
+                keyChar, keyModifiers = event.GetKeyCode(), event.GetModifiers()
+                if (keyChar, keyModifiers) == (wx.WXK_DELETE, wx.MOD_NONE):
+                    self.currentIndex, rc = index, True; self.onRemove(None);
+            if not rc:
+                event.Skip()
 
     def onListViewItemSelected(self, event):
         self.currentIndex = event.GetItem().GetId()
@@ -217,6 +252,10 @@ class RoarAssetsWindow(GuiMiniFrame):
             self.contextMenuItems[4].Enable(False)
         else:
             self.contextMenuItems[4].Enable(True)
+        if len(self.canvasList) == 0:
+            self.contextMenuItems[7].Enable(False)
+        else:
+            self.contextMenuItems[7].Enable(True)
         self.PopupMenu(self.contextMenu, eventPoint)
 
     def onLoad(self, event):
@@ -256,23 +295,15 @@ class RoarAssetsWindow(GuiMiniFrame):
                 self._load_list(pathName)
 
     def onRemove(self, event):
-        del self.canvasList[self.currentIndex]; self.listView.DeleteItem(self.currentIndex);
-        itemCount = self.listView.GetItemCount()
-        if itemCount > 0:
-            for numCanvas in [n for n in sorted(self.canvasList.keys()) if n >= self.currentIndex]:
-                self.canvasList[numCanvas - 1] = self.canvasList[numCanvas]; del self.canvasList[numCanvas];
-            [self.listView.SetColumnWidth(col, wx.LIST_AUTOSIZE) for col in (0, 1)]
-            if (self.currentIndex == 0) or (self.currentIndex >= itemCount):
-                self.currentIndex = 0 if itemCount > 0 else None
+        items = [self.listView.GetFirstSelected()]
+        while True:
+            item = self.listView.GetNextSelected(items[-1])
+            if item != -1:
+                items += [item]
             else:
-                self.currentIndex = self.currentIndex if self.currentIndex < itemCount else None
-            if self.currentIndex != None:
-                self.listView.Select(self.currentIndex, on=1)
-                self.drawCanvas(self.canvasList[self.currentIndex][0])
-        else:
-            self.currentIndex = None
-            [self.listView.SetColumnWidth(col, wx.LIST_AUTOSIZE_USEHEADER) for col in (0, 1)]
-            self.drawCanvas(Canvas((0, 0)))
+                break
+        while len(items):
+            self._removeAsset(items[0]); del items[0]; items = [i - 1 for i in items];
 
     def onSaveList(self, event):
         rc = True
@@ -293,12 +324,12 @@ class RoarAssetsWindow(GuiMiniFrame):
             with wx.MessageDialog(self, "Error: {}".format(error), "", wx.OK | wx.OK_DEFAULT) as dialog:
                 dialogChoice = dialog.ShowModal()
 
-    def __init__(self, backend, cellSize, parent, pos=None, size=(400, 400), title="Assets"):
+    def __init__(self, backend, parent, pos=None, size=(400, 400), title="Assets"):
         if pos == None:
             parentRect = parent.GetScreenRect(); pos = (parentRect.x + parentRect.width, parentRect.y);
         super().__init__(parent, size, title, pos=pos)
-        self.backend, self.canvasList, self.lastDir = backend((0, 0), cellSize), {}, None
-        self.cellSize, self.currentIndex, self.leftDown, self.parent, self.scrollFlag = cellSize, None, False, parent, False
+        self.backend, self.canvasList, self.lastDir = backend((0, 0)), {}, None
+        self.currentIndex, self.leftDown, self.parent, self.scrollFlag = None, False, parent, False
         self.Bind(wx.EVT_CHAR, self.onChar)
         self._loadLastDir()
 
@@ -311,7 +342,9 @@ class RoarAssetsWindow(GuiMiniFrame):
                 ("&Remove", self.onRemove),
                 (None, None),
                 ("Load from l&ist...", self.onLoadList),
-                ("Sa&ve as list...", self.onSaveList),):
+                ("Sa&ve as list...", self.onSaveList),
+                (None, None),
+                ("Cl&ear list", self.onClearList),):
             if (text, f) == (None, None):
                 self.contextMenu.AppendSeparator()
             else:
@@ -325,7 +358,8 @@ class RoarAssetsWindow(GuiMiniFrame):
         self.listView.Bind(wx.EVT_LIST_ITEM_SELECTED, self.onListViewItemSelected)
         self.listView.Bind(wx.EVT_RIGHT_DOWN, self.onListViewRightDown)
 
-        self.panelCanvas = GuiWindow(self, (0, 0), cellSize, wx.BORDER_SUNKEN)
+        self.panelCanvas = GuiWindow(self, (0, 0), wx.BORDER_SUNKEN)
+        self.panelCanvas.Bind(wx.EVT_CHAR, self.onChar)
         self.panelCanvas.Bind(wx.EVT_LEFT_DOWN, self.onPanelLeftDown)
         self.panelCanvas.Bind(wx.EVT_PAINT, self.onPanelPaint)
         self.panelCanvas.Bind(wx.EVT_SIZE, self.onPanelSize)
