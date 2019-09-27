@@ -53,7 +53,7 @@ class ToolLine(Tool):
         if self.toolState == self.TS_NONE:
             if mouseLeftDown or mouseRightDown:
                 self.toolOriginPoint, self.toolState = list(mapPoint), self.TS_ORIGIN
-            patches, rc = [], True
+            isCursor, patches, rc = True, [], True
             for brushCol in range(brushSize[0]):
                 if  ((mapPoint[0] + brushCol) < canvas.size[0]) \
                 and (mapPoint[1] < canvas.size[1]):
