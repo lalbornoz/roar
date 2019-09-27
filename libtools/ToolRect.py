@@ -14,9 +14,9 @@ class ToolRect(Tool):
 
     def _drawRect(self, brushColours, canvas, rect):
         patches = []
-        for brushRow in range(rect[3] - rect[1]):
-            for brushCol in range(rect[2] - rect[0]):
-                if (brushCol in [0, (rect[2] - rect[0]) - 1]) or (brushRow in [0, (rect[3] - rect[1]) - 1]):
+        for brushRow in range((rect[3] - rect[1]) + 1):
+            for brushCol in range((rect[2] - rect[0]) + 1):
+                if (brushCol in [0, (rect[2] - rect[0])]) or (brushRow in [0, (rect[3] - rect[1])]):
                     patchColours = [brushColours[0]] * 2
                     patch = [rect[0] + brushCol, rect[1] + brushRow, *patchColours, 0, " "]
                 elif brushColours[1] == -1:
@@ -39,10 +39,10 @@ class ToolRect(Tool):
                 self.brushColours, isCursor, self.originPoint, self.toolState = list(brushColours), True, list(mapPoint), self.TS_ORIGIN
             else:
                 isCursor = not (mouseLeftDown or mouseRightDown)
-            rect = [*mapPoint, *[a + b for a, b in zip(brushSize, mapPoint)]]
+            rect = [*mapPoint, *([a + b for a, b in zip(brushSize, mapPoint)] if brushSize[0] > 1 else mapPoint)]
         elif self.toolState == self.TS_ORIGIN:
             rect = [*self.originPoint, *mapPoint]
-            if keyModifiers != wx.MOD_CONTROL:
+            if not (mouseLeftDown or mouseRightDown):
                 brushColours, isCursor, self.brushColours, self.originPoint, self.toolState = self.brushColours, False, None, None, self.TS_NONE
             else:
                 isCursor = True
