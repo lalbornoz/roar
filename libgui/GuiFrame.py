@@ -146,7 +146,7 @@ class GuiFrame(wx.Frame):
 
     def loadToolBars(self, toolBars):
         for toolBar in toolBars:
-            self.toolBars.append(wx.lib.agw.aui.AuiToolBar(self.panelSkin, -1))
+            self.toolBars.append(wx.lib.agw.aui.AuiToolBar(self, -1))
             self.toolBars[-1].SetArtProvider(GuiToolBarArtProvider())
             self.toolBars[-1].SetToolBitmapSize((16, 16))
             for toolBarItem in toolBar:
@@ -170,13 +170,16 @@ class GuiFrame(wx.Frame):
                         else:
                             self.toolBars[-1].EnableTool(toolBarItem.attrDict["id"], toolBarItem.attrDict["initialState"])
         self.toolBars[-1].Refresh()
+        self.toolBarPanes, row = [], 0
         for toolBar in self.toolBars:
-            self.sizerSkin.Add(toolBar, 0, wx.ALIGN_LEFT | wx.ALL, 3)
             toolBar.Realize(); toolBar.Fit();
+            self.toolBarPanes += [wx.lib.agw.aui.AuiPaneInfo().ToolbarPane().CaptionVisible(False).CloseButton(False).Dockable(True).Floatable(True).Gripper(True).Row(row).Top()]
+            self.auiManager.AddPane(toolBar, self.toolBarPanes[-1]); row += 1;
+        self.auiManager.Update()
 
-    def addWindow(self, window, border=14, expand=False):
-        flags = wx.ALL; flags = flags | wx.EXPAND if expand else flags;
-        self.sizerSkin.Add(window, 0, flags, border); self.sizerSkin.Fit(self.panelSkin);
+    def addWindow(self, window):
+        self.auiManager.AddPane(window, wx.lib.agw.aui.AuiPaneInfo().CaptionVisible(False).Centre().CloseButton(False).Dockable(False).Floatable(False).Gripper(False))
+        self.auiManager.Update()
 
     def onChar(self, event):
         event.Skip()
@@ -193,11 +196,10 @@ class GuiFrame(wx.Frame):
 
     def __init__(self, iconPathName, size, parent=None, title=""):
         super().__init__(parent, wx.ID_ANY, title, size=size)
-        self.itemsById, self.menuItemsById, self.toolBarItemsById = {}, {}, {}
-        self.panelSkin, self.sizerSkin, self.toolBars = wx.Panel(self, wx.ID_ANY), wx.BoxSizer(wx.VERTICAL), []
-        self.sizerSkin.AddSpacer(5); self.panelSkin.SetSizer(self.sizerSkin); self.panelSkin.SetAutoLayout(1);
+        self.auiManager = wx.lib.agw.aui.AuiManager(); self.auiManager.SetManagedWindow(self);
+        self.itemsById, self.menuItemsById, self.toolBarItemsById, self.toolBars = {}, {}, {}, []
         self._initIcon(iconPathName); self.statusBar = self.CreateStatusBar();
-        self.sizerSkin.Fit(self.panelSkin); self.SetFocus(); self.Show(True);
+        self.SetFocus(); self.Show(True);
         for event, f in ((wx.EVT_CHAR, self.onChar), (wx.EVT_MENU, self.onMenu), (wx.EVT_MOUSEWHEEL, self.onMouseWheel)):
             self.Bind(event, f)
 

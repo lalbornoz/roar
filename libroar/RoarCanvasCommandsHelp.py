@@ -7,14 +7,14 @@
 from GuiFrame import GuiCommandDecorator, NID_MENU_SEP
 from RoarWindowAbout import RoarWindowAbout
 from RoarWindowMelp import RoarWindowMelp
-import webbrowser
+import webbrowser, wx
 
 class RoarCanvasCommandsHelp():
     @GuiCommandDecorator("About roar", "&About roar", None, None, True)
     def canvasAbout(self, event):
         RoarWindowAbout(self.parentFrame)
 
-    @GuiCommandDecorator("View melp?", "View &melp?", None, None, True)
+    @GuiCommandDecorator("View melp?", "View &melp?", None, [wx.MOD_NONE, wx.WXK_F1], True)
     def canvasMelp(self, event):
         RoarWindowMelp(self.parentFrame)
 

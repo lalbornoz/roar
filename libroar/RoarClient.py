@@ -39,13 +39,10 @@ class RoarClient(GuiFrame):
         if closeFlag:
             event.Skip();
 
-    def onSize(self, event):
-        self.canvasPanel.SetMinSize(self.GetSize()); self.canvasPanel.SetSize(wx.DefaultCoord, wx.DefaultCoord, *self.GetSize()); event.Skip();
-
-    def __init__(self, parent, defaultCanvasPos=(0, 75), defaultCanvasSize=(100, 30), defaultCellSize=(7, 14), size=(840, 640), title=""):
+    def __init__(self, parent, defaultCanvasPos=(0, 75), defaultCanvasSize=(100, 30), size=(840, 640), title=""):
         super().__init__(self._getIconPathName(), size, parent, title)
         self.canvas = Canvas(defaultCanvasSize)
-        self.canvasPanel = RoarCanvasWindow(GuiCanvasWxBackend, self.canvas, defaultCellSize, RoarCanvasCommands, self.panelSkin, self, defaultCanvasPos, defaultCellSize, defaultCanvasSize)
+        self.canvasPanel = RoarCanvasWindow(GuiCanvasWxBackend, self.canvas, RoarCanvasCommands, self, defaultCanvasPos, defaultCanvasSize)
         self.loadAccels(self.canvasPanel.commands.accels, self.canvasPanel.commands.menus, self.canvasPanel.commands.toolBars)
         self.loadMenus(self.canvasPanel.commands.menus)
         self._initToolBitmaps(self.canvasPanel.commands.toolBars)
@@ -54,8 +51,8 @@ class RoarClient(GuiFrame):
         self.canvasPanel.commands.canvasNew(None)
         self.canvasPanel.commands.canvasTool(self.canvasPanel.commands.canvasTool, 1)(None)
         self.canvasPanel.commands.update(brushSize=self.canvasPanel.brushSize, colours=self.canvasPanel.brushColours)
-        self.addWindow(self.canvasPanel, expand=True)
-        self.assetsWindow = RoarAssetsWindow(GuiCanvasWxBackend, defaultCellSize, self)
+        self.addWindow(self.canvasPanel)
+        self.assetsWindow = RoarAssetsWindow(GuiCanvasWxBackend, self)
         self.canvasPanel.commands.canvasAssetsWindowShow(None)
 
         self.canvasPanel.operatorsMenu = wx.Menu()
@@ -67,6 +64,6 @@ class RoarClient(GuiFrame):
         menuItemWindow = self.canvasPanel.commands.canvasOpenRecent.attrDict["menu"].Append(self.canvasPanel.commands.canvasClearRecent.attrDict["id"], self.canvasPanel.commands.canvasClearRecent.attrDict["label"], self.canvasPanel.commands.canvasClearRecent.attrDict["caption"])
         self.canvasPanel.commands.canvasOpenRecent.attrDict["menu"].Bind(wx.EVT_MENU, self.canvasPanel.commands.canvasClearRecent, menuItemWindow)
         self.Bind(wx.EVT_CLOSE, self.onClose)
-        self.Bind(wx.EVT_SIZE, self.onSize)
+        self.toolBarPanes[0].BestSize(0, 0).Right(); self.toolBarPanes[1].BestSize(0, 0).Right(); self.auiManager.Update();
 
 # vim:expandtab foldmethod=marker sw=4 ts=4 tw=120
