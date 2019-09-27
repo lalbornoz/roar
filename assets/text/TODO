@@ -19,10 +19,10 @@
 
 Release roadmap:
 1)  {copy,cut,delete,insert from,paste}, edit asset in new canvas, import from {canvas,object}
-2)  operators: crop, scale, shift, slice
-3)  tools: unicode block elements
-4)  floating/dockable toolbar https://wxpython.org/Phoenix/docs/html/wx.aui.AuiManager.html
-5)  reimplement cursor unmasking w/ simple list of points
-6)  auto{load,save} & {backup,restore}
+2)  reimplement cursor unmasking w/ simple list of points
+3)  operators: crop, scale, shift, slice
+4)  auto{load,save} & {backup,restore}
+5)  tools: unicode block elements
+6)  bugs: a) undock all toolbars & resize window b) increase cell size, scroll down
 
 vim:ff=dos tw=0

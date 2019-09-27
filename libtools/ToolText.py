@@ -111,7 +111,7 @@ class ToolText(Tool):
             else:
                 brushPos[0], brushPos[1] = 0, 0
             rc = True; patchesCursor += [[*brushPos, *brushColours, 0, "_"]];
-        else:
+        elif not (keyModifiers in (wx.MOD_ALT, wx.MOD_ALTGR, wx.MOD_CONTROL)):
             rc, patches_ = self._processKeyChar(brushColours, brushPos, canvas, keyChar, keyModifiers)
             patches += patches_
             if rc:
