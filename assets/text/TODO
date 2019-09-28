@@ -23,6 +23,5 @@ Release roadmap:
 3)  operators: crop, scale, shift, slice
 4)  auto{load,save} & {backup,restore}
 5)  tools: unicode block elements
-6)  bugs: a) undock all toolbars & resize window b) increase cell size, scroll down
 
 vim:ff=dos tw=0

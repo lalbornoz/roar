@@ -28,9 +28,6 @@ class RoarClient(GuiFrame):
     def onChar(self, event):
         self.canvasPanel.onKeyboardInput(event)
 
-    def onMouseWheel(self, event):
-        self.canvasPanel.GetEventHandler().ProcessEvent(event)
-
     def onClose(self, event):
         if not self.canvasPanel.commands.exiting:
             closeFlag = self.canvasPanel.commands._promptSaveChanges()
@@ -38,6 +35,12 @@ class RoarClient(GuiFrame):
             closeFlag = True
         if closeFlag:
             event.Skip();
+
+    def onMouseWheel(self, event):
+        self.canvasPanel.GetEventHandler().ProcessEvent(event)
+
+    def onSize(self, event):
+        pass
 
     def __init__(self, parent, defaultCanvasPos=(0, 75), defaultCanvasSize=(100, 30), size=(840, 640), title=""):
         super().__init__(self._getIconPathName(), size, parent, title)
@@ -63,7 +66,7 @@ class RoarClient(GuiFrame):
         self.canvasPanel.commands.canvasClearRecent.attrDict["id"] = wx.NewId()
         menuItemWindow = self.canvasPanel.commands.canvasOpenRecent.attrDict["menu"].Append(self.canvasPanel.commands.canvasClearRecent.attrDict["id"], self.canvasPanel.commands.canvasClearRecent.attrDict["label"], self.canvasPanel.commands.canvasClearRecent.attrDict["caption"])
         self.canvasPanel.commands.canvasOpenRecent.attrDict["menu"].Bind(wx.EVT_MENU, self.canvasPanel.commands.canvasClearRecent, menuItemWindow)
-        self.Bind(wx.EVT_CLOSE, self.onClose)
+        self.Bind(wx.EVT_CLOSE, self.onClose); self.Bind(wx.EVT_SIZE, self.onSize);
         self.toolBarPanes[0].BestSize(0, 0).Right(); self.toolBarPanes[1].BestSize(0, 0).Right(); self.auiManager.Update();
 
 # vim:expandtab foldmethod=marker sw=4 ts=4 tw=120
