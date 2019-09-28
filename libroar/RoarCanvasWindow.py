@@ -45,20 +45,18 @@ class RoarCanvasWindow(GuiWindow):
             eventDcOrigin = eventDc.GetDeviceOrigin(); eventDc.SetDeviceOrigin(0, 0);
             if ((patches != None) and (len(patches) > 0))   \
             or ((patchesCursor != None) and (len(patchesCursor) > 0)):
-                self.backend.drawCursorMaskWithJournal(self.canvas, self.canvas.journal, eventDc); self.canvas.dirtyCursor = True;
+                self.backend.drawCursorMaskWithJournal(self.canvas, self.canvas.journal, eventDc)
             if (patches != None) and (len(patches) > 0):
                 self.backend.drawPatches(self.canvas, eventDc, patches, isCursor=False)
                 self.dirty = True if not self.dirty else self.dirty;
                 self.canvas.journal.begin()
                 for patch in patches if patches != None else []:
-                    self.canvas.dispatchPatchSingle(False, patch, commitUndo=True)
+                    self.canvas.applyPatch(patch, commitUndo=True)
                 self.canvas.journal.end()
             if patchesCursor != None:
-                patchesCursorDeltaCells = self.backend.drawPatches(self.canvas, eventDc, patchesCursor, isCursor=True)
-                if len(patchesCursorDeltaCells) > 0:
-                    self.canvas.dirtyCursor = False if self.canvas.dirtyCursor else self.canvas.dirtyCursor
-                    for patchCursorDeltaCell in patchesCursorDeltaCells:
-                        self.canvas.journal.pushCursor(patchCursorDeltaCell)
+                patchesCursorCells = self.backend.drawPatches(self.canvas, eventDc, patchesCursor, isCursor=True)
+                if len(patchesCursorCells) > 0:
+                    self.canvas.journal.pushCursor(patchesCursorCells)
             eventDc.SetDeviceOrigin(*eventDcOrigin)
             self.commands.update(dirty=self.dirty, cellPos=self.brushPos, undoLevel=self.canvas.journal.patchesUndoLevel)
 
@@ -121,26 +119,6 @@ class RoarCanvasWindow(GuiWindow):
                     else:
                         self.commands.update(undoInhibit=False)
         return rc
-
-    def dispatchDeltaPatches(self, deltaPatches, eventDc=None, forceDirtyCursor=True):
-        if eventDc == None:
-            eventDc = self.backend.getDeviceContext(self.GetClientSize(), self)
-        eventDcOrigin = eventDc.GetDeviceOrigin(); eventDc.SetDeviceOrigin(0, 0);
-        if self.canvas.dirtyCursor or forceDirtyCursor:
-            self.backend.drawCursorMaskWithJournal(self.canvas, self.canvas.journal, eventDc)
-            self.canvas.dirtyCursor = False
-        patches = []
-        for patch in deltaPatches:
-            if patch == None:
-                continue
-            elif patch[0] == "resize":
-                del eventDc; self.resize(patch[1:], False);
-                eventDc = self.backend.getDeviceContext(self.GetClientSize(), self)
-                eventDcOrigin = eventDc.GetDeviceOrigin(); eventDc.SetDeviceOrigin(0, 0);
-            else:
-               self.canvas._commitPatch(patch); patches += [patch];
-        self.backend.drawPatches(self.canvas, eventDc, patches, isCursor=False)
-        eventDc.SetDeviceOrigin(*eventDcOrigin)
 
     def onKeyboardInput(self, event):
         keyCode, keyModifiers = event.GetKeyCode(), event.GetModifiers()
@@ -211,9 +189,9 @@ class RoarCanvasWindow(GuiWindow):
             event.Skip()
 
     def onMouseWheel(self, event):
-        if event.GetModifiers() == wx.MOD_CONTROL:
-            fd = +1 if event.GetWheelRotation() >= event.GetWheelDelta() else -1
-            newFontSize = self.backend.fontSize + fd
+        delta, modifiers = +1 if event.GetWheelRotation() >= event.GetWheelDelta() else -1, event.GetModifiers()
+        if modifiers == (wx.MOD_CONTROL | wx.MOD_ALT):
+            newFontSize = self.backend.fontSize + delta
             if newFontSize > 0:
                 self.backend.fontSize = newFontSize
                 self.backend.resize(self.canvas.size); self.scrollStep = self.backend.cellSize;
@@ -226,12 +204,15 @@ class RoarCanvasWindow(GuiWindow):
                         patches += [[numCol, numRow, *self.canvas.map[numRow][numCol]]]
                 self.backend.drawPatches(self.canvas, eventDc, patches, isCursor=False)
                 eventDc.SetDeviceOrigin(*eventDcOrigin)
+        elif modifiers == (wx.MOD_CONTROL | wx.MOD_SHIFT):
+            self.commands.canvasCanvasSize(self.commands.canvasCanvasSize, 2, 1 if delta > 0 else 0)(None)
+        elif modifiers == wx.MOD_CONTROL:
+            self.commands.canvasBrushSize(self.commands.canvasBrushSize, 2, 1 if delta > 0 else 0)(None)
         else:
             event.Skip()
 
     def onPaint(self, event):
         eventDc = self.backend.getDeviceContext(self.GetClientSize(), self)
-        self.backend.drawCursorMaskWithJournal(self.canvas, self.canvas.journal, eventDc)
         self.backend.onPaint(self.GetClientSize(), self, self.GetViewStart())
 
     def resize(self, newSize, commitUndo=True, dirty=True):
@@ -256,6 +237,24 @@ class RoarCanvasWindow(GuiWindow):
             eventDc.SetDeviceOrigin(*eventDcOrigin)
             self.Scroll(*viewRect); self.dirty = dirty;
             self.commands.update(dirty=self.dirty, size=newSize, undoLevel=self.canvas.journal.patchesUndoLevel)
+
+    def undo(self, redo=False):
+        deltaPatches = self.canvas.journal.popUndo() if not redo else self.canvas.journal.popRedo()
+        eventDc = self.backend.getDeviceContext(self.GetClientSize(), self)
+        eventDcOrigin = eventDc.GetDeviceOrigin(); eventDc.SetDeviceOrigin(0, 0);
+        self.backend.drawCursorMaskWithJournal(self.canvas, self.canvas.journal, eventDc)
+        patches = []
+        for patch in deltaPatches:
+            if patch == None:
+                continue
+            elif patch[0] == "resize":
+                del eventDc; self.resize(patch[1:], False);
+                eventDc = self.backend.getDeviceContext(self.GetClientSize(), self)
+                eventDcOrigin = eventDc.GetDeviceOrigin(); eventDc.SetDeviceOrigin(0, 0);
+            else:
+               self.canvas._commitPatch(patch); patches += [patch];
+        self.backend.drawPatches(self.canvas, eventDc, patches, isCursor=False)
+        eventDc.SetDeviceOrigin(*eventDcOrigin)
 
     def update(self, newSize, commitUndo=True, newCanvas=None, dirty=True):
         self.resize(newSize, commitUndo, dirty)

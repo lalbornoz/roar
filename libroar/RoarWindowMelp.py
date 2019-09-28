@@ -14,7 +14,7 @@ class RoarWindowMelp(wx.Dialog):
         super().__init__(parent, size=minSize, title=title)
         self.panel, self.sizer = wx.Panel(self), wx.BoxSizer(wx.VERTICAL)
 
-        with open(os.path.join("assets", "text", "hotkeys.txt"), "r") as fileObject:
+        with open(os.path.join("assets", "text", "melp.txt"), "r") as fileObject:
             helpLabel = "".join(fileObject.readlines())
         self.title = wx.StaticText(self.panel, label=helpLabel, style=wx.ALIGN_LEFT)
         self.title.SetFont(wx.Font(8, wx.MODERN, wx.NORMAL, wx.NORMAL, underline=False))

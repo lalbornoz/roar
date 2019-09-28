@@ -37,7 +37,7 @@ class CanvasJournal():
             return []
 
     def pushCursor(self, patches):
-        self.patchesCursor.append(patches)
+        self.patchesCursor = patches
 
     def resetCursor(self):
         if self.patchesCursor != None:
