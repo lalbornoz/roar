@@ -227,6 +227,7 @@ class RoarCanvasWindow(GuiWindow):
     def onMouseInput(self, event):
         viewRect = self.GetViewStart(); eventDc = self.backend.getDeviceContext(self.GetClientSize(), self, viewRect);
         mouseDragging, mouseLeftDown, mouseRightDown = event.Dragging(), event.LeftIsDown(), event.RightIsDown()
+        self.lastMouseState = [mouseDragging, mouseLeftDown, mouseRightDown]
         mapPoint = self.backend.xlateEventPoint(event, eventDc, viewRect)
         if viewRect != (0, 0):
             mapPoint = [a + b for a, b in zip(mapPoint, viewRect)]
@@ -322,7 +323,7 @@ class RoarCanvasWindow(GuiWindow):
 
     def __init__(self, backend, canvas, commands, parent, pos, size):
         super().__init__(parent, pos)
-        self.size = size
+        self.lastMouseState, self.size = [False, False, False], size
         self.backend, self.canvas, self.commands, self.parentFrame = backend(self.size), canvas, commands(self, parent), parent
         self.brushColours, self.brushPos, self.brushSize, self.dirty, self.lastCellState = [4, 1], [0, 0], [1, 1], False, None
         self.popupEventDc = None

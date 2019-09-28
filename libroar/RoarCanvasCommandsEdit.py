@@ -55,7 +55,7 @@ class RoarCanvasCommandsEdit():
                 [self.canvasBrushSize(f, dimension_, incrFlag)(None) for dimension_ in [0, 1]]
             viewRect = self.parentCanvas.GetViewStart()
             eventDc = self.parentCanvas.backend.getDeviceContext(self.parentCanvas.GetClientSize(), self.parentCanvas, viewRect)
-            self.parentCanvas.applyTool(eventDc, True, None, None, None, self.parentCanvas.brushPos, False, False, False, self.currentTool, viewRect, force=True)
+            self.parentCanvas.applyTool(eventDc, True, None, None, None, self.parentCanvas.brushPos, *self.parentCanvas.lastMouseState, self.currentTool, viewRect, force=True)
         setattr(canvasBrushSize_, "attrDict", f.attrList[dimension + (0 if not incrFlag else 3)])
         return canvasBrushSize_
 
@@ -109,7 +109,7 @@ class RoarCanvasCommandsEdit():
             self.update(colours=self.parentCanvas.brushColours)
             viewRect = self.parentCanvas.GetViewStart()
             eventDc = self.parentCanvas.backend.getDeviceContext(self.parentCanvas.GetClientSize(), self.parentCanvas, viewRect)
-            self.parentCanvas.applyTool(eventDc, True, None, None, None, self.parentCanvas.brushPos, False, False, False, self.currentTool, viewRect, force=True)
+            self.parentCanvas.applyTool(eventDc, True, None, None, None, self.parentCanvas.brushPos, *self.parentCanvas.lastMouseState, self.currentTool, viewRect, force=True)
         setattr(canvasColour_, "attrDict", f.attrList[idx])
         setattr(canvasColour_, "isSelect", True)
         return canvasColour_
@@ -124,7 +124,7 @@ class RoarCanvasCommandsEdit():
             self.update(colours=self.parentCanvas.brushColours)
             viewRect = self.parentCanvas.GetViewStart()
             eventDc = self.parentCanvas.backend.getDeviceContext(self.parentCanvas.GetClientSize(), self.parentCanvas, viewRect)
-            self.parentCanvas.applyTool(eventDc, True, None, None, None, self.parentCanvas.brushPos, False, False, False, self.currentTool, viewRect, force=True)
+            self.parentCanvas.applyTool(eventDc, True, None, None, None, self.parentCanvas.brushPos, *self.parentCanvas.lastMouseState, self.currentTool, viewRect, force=True)
         setattr(canvasColourAlpha_, "attrDict", f.attrList[idx])
         setattr(canvasColourAlpha_, "isSelect", True)
         return canvasColourAlpha_
@@ -136,7 +136,7 @@ class RoarCanvasCommandsEdit():
             self.update(colours=self.parentCanvas.brushColours)
             viewRect = self.parentCanvas.GetViewStart()
             eventDc = self.parentCanvas.backend.getDeviceContext(self.parentCanvas.GetClientSize(), self.parentCanvas, viewRect)
-            self.parentCanvas.applyTool(eventDc, True, None, None, None, self.parentCanvas.brushPos, False, False, False, self.currentTool, viewRect, force=True)
+            self.parentCanvas.applyTool(eventDc, True, None, None, None, self.parentCanvas.brushPos, *self.parentCanvas.lastMouseState, self.currentTool, viewRect, force=True)
         setattr(canvasColourAlphaBackground_, "attrDict", f.attrList[idx])
         setattr(canvasColourAlphaBackground_, "isSelect", True)
         return canvasColourAlphaBackground_
@@ -163,7 +163,7 @@ class RoarCanvasCommandsEdit():
             self.update(colours=self.parentCanvas.brushColours)
             viewRect = self.parentCanvas.GetViewStart()
             eventDc = self.parentCanvas.backend.getDeviceContext(self.parentCanvas.GetClientSize(), self.parentCanvas, viewRect)
-            self.parentCanvas.applyTool(eventDc, True, None, None, None, self.parentCanvas.brushPos, False, False, False, self.currentTool, viewRect, force=True)
+            self.parentCanvas.applyTool(eventDc, True, None, None, None, self.parentCanvas.brushPos, *self.parentCanvas.lastMouseState, self.currentTool, viewRect, force=True)
         setattr(canvasColourBackground_, "attrDict", f.attrList[idx])
         setattr(canvasColourBackground_, "isSelect", True)
         return canvasColourBackground_
@@ -174,7 +174,7 @@ class RoarCanvasCommandsEdit():
         self.update(colours=self.parentCanvas.brushColours)
         viewRect = self.parentCanvas.GetViewStart()
         eventDc = self.parentCanvas.backend.getDeviceContext(self.parentCanvas.GetClientSize(), self.parentCanvas, viewRect)
-        self.parentCanvas.applyTool(eventDc, True, None, None, None, self.parentCanvas.brushPos, False, False, False, self.currentTool, viewRect, force=True)
+        self.parentCanvas.applyTool(eventDc, True, None, None, None, self.parentCanvas.brushPos, *self.parentCanvas.lastMouseState, self.currentTool, viewRect, force=True)
 
     @GuiCommandDecorator("Copy", "&Copy", ["", wx.ART_COPY], None, False)
     def canvasCopy(self, event):
