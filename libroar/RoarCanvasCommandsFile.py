@@ -18,10 +18,10 @@ except ImportError:
 
 from GuiFrame import GuiCommandDecorator, GuiSubMenuDecorator, NID_MENU_SEP
 from RtlPlatform import getLocalConfPathName
-import io, os, wx
+import datetime, io, os, stat, wx
 
 class RoarCanvasCommandsFile():
-    def _import(self, f, newDirty, pathName):
+    def _import(self, f, newDirty, pathName, emptyPathName=False):
         rc = False
         self.parentCanvas.SetCursor(wx.Cursor(wx.CURSOR_WAIT))
         try:
@@ -29,7 +29,11 @@ class RoarCanvasCommandsFile():
             if rc:
                 self.parentCanvas.update(newSize, False, newMap, dirty=newDirty)
                 self.parentCanvas.dirty = newDirty
-                self.canvasPathName = newPathName
+                if not emptyPathName:
+                    self.canvasPathName = newPathName
+                else:
+                    self.canvasPathName = None
+                self.parentCanvas._snapshotsReset()
                 self.update(dirty=self.parentCanvas.dirty, pathName=self.canvasPathName, undoLevel=-1)
                 self.parentCanvas.canvas.journal.resetCursor()
                 self.parentCanvas.canvas.journal.resetUndo()
@@ -41,7 +45,7 @@ class RoarCanvasCommandsFile():
         self.parentCanvas.SetCursor(wx.Cursor(wx.NullCursor))
         return rc, newPathName
 
-    def _importFile(self, f, newDirty, wildcard):
+    def _importFile(self, f, newDirty, wildcard, emptyPathName=False):
         with wx.FileDialog(self.parentCanvas, "Open...", os.getcwd(), "", wildcard, wx.FD_OPEN) as dialog:
             if self.lastDir != None:
                 dialog.SetDirectory(self.lastDir)
@@ -49,7 +53,7 @@ class RoarCanvasCommandsFile():
                 return False, None
             elif self._promptSaveChanges():
                 pathName = dialog.GetPath(); self.lastDir = os.path.dirname(pathName); self._storeLastDir(self.lastDir);
-                return self._import(f, newDirty, pathName)
+                return self._import(f, newDirty, pathName, emptyPathName=emptyPathName)
         return False, None
 
     def _loadLastDir(self):
@@ -64,6 +68,11 @@ class RoarCanvasCommandsFile():
             with open(localConfFileName, "r", encoding="utf-8") as inFile:
                 for lastFile in inFile.readlines():
                     self._pushRecent(lastFile.rstrip("\r\n"), False)
+
+    def _popSnapshot(self, pathName):
+        if pathName in self.snapshots.keys():
+            self.canvasRestore.attrDict["menu"].Delete(self.snapshots[pathName]["menuItemId"])
+            del self.snapshots[pathName]
 
     def _promptSaveChanges(self):
         if self.parentCanvas.dirty:
@@ -88,7 +97,7 @@ class RoarCanvasCommandsFile():
             if (numLastFiles + 1) > 8:
                 self.canvasOpenRecent.attrDict["menu"].Delete(self.lastFiles[0]["menuItemId"])
                 del self.lastFiles[0]
-            menuItemWindow = self.canvasOpenRecent.attrDict["menu"].Insert(self.canvasOpenRecent.attrDict["menu"].GetMenuItemCount() - 2, menuItemId, "{}".format(pathName), pathName)
+            menuItemWindow = self.canvasOpenRecent.attrDict["menu"].Insert(self.canvasOpenRecent.attrDict["menu"].GetMenuItemCount() - 2, menuItemId, pathName, pathName)
             self.parentFrame.menuItemsById[self.canvasOpenRecent.attrDict["id"]].Enable(True)
             self.parentFrame.Bind(wx.EVT_MENU, lambda event: self.canvasOpenRecent(event, pathName), menuItemWindow)
             self.lastFiles += [{"menuItemId":menuItemId, "menuItemWindow":menuItemWindow, "pathName":pathName}]
@@ -97,6 +106,21 @@ class RoarCanvasCommandsFile():
                 with open(localConfFileName, "w", encoding="utf-8") as outFile:
                     for lastFile in [l["pathName"] for l in self.lastFiles]:
                         print(lastFile, file=outFile)
+
+    def _pushSnapshot(self, pathName):
+        menuItemId = wx.NewId()
+        if not (pathName in self.snapshots.keys()):
+            label = datetime.datetime.fromtimestamp(os.stat(pathName)[stat.ST_MTIME]).strftime("%c")
+            menuItemWindow = self.canvasRestore.attrDict["menu"].Insert(self.canvasRestore.attrDict["menu"].GetMenuItemCount() - 2, menuItemId, label)
+            self.parentFrame.menuItemsById[self.canvasRestore.attrDict["id"]].Enable(True)
+            self.parentFrame.Bind(wx.EVT_MENU, lambda event: self.canvasRestore(event, pathName), menuItemWindow)
+            self.snapshots[pathName] = {"menuItemId":menuItemId, "menuItemWindow":menuItemWindow}
+
+    def _resetSnapshots(self):
+        for pathName in list(self.snapshots.keys()):
+            self._popSnapshot(pathName)
+        if self.canvasRestore.attrDict["id"] in self.parentFrame.menuItemsById:
+            self.parentFrame.menuItemsById[self.canvasRestore.attrDict["id"]].Enable(False)
 
     def _storeLastDir(self, pathName):
         localConfFileName = getLocalConfPathName("RecentDir.txt")
@@ -194,7 +218,7 @@ class RoarCanvasCommandsFile():
         def canvasImportAnsi_(pathName):
             rc, error = self.parentCanvas.canvas.importStore.importAnsiFile(pathName)
             return (rc, error, self.parentCanvas.canvas.importStore.outMap, pathName, self.parentCanvas.canvas.importStore.inSize)
-        self._importFile(canvasImportAnsi_, True, "ANSI files (*.ans;*.txt)|*.ans;*.txt|All Files (*.*)|*.*")
+        self._importFile(canvasImportAnsi_, True, "ANSI files (*.ans;*.txt)|*.ans;*.txt|All Files (*.*)|*.*", emptyPathName=True)
 
     @GuiCommandDecorator("Import from clipboard", "Import from &clipboard", None, None, None)
     def canvasImportFromClipboard(self, event):
@@ -209,15 +233,14 @@ class RoarCanvasCommandsFile():
             else:
                 rc, error = False, "Clipboard does not contain text data and/or cannot be opened"
             return (rc, error, self.parentCanvas.canvas.importStore.outMap, None, self.parentCanvas.canvas.importStore.inSize)
-        if self._promptSaveChanges():
-            self._import(canvasImportFromClipboard_, True, None)
+        self._import(canvasImportFromClipboard_, True, None, emptyPathName=True)
 
     @GuiCommandDecorator("Import SAUCE...", "Import &SAUCE...", None, None, None)
     def canvasImportSauce(self, event):
         def canvasImportSauce_(pathName):
             rc, error = self.parentCanvas.canvas.importStore.importSauceFile(pathName)
             return (rc, error, self.parentCanvas.canvas.importStore.outMap, pathName, self.parentCanvas.canvas.importStore.inSize)
-        self._importFile(canvasImportSauce_, True, "SAUCE files (*.ans;*.txt)|*.ans;*.txt|All Files (*.*)|*.*")
+        self._importFile(canvasImportSauce_, True, "SAUCE files (*.ans;*.txt)|*.ans;*.txt|All Files (*.*)|*.*", emptyPathName=True)
 
     @GuiCommandDecorator("New", "&New", ["", wx.ART_NEW], [wx.ACCEL_CTRL, ord("N")], None)
     def canvasNew(self, event, newCanvasSize=None):
@@ -249,6 +272,22 @@ class RoarCanvasCommandsFile():
             if not rc:
                 numLastFile = [i for i in range(len(self.lastFiles)) if self.lastFiles[i]["pathName"] == pathName][0]
                 self.canvasOpenRecent.attrDict["menu"].Delete(self.lastFiles[numLastFile]["menuItemId"]); del self.lastFiles[numLastFile];
+
+    @GuiSubMenuDecorator("Restore Snapshot", "Res&tore Snapshot", None, None, False)
+    def canvasRestore(self, event, pathName=None):
+        def canvasImportmIRC(pathName_):
+            rc, error = self.parentCanvas.canvas.importStore.importTextFile(pathName)
+            return (rc, error, self.parentCanvas.canvas.importStore.outMap, self.canvasPathName, self.parentCanvas.canvas.importStore.inSize)
+        if self._promptSaveChanges():
+            rc, newPathName = self._import(canvasImportmIRC, False, self.canvasPathName)
+
+    @GuiCommandDecorator("Restore from file", "Restore from &file", None, None, False)
+    def canvasRestoreFile(self, event):
+        def canvasImportmIRC(pathName):
+            rc, error = self.parentCanvas.canvas.importStore.importTextFile(pathName)
+            return (rc, error, self.parentCanvas.canvas.importStore.outMap, pathName, self.parentCanvas.canvas.importStore.inSize)
+        if self._promptSaveChanges():
+            rc, newPathName = self._import(canvasImportmIRC, False, self.canvasPathName)
 
     @GuiCommandDecorator("Save", "&Save", ["", wx.ART_FILE_SAVE], [wx.ACCEL_CTRL, ord("S")], None)
     def canvasSave(self, event, newDirty=False):
@@ -284,11 +323,11 @@ class RoarCanvasCommandsFile():
                     return False
 
     def __init__(self):
-        self.imgurApiKey, self.lastFiles, self.lastDir = ImgurApiKey.imgurApiKey if haveImgurApiKey else None, [], None
+        self.imgurApiKey, self.lastFiles, self.lastDir, self.snapshots = ImgurApiKey.imgurApiKey if haveImgurApiKey else None, [], None, {}
         self.accels = ()
         self.menus = (
             ("&File",
-                self.canvasNew, self.canvasOpen, self.canvasOpenRecent, self.canvasSave, self.canvasSaveAs, NID_MENU_SEP,
+                self.canvasNew, self.canvasOpen, self.canvasOpenRecent, self.canvasRestore, self.canvasSave, self.canvasSaveAs, NID_MENU_SEP,
                 ("&Export...", self.canvasExportAsAnsi, self.canvasExportToClipboard, self.canvasExportImgur, self.canvasExportPastebin, self.canvasExportAsPng,),
                 ("&Import...", self.canvasImportAnsi, self.canvasImportFromClipboard, self.canvasImportSauce,),
                 NID_MENU_SEP,

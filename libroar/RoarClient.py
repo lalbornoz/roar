@@ -62,10 +62,15 @@ class RoarClient(GuiFrame):
         for menuItem in self.canvasPanel.commands.menus[3][1:]:
             menuItemWindow = self.canvasPanel.operatorsMenu.Append(menuItem.attrDict["id"], menuItem.attrDict["label"], menuItem.attrDict["caption"])
             self.Bind(wx.EVT_MENU, self.onMenu, menuItemWindow)
-        self.canvasPanel.commands.canvasOpenRecent.attrDict["menu"].AppendSeparator()
+
         self.canvasPanel.commands.canvasClearRecent.attrDict["id"] = wx.NewId()
+        self.canvasPanel.commands.canvasOpenRecent.attrDict["menu"].AppendSeparator()
+        self.canvasPanel.commands.canvasRestore.attrDict["menu"].AppendSeparator()
+        self.canvasPanel.commands.canvasRestoreFile.attrDict["id"] = wx.NewId()
         menuItemWindow = self.canvasPanel.commands.canvasOpenRecent.attrDict["menu"].Append(self.canvasPanel.commands.canvasClearRecent.attrDict["id"], self.canvasPanel.commands.canvasClearRecent.attrDict["label"], self.canvasPanel.commands.canvasClearRecent.attrDict["caption"])
+        menuItemWindow = self.canvasPanel.commands.canvasRestore.attrDict["menu"].Append(self.canvasPanel.commands.canvasRestoreFile.attrDict["id"], self.canvasPanel.commands.canvasRestoreFile.attrDict["label"], self.canvasPanel.commands.canvasRestoreFile.attrDict["caption"])
         self.canvasPanel.commands.canvasOpenRecent.attrDict["menu"].Bind(wx.EVT_MENU, self.canvasPanel.commands.canvasClearRecent, menuItemWindow)
+        self.canvasPanel.commands.canvasRestore.attrDict["menu"].Bind(wx.EVT_MENU, self.canvasPanel.commands.canvasRestoreFile, menuItemWindow)
         self.Bind(wx.EVT_CLOSE, self.onClose); self.Bind(wx.EVT_SIZE, self.onSize);
         self.toolBarPanes[0].BestSize(0, 0).Right(); self.toolBarPanes[1].BestSize(0, 0).Right(); self.auiManager.Update();
 
