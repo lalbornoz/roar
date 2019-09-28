@@ -1,6 +1,10 @@
-Global hotkeys:
-<Ctrl> -/+				Decrease/increase brush size height and width
-<Ctrl> <Shift> -/+			Decrease/increase canvas size height and width
+Keys or mouse actions separated by forward slashes (`/') indicate alternatives.
+Keys or mouse actions separated by commas indicate separate commands.
+
+Global commands:
+<Ctrl> -, +/<Mouse wheel>		Decrease/increase brush size height and width
+<Ctrl> <Alt> <Mouse wheel>		Decrease/increase rendered cell size
+<Ctrl> <Shift> -, +/<Mouse wheel>	Decrease/increase canvas size height and width
 <Ctrl> 0-9				Set foreground colour to #0-9
 <Ctrl> <Shift> 0-5, 6			Set foreground colour to #10-15 or transparent colour, resp.
 <Ctrl> <Alt> 0-9			Set background colour to #0-9
@@ -15,15 +19,15 @@ Global hotkeys:
 <F1>					View melp?
 <Shift> <Pause>				Break into Python debugger
 
-Canvas hotkeys:
+Canvas commands:
 <Down>, <Left>, <Right>, <Up>		Move canvas cursor
 <LMB>/<Space>				Apply current tool with foreground colour (with exceptions)
 <RMB>					Apply current tool with background colour (with exceptions)
 
-Tool-specific hotkeys:
-(Circle, rectangle) <Ctrl> <LMB>/<RMB>	Initiate circle/rectangle dragging irrespective of brush size
+Tool-specific commands:
+(Circle, rectangle) <Ctrl> <LMB>, <RMB>	Initiate circle/rectangle dragging irrespective of brush size
 (Erase) <RMB>				Erase background colour with foreground colour
-(Fill) <Ctrl> <LMB>/<Space>/<RMB>	Fill entire region with foreground/background colour ignoring character cells
+(Fill) <Ctrl> <LMB>, <Space>/<RMB>	Fill entire region with foreground/background colour ignoring character cells
 (Line, object) <LMB>/<Space>		Initiate line drawing/selection
 (Object) <Ctrl> <LMB>			Move selection instead of cloning
 (Pick colour) <LMB>/<Space>		Pick current cell's foreground colour
