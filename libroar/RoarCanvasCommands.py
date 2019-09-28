@@ -79,6 +79,9 @@ class RoarCanvasCommands(RoarCanvasCommandsFile, RoarCanvasCommandsEdit, RoarCan
         if  "dirty" in self.lastPanelState              \
         and self.lastPanelState["dirty"]:
             textItems.append("*")
+        if  "backupStatus" in self.lastPanelState        \
+        and self.lastPanelState["backupStatus"] == True:
+            textItems.append("Saving backup...")
         self.parentFrame.statusBar.SetStatusText(" | ".join(textItems))
         if  ("undoInhibit" in self.lastPanelState)      \
         and (self.lastPanelState["undoInhibit"]):

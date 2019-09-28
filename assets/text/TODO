@@ -20,7 +20,6 @@
 Release roadmap:
 1)  {copy,cut,delete,insert from,paste}, edit asset in new canvas, import from {canvas,object}
 2)  operators: crop, scale, shift, slice
-3)  auto{load,save} & {backup,restore}
-4)  tools: unicode block elements
+3)  tools: unicode block elements
 
 vim:ff=dos tw=0

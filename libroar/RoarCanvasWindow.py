@@ -5,9 +5,11 @@
 #
 
 from GuiWindow import GuiWindow
+from Rtl import natural_sort
+from RtlPlatform import getLocalConfPathName
 from ToolObject import ToolObject
 from ToolText import ToolText
-import copy, json, wx, sys
+import copy, hashlib, json, os, re, time, wx, sys
 
 class RoarCanvasWindowDropTarget(wx.TextDropTarget):
     def done(self):
@@ -60,6 +62,50 @@ class RoarCanvasWindow(GuiWindow):
             eventDc.SetDeviceOrigin(*eventDcOrigin)
             self.commands.update(dirty=self.dirty, cellPos=self.brushPos, undoLevel=self.canvas.journal.patchesUndoLevel)
 
+    def _snapshotsReset(self):
+        self._snapshotFiles, self._snapshotsUpdateLast = [], time.time()
+        self.commands._resetSnapshots()
+        if self.commands.canvasPathName != None:
+            canvasPathName = os.path.abspath(self.commands.canvasPathName)
+            canvasFileName = os.path.basename(canvasPathName)
+            canvasPathNameHash = hashlib.sha1(canvasPathName.encode()).hexdigest()
+            self._snapshotsDirName = os.path.join(getLocalConfPathName(), "{}_{}".format(canvasFileName, canvasPathNameHash))
+            if os.path.exists(self._snapshotsDirName):
+                for snapshotFile in natural_sort([f for f in os.listdir(self._snapshotsDirName) \
+                        if (re.match(r'snapshot\d+\.txt$', f)) and os.path.isfile(os.path.join(self._snapshotsDirName, f))]):
+                    self.commands._pushSnapshot(os.path.join(self._snapshotsDirName, snapshotFile))
+        else:
+            self._snapshotsDirName = None
+
+    def _snapshotsUpdate(self):
+        if self._snapshotsDirName != None:
+            t = time.time()
+            if (t > self._snapshotsUpdateLast) and ((t - self._snapshotsUpdateLast) >= (5 * 60)):
+                try:
+                    if not os.path.exists(self._snapshotsDirName):
+                        os.makedirs(self._snapshotsDirName)
+                    self._snapshotFiles = natural_sort([f for f in os.listdir(self._snapshotsDirName)
+                        if (re.match(r'snapshot\d+\.txt$', f)) and os.path.isfile(os.path.join(self._snapshotsDirName, f))])
+                    if self._snapshotFiles != []:
+                        snapshotsCount, snapshotIndex = len(self._snapshotFiles), abs(int(re.match(r'snapshot(\d+)\.txt$', self._snapshotFiles[-1])[1])) + 1
+                    else:
+                        snapshotsCount, snapshotIndex = 0, 1
+                    snapshotPathName = os.path.join(self._snapshotsDirName, "snapshot{}.txt".format(snapshotIndex));
+                    self.commands.update(snapshotStatus=True)
+                    with open(snapshotPathName, "w", encoding="utf-8") as outFile:
+                        self.SetCursor(wx.Cursor(wx.CURSOR_WAIT))
+                        self.canvas.exportStore.exportTextFile(self.canvas.map, self.canvas.size, outFile)
+                        self.SetCursor(wx.Cursor(wx.NullCursor))
+                    self.commands.update(snapshotStatus=False); self._snapshotsUpdateLast = time.time();
+                    self._snapshotFiles += [os.path.basename(snapshotPathName)];
+                    self.commands._pushSnapshot(snapshotPathName)
+                    if len(self._snapshotFiles) > 72:
+                        for snapshotFile in self._snapshotFiles[:len(self._snapshotFiles) - 8]:
+                            self.commands._popSnapshot(os.path.join(self._snapshotsDirName, snapshotFile))
+                            os.remove(os.path.join(self._snapshotsDirName, snapshotFile)); snapshotsCount -= 1;
+                except:
+                    print("Exception during _snapshotsUpdate(): {}".format(sys.exc_info()[1]))
+
     def applyOperator(self, currentTool, mapPoint, mouseLeftDown, mousePoint, operator, viewRect):
         eventDc, patches, patchesCursor, rc = self.backend.getDeviceContext(self.GetClientSize(), self), None, None, True
         if (currentTool.__class__ == ToolObject) and (currentTool.toolState >= currentTool.TS_SELECT):
@@ -81,16 +127,19 @@ class RoarCanvasWindow(GuiWindow):
                 rc, patches, patchesCursor = currentTool.onSelectEvent(self.canvas, (0, 0), True, wx.MOD_NONE, None, currentTool.targetRect)
                 patchesCursor = [] if patchesCursor == None else patchesCursor
                 patchesCursor += currentTool._drawSelectRect(currentTool.targetRect)
+                self._applyPatches(eventDc, patches, patchesCursor, rc)
             else:
                 patches = []
                 for numRow in range(len(region)):
                     for numCol in range(len(region[numRow])):
                         patches += [[numCol, numRow, *region[numRow][numCol]]]
-            self._applyPatches(eventDc, patches, patchesCursor, rc)
+                self._applyPatches(eventDc, patches, patchesCursor, rc)
+                if (patches != None) and (len(patches) > 0):
+                    self._snapshotsUpdate()
         return rc
 
     def applyTool(self, eventDc, eventMouse, keyChar, keyCode, keyModifiers, mapPoint, mouseDragging, mouseLeftDown, mouseRightDown, tool, viewRect, force=False):
-        dirty, patches, patchesCursor, rc = False, None, None, False
+        patches, patchesCursor, rc = None, None, False
         if eventMouse:
             self.lastCellState = None if force else self.lastCellState
             if  ((mapPoint[0] < self.canvas.size[0]) and (mapPoint[1] < self.canvas.size[1]))   \
@@ -118,6 +167,8 @@ class RoarCanvasWindow(GuiWindow):
                         self.commands.update(toolName=newToolName, undoInhibit=False)
                     else:
                         self.commands.update(undoInhibit=False)
+            if (patches != None) and (len(patches) > 0):
+                self._snapshotsUpdate()
         return rc
 
     def onKeyboardInput(self, event):
@@ -237,6 +288,8 @@ class RoarCanvasWindow(GuiWindow):
             eventDc.SetDeviceOrigin(*eventDcOrigin)
             self.Scroll(*viewRect); self.dirty = dirty;
             self.commands.update(dirty=self.dirty, size=newSize, undoLevel=self.canvas.journal.patchesUndoLevel)
+            if commitUndo:
+                self._snapshotsUpdate()
 
     def undo(self, redo=False):
         deltaPatches = self.canvas.journal.popUndo() if not redo else self.canvas.journal.popRedo()
@@ -276,5 +329,6 @@ class RoarCanvasWindow(GuiWindow):
         self.dropTarget = RoarCanvasWindowDropTarget(self)
         self.SetDropTarget(self.dropTarget)
         self.Bind(wx.EVT_MOUSEWHEEL, self.onMouseWheel)
+        self._snapshotsReset()
 
 # vim:expandtab foldmethod=marker sw=4 ts=4 tw=120

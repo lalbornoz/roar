@@ -25,6 +25,7 @@ def main(*argv):
         if (len(argv) >= 2) and (argv[1].endswith(".lst")):
             roarClient.assetsWindow._load_list(argv[1])
         roarClient.canvasPanel.commands.canvasPathName = argv[0]
+        roarClient.canvasPanel._snapshotsReset()
         rc, error = roarClient.canvasPanel.canvas.importStore.importTextFile(argv[0])
         if rc:
             roarClient.canvasPanel.update(roarClient.canvasPanel.canvas.importStore.inSize, False, roarClient.canvasPanel.canvas.importStore.outMap, dirty=False)
