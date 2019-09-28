@@ -216,7 +216,7 @@ class RoarCanvasWindow(GuiWindow):
             newFontSize = self.backend.fontSize + fd
             if newFontSize > 0:
                 self.backend.fontSize = newFontSize
-                self.backend.resize(self.canvas.size)
+                self.backend.resize(self.canvas.size); self.scrollStep = self.backend.cellSize;
                 super().resize([a * b for a, b in zip(self.canvas.size, self.backend.cellSize)])
                 eventDc = self.backend.getDeviceContext(self.GetClientSize(), self)
                 eventDcOrigin = eventDc.GetDeviceOrigin(); eventDc.SetDeviceOrigin(0, 0);
