@@ -194,13 +194,11 @@ class RoarCanvasCommandsEdit():
 
     @GuiCommandDecorator("Redo", "&Redo", ["", wx.ART_REDO], [wx.ACCEL_CTRL, ord("Y")], False)
     def canvasRedo(self, event):
-        self.parentCanvas.dispatchDeltaPatches(self.parentCanvas.canvas.journal.popRedo(), forceDirtyCursor=True)
-        self.update(size=self.parentCanvas.canvas.size, undoLevel=self.parentCanvas.canvas.journal.patchesUndoLevel)
+        self.parentCanvas.undo(redo=True); self.update(size=self.parentCanvas.canvas.size, undoLevel=self.parentCanvas.canvas.journal.patchesUndoLevel);
 
     @GuiCommandDecorator("Undo", "&Undo", ["", wx.ART_UNDO], [wx.ACCEL_CTRL, ord("Z")], False)
     def canvasUndo(self, event):
-        self.parentCanvas.dispatchDeltaPatches(self.parentCanvas.canvas.journal.popUndo(), forceDirtyCursor=True)
-        self.update(size=self.parentCanvas.canvas.size, undoLevel=self.parentCanvas.canvas.journal.patchesUndoLevel)
+        self.parentCanvas.undo(); self.update(size=self.parentCanvas.canvas.size, undoLevel=self.parentCanvas.canvas.journal.patchesUndoLevel);
 
     def __init__(self):
         self.accels = (

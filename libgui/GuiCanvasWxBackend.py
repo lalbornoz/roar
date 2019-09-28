@@ -148,11 +148,16 @@ class GuiCanvasWxBackend():
 
     def drawCursorMaskWithJournal(self, canvas, canvasJournal, eventDc):
         eventDcOrigin = eventDc.GetDeviceOrigin(); eventDc.SetDeviceOrigin(0, 0);
-        self.drawPatches(canvas, eventDc, canvasJournal.popCursor(), False)
+        cursorCells, patches = canvasJournal.popCursor(), []
+        for cursorCell in cursorCells:
+            patches += [[*cursorCell, *canvas.map[cursorCell[1]][cursorCell[0]]]]
+        if len(patches) > 0:
+            self.drawPatches(canvas, eventDc, patches, False)
         eventDc.SetDeviceOrigin(*eventDcOrigin)
+        return cursorCells
 
     def drawPatches(self, canvas, eventDc, patches, isCursor=False):
-        patchDeltaCells, patchesRender = [], []
+        patchCursorCells, patchesRender = [], []
         for patch in patches:
             point = patch[:2]
             if [(c >= 0) and (c < s) for c, s in zip(point, self.canvasSize)] == [True, True]:
@@ -186,8 +191,8 @@ class GuiCanvasWxBackend():
                     eventDc.DestroyClippingRegion(); eventDc.SetClippingRegion(*absPoint, *self.cellSize);
                     eventDc.SetTextForeground(textFg); eventDc.DrawText(patchRender[5], *absPoint);
                     eventDc.DestroyClippingRegion()
-            patchDeltaCells += [[*patchRender[:2], *canvas.map[patchRender[1]][patchRender[0]]]]
-        return patchDeltaCells
+            patchCursorCells += [patchRender[:2]]
+        return patchCursorCells
 
     def getDeviceContext(self, clientSize, parentWindow, viewRect=None):
         if viewRect == None:

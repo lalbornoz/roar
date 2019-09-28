@@ -12,30 +12,14 @@ class Canvas():
     def _commitPatch(self, patch):
         self.map[patch[1]][patch[0]] = patch[2:]
 
-    def dispatchPatch(self, isCursor, patch, commitUndo=True):
+    def applyPatch(self, patch, commitUndo=True):
         if (patch[0] >= self.size[0]) or (patch[1] >= self.size[1]):
             return False
         else:
             patchDeltaCell = self.map[patch[1]][patch[0]]; patchDelta = [*patch[0:2], *patchDeltaCell];
-            if isCursor:
-                self.journal.pushCursor(patchDelta)
-            else:
-                if commitUndo:
-                    self.journal.begin(); self.journal.updateCurrentDeltas(patch, patchDelta); self.journal.end();
-                self._commitPatch(patch)
-            return True
-
-    def dispatchPatchSingle(self, isCursor, patch, commitUndo=True):
-        if (patch[0] >= self.size[0]) or (patch[1] >= self.size[1]):
-            return False
-        else:
-            patchDeltaCell = self.map[patch[1]][patch[0]]; patchDelta = [*patch[0:2], *patchDeltaCell];
-            if isCursor:
-                self.journal.pushCursor(patchDelta)
-            else:
-                if commitUndo:
-                    self.journal.updateCurrentDeltas(patch, patchDelta)
-                self._commitPatch(patch)
+            if commitUndo:
+                self.journal.updateCurrentDeltas(patch, patchDelta)
+            self._commitPatch(patch)
             return True
 
     def resize(self, newSize, commitUndo=True):
@@ -62,7 +46,7 @@ class Canvas():
                     for numNewCol in range(oldSize[0], newSize[0]):
                         if commitUndo:
                             self.journal.updateCurrentDeltas([numNewCol, numRow, 1, 1, 0, " "], None)
-                        self.dispatchPatch(False, [numNewCol, numRow, 1, 1, 0, " "], False)
+                        self.applyPatch([numNewCol, numRow, 1, 1, 0, " "], False)
             if deltaSize[1] < 0:
                 if commitUndo:
                     for numRow in range((oldSize[1] + deltaSize[1]), oldSize[1]):
@@ -75,7 +59,7 @@ class Canvas():
                     for numNewCol in range(newSize[0]):
                         if commitUndo:
                             self.journal.updateCurrentDeltas([numNewCol, numNewRow, 1, 1, 0, " "], None)
-                        self.dispatchPatch(False, [numNewCol, numNewRow, 1, 1, 0, " "], False)
+                        self.applyPatch([numNewCol, numNewRow, 1, 1, 0, " "], False)
             self.size = newSize
             if commitUndo:
                 self.journal.end()
@@ -86,13 +70,11 @@ class Canvas():
     def update(self, newSize, newCanvas=None):
         for numRow in range(self.size[1]):
             for numCol in range(self.size[0]):
-                if  (newCanvas != None)         \
-                and (numRow < len(newCanvas))   \
-                and (numCol < len(newCanvas[numRow])):
+                if  (newCanvas != None) \
+                and (numRow < len(newCanvas)) and (numCol < len(newCanvas[numRow])):
                     self._commitPatch([numCol, numRow, *newCanvas[numRow][numCol]])
 
     def __init__(self, size):
-        self.dirtyCursor, self.map, self.size = False, None, size
-        self.exportStore, self.importStore, self.journal = CanvasExportStore(), CanvasImportStore(), CanvasJournal()
+        self.exportStore, self.importStore, self.journal, self.map, self.size = CanvasExportStore(), CanvasImportStore(), CanvasJournal(), None, size
 
 # vim:expandtab foldmethod=marker sw=4 ts=4 tw=120
