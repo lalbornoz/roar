@@ -261,7 +261,7 @@ class RoarCanvasCommandsFile():
             nonlocal newCanvasSize
             if newCanvasSize == None:
                 newCanvasSize = list(self.parentCanvas.canvas.size)
-            newMap = [[[1, 1, 0, " "] for x in range(newCanvasSize[0])] for y in range(newCanvasSize[1])]
+            newMap = [[[-1, -1, 0, " "] for x in range(newCanvasSize[0])] for y in range(newCanvasSize[1])]
             return (True, "", newMap, None, newCanvasSize)
         if self._promptSaveChanges():
             self._import(canvasImportEmpty, False, None)

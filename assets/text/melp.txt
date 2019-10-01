@@ -2,21 +2,25 @@ Keys or mouse actions separated by forward slashes (`/') indicate alternatives.
 Keys or mouse actions separated by commas indicate separate commands.
 
 Global commands:
-<Ctrl> -, +/<Mouse wheel>		Decrease/increase brush size height and width
-<Ctrl> <Alt> <Mouse wheel>		Decrease/increase rendered cell size
-<Ctrl> <Shift> -, +/<Mouse wheel>	Decrease/increase canvas size height and width
+<Ctrl> -, +/<Mouse wheel>		Decrease/increase brush height and width
+<Ctrl> <Mouse wheel>	                Decrease/increase canvas height and width
+<Ctrl> <Up>, <Down>			Decrease/increase canvas height
+<Ctrl> <Left>, <Right>			Decrease/increase canvas width
+<Ctrl> <Alt> <Mouse wheel>		Decrease/increase cell size
+
 <Ctrl> 0-9				Set foreground colour to #0-9
 <Ctrl> <Shift> 0-5, 6			Set foreground colour to #10-15 or transparent colour, resp.
 <Ctrl> <Alt> 0-9			Set background colour to #0-9
 <Ctrl> <Alt> <Shift> 0-5, 6		Set background colour to #10-15 or transparent colour, resp.
-<Ctrl> C, U, E, F, L, P, R, E, T	Switch to circle, cursor, erase, fill, line, pick colour, rectangle, object, text tool
 <Ctrl> I				Flip colours
+<F1>					View melp?
+<F2-F10>				Switch to cursor, rectangle, circle, fill, line, text, object, erase, pick colour tool
+
 <Ctrl> N				New canvas
 <Ctrl> O				Open mIRC art file
 <Ctrl> S				Save canvas as mIRC art file
 <Ctrl> X				Exit
 <Ctrl> Y, Z				Redo, undo last action
-<F1>					View melp?
 <Shift> <Pause>				Break into Python debugger
 
 Canvas commands:

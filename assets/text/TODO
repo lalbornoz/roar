@@ -15,6 +15,6 @@
     c) https://material.io/resources/icons/?style=baseline
     d) replace logo w/ canvas panel in About dialogue, revisit melp? dialogue
     e) replace resize buttons w/ {-,edit box,+} buttons & lock button re: ratio (ty lol3)
-    f) Settings/Settings window (e.g. autosave, cursor opacity, hide cursor on leaving window, ...)
+    f) Settings window (e.g. autosave parameters, cursor opacity, default colours, hide cursor on leaving window, keyboard/mouse map, show cell position tooltip on mouse hover, ...)
 
 vim:ff=dos tw=0
