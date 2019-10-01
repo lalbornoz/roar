@@ -24,8 +24,7 @@ class ToolCircle(Tool):
         for numRow in range(len(cells)):
             for numCol in range(len(cells[numRow])):
                 point = cells[numRow][numCol]
-                if  ((point[0] >= 0) and (point[1] >= 0))                                           \
-                and (point[0] < canvas.size[0]) and (point[1] < canvas.size[1]):
+                if (point[0] >= 0) and (point[1] >= 0):
                     if ((numRow == 0) or (numRow == (len(cells) - 1)))                              \
                     or ((numCol == 0) or (numCol == (len(cells[numRow]) - 1))):
                         patch = [*cells[numRow][numCol], brushColours[0], brushColours[0], 0, " "]

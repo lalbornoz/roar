@@ -6,7 +6,8 @@
 
 from ctypes import *
 from GuiCanvasColours import Colours
-import math, os, platform, Rtl, wx
+import GuiCanvasWxBackendFast
+import math, os, platform, wx
 
 class GuiBufferedDC(wx.MemoryDC):
     def __del__(self):
@@ -70,7 +71,7 @@ class GuiCanvasWxBackend():
         CS_UNDERLINE    = 0x02
 
     def _blendColours(self, bg, fg):
-        return [int((fg * 0.75) + (bg * (1.0 - 0.75))) for bg, fg in zip(Colours[bg][:3], Colours[fg][:3])]
+        return [int((fg * 0.8) + (bg * (1.0 - 0.8))) for bg, fg in zip(Colours[bg][:3], Colours[fg][:3])]
 
     def _finiBrushesAndPens(self):
         for wxObject in Rtl.flatten([
@@ -140,24 +141,23 @@ class GuiCanvasWxBackend():
             else:
                 bg = patchBg[1] if patchBg[1] != -1 else 14
                 brush, pen = self._brushesBlend[bg][14], self._pensBlend[bg][14]
-        if self._lastBrush != brush:
-            dc.SetBrush(brush); self._lastBrush = brush;
-        if self._lastPen != pen:
-            dc.SetPen(pen); self._lastPen = pen;
         return brush, pen
 
-    def drawCursorMaskWithJournal(self, canvas, canvasJournal, eventDc):
+    def drawCursorMaskWithJournal(self, canvas, canvasJournal, eventDc, reset=True):
         eventDcOrigin = eventDc.GetDeviceOrigin(); eventDc.SetDeviceOrigin(0, 0);
-        cursorCells, patches = canvasJournal.popCursor(), []
-        for cursorCell in cursorCells:
-            patches += [[*cursorCell, *canvas.map[cursorCell[1]][cursorCell[0]]]]
+        cursorPatches = canvasJournal.popCursor(reset=reset); patches = [];
+        for cursorCell in [p[:2] for p in cursorPatches]:
+            if  (cursorCell[0] < canvas.size[0])    \
+            and (cursorCell[1] < canvas.size[1]):
+                patches += [[*cursorCell, *canvas.map[cursorCell[1]][cursorCell[0]]]]
         if len(patches) > 0:
             self.drawPatches(canvas, eventDc, patches, False)
         eventDc.SetDeviceOrigin(*eventDcOrigin)
-        return cursorCells
+        return cursorPatches
 
     def drawPatches(self, canvas, eventDc, patches, isCursor=False):
-        patchCursorCells, patchesRender = [], []
+        GuiCanvasWxBackendFast.drawPatches()
+        patchesRender = []
         for patch in patches:
             point = patch[:2]
             if [(c >= 0) and (c < s) for c, s in zip(point, self.canvasSize)] == [True, True]:
@@ -166,33 +166,33 @@ class GuiCanvasWxBackend():
                         patchesRender += [patchReshaped]
                 else:
                     patchesRender += [patch]
+        numPatch, textBg = 0, wx.Colour(0, 0, 0, 0)
+        rectangles, pens, brushes = [None] * len(patchesRender), [None] * len(patchesRender), [None] * len(patchesRender)
+        textList, coords, foregrounds, backgrounds = [], [], [], []
+        eventDc.SetFont(self._font)
         for patchRender in patchesRender:
-            absPoint, charFlag = [a * b for a, b in zip(self.cellSize, patchRender[:2])], False
             if (patchRender[5] == " ") and (patchRender[3] == -1):
-                charFlag, patchRender, textFg = True, [*patchRender[:-1], "░"], wx.Colour(0, 0, 0, 255)
-            elif isCursor and (patchRender[5] == " ") and ((canvas.map[patchRender[1]][patchRender[0]][3] != " ") or (canvas.map[patchRender[1]][patchRender[0]][2] & self._CellState.CS_UNDERLINE)):
-                charFlag, patchRender = True, [*patchRender[:-2], *canvas.map[patchRender[1]][patchRender[0]][2:]]
-                textFg = wx.Colour(self._blendColours(canvas.map[patchRender[1]][patchRender[0]][0], patchRender[3]))
-            elif (patchRender[5] != " ") or (patchRender[4] & self._CellState.CS_UNDERLINE):
-                charFlag, textFg = True, wx.Colour(Colours[patchRender[2]][:4])
+                text, textFg = "░", wx.Colour(0, 0, 0, 255)
+            elif isCursor and (patchRender[5] == " ") and (canvas.map[patchRender[1]][patchRender[0]][3] != " "):
+                patchRender = [*patchRender[:-2], *canvas.map[patchRender[1]][patchRender[0]][2:]]
+                text, textFg = canvas.map[patchRender[1]][patchRender[0]][3], wx.Colour(self._blendColours(canvas.map[patchRender[1]][patchRender[0]][0], patchRender[3]))
+            elif isCursor and (patchRender[5] == " ") and (canvas.map[patchRender[1]][patchRender[0]][2] & self._CellState.CS_UNDERLINE):
+                patchRender = [*patchRender[:-2], *canvas.map[patchRender[1]][patchRender[0]][2:]]
+                text, textFg = "_", wx.Colour(self._blendColours(canvas.map[patchRender[1]][patchRender[0]][0], patchRender[3]))
+            elif patchRender[5] != " ":
+                text, textFg = patchRender[5], wx.Colour(Colours[patchRender[2]][:4])
+            elif patchRender[4] & self._CellState.CS_UNDERLINE:
+                text, textFg = "_", wx.Colour(Colours[patchRender[2]][:4])
+            else:
+                text = None
             brush, pen = self._setBrushColours(eventDc, isCursor, patchRender[2:], canvas.map[patchRender[1]][patchRender[0]])
-            eventDc.DrawRectangle(*absPoint, *self.cellSize)
-            if charFlag:
-                if (patchRender[4] & self._CellState.CS_UNDERLINE) or (patchRender[5] == "_"):
-                    if isCursor and (patchRender[5] == " ") and ((canvas.map[patchRender[1]][patchRender[0]][3] != " ") or (canvas.map[patchRender[1]][patchRender[0]][2] & self._CellState.CS_UNDERLINE)):
-                        eventDc.SetPen(self._pensBlend[patchRender[2]][patchRender[3]])
-                    else:
-                        eventDc.SetPen(self._pens[patchRender[2]])
-                    eventDc.DrawLine(absPoint[0], absPoint[1] + self.cellSize[1] - 1, absPoint[0] + self.cellSize[0], absPoint[1] + self.cellSize[1] - 1)
-                    eventDc.SetPen(pen)
-                if patchRender[5] != "_":
-                    oldClippingRegion = eventDc.GetClippingBox()
-                    eventDc.SetFont(self._font)
-                    eventDc.DestroyClippingRegion(); eventDc.SetClippingRegion(*absPoint, *self.cellSize);
-                    eventDc.SetTextForeground(textFg); eventDc.DrawText(patchRender[5], *absPoint);
-                    eventDc.DestroyClippingRegion()
-            patchCursorCells += [patchRender[:2]]
-        return patchCursorCells
+            rectangles[numPatch] = [patchRender[:2][0] * self.cellSize[0], patchRender[:2][1] * self.cellSize[1], self.cellSize[0], self.cellSize[1]];
+            pens[numPatch] = pen; brushes[numPatch] = brush;
+            if text != None:
+                textList += [text]; coords += [[patchRender[:2][0] * self.cellSize[0], patchRender[:2][1] * self.cellSize[1]]]; foregrounds += [textFg]; backgrounds += [textBg];
+            numPatch += 1
+        eventDc.DrawRectangleList(rectangles, pens, brushes)
+        eventDc.DrawTextList(textList, coords, foregrounds, backgrounds)
 
     def getDeviceContext(self, clientSize, parentWindow, viewRect=None):
         if viewRect == None:

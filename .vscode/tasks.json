@@ -4,9 +4,12 @@
         "version": "2.0.0",
         "tasks": [
                 {
-                        "label": "echo",
+                        "label": "Build libgui/GuiCanvasWxBackendFast.pyd",
                         "type": "shell",
-                        "command": "echo Hello"
+                        "command": "cd \"${workspaceFolder}/libgui\" && cmd /c cl /LD /IC:/Python37/include GuiCanvasWxBackendFast.c C:/Python37/libs/python37.lib /FeGuiCanvasWxBackendFast.pyd",
+                        "problemMatcher": [
+                                "$msCompile"
+                        ]
                 }
         ]
 }

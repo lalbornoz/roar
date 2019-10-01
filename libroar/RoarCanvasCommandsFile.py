@@ -102,10 +102,7 @@ class RoarCanvasCommandsFile():
             self.parentFrame.Bind(wx.EVT_MENU, lambda event: self.canvasOpenRecent(event, pathName), menuItemWindow)
             self.lastFiles += [{"menuItemId":menuItemId, "menuItemWindow":menuItemWindow, "pathName":pathName}]
             if serialise:
-                localConfFileName = getLocalConfPathName("Recent.lst")
-                with open(localConfFileName, "w", encoding="utf-8") as outFile:
-                    for lastFile in [l["pathName"] for l in self.lastFiles]:
-                        print(lastFile, file=outFile)
+                self._saveRecent()
 
     def _pushSnapshot(self, pathName):
         menuItemId = wx.NewId()
@@ -121,6 +118,12 @@ class RoarCanvasCommandsFile():
             self._popSnapshot(pathName)
         if self.canvasRestore.attrDict["id"] in self.parentFrame.menuItemsById:
             self.parentFrame.menuItemsById[self.canvasRestore.attrDict["id"]].Enable(False)
+
+    def _saveRecent(self):
+        localConfFileName = getLocalConfPathName("Recent.lst")
+        with open(localConfFileName, "w", encoding="utf-8") as outFile:
+            for lastFile in [l["pathName"] for l in self.lastFiles]:
+                print(lastFile, file=outFile)
 
     def _storeLastDir(self, pathName):
         localConfFileName = getLocalConfPathName("RecentDir.txt")
@@ -170,8 +173,13 @@ class RoarCanvasCommandsFile():
                 outPathName = dialog.GetPath(); self.lastDir = os.path.dirname(outPathName); self._storeLastDir(self.lastDir);
                 self.parentCanvas.SetCursor(wx.Cursor(wx.CURSOR_WAIT))
                 eventDc = self.parentCanvas.backend.getDeviceContext(self.parentCanvas.GetClientSize(), self.parentCanvas)
-                self.parentCanvas.backend.drawCursorMaskWithJournal(self.parentCanvas.canvas, self.parentCanvas.canvas.journal, eventDc)
+                self.parentCanvas.backend.drawCursorMaskWithJournal(self.parentCanvas.canvas, self.parentCanvas.canvas.journal, eventDc, reset=False)
                 self.parentCanvas.canvas.exportStore.exportBitmapToPngFile(self.parentCanvas.backend.canvasBitmap, outPathName, wx.BITMAP_TYPE_PNG)
+                eventDcOrigin = eventDc.GetDeviceOrigin(); eventDc.SetDeviceOrigin(0, 0);
+                cursorPatches = self.parentCanvas.canvas.journal.popCursor(reset=False)
+                if len(cursorPatches) > 0:
+                    self.parentCanvas.backend.drawPatches(self.parentCanvas.canvas, eventDc, cursorPatches, isCursor=True)
+                eventDc.SetDeviceOrigin(*eventDcOrigin)
                 self.parentCanvas.SetCursor(wx.Cursor(wx.NullCursor))
                 return True
 
@@ -179,8 +187,13 @@ class RoarCanvasCommandsFile():
     def canvasExportImgur(self, event):
         self.parentCanvas.SetCursor(wx.Cursor(wx.CURSOR_WAIT))
         eventDc = self.parentCanvas.backend.getDeviceContext(self.parentCanvas.GetClientSize(), self.parentCanvas)
-        self.parentCanvas.backend.drawCursorMaskWithJournal(self.parentCanvas.canvas, self.parentCanvas.canvas.journal, eventDc)
+        self.parentCanvas.backend.drawCursorMaskWithJournal(self.parentCanvas.canvas, self.parentCanvas.canvas.journal, eventDc, reset=False)
         rc, status, result = self.parentCanvas.canvas.exportStore.exportBitmapToImgur(self.imgurApiKey, self.parentCanvas.backend.canvasBitmap, "", "", wx.BITMAP_TYPE_PNG)
+        eventDcOrigin = eventDc.GetDeviceOrigin(); eventDc.SetDeviceOrigin(0, 0);
+        cursorPatches = self.parentCanvas.canvas.journal.popCursor(reset=False)
+        if len(cursorPatches) > 0:
+            self.parentCanvas.backend.drawPatches(self.parentCanvas.canvas, eventDc, cursorPatches, isCursor=True)
+        eventDc.SetDeviceOrigin(*eventDcOrigin)
         self.parentCanvas.SetCursor(wx.Cursor(wx.NullCursor))
         if rc:
             if not wx.TheClipboard.IsOpened():
@@ -272,6 +285,7 @@ class RoarCanvasCommandsFile():
             if not rc:
                 numLastFile = [i for i in range(len(self.lastFiles)) if self.lastFiles[i]["pathName"] == pathName][0]
                 self.canvasOpenRecent.attrDict["menu"].Delete(self.lastFiles[numLastFile]["menuItemId"]); del self.lastFiles[numLastFile];
+                self._saveRecent()
 
     @GuiSubMenuDecorator("Restore Snapshot", "Res&tore Snapshot", None, None, False)
     def canvasRestore(self, event, pathName=None):

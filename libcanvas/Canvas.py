@@ -29,7 +29,6 @@ class Canvas():
             else:
                 oldSize = self.size
             deltaSize = [b - a for a, b in zip(oldSize, newSize)]
-            self.journal.resetCursor()
             if commitUndo:
                 self.journal.begin()
                 undoPatches, redoPatches = ["resize", *oldSize], ["resize", *newSize]

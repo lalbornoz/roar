@@ -15,9 +15,11 @@ class CanvasJournal():
             if self.patchesUndoLevel > 0:
                 del self.patchesUndo[:self.patchesUndoLevel]; self.patchesUndoLevel = 0;
 
-    def popCursor(self):
+    def popCursor(self, reset=True):
         if len(self.patchesCursor):
-            patchesCursor = self.patchesCursor; self.patchesCursor = [];
+            patchesCursor = self.patchesCursor
+            if reset:
+                self.resetCursor()
             return patchesCursor
         else:
             return []
@@ -40,8 +42,6 @@ class CanvasJournal():
         self.patchesCursor = patches
 
     def resetCursor(self):
-        if self.patchesCursor != None:
-            self.patchesCursor.clear()
         self.patchesCursor = []
 
     def resetUndo(self):
@@ -57,7 +57,6 @@ class CanvasJournal():
         self.resetCursor(); self.resetUndo();
 
     def __init__(self):
-        self.patchesCursor, self.patchesUndo, self. patchesUndoLevel = None, None, None
-        self.resetCursor(); self.resetUndo();
+        self.patchesUndo = None; self.resetCursor(); self.resetUndo();
 
 # vim:expandtab foldmethod=marker sw=4 ts=4 tw=120
