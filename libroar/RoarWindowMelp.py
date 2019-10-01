@@ -23,7 +23,7 @@ class RoarWindowMelp(wx.Dialog):
         self.sizer.AddMany(((self.title, 1, wx.ALL | wx.CENTER | wx.EXPAND, 4), (self.buttonRoar, 0, wx.ALL | wx.CENTER, 4),))
         self.panel.SetSizerAndFit(self.sizer)
         newSize = self.sizer.ComputeFittingWindowSize(self)
-        self.SetSize((newSize[0] + 64, newSize[1],)); self.Center();
+        self.SetSize((newSize[0] + 128, newSize[1],)); self.Center();
         self.SetTitle(title)
 
         self.ShowModal()

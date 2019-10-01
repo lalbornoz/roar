@@ -59,12 +59,12 @@ class RoarCanvasCommandsEdit():
         setattr(canvasBrushSize_, "attrDict", f.attrList[dimension + (0 if not incrFlag else 3)])
         return canvasBrushSize_
 
-    @GuiCommandListDecorator(0, "Decrease canvas height", "Decrease canvas height", ["toolDecrCanvasH.png"], None, None)
-    @GuiCommandListDecorator(1, "Decrease canvas width", "Decrease canvas width", ["toolDecrCanvasW.png"], None, None)
-    @GuiCommandListDecorator(2, "Decrease canvas size", "Decrease canvas size", ["toolDecrCanvasHW.png"], [wx.ACCEL_CTRL | wx.ACCEL_SHIFT, ord("-")], None)
-    @GuiCommandListDecorator(3, "Increase canvas height", "Increase canvas height", ["toolIncrCanvasH.png"], None, None)
-    @GuiCommandListDecorator(4, "Increase canvas width", "Increase canvas width", ["toolIncrCanvasW.png"], None, None)
-    @GuiCommandListDecorator(5, "Increase canvas size", "Increase canvas size", ["toolIncrCanvasHW.png"], [wx.ACCEL_CTRL | wx.ACCEL_SHIFT, ord("+")], None)
+    @GuiCommandListDecorator(0, "Decrease canvas height", "Decrease canvas height", ["toolDecrCanvasH.png"], [wx.ACCEL_CTRL, wx.WXK_UP], None)
+    @GuiCommandListDecorator(1, "Decrease canvas width", "Decrease canvas width", ["toolDecrCanvasW.png"], [wx.ACCEL_CTRL, wx.WXK_LEFT], None)
+    @GuiCommandListDecorator(2, "Decrease canvas size", "Decrease canvas size", ["toolDecrCanvasHW.png"], None, None)
+    @GuiCommandListDecorator(3, "Increase canvas height", "Increase canvas height", ["toolIncrCanvasH.png"], [wx.ACCEL_CTRL, wx.WXK_DOWN], None)
+    @GuiCommandListDecorator(4, "Increase canvas width", "Increase canvas width", ["toolIncrCanvasW.png"], [wx.ACCEL_CTRL, wx.WXK_RIGHT], None)
+    @GuiCommandListDecorator(5, "Increase canvas size", "Increase canvas size", ["toolIncrCanvasHW.png"], None, None)
     def canvasCanvasSize(self, f, dimension, incrFlag):
         def canvasCanvasSize_(event):
             if (dimension < 2) and not incrFlag:

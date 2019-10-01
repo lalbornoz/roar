@@ -27,6 +27,7 @@ class RoarCanvasWindowDropTarget(wx.TextDropTarget):
                 viewRect = self.parent.GetViewStart(); mapPoint = [m + n for m, n in zip((mapX, mapY), viewRect)];
                 self.parent.commands.lastTool, self.parent.commands.currentTool = self.parent.commands.currentTool, ToolObject()
                 self.parent.commands.currentTool.setRegion(self.parent.canvas, mapPoint, dropMap, dropSize, external=True)
+                self.parent.parentFrame.menuItemsById[self.parent.commands.canvasOperator.attrList[4]["id"]].Enable(True)
                 self.parent.commands.update(toolName=self.parent.commands.currentTool.name)
                 eventDc = self.parent.backend.getDeviceContext(self.parent.GetClientSize(), self.parent, viewRect)
                 eventDcOrigin = eventDc.GetDeviceOrigin(); eventDc.SetDeviceOrigin(0, 0);
@@ -129,10 +130,10 @@ class RoarCanvasWindow(GuiWindow):
         else:
             region = self.canvas.map
         if hasattr(operator, "apply2"):
+            self.commands.update(operator=self.commands.currentOperator.name)
             if mouseLeftDown:
                 self.commands.operatorState = True if self.commands.operatorState == None else self.commands.operatorState
                 region = operator.apply2(mapPoint, mousePoint, region, copy.deepcopy(region))
-                self.commands.update(operator=self.commands.currentOperator.name)
             elif self.commands.operatorState != None:
                 self.commands.currentOperator = None; self.commands.update(operator=None); rc = False;
         else:
@@ -359,7 +360,7 @@ class RoarCanvasWindow(GuiWindow):
         super().__init__(parent, pos)
         self.lastMouseState, self.size = [False, False, False], size
         self.backend, self.canvas, self.commands, self.parentFrame = backend(self.size), canvas, commands(self, parent), parent
-        self.brushColours, self.brushPos, self.brushSize, self.dirty, self.lastCellState = [4, 1], [0, 0], [1, 1], False, None
+        self.brushColours, self.brushPos, self.brushSize, self.dirty, self.lastCellState = [3, 9], [0, 0], [1, 1], False, None
         self.popupEventDc = None
         self.dropTarget = RoarCanvasWindowDropTarget(self)
         self.SetDropTarget(self.dropTarget)
