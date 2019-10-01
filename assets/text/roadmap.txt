@@ -1,0 +1,13 @@
+1)  canvas: default to transparent background colour
+2)  GUI: disable tiling items unless current tool is object tool
+3)  GUI: edit asset in new canvas, import from {canvas,object}
+4)  GUI: implement GuiCanvasWxBackendFast.c{,c}
+5)  GUI: select all
+6)  GUI: show line numbers w/ either ruler or tooltip
+7)  operators: copy, cut, delete, insert from, paste
+8)  operators: crop, scale, shift, slice operators
+9)  tools: measure, triangle, unicode block elements tool
+10) tools: text tool: finish Arabic/RTL text implementation
+11) tools: text tool: implicitly draw (text) w/ bg -1, toggle drawing actual brushColours[1] mode w/ RMB
+
+vim:ff=dos tw=0

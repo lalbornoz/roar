@@ -5,9 +5,7 @@
 # This project is licensed under the terms of the MIT licence.
 #
 
-import re, statistics, time
-
-timeState = [None, None, 0, []]
+import re
 
 def flatten(l):
     return [li for l_ in l for li in l_]
@@ -16,20 +14,5 @@ def natural_sort(l):
     convert = lambda text: int(text) if text.isdigit() else text.lower() 
     alphanum_key = lambda key: [convert(c) for c in re.split('([0-9]+)', key)] 
     return sorted(l, key=alphanum_key)
-
-def timePrint(pfx):
-    timeState[0] = time.time() if timeState[0] == None else timeState[0]
-    t1 = time.time(); td = t1 - timeState[0]
-    if td > 0:
-        timeState[1] = td if timeState[1] == None else min(td, timeState[1])
-        timeState[2] = max(td, timeState[2])
-        timeState[3] += [td]
-        print("{} took {:.4f} ms (min: {:.4f} max: {:.4f} avg: {:.4f})".format(pfx, td * 1000, timeState[1] * 1000, timeState[2] * 1000, statistics.mean(timeState[3]) * 1000))
-
-def timeReset():
-    timeState = [None, None, 0, []]
-
-def timeStart():
-    timeState[0] = time.time()
 
 # vim:expandtab foldmethod=marker sw=4 ts=4 tw=120

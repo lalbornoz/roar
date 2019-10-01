@@ -56,11 +56,27 @@ class RoarCanvasWindow(GuiWindow):
                     self.canvas.applyPatch(patch, commitUndo=True)
                 self.canvas.journal.end()
             if patchesCursor != None:
-                patchesCursorCells = self.backend.drawPatches(self.canvas, eventDc, patchesCursor, isCursor=True)
-                if len(patchesCursorCells) > 0:
-                    self.canvas.journal.pushCursor(patchesCursorCells)
+                self.backend.drawPatches(self.canvas, eventDc, patchesCursor, isCursor=True)
+                if len(patchesCursor) > 0:
+                    self.canvas.journal.pushCursor(patchesCursor)
             eventDc.SetDeviceOrigin(*eventDcOrigin)
             self.commands.update(dirty=self.dirty, cellPos=self.brushPos, undoLevel=self.canvas.journal.patchesUndoLevel)
+
+    def _eraseBackground(self, eventDc):
+        viewRect = self.GetViewStart()
+        canvasSize, panelSize = [a * b for a, b in zip(self.backend.canvasSize, self.backend.cellSize)], self.GetSize()
+        if viewRect != (0, 0):
+            viewRect = [a * b for a, b in zip(self.backend.cellSize, viewRect)]
+            canvasSize = [a - b for a, b in zip(canvasSize, viewRect)]
+        rectangles, pens, brushes = [], [], []
+        if panelSize[0] > canvasSize[0]:
+            brushes += [self.bgBrush]; pens += [self.bgPen];
+            rectangles += [[canvasSize[0], 0, panelSize[0] - canvasSize[0], panelSize[1]]]
+        if panelSize[1] > canvasSize[1]:
+            brushes += [self.bgBrush]; pens += [self.bgPen];
+            rectangles += [[0, canvasSize[1], panelSize[0], panelSize[1] - canvasSize[1]]]
+        if len(rectangles) > 0:
+            eventDc.DrawRectangleList(rectangles, pens, brushes)
 
     def _snapshotsReset(self):
         self._snapshotFiles, self._snapshotsUpdateLast = [], time.time()
@@ -218,6 +234,9 @@ class RoarCanvasWindow(GuiWindow):
     def onEnterWindow(self, event):
         self.lastCellState = None
 
+    def onErase(self, event):
+        pass
+
     def onLeaveWindow(self, event):
         if False:
             eventDc = self.backend.getDeviceContext(self.GetClientSize(), self, self.GetViewStart())
@@ -245,6 +264,7 @@ class RoarCanvasWindow(GuiWindow):
         if modifiers == (wx.MOD_CONTROL | wx.MOD_ALT):
             newFontSize = self.backend.fontSize + delta
             if newFontSize > 0:
+                self.Freeze()
                 self.backend.fontSize = newFontSize
                 self.backend.resize(self.canvas.size); self.scrollStep = self.backend.cellSize;
                 super().resize([a * b for a, b in zip(self.canvas.size, self.backend.cellSize)])
@@ -256,6 +276,7 @@ class RoarCanvasWindow(GuiWindow):
                         patches += [[numCol, numRow, *self.canvas.map[numRow][numCol]]]
                 self.backend.drawPatches(self.canvas, eventDc, patches, isCursor=False)
                 eventDc.SetDeviceOrigin(*eventDcOrigin)
+                self.Thaw(); del eventDc; self._eraseBackground(wx.ClientDC(self));
         elif modifiers == (wx.MOD_CONTROL | wx.MOD_SHIFT):
             self.commands.canvasCanvasSize(self.commands.canvasCanvasSize, 2, 1 if delta > 0 else 0)(None)
         elif modifiers == wx.MOD_CONTROL:
@@ -264,51 +285,64 @@ class RoarCanvasWindow(GuiWindow):
             event.Skip()
 
     def onPaint(self, event):
+        viewRect = self.GetViewStart()
         eventDc = self.backend.getDeviceContext(self.GetClientSize(), self)
-        self.backend.onPaint(self.GetClientSize(), self, self.GetViewStart())
+        self.backend.onPaint(self.GetClientSize(), self, viewRect)
+        del eventDc; self._eraseBackground(wx.PaintDC(self));
 
-    def resize(self, newSize, commitUndo=True, dirty=True):
+    def resize(self, newSize, commitUndo=True, dirty=True, freeze=True):
+        if freeze:
+            self.Freeze()
         viewRect = self.GetViewStart()
         oldSize = [0, 0] if self.canvas.map == None else self.canvas.size
         deltaSize = [b - a for a, b in zip(oldSize, newSize)]
         if self.canvas.resize(newSize, commitUndo):
             self.backend.resize(newSize); self.scrollStep = self.backend.cellSize;
             super().resize([a * b for a, b in zip(newSize, self.backend.cellSize)])
-            eventDc = self.backend.getDeviceContext(self.GetClientSize(), self)
-            eventDcOrigin = eventDc.GetDeviceOrigin(); eventDc.SetDeviceOrigin(0, 0);
-            patches = []
-            if deltaSize[0] > 0:
-                for numRow in range(oldSize[1]):
-                    for numNewCol in range(oldSize[0], newSize[0]):
-                        patches += [[numNewCol, numRow, 1, 1, 0, " "]]
-            if deltaSize[1] > 1:
-                for numNewRow in range(oldSize[1], newSize[1]):
-                    for numNewCol in range(newSize[0]):
-                        patches += [[numNewCol, numNewRow, 1, 1, 0, " "]]
-            self.backend.drawPatches(self.canvas, eventDc, patches, isCursor=False)
-            eventDc.SetDeviceOrigin(*eventDcOrigin)
             self.Scroll(*viewRect); self.dirty = dirty;
             self.commands.update(dirty=self.dirty, size=newSize, undoLevel=self.canvas.journal.patchesUndoLevel)
             if commitUndo:
                 self._snapshotsUpdate()
+        if freeze:
+            eventDc = self.backend.getDeviceContext(self.GetClientSize(), self)
+            eventDcOrigin = eventDc.GetDeviceOrigin(); eventDc.SetDeviceOrigin(0, 0);
+            cursorPatches = self.canvas.journal.popCursor(reset=False)
+            if len(cursorPatches) > 0:
+                self.backend.drawPatches(self.canvas, eventDc, cursorPatches, isCursor=True)
+            eventDc.SetDeviceOrigin(*eventDcOrigin)
+            del eventDc; self.Thaw(); self._eraseBackground(wx.ClientDC(self));
 
     def undo(self, redo=False):
+        freezeFlag = False 
         deltaPatches = self.canvas.journal.popUndo() if not redo else self.canvas.journal.popRedo()
         eventDc = self.backend.getDeviceContext(self.GetClientSize(), self)
         eventDcOrigin = eventDc.GetDeviceOrigin(); eventDc.SetDeviceOrigin(0, 0);
-        self.backend.drawCursorMaskWithJournal(self.canvas, self.canvas.journal, eventDc)
+        patchesCursor = self.backend.drawCursorMaskWithJournal(self.canvas, self.canvas.journal, eventDc, reset=False)
         patches = []
         for patch in deltaPatches:
             if patch == None:
                 continue
             elif patch[0] == "resize":
-                del eventDc; self.resize(patch[1:], False);
-                eventDc = self.backend.getDeviceContext(self.GetClientSize(), self)
-                eventDcOrigin = eventDc.GetDeviceOrigin(); eventDc.SetDeviceOrigin(0, 0);
+                if not freezeFlag:
+                    self.Freeze(); freezeFlag = True;
+                eventDc = None; self.resize(patch[1:], False, freeze=False);
             else:
                self.canvas._commitPatch(patch); patches += [patch];
+        if eventDc == None:
+            eventDc = self.backend.getDeviceContext(self.GetClientSize(), self)
+            eventDcOrigin = eventDc.GetDeviceOrigin(); eventDc.SetDeviceOrigin(0, 0);
         self.backend.drawPatches(self.canvas, eventDc, patches, isCursor=False)
+        if len(patchesCursor):
+            self.backend.drawPatches(self.canvas, eventDc, patchesCursor, isCursor=True)
         eventDc.SetDeviceOrigin(*eventDcOrigin)
+        if freezeFlag:
+            eventDc = self.backend.getDeviceContext(self.GetClientSize(), self)
+            eventDcOrigin = eventDc.GetDeviceOrigin(); eventDc.SetDeviceOrigin(0, 0);
+            cursorPatches = self.canvas.journal.popCursor(reset=False)
+            if len(cursorPatches) > 0:
+                self.backend.drawPatches(self.canvas, eventDc, cursorPatches, isCursor=True)
+            eventDc.SetDeviceOrigin(*eventDcOrigin)
+            del eventDc; self.Thaw(); self._eraseBackground(wx.ClientDC(self));
 
     def update(self, newSize, commitUndo=True, newCanvas=None, dirty=True):
         self.resize(newSize, commitUndo, dirty)
@@ -329,6 +363,8 @@ class RoarCanvasWindow(GuiWindow):
         self.popupEventDc = None
         self.dropTarget = RoarCanvasWindowDropTarget(self)
         self.SetDropTarget(self.dropTarget)
+        self.bgBrush, self.bgPen = wx.Brush(self.GetBackgroundColour(), wx.BRUSHSTYLE_SOLID), wx.Pen(self.GetBackgroundColour(), 1)
+        self.Bind(wx.EVT_ERASE_BACKGROUND, self.onErase)
         self.Bind(wx.EVT_MOUSEWHEEL, self.onMouseWheel)
         self._snapshotsReset()
 
