@@ -1,25 +1,20 @@
 1)  ANSI CSI CU[BDPU] sequences
-2)  Fix & finish Arabic/RTL text tool support
 3)  Documentation, instrumentation & unit tests
 4)  Layers & layout (e.g. for comics, zines, etc.)
 5)  Open and toggle a reference image in the background
 6)  Client-Server or Peer-to-Peer realtime collaboration
 7)  Arbitrary {format,palette}s ({4,8} bit ANSI/mIRC, etc.)
-8)  {record,replay} {keyboard,mouse,...} events in debugging builds
-9)  Unit tools: arrow, {cloud,speech bubble}, curve, measure, polygon, triangle
+8)  Unit tools: arrow, {cloud,speech bubble}, curve, polygon
+9)  {record,replay} {keyboard,mouse,...} events in debugging builds
 10) Integrate ENNTool code in the form of OpenGL-based animation window (see 13) and 14))
 11) Composition, parametrisation & keying of tools from higher-order operators (brushes, functions, filters, outlines, patterns & shaders) and unit tools
 12) Sprites & scripted (Python?) animation on the basis of asset traits and {composable,parametrised} patterns (metric flow, particle system, rigging, ...)
 13) GUI TODO list:
     a) switch to Gtk
-    b) https://material.io/resources/icons/?style=baseline
-    c) replace logo w/ canvas panel in About dialogue, revisit melp? dialogue
-    d) replace resize buttons w/ {-,edit box,+} buttons & lock button re: ratio (ty lol3)
-    e) Settings/Settings window (e.g. autosave, cursor opacity, hide cursor on leaving window, ...)
-
-Release roadmap:
-1)  {copy,cut,delete,insert from,paste}, edit asset in new canvas, import from {canvas,object}
-2)  operators: crop, scale, shift, slice
-3)  tools: unicode block elements
+    b) canvas preview in Open dialogue(s)
+    c) https://material.io/resources/icons/?style=baseline
+    d) replace logo w/ canvas panel in About dialogue, revisit melp? dialogue
+    e) replace resize buttons w/ {-,edit box,+} buttons & lock button re: ratio (ty lol3)
+    f) Settings/Settings window (e.g. autosave, cursor opacity, hide cursor on leaving window, ...)
 
 vim:ff=dos tw=0

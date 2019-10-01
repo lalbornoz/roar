@@ -101,6 +101,8 @@ class CanvasImportStore():
                                 inCurColours = (int(m[2]), int(m[3]))
                             elif (m[2] != None) and (m[3] == None):
                                 inCurColours = (int(m[2]), int(inCurColours[1]))
+                            elif (m[2] == None) and (m[3] != None):
+                                inCurColours = (int(inCurColours[0]), int(m[3]))
                             else:
                                 inCurColours = (15, -1)
                             inCurCol += len(m[0])

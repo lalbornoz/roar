@@ -1,5 +1,9 @@
 *.sw[op]
 __pycache__/
 build/
+libgui/GuiCanvasWxBackendFast.exp
+libgui/GuiCanvasWxBackendFast.lib
+libgui/GuiCanvasWxBackendFast.obj
+libgui/GuiCanvasWxBackendFast.pyd
 librtl/ImgurApiKey.py
 releases/
