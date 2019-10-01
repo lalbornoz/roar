@@ -31,8 +31,12 @@ def main(*argv):
             roarClient.canvasPanel.update(roarClient.canvasPanel.canvas.importStore.inSize, False, roarClient.canvasPanel.canvas.importStore.outMap, dirty=False)
             roarClient.canvasPanel.commands.update(pathName=argv[0], undoLevel=-1)
             roarClient.canvasPanel.commands._pushRecent(argv[0])
+            roarClient.canvasPanel.commands.canvasTool(roarClient.canvasPanel.commands.canvasTool, 1)(None)
         else:
             print("error: {}".format(error), file=sys.stderr)
+    else:
+        roarClient.canvasPanel.commands.canvasNew(None)
+        roarClient.canvasPanel.commands.canvasTool(roarClient.canvasPanel.commands.canvasTool, 1)(None)
     wxApp.MainLoop()
 if __name__ == "__main__":
     main(*sys.argv)

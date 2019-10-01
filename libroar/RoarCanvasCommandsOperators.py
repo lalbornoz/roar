@@ -18,7 +18,7 @@ class RoarCanvasCommandsOperators():
     @GuiCommandListDecorator(1, "Flip horizontally", "Flip &horizontally", None, None, None)
     @GuiCommandListDecorator(2, "Invert colours", "&Invert colours", None, None, None)
     @GuiCommandListDecorator(3, "Rotate", "&Rotate", None, None, None)
-    @GuiCommandListDecorator(4, "Tile", "&Tile", None, None, None)
+    @GuiCommandListDecorator(4, "Tile", "&Tile", None, None, False)
     def canvasOperator(self, f, idx):
         def canvasOperator_(event):
             self.currentOperator = [OperatorFlipVertical, OperatorFlipHorizontal, OperatorInvert, OperatorRotate, OperatorTile][idx]()

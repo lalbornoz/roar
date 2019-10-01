@@ -21,7 +21,10 @@ class ToolErase(Tool):
                 and  ((mapPoint[0] + brushCol) < canvas.size[0])    \
                 and  ((mapPoint[1] + brushRow) < canvas.size[1])    \
                 and  (canvas.map[mapPoint[1] + brushRow][mapPoint[0] + brushCol][1] == brushColours[1]):
-                    patches += [[mapPoint[0] + brushCol, mapPoint[1] + brushRow, canvas.map[mapPoint[1] + brushRow][mapPoint[0] + brushCol][0], brushColours[0], *canvas.map[mapPoint[1] + brushRow][mapPoint[0] + brushCol][2:]]]
+                    if canvas.map[mapPoint[1] + brushRow][mapPoint[0] + brushCol][3] == " ":
+                        patches += [[mapPoint[0] + brushCol, mapPoint[1] + brushRow, brushColours[0], brushColours[0], *canvas.map[mapPoint[1] + brushRow][mapPoint[0] + brushCol][2:]]]
+                    else:
+                        patches += [[mapPoint[0] + brushCol, mapPoint[1] + brushRow, canvas.map[mapPoint[1] + brushRow][mapPoint[0] + brushCol][0], brushColours[0], *canvas.map[mapPoint[1] + brushRow][mapPoint[0] + brushCol][2:]]]
                 else:
                     patchesCursor += [[mapPoint[0] + brushCol, mapPoint[1] + brushRow, brushColours[1], brushColours[1], 0, " "]]
         return True, patches if not isCursor else None, patchesCursor
