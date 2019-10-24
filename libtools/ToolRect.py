@@ -18,17 +18,9 @@ class ToolRect(Tool):
             for brushCol in range((rect[2] - rect[0]) + 1):
                 if (brushCol in [0, (rect[2] - rect[0])]) or (brushRow in [0, (rect[3] - rect[1])]):
                     patchColours = [brushColours[0]] * 2
-                    patch = [rect[0] + brushCol, rect[1] + brushRow, *patchColours, 0, " "]
-                elif brushColours[1] == -1:
-                    if  ((rect[0] + brushCol) < canvas.size[0]) \
-                    and ((rect[1] + brushRow) < canvas.size[1]):
-                        patch = [rect[0] + brushCol, rect[1] + brushRow, *canvas.map[rect[1] + brushRow][rect[0] + brushCol]]
-                    else:
-                        patch = [rect[0] + brushCol, rect[1] + brushRow, -1, -1, 0, " "]
                 else:
                     patchColours = [brushColours[1]] * 2
-                    patch = [rect[0] + brushCol, rect[1] + brushRow, *patchColours, 0, " "]
-                patches += [patch]
+                patches += [[rect[0] + brushCol, rect[1] + brushRow, *patchColours, 0, " "]]
         return patches
 
     def onMouseEvent(self, atPoint, brushColours, brushPos, brushSize, canvas, keyModifiers, mapPoint, mouseDragging, mouseLeftDown, mouseRightDown):

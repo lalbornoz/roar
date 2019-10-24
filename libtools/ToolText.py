@@ -70,12 +70,17 @@ class ToolText(Tool):
             rc = True
         elif keyCode == wx.WXK_CONTROL_V:
             rc = True
-            if  wx.TheClipboard.IsSupported(wx.DataFormat(wx.DF_TEXT))  \
-            and wx.TheClipboard.Open():
+            if  wx.TheClipboard.IsSupported(wx.DataFormat(wx.DF_TEXT)) and wx.TheClipboard.Open():
                 inBuffer = wx.TextDataObject()
                 if wx.TheClipboard.GetData(inBuffer):
+                    brushPosOriginX = brushPos[0]
                     for inBufferChar in list(inBuffer.GetText()):
-                        if not re.match(self.arabicCombiningRegEx, inBufferChar):
+                        if inBufferChar in set("\r\n"):
+                            if brushPos[1] < (canvas.size[1] - 1):
+                                brushPos[0], brushPos[1] = brushPosOriginX, brushPos[1] + 1
+                            else:
+                                brushPos[0], brushPos[1] = brushPosOriginX, 0
+                        elif not re.match(self.arabicCombiningRegEx, inBufferChar):
                             rc_, patches_ = self._processKeyChar(brushColours, brushPos, canvas, inBufferChar, 0)
                             patches += patches_
                             rc = True if rc_ else rc

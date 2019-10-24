@@ -14,6 +14,7 @@ class RoarWindowAbout(wx.Dialog):
     def __init__(self, parent, minSize=(320, 300), title="About roar"):
         super().__init__(parent, size=minSize, title=title)
         self.panel, self.sizer, self.sizerV = wx.Panel(self), wx.FlexGridSizer(2, 2, 4, 4), wx.BoxSizer(wx.VERTICAL)
+        self.panel.SetBackgroundColour(wx.Colour(0, 0, 0)); self.panel.SetForegroundColour(wx.Colour(0, 187, 0));
 
         logoPathNames = glob(os.path.join("assets", "images", "logo*.bmp"))
         logoPathName = logoPathNames[random.randint(0, len(logoPathNames) - 1)]

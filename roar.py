@@ -20,7 +20,7 @@ def main(*argv):
         os.makedirs(localConfirName)
     wxApp, roarClient = wx.App(False), RoarClient(None)
     argv0, argv = argv[0], argv[1:]
-    roarClient.canvasPanel.commands._loadLastDir(); roarClient.canvasPanel.commands._loadRecent();
+    roarClient.canvasPanel.commands._recentDirLoad(); roarClient.canvasPanel.commands._recentLoad();
     if len(argv) >= 1:
         if (len(argv) >= 2) and (argv[1].endswith(".lst")):
             roarClient.assetsWindow._load_list(argv[1])
@@ -30,7 +30,7 @@ def main(*argv):
         if rc:
             roarClient.canvasPanel.update(roarClient.canvasPanel.canvas.importStore.inSize, False, roarClient.canvasPanel.canvas.importStore.outMap, dirty=False)
             roarClient.canvasPanel.commands.update(pathName=argv[0], undoLevel=-1)
-            roarClient.canvasPanel.commands._pushRecent(argv[0])
+            roarClient.canvasPanel.commands._recentPush(argv[0])
             roarClient.canvasPanel.commands.canvasTool(roarClient.canvasPanel.commands.canvasTool, 1)(None)
         else:
             print("error: {}".format(error), file=sys.stderr)
