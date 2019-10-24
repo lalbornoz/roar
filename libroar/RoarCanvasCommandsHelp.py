@@ -4,7 +4,7 @@
 # Copyright (c) 2018, 2019 Lucio Andrés Illanes Albornoz <lucio@lucioillanes.de>
 #
 
-from GuiFrame import GuiCommandDecorator, NID_MENU_SEP
+from GuiFrame import GuiCommandDecorator
 from RoarWindowAbout import RoarWindowAbout
 from RoarWindowMelp import RoarWindowMelp
 import webbrowser, wx
@@ -25,9 +25,5 @@ class RoarCanvasCommandsHelp():
     @GuiCommandDecorator("Visit GitHub website", "Visit &GitHub website", None, None, True)
     def canvasVisitGitHub(self, event):
         webbrowser.open("https://www.github.com/lalbornoz/roar")
-
-    def __init__(self):
-        self.accels = ()
-        self.menus, self.toolBars = (("&Help", self.canvasMelp, NID_MENU_SEP, self.canvasNewIssueGitHub, self.canvasVisitGitHub, NID_MENU_SEP, self.canvasAbout,),), ()
 
 # vim:expandtab foldmethod=marker sw=4 ts=4 tw=0

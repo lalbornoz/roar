@@ -13,6 +13,7 @@ class RoarWindowMelp(wx.Dialog):
     def __init__(self, parent, minSize=(320, 300), title="melp?"):
         super().__init__(parent, size=minSize, title=title)
         self.panel, self.sizer = wx.Panel(self), wx.BoxSizer(wx.VERTICAL)
+        self.panel.SetBackgroundColour(wx.Colour(0, 0, 0)); self.panel.SetForegroundColour(wx.Colour(0, 187, 0));
 
         with open(os.path.join("assets", "text", "melp.txt"), "r") as fileObject:
             helpLabel = "".join(fileObject.readlines())

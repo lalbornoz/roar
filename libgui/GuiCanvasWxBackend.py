@@ -4,10 +4,14 @@
 # Copyright (c) 2018, 2019 Lucio Andrés Illanes Albornoz <lucio@lucioillanes.de>
 #
 
-from ctypes import *
+try:
+    import GuiCanvasWxBackendFast; haveGuiCanvasWxBackendFast = True;
+except ImportError as e:
+    print("Failed to import GuiCanvasWxBackendFast: {}".format(e)); haveGuiCanvasWxBackendFast = False;
+
+from ctypes import WinDLL
 from GuiCanvasColours import Colours
-import GuiCanvasWxBackendFast
-import math, os, platform, wx
+import math, os, platform, Rtl, wx
 
 class GuiBufferedDC(wx.MemoryDC):
     def __del__(self):
@@ -143,20 +147,7 @@ class GuiCanvasWxBackend():
                 brush, pen = self._brushesBlend[bg][14], self._pensBlend[bg][14]
         return brush, pen
 
-    def drawCursorMaskWithJournal(self, canvas, canvasJournal, eventDc, reset=True):
-        eventDcOrigin = eventDc.GetDeviceOrigin(); eventDc.SetDeviceOrigin(0, 0);
-        cursorPatches = canvasJournal.popCursor(reset=reset); patches = [];
-        for cursorCell in [p[:2] for p in cursorPatches]:
-            if  (cursorCell[0] < canvas.size[0])    \
-            and (cursorCell[1] < canvas.size[1]):
-                patches += [[*cursorCell, *canvas.map[cursorCell[1]][cursorCell[0]]]]
-        if len(patches) > 0:
-            self.drawPatches(canvas, eventDc, patches, False)
-        eventDc.SetDeviceOrigin(*eventDcOrigin)
-        return cursorPatches
-
     def drawPatches(self, canvas, eventDc, patches, isCursor=False):
-        GuiCanvasWxBackendFast.drawPatches()
         patchesRender = []
         for patch in patches:
             point = patch[:2]
@@ -166,6 +157,8 @@ class GuiCanvasWxBackend():
                         patchesRender += [patchReshaped]
                 else:
                     patchesRender += [patch]
+        if haveGuiCanvasWxBackendFast:
+            GuiCanvasWxBackendFast.drawPatches(self.canvasBitmap, canvas.map, canvas.size, eventDc, isCursor, patchesRender); return;
         numPatch, textBg = 0, wx.Colour(0, 0, 0, 0)
         rectangles, pens, brushes = [None] * len(patchesRender), [None] * len(patchesRender), [None] * len(patchesRender)
         textList, coords, foregrounds, backgrounds = [], [], [], []
@@ -173,10 +166,10 @@ class GuiCanvasWxBackend():
         for patchRender in patchesRender:
             if (patchRender[5] == " ") and (patchRender[3] == -1):
                 text, textFg = "░", wx.Colour(0, 0, 0, 255)
-            elif isCursor and (patchRender[5] == " ") and (canvas.map[patchRender[1]][patchRender[0]][3] != " "):
+            elif False and isCursor and (patchRender[5] == " ") and (canvas.map[patchRender[1]][patchRender[0]][3] != " "):
                 patchRender = [*patchRender[:-2], *canvas.map[patchRender[1]][patchRender[0]][2:]]
                 text, textFg = canvas.map[patchRender[1]][patchRender[0]][3], wx.Colour(self._blendColours(canvas.map[patchRender[1]][patchRender[0]][0], patchRender[3]))
-            elif isCursor and (patchRender[5] == " ") and (canvas.map[patchRender[1]][patchRender[0]][2] & self._CellState.CS_UNDERLINE):
+            elif False and isCursor and (patchRender[5] == " ") and (canvas.map[patchRender[1]][patchRender[0]][2] & self._CellState.CS_UNDERLINE):
                 patchRender = [*patchRender[:-2], *canvas.map[patchRender[1]][patchRender[0]][2:]]
                 text, textFg = "_", wx.Colour(self._blendColours(canvas.map[patchRender[1]][patchRender[0]][0], patchRender[3]))
             elif patchRender[5] != " ":
@@ -228,9 +221,11 @@ class GuiCanvasWxBackend():
             oldDc = wx.MemoryDC(); oldDc.SelectObject(self.canvasBitmap);
             newDc = wx.MemoryDC(); newBitmap = wx.Bitmap(winSize); newDc.SelectObject(newBitmap);
             newDc.Blit(0, 0, *self.canvasBitmap.GetSize(), oldDc, 0, 0)
-            oldDc.SelectObject(wx.NullBitmap)
+            oldDc.SelectObject(wx.NullBitmap); newDc.SelectObject(wx.NullBitmap);
             self.canvasBitmap.Destroy(); self.canvasBitmap = newBitmap;
-        self.canvasSize = canvasSize
+        self.canvasSize = canvasSize;
+        if haveGuiCanvasWxBackendFast:
+            GuiCanvasWxBackendFast.resize(tuple(self.cellSize), self._font, tuple(winSize))
 
     def xlateEventPoint(self, event, eventDc, viewRect):
         eventPoint = event.GetLogicalPosition(eventDc)
@@ -244,6 +239,8 @@ class GuiCanvasWxBackend():
         self._finiBrushesAndPens()
 
     def __init__(self, canvasSize, fontName="Dejavu Sans Mono", fontPathName=os.path.join("assets", "fonts", "DejaVuSansMono.ttf"), fontSize=8):
+        if haveGuiCanvasWxBackendFast:
+            GuiCanvasWxBackendFast.init(wx)
         self._brushes, self._font, self._lastBrush, self._lastPen, self._pens = None, None, None, None, None
         self.canvasBitmap, self.cellSize, self.fontName, self.fontPathName, self.fontSize = None, None, fontName, fontPathName, fontSize
         if platform.system() == "Windows":

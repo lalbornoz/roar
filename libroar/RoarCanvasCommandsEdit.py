@@ -4,7 +4,7 @@
 # Copyright (c) 2018, 2019 Lucio Andrés Illanes Albornoz <lucio@lucioillanes.de>
 #
 
-from GuiFrame import GuiCommandDecorator, GuiCommandListDecorator, GuiSelectDecorator, NID_MENU_SEP
+from GuiFrame import GuiCommandDecorator, GuiCommandListDecorator, GuiSelectDecorator
 import wx
 
 class RoarCanvasCommandsEdit():
@@ -194,31 +194,10 @@ class RoarCanvasCommandsEdit():
 
     @GuiCommandDecorator("Redo", "&Redo", ["", wx.ART_REDO], [wx.ACCEL_CTRL, ord("Y")], False)
     def canvasRedo(self, event):
-        self.parentCanvas.undo(redo=True); self.update(size=self.parentCanvas.canvas.size, undoLevel=self.parentCanvas.canvas.journal.patchesUndoLevel);
+        self.parentCanvas.undo(redo=True); self.update(size=self.parentCanvas.canvas.size, undoLevel=self.parentCanvas.canvas.patchesUndoLevel);
 
     @GuiCommandDecorator("Undo", "&Undo", ["", wx.ART_UNDO], [wx.ACCEL_CTRL, ord("Z")], False)
     def canvasUndo(self, event):
-        self.parentCanvas.undo(); self.update(size=self.parentCanvas.canvas.size, undoLevel=self.parentCanvas.canvas.journal.patchesUndoLevel);
-
-    def __init__(self):
-        self.accels = (
-            (self.canvasColourBackground(self.canvasColourBackground, 0), self.canvasColourBackground(self.canvasColourBackground, 1), self.canvasColourBackground(self.canvasColourBackground, 2), self.canvasColourBackground(self.canvasColourBackground, 3), self.canvasColourBackground(self.canvasColourBackground, 4), self.canvasColourBackground(self.canvasColourBackground, 5), self.canvasColourBackground(self.canvasColourBackground, 6), self.canvasColourBackground(self.canvasColourBackground, 7), self.canvasColourBackground(self.canvasColourBackground, 8), self.canvasColourBackground(self.canvasColourBackground, 9), self.canvasColourBackground(self.canvasColourBackground, 10), self.canvasColourBackground(self.canvasColourBackground, 11), self.canvasColourBackground(self.canvasColourBackground, 12), self.canvasColourBackground(self.canvasColourBackground, 13), self.canvasColourBackground(self.canvasColourBackground, 14), self.canvasColourBackground(self.canvasColourBackground, 15), self.canvasColourAlphaBackground(self.canvasColourAlphaBackground, 0),),
-        )
-        self.menus = (
-            ("&Edit",
-                self.canvasUndo, self.canvasRedo, NID_MENU_SEP,
-                self.canvasCut, self.canvasCopy, self.canvasPaste,
-                self.canvasDelete, NID_MENU_SEP,
-                ("Brush size", self.canvasBrushSize(self.canvasBrushSize, 0, True), self.canvasBrushSize(self.canvasBrushSize, 0, False), self.canvasBrushSize(self.canvasBrushSize, 1, True), self.canvasBrushSize(self.canvasBrushSize, 1, False), NID_MENU_SEP,
-                    self.canvasBrushSize(self.canvasBrushSize, 2, True), self.canvasBrushSize(self.canvasBrushSize, 2, False),),
-                ("Canvas size", self.canvasCanvasSize(self.canvasCanvasSize, 1, True), self.canvasCanvasSize(self.canvasCanvasSize, 1, False), self.canvasCanvasSize(self.canvasCanvasSize, 0, True), self.canvasCanvasSize(self.canvasCanvasSize, 0, False), NID_MENU_SEP,
-                    self.canvasCanvasSize(self.canvasCanvasSize, 2, True), self.canvasCanvasSize(self.canvasCanvasSize, 2, False),),
-                self.canvasColoursFlip,
-                NID_MENU_SEP,
-                self.canvasBrush(self.canvasBrush, 0), NID_MENU_SEP,
-                self.canvasAssetsWindowHide, self.canvasAssetsWindowShow,
-            ),
-        )
-        self.toolBars = ()
+        self.parentCanvas.undo(); self.update(size=self.parentCanvas.canvas.size, undoLevel=self.parentCanvas.canvas.patchesUndoLevel);
 
 # vim:expandtab foldmethod=marker sw=4 ts=4 tw=0
