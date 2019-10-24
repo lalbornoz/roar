@@ -6,7 +6,7 @@
                 {
                         "label": "Build libgui/GuiCanvasWxBackendFast.pyd",
                         "type": "shell",
-                        "command": "cd \"${workspaceFolder}/libgui\" && cmd /c cl /LD /IC:/Python37/include GuiCanvasWxBackendFast.c C:/Python37/libs/python37.lib /FeGuiCanvasWxBackendFast.pyd",
+                        "command": "cd \"${workspaceFolder}/libgui\" && cmd /c cl /EHsc /LD /Ox /Wall /WX /IC:/Python37/include GuiCanvasWxBackendFast.cpp C:/Python37/libs/python37.lib /FeGuiCanvasWxBackendFast.pyd",
                         "problemMatcher": [
                                 "$msCompile"
                         ]

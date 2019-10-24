@@ -1,4 +1,4 @@
-1)  Backend: correctly refresh transparent cursor cells when drawing cursor patches
+1)  GUI: drag & drop file outside of canvas to open, into canvas as object w/ select tool
 2)  GUI: edit asset in new canvas, import from {canvas,object}
 3)  GUI: implement GuiCanvasWxBackendFast.c{,c}
 4)  GUI: select all
@@ -6,8 +6,10 @@
 6)  Operators: copy, cut, delete, insert from, paste
 7)  Operators: crop, scale, shift, slice operators
 8)  Tools: measure, triangle, unicode block elements tool
-9)  Tools: object tool: reimplement cloning correctly outside of object tool
-10) Tools: text tool: finish Arabic/RTL text implementation
-11) Tools: text tool: implicitly draw (text) w/ bg -1, toggle drawing actual brushColours[1] mode w/ RMB
+9)  Tools: object tool: allow application of arbitrary tool to selection before setting
+10) Tools: object tool: reimplement cloning correctly outside of object tool
+11) Tools: reimplement in C++
+12) Tools: text tool: finish Arabic/RTL text implementation
+13) Tools: text tool: implicitly draw (text) w/ bg -1, toggle drawing actual brushColours[1] mode w/ RMB
 
 vim:ff=dos tw=0

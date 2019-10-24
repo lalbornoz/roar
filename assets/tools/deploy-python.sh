@@ -32,6 +32,9 @@ deploy() {
 		-not -path '*/__pycache__/*'		\
 		-not -path '*/__pycache__'		\
 		-not -path './librtl/ImgurApiKey.py'	\
+		-not -name '*.exp'			\
+		-not -name '*.lib'			\
+		-not -name '*.obj'			\
 		-not -name '*.sw*'			\
 		-not -name "${0##*/}"			|\
 			cpio --quiet -dLmp "${_release_dname}";

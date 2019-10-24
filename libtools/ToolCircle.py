@@ -34,12 +34,6 @@ class ToolCircle(Tool):
                     elif ((numRow > 0) and (cells[numRow][numCol][0] > cells[numRow - 1][-1][0]))   \
                     or   ((numRow < len(cells)) and (cells[numRow][numCol][0] > cells[numRow + 1][-1][0])):
                         patch = [*cells[numRow][numCol], brushColours[0], brushColours[0], 0, " "]
-                    elif brushColours[1] == -1:
-                        if  (cells[numRow][numCol][0] < canvas.size[0])                             \
-                        and (cells[numRow][numCol][1] < canvas.size[1]):
-                            patch = [cells[numRow][numCol][0], cells[numRow][numCol][1], *canvas.map[cells[numRow][numCol][1]][cells[numRow][numCol][0]]]
-                        else:
-                            patch = [*cells[numRow][numCol], brushColours[1], brushColours[1], 0, " "]
                     else:
                         patch = [*cells[numRow][numCol], brushColours[1], brushColours[1], 0, " "]
                     patches += [patch]

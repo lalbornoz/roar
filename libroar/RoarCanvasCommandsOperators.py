@@ -4,14 +4,13 @@
 # Copyright (c) 2018, 2019 Lucio Andrés Illanes Albornoz <lucio@lucioillanes.de>
 #
 
+from GuiFrame import GuiCommandListDecorator
 from OperatorFlipHorizontal import OperatorFlipHorizontal
 from OperatorFlipVertical import OperatorFlipVertical
 from OperatorInvert import OperatorInvert
 from OperatorRotate import OperatorRotate
 from OperatorTile import OperatorTile
-from GuiFrame import GuiCommandListDecorator
 from ToolObject import ToolObject
-import copy, wx
 
 class RoarCanvasCommandsOperators():
     @GuiCommandListDecorator(0, "Flip", "&Flip", None, None, None)
@@ -28,13 +27,6 @@ class RoarCanvasCommandsOperators():
         return canvasOperator_
 
     def __init__(self):
-        self.accels = ()
-        self.menus = (
-            ("&Operators",
-                self.canvasOperator(self.canvasOperator, 0), self.canvasOperator(self.canvasOperator, 1), self.canvasOperator(self.canvasOperator, 2), self.canvasOperator(self.canvasOperator, 3), self.canvasOperator(self.canvasOperator, 4),
-            ),
-        )
-        self.toolBars = ()
         self.currentOperator, self.operatorState = None, None
 
 # vim:expandtab foldmethod=marker sw=4 ts=4 tw=0

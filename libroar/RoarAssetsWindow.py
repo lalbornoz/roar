@@ -165,7 +165,7 @@ class RoarAssetsWindow(GuiMiniFrame):
     def resize(self, canvas, newSize):
         oldSize = [0, 0] if canvas.map == None else canvas.size
         deltaSize = [b - a for a, b in zip(oldSize, newSize)]
-        if canvas.resize(newSize, False):
+        if canvas.resize((1, 1,), newSize, False):
             panelSize = [a * b for a, b in zip(canvas.size, self.backend.cellSize)]
             self.panelCanvas.SetMinSize(panelSize); self.panelCanvas.SetSize(wx.DefaultCoord, wx.DefaultCoord, *panelSize);
             curWindow = self.panelCanvas
@@ -228,6 +228,7 @@ class RoarAssetsWindow(GuiMiniFrame):
             id = +1 if keyCode == wx.WXK_DOWN else -1
             self.currentIndex = (self.currentIndex + id) % len(self.canvasList)
             self.listView.Select(self.currentIndex, on=1)
+            self.listView.EnsureVisible(self.currentIndex)
         else:
             index, rc = self.listView.GetFirstSelected(), False
             if index != -1:
@@ -304,6 +305,8 @@ class RoarAssetsWindow(GuiMiniFrame):
                 break
         while len(items):
             self._removeAsset(items[0]); del items[0]; items = [i - 1 for i in items];
+        if self.currentIndex != None:
+            self.listView.EnsureVisible(self.currentIndex)
 
     def onSaveList(self, event):
         rc = True
