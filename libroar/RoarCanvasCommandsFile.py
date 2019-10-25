@@ -247,7 +247,7 @@ class RoarCanvasCommandsFile():
         def canvasImportEmpty(pathName):
             nonlocal newCanvasSize
             if newCanvasSize == None:
-                newCanvasSize = list(self.parentCanvas.canvas.size)
+                newCanvasSize = [100, 30]
             newMap = [[[*self.parentCanvas.brushColours, 0, " "] for x in range(newCanvasSize[0])] for y in range(newCanvasSize[1])]
             return (True, "", newMap, None, newCanvasSize)
         if self._promptSaveChanges():
