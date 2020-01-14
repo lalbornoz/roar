@@ -1,0 +1,268 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Qt Files">
+      <UniqueIdentifier>{6e37976b-044e-4179-b019-74db52729a10}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Python Files">
+      <UniqueIdentifier>{1e8dd17b-d6ed-4fd8-913b-34f993cc5920}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="libcanvas">
+      <UniqueIdentifier>{d6b1ff75-b7aa-4b7c-bbce-20091145029d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="libgui">
+      <UniqueIdentifier>{cbe0335f-fac3-405f-aeaa-39d2564371bb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="librtl">
+      <UniqueIdentifier>{4add3d1d-9549-40df-9847-d1295fb5405c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="libtools">
+      <UniqueIdentifier>{75543269-0692-40a2-9378-60a82b70c1e5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Text Files">
+      <UniqueIdentifier>{3e36d6d9-4cf5-4b33-bd13-6034f56f75c7}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\roar-python\libgui\GuiCanvasWxBackendFast.cpp">
+      <Filter>Python Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libcanvas\Canvas.cpp">
+      <Filter>libcanvas</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libcanvas\subr_export.cpp">
+      <Filter>libcanvas</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libcanvas\subr_import.cpp">
+      <Filter>libcanvas</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libgui\CanvasEditorWindow.cpp">
+      <Filter>libgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libgui\CanvasWidget.cpp">
+      <Filter>libgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libgui\roar.cpp">
+      <Filter>libgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\librtl\subr_rtl.cpp">
+      <Filter>librtl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libtools\ToolRect.cpp">
+      <Filter>libtools</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libtools\ToolCursor.cpp">
+      <Filter>libtools</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libtools\ToolCircle.cpp">
+      <Filter>libtools</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libtools\ToolErase.cpp">
+      <Filter>libtools</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libtools\ToolFill.cpp">
+      <Filter>libtools</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libtools\ToolLine.cpp">
+      <Filter>libtools</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libtools\ToolObject.cpp">
+      <Filter>libtools</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libtools\ToolPickColour.cpp">
+      <Filter>libtools</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libtools\ToolText.cpp">
+      <Filter>libtools</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\libgui\roar.pro">
+      <Filter>Qt Files</Filter>
+    </None>
+    <None Include="..\libgui\roar.ui">
+      <Filter>Qt Files</Filter>
+    </None>
+    <None Include="..\roar-python\libcanvas\Canvas.py">
+      <Filter>Python Files</Filter>
+    </None>
+    <None Include="..\roar-python\libcanvas\CanvasColours.py">
+      <Filter>Python Files</Filter>
+    </None>
+    <None Include="..\roar-python\libcanvas\CanvasExportStore.py">
+      <Filter>Python Files</Filter>
+    </None>
+    <None Include="..\roar-python\libcanvas\CanvasImportStore.py">
+      <Filter>Python Files</Filter>
+    </None>
+    <None Include="..\roar-python\libgui\GuiCanvasColours.py">
+      <Filter>Python Files</Filter>
+    </None>
+    <None Include="..\roar-python\libgui\GuiCanvasWxBackend.py">
+      <Filter>Python Files</Filter>
+    </None>
+    <None Include="..\roar-python\libgui\GuiFrame.py">
+      <Filter>Python Files</Filter>
+    </None>
+    <None Include="..\roar-python\libgui\GuiWindow.py">
+      <Filter>Python Files</Filter>
+    </None>
+    <None Include="..\roar-python\liboperators\Operator.py">
+      <Filter>Python Files</Filter>
+    </None>
+    <None Include="..\roar-python\liboperators\OperatorFlipHorizontal.py">
+      <Filter>Python Files</Filter>
+    </None>
+    <None Include="..\roar-python\liboperators\OperatorFlipVertical.py">
+      <Filter>Python Files</Filter>
+    </None>
+    <None Include="..\roar-python\liboperators\OperatorInvert.py">
+      <Filter>Python Files</Filter>
+    </None>
+    <None Include="..\roar-python\liboperators\OperatorRotate.py">
+      <Filter>Python Files</Filter>
+    </None>
+    <None Include="..\roar-python\liboperators\OperatorTile.py">
+      <Filter>Python Files</Filter>
+    </None>
+    <None Include="..\roar-python\libroar\RoarAssetsWindow.py">
+      <Filter>Python Files</Filter>
+    </None>
+    <None Include="..\roar-python\libroar\RoarCanvasCommands.py">
+      <Filter>Python Files</Filter>
+    </None>
+    <None Include="..\roar-python\libroar\RoarCanvasCommandsEdit.py">
+      <Filter>Python Files</Filter>
+    </None>
+    <None Include="..\roar-python\libroar\RoarCanvasCommandsFile.py">
+      <Filter>Python Files</Filter>
+    </None>
+    <None Include="..\roar-python\libroar\RoarCanvasCommandsHelp.py">
+      <Filter>Python Files</Filter>
+    </None>
+    <None Include="..\roar-python\libroar\RoarCanvasCommandsOperators.py">
+      <Filter>Python Files</Filter>
+    </None>
+    <None Include="..\roar-python\libroar\RoarCanvasCommandsTools.py">
+      <Filter>Python Files</Filter>
+    </None>
+    <None Include="..\roar-python\libroar\RoarCanvasWindow.py">
+      <Filter>Python Files</Filter>
+    </None>
+    <None Include="..\roar-python\libroar\RoarClient.py">
+      <Filter>Python Files</Filter>
+    </None>
+    <None Include="..\roar-python\libroar\RoarWindowAbout.py">
+      <Filter>Python Files</Filter>
+    </None>
+    <None Include="..\roar-python\libroar\RoarWindowMelp.py">
+      <Filter>Python Files</Filter>
+    </None>
+    <None Include="..\roar-python\librtl\ImgurApiKey.py">
+      <Filter>Python Files</Filter>
+    </None>
+    <None Include="..\roar-python\librtl\IrcClient.py">
+      <Filter>Python Files</Filter>
+    </None>
+    <None Include="..\roar-python\librtl\Rtl.py">
+      <Filter>Python Files</Filter>
+    </None>
+    <None Include="..\roar-python\librtl\RtlPlatform.py">
+      <Filter>Python Files</Filter>
+    </None>
+    <None Include="..\roar-python\libtools\Tool.py">
+      <Filter>Python Files</Filter>
+    </None>
+    <None Include="..\roar-python\libtools\ToolCircle.py">
+      <Filter>Python Files</Filter>
+    </None>
+    <None Include="..\roar-python\libtools\ToolErase.py">
+      <Filter>Python Files</Filter>
+    </None>
+    <None Include="..\roar-python\libtools\ToolFill.py">
+      <Filter>Python Files</Filter>
+    </None>
+    <None Include="..\roar-python\libtools\ToolLine.py">
+      <Filter>Python Files</Filter>
+    </None>
+    <None Include="..\roar-python\libtools\ToolObject.py">
+      <Filter>Python Files</Filter>
+    </None>
+    <None Include="..\roar-python\libtools\ToolPickColour.py">
+      <Filter>Python Files</Filter>
+    </None>
+    <None Include="..\roar-python\libtools\ToolRect.py">
+      <Filter>Python Files</Filter>
+    </None>
+    <None Include="..\roar-python\libtools\ToolText.py">
+      <Filter>Python Files</Filter>
+    </None>
+    <None Include="..\roar-python\roar.py">
+      <Filter>Python Files</Filter>
+    </None>
+    <None Include="..\assets\text\README.md">
+      <Filter>Text Files</Filter>
+    </None>
+    <None Include="..\assets\text\TODO">
+      <Filter>Text Files</Filter>
+    </None>
+    <None Include="..\libgui\roar_about.ui">
+      <Filter>Qt Files</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\libcanvas\Canvas.hpp">
+      <Filter>libcanvas</Filter>
+    </ClInclude>
+    <ClInclude Include="..\libgui\CanvasEditorWindow.hpp">
+      <Filter>libgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\libgui\CanvasWidget.hpp">
+      <Filter>libgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\libgui\ui_roar.h">
+      <Filter>libgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\librtl\rtldef.hpp">
+      <Filter>librtl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\libtools\Tool.hpp">
+      <Filter>libtools</Filter>
+    </ClInclude>
+    <ClInclude Include="..\libtools\ToolRect.hpp">
+      <Filter>libtools</Filter>
+    </ClInclude>
+    <ClInclude Include="..\libtools\ToolCursor.hpp">
+      <Filter>libtools</Filter>
+    </ClInclude>
+    <ClInclude Include="..\libtools\ToolCircle.hpp">
+      <Filter>libtools</Filter>
+    </ClInclude>
+    <ClInclude Include="..\libtools\ToolErase.hpp">
+      <Filter>libtools</Filter>
+    </ClInclude>
+    <ClInclude Include="..\libtools\ToolFill.hpp">
+      <Filter>libtools</Filter>
+    </ClInclude>
+    <ClInclude Include="..\libtools\ToolLine.hpp">
+      <Filter>libtools</Filter>
+    </ClInclude>
+    <ClInclude Include="..\libtools\ToolObject.hpp">
+      <Filter>libtools</Filter>
+    </ClInclude>
+    <ClInclude Include="..\libtools\ToolPickColour.hpp">
+      <Filter>libtools</Filter>
+    </ClInclude>
+    <ClInclude Include="..\libtools\ToolText.hpp">
+      <Filter>libtools</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="..\assets\text\melp.txt">
+      <Filter>Text Files</Filter>
+    </Text>
+    <Text Include="..\assets\text\roadmap.txt">
+      <Filter>Text Files</Filter>
+    </Text>
+  </ItemGroup>
+</Project>

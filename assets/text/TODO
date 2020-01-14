@@ -9,12 +9,5 @@
 10) Integrate ENNTool code in the form of OpenGL-based animation window (see 13) and 14))
 11) Composition, parametrisation & keying of tools from higher-order operators (brushes, functions, filters, outlines, patterns & shaders) and unit tools
 12) Sprites & scripted (Python?) animation on the basis of asset traits and {composable,parametrised} patterns (metric flow, particle system, rigging, ...)
-13) GUI TODO list:
-    a) switch to Gtk
-    b) canvas preview in Open dialogue(s)
-    c) https://material.io/resources/icons/?style=baseline
-    d) replace logo w/ canvas panel in About dialogue, revisit melp? dialogue
-    e) replace resize buttons w/ {-,edit box,+} buttons & lock button re: ratio (ty lol3)
-    f) Settings window (e.g. autosave parameters, cursor opacity, default colours, hide cursor on leaving window, keyboard/mouse map, show cell position tooltip on mouse hover, ...)
 
 vim:ff=dos tw=0

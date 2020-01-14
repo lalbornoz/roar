@@ -1,15 +1,30 @@
-1)  GUI: drag & drop file outside of canvas to open, into canvas as object w/ select tool
-2)  GUI: edit asset in new canvas, import from {canvas,object}
-3)  GUI: implement GuiCanvasWxBackendFast.c{,c}
-4)  GUI: select all
-5)  GUI: show line numbers w/ tooltip on accelerator
-6)  Operators: copy, cut, delete, insert from, paste
-7)  Operators: crop, scale, shift, slice operators
-8)  Tools: measure, triangle, unicode block elements tool
-9)  Tools: object tool: allow application of arbitrary tool to selection before setting
-10) Tools: object tool: reimplement cloning correctly outside of object tool
-11) Tools: reimplement in C++
-12) Tools: text tool: finish Arabic/RTL text implementation
-13) Tools: text tool: implicitly draw (text) w/ bg -1, toggle drawing actual brushColours[1] mode w/ RMB
+1)  GUI: canvas preview in Open dialogue(s)
+2)  GUI: drag & drop file outside of canvas to open, into canvas as object w/ select tool
+3)  GUI: edit asset in new canvas, import from {canvas,object}
+4)  GUI: implement GuiCanvasWxBackendFast.c{,c}
+5)  GUI: replace logo w/ canvas window in About dialogue, revisit melp? dialogue
+6)  GUI: replace resize buttons w/ {-,edit box,+} buttons & lock button re: ratio (ty lol3)
+7)  GUI: select all
+8)  GUI: settings window (e.g. autosave parameters, cursor opacity, default colours, hide cursor on leaving window, keyboard/mouse map, show cell position tooltip on mouse hover, ...)
+9)  GUI: show line numbers w/ tooltip on accelerator
+10) Operators: copy, cut, delete, insert from, paste
+11) Operators: crop, scale, shift, slice operators
+12) Tools: measure, triangle, unicode block elements tool
+13) Tools: object tool: allow application of arbitrary tool to selection before setting
+14) Tools: object tool: reimplement cloning correctly outside of object tool
+15) Tools: text tool: finish Arabic/RTL text implementation
+16) Tools: text tool: implicitly draw (text) w/ bg -1, toggle drawing actual brushColours[1] mode w/ RMB
+17) Tools: unicode tool: half block line drawing
+
+1)  help menu items
+2)  canvas keyboard input vs. mouse only
+3)  resizing canvas
+4)  import from/export to clipboard
+5)  MRU, snapshots
+6)  all remaining tools
+7)  operators
+8)  assets window
+9)  export to imgur, pastebin, as png
+10) cleanup/optimise; use std::nothrow etc. pp. wherever required; use COW strings & UTF-8 instead of UTF-16 wrt. std::{,w}string<>: http://utfcpp.sourceforge.net/ http://web.archive.org/web/20150427215431/https://github.com/aseprite/aseprite/blob/master/src/base/string.h#L26 http://web.archive.org/web/20150427215431/https://github.com/aseprite/aseprite/blob/master/src/base/string.h#L26
 
 vim:ff=dos tw=0

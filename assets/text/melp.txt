@@ -3,7 +3,7 @@ Keys or mouse actions separated by commas indicate separate commands.
 
 Global commands:
 <Ctrl> -, +/<Mouse wheel>		Decrease/increase brush height and width
-<Ctrl> <Mouse wheel>	                Decrease/increase canvas height and width
+<Shift> <Mouse wheel>	                Decrease/increase canvas height and width
 <Ctrl> <Up>, <Down>			Decrease/increase canvas height
 <Ctrl> <Left>, <Right>			Decrease/increase canvas width
 <Ctrl> <Alt> <Mouse wheel>		Decrease/increase cell size

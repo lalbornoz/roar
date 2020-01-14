@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>16.0</VCProjectVersion>
+    <ProjectGuid>{3674056B-692E-44B9-8A3A-F540FFB3AE18}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Makefile</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Makefile</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Makefile</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Makefile</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <NMakeBuildCommandLine>cd libgui &amp;&amp; nmake -f Makefile.Debug all</NMakeBuildCommandLine>
+    <NMakeOutput>debug\roar.exe</NMakeOutput>
+    <NMakeCleanCommandLine>cd libgui &amp;&amp; nmake -f Makefile.Debug clean</NMakeCleanCommandLine>
+    <NMakeReBuildCommandLine>cd libgui &amp;&amp; nmake -f Makefile.Debug all clean</NMakeReBuildCommandLine>
+    <NMakePreprocessorDefinitions>DEBUG;_DEBUG;UNICODE;WIN32;_DEBUG;$(NMakePreprocessorDefinitions)</NMakePreprocessorDefinitions>
+    <NMakeIncludeSearchPath>C:\Qt\5.12.5\msvc2017_64\include;$(NMakeIncludeSearchPath)</NMakeIncludeSearchPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <NMakeBuildCommandLine>cd ..\libgui &amp;&amp; nmake -f Makefile.Debug all</NMakeBuildCommandLine>
+    <NMakeOutput>debug\roar.exe</NMakeOutput>
+    <NMakeCleanCommandLine>cd ..\libgui &amp;&amp; nmake -f Makefile.Debug clean</NMakeCleanCommandLine>
+    <NMakeReBuildCommandLine>cd ..\libgui &amp;&amp; nmake -f Makefile.Debug all clean</NMakeReBuildCommandLine>
+    <NMakePreprocessorDefinitions>DEBUG;_DEBUG;UNICODE;_DEBUG;$(NMakePreprocessorDefinitions)</NMakePreprocessorDefinitions>
+    <NMakeIncludeSearchPath>C:\Qt\5.12.5\msvc2017_64\include;$(NMakeIncludeSearchPath)</NMakeIncludeSearchPath>
+    <SourcePath>$(VC_SourcePath);$(ProjectPath);$(ProjectPath)\libcanvas;$(ProjectPath)\libgui;$(ProjectPath)\librtl</SourcePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <NMakeBuildCommandLine>cd libgui &amp;&amp; nmake -f Makefile.Debug all</NMakeBuildCommandLine>
+    <NMakeOutput>debug\roar.exe</NMakeOutput>
+    <NMakeCleanCommandLine>cd libgui &amp;&amp; nmake -f Makefile.Debug clean</NMakeCleanCommandLine>
+    <NMakeReBuildCommandLine>cd libgui &amp;&amp; nmake -f Makefile.Debug all clean</NMakeReBuildCommandLine>
+    <NMakePreprocessorDefinitions>DEBUG;_DEBUG;UNICODE;WIN32;NDEBUG;$(NMakePreprocessorDefinitions)</NMakePreprocessorDefinitions>
+    <NMakeIncludeSearchPath>C:\Qt\5.12.5\msvc2017_64\include;$(NMakeIncludeSearchPath)</NMakeIncludeSearchPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <NMakeBuildCommandLine>cd ..\libgui &amp;&amp; nmake -f Makefile.Release all</NMakeBuildCommandLine>
+    <NMakeOutput>..\release\roar.exe</NMakeOutput>
+    <NMakeCleanCommandLine>cd ..\libgui &amp;&amp; nmake -f Makefile.Release clean</NMakeCleanCommandLine>
+    <NMakeReBuildCommandLine>cd ..\libgui &amp;&amp; nmake -f Makefile.Release all clean</NMakeReBuildCommandLine>
+    <NMakePreprocessorDefinitions>UNICODE;$(NMakePreprocessorDefinitions)</NMakePreprocessorDefinitions>
+    <NMakeIncludeSearchPath>C:\Qt\5.12.5\msvc2017_64\include;$(NMakeIncludeSearchPath)</NMakeIncludeSearchPath>
+    <SourcePath>$(VC_SourcePath);$(ProjectPath);$(ProjectPath)\libcanvas;$(ProjectPath)\libgui;$(ProjectPath)\librtl</SourcePath>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\libcanvas\Canvas.cpp" />
+    <ClCompile Include="..\libcanvas\subr_export.cpp" />
+    <ClCompile Include="..\libcanvas\subr_import.cpp" />
+    <ClCompile Include="..\libgui\CanvasEditorWindow.cpp" />
+    <ClCompile Include="..\libgui\CanvasWidget.cpp" />
+    <ClCompile Include="..\libgui\roar.cpp" />
+    <ClCompile Include="..\librtl\subr_rtl.cpp" />
+    <ClCompile Include="..\libtools\ToolCircle.cpp" />
+    <ClCompile Include="..\libtools\ToolCursor.cpp" />
+    <ClCompile Include="..\libtools\ToolErase.cpp" />
+    <ClCompile Include="..\libtools\ToolFill.cpp" />
+    <ClCompile Include="..\libtools\ToolLine.cpp" />
+    <ClCompile Include="..\libtools\ToolObject.cpp" />
+    <ClCompile Include="..\libtools\ToolPickColour.cpp" />
+    <ClCompile Include="..\libtools\ToolRect.cpp" />
+    <ClCompile Include="..\libtools\ToolText.cpp" />
+    <ClCompile Include="..\roar-python\libgui\GuiCanvasWxBackendFast.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\assets\text\README.md" />
+    <None Include="..\assets\text\TODO" />
+    <None Include="..\libgui\roar.pro" />
+    <None Include="..\libgui\roar.ui" />
+    <None Include="..\libgui\roar_about.ui" />
+    <None Include="..\roar-python\libcanvas\Canvas.py" />
+    <None Include="..\roar-python\libcanvas\CanvasColours.py" />
+    <None Include="..\roar-python\libcanvas\CanvasExportStore.py" />
+    <None Include="..\roar-python\libcanvas\CanvasImportStore.py" />
+    <None Include="..\roar-python\libgui\GuiCanvasColours.py" />
+    <None Include="..\roar-python\libgui\GuiCanvasWxBackend.py" />
+    <None Include="..\roar-python\libgui\GuiFrame.py" />
+    <None Include="..\roar-python\libgui\GuiWindow.py" />
+    <None Include="..\roar-python\liboperators\Operator.py" />
+    <None Include="..\roar-python\liboperators\OperatorFlipHorizontal.py" />
+    <None Include="..\roar-python\liboperators\OperatorFlipVertical.py" />
+    <None Include="..\roar-python\liboperators\OperatorInvert.py" />
+    <None Include="..\roar-python\liboperators\OperatorRotate.py" />
+    <None Include="..\roar-python\liboperators\OperatorTile.py" />
+    <None Include="..\roar-python\libroar\RoarAssetsWindow.py" />
+    <None Include="..\roar-python\libroar\RoarCanvasCommands.py" />
+    <None Include="..\roar-python\libroar\RoarCanvasCommandsEdit.py" />
+    <None Include="..\roar-python\libroar\RoarCanvasCommandsFile.py" />
+    <None Include="..\roar-python\libroar\RoarCanvasCommandsHelp.py" />
+    <None Include="..\roar-python\libroar\RoarCanvasCommandsOperators.py" />
+    <None Include="..\roar-python\libroar\RoarCanvasCommandsTools.py" />
+    <None Include="..\roar-python\libroar\RoarCanvasWindow.py" />
+    <None Include="..\roar-python\libroar\RoarClient.py" />
+    <None Include="..\roar-python\libroar\RoarWindowAbout.py" />
+    <None Include="..\roar-python\libroar\RoarWindowMelp.py" />
+    <None Include="..\roar-python\librtl\ImgurApiKey.py" />
+    <None Include="..\roar-python\librtl\IrcClient.py" />
+    <None Include="..\roar-python\librtl\Rtl.py" />
+    <None Include="..\roar-python\librtl\RtlPlatform.py" />
+    <None Include="..\roar-python\libtools\Tool.py" />
+    <None Include="..\roar-python\libtools\ToolCircle.py" />
+    <None Include="..\roar-python\libtools\ToolErase.py" />
+    <None Include="..\roar-python\libtools\ToolFill.py" />
+    <None Include="..\roar-python\libtools\ToolLine.py" />
+    <None Include="..\roar-python\libtools\ToolObject.py" />
+    <None Include="..\roar-python\libtools\ToolPickColour.py" />
+    <None Include="..\roar-python\libtools\ToolRect.py" />
+    <None Include="..\roar-python\libtools\ToolText.py" />
+    <None Include="..\roar-python\roar.py" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\libcanvas\Canvas.hpp" />
+    <ClInclude Include="..\libgui\CanvasEditorWindow.hpp" />
+    <ClInclude Include="..\libgui\CanvasWidget.hpp" />
+    <ClInclude Include="..\libgui\ui_roar.h" />
+    <ClInclude Include="..\librtl\rtldef.hpp" />
+    <ClInclude Include="..\libtools\Tool.hpp" />
+    <ClInclude Include="..\libtools\ToolCircle.hpp" />
+    <ClInclude Include="..\libtools\ToolCursor.hpp" />
+    <ClInclude Include="..\libtools\ToolErase.hpp" />
+    <ClInclude Include="..\libtools\ToolFill.hpp" />
+    <ClInclude Include="..\libtools\ToolLine.hpp" />
+    <ClInclude Include="..\libtools\ToolObject.hpp" />
+    <ClInclude Include="..\libtools\ToolPickColour.hpp" />
+    <ClInclude Include="..\libtools\ToolRect.hpp" />
+    <ClInclude Include="..\libtools\ToolText.hpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="..\assets\text\melp.txt" />
+    <Text Include="..\assets\text\roadmap.txt" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <PropertyGroup Condition="'$(Language)'=='C++'">
+    <IncludePath>C:\Qt\5.12.5\msvc2017_64\include;$(IncludePath)</IncludePath>
+    <CAExcludePath>C:\Qt\5.12.5\msvc2017_64\include;$(CAExcludePath)</CAExcludePath>
+  </PropertyGroup>
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
