@@ -17,7 +17,7 @@ import wx
 def main(*argv):
     localConfDirName = getLocalConfPathName()
     if not os.path.exists(localConfDirName):
-        os.makedirs(localConfirName)
+        os.makedirs(localConfDirName)
     wxApp, roarClient = wx.App(False), RoarClient(None)
     argv0, argv = argv[0], argv[1:]
     roarClient.canvasPanel.commands._recentDirLoad(); roarClient.canvasPanel.commands._recentLoad();
