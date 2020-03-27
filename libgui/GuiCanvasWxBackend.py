@@ -9,7 +9,6 @@ try:
 except ImportError as e:
     print("Failed to import GuiCanvasWxBackendFast: {}".format(e)); haveGuiCanvasWxBackendFast = False;
 
-from ctypes import WinDLL
 from GuiCanvasColours import Colours
 import math, os, platform, Rtl, wx
 
@@ -244,6 +243,7 @@ class GuiCanvasWxBackend():
         self._brushes, self._font, self._lastBrush, self._lastPen, self._pens = None, None, None, None, None
         self.canvasBitmap, self.cellSize, self.fontName, self.fontPathName, self.fontSize = None, None, fontName, fontPathName, fontSize
         if platform.system() == "Windows":
+            from ctypes import WinDLL
             WinDLL("gdi32.dll").AddFontResourceW(self.fontPathName.encode("utf16"))
         self._initBrushesAndPens(); self.resize(canvasSize);
 
