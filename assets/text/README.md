@@ -1,4 +1,4 @@
-# roar.py -- mIRC art editor for Windows & Linux (WIP)
+# roar.py -- mIRC art editor for Windows & Linux (unmaintained reference implementation, do not use)
 * Prerequisites on Windows: install Python v3.7.x[1] and script dependencies w/ the following elevated command prompt command line:  
   `pip install requests urllib3 wxPython`
 * Prerequisites on Linux: python3 (v3.7.x) && python-wx{gtk2.8,tools} on Debian-family Linux distributions
