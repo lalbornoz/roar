@@ -212,7 +212,10 @@ class GuiCanvasWxBackend():
             dc.SetFont(self._font); self.cellSize = dc.GetTextExtent("_");
             dc.Destroy()
         else:
-            self._font = wx.Font(self.cellSize[0] + 1, wx.FONTFAMILY_TELETYPE, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL)
+            self._font = wx.Font(self.fontSize, wx.FONTFAMILY_TELETYPE, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL)
+            dc = wx.MemoryDC()
+            dc.SetFont(self._font); self.cellSize = dc.GetTextExtent("_");
+            dc.Destroy()
         winSize = [a * b for a, b in zip(canvasSize, self.cellSize)]
         if self.canvasBitmap == None:
             self.canvasBitmap = wx.Bitmap(winSize)
